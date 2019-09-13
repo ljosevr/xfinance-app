@@ -96,7 +96,7 @@ public class CategoriaForm extends Div {
         content.add(tfCatDescripcion);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
-        //binder.bindInstanceFields(this);
+        binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
         binder.addStatusChangeListener(event -> {

@@ -70,7 +70,7 @@ public class CategoriaCrudLogic implements Serializable {
         return icategoriaProductoService.findById(productId);
     }
 
-    public void     saveCategoria(CategoriaProducto categoria) {
+    public void saveCategoria(CategoriaProducto categoria) {
         view.clearSelection();
         view.updateCategoria(categoria);
         setFragmentParameter("");
