@@ -45,4 +45,10 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
             return null;
         }
     }
+
+    @Override
+    public CategoriaProducto findById(String id) {
+        Optional<CategoriaProducto> option = categoriaProductoRepository.findById(id);
+        return option.orElse(null);
+    }
 }

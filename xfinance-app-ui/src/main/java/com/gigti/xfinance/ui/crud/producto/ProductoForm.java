@@ -98,7 +98,7 @@ public class ProductoForm extends Div {
     }
 
     public ProductoForm(ProductoCrudLogic productoCrudLogic) {
-        setClassName("product-form");
+        setClassName("standard-form");
 
         content = new VerticalLayout();
         content.setSizeUndefined();

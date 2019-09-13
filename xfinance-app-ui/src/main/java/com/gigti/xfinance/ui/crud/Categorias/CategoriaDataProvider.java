@@ -13,36 +13,32 @@ import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-//public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
-public class CategoriaDataProvider {
+public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
+//public class CategoriaDataProvider {
 
     /** Text filter that can be changed separately. */
     private String filterText = "";
-
-
     private static IcategoriaProductoService icategoriaProductoService;
-
     private static CategoriaDataProvider categoriaDataProvider;
 
 
     private CategoriaDataProvider() {
+        super(icategoriaProductoService.findAll(CurrentUser.get().getEmpresa()));
     }
 
-    @Autowired
     public static CategoriaDataProvider getInstance(IcategoriaProductoService iService){
+        icategoriaProductoService = iService;
         if(categoriaDataProvider == null) {
             categoriaDataProvider = new CategoriaDataProvider();
+        } else{
+            categoriaDataProvider.refreshAll();
         }
-        icategoriaProductoService = iService;
         return categoriaDataProvider;
-    }
-
-    public List<CategoriaProducto> findAll(){
-        return icategoriaProductoService.findAll(CurrentUser.get().getEmpresa());
     }
 
     /**
@@ -51,9 +47,13 @@ public class CategoriaDataProvider {
      * @param categoria
      *            the updated or new Categoria
      */
-    public CategoriaProducto save(CategoriaProducto categoria) {
-        //boolean newProduct = categoria.getId().isBlank();
-        return icategoriaProductoService.guardarCategoria(categoria);
+    public boolean save(CategoriaProducto categoria) {
+        categoria = icategoriaProductoService.guardarCategoria(categoria);
+        if(categoria != null){
+            refreshItem(categoria);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -63,7 +63,11 @@ public class CategoriaDataProvider {
      *            the CategoriaProducto to be deleted
      */
     public boolean delete(CategoriaProducto categoria) {
-        return icategoriaProductoService.eliminarCategoria(categoria.getId());
+        if(icategoriaProductoService.eliminarCategoria(categoria.getId())){
+            refreshAll();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -74,28 +78,31 @@ public class CategoriaDataProvider {
      * @param filterText
      *            the text to filter by, never null
      */
-//    public void setFilter(String filterText) {
-//        Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
-//        if (Objects.equals(this.filterText, filterText.trim())) {
-//            return;
-//        }
-//        this.filterText = filterText.trim();
-//        setFilter(categoriaProducto -> passesFilter(categoriaProducto.getNombre(), filterText)
-//                || passesFilter(categoriaProducto.getDescripcion(), filterText)
-//        );
-//    }
+    public void setFilter(String filterText) {
+        Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
+        if (Objects.equals(this.filterText, filterText.trim())) {
+            return;
+        }
+        this.filterText = filterText.trim();
+        setFilter(categoriaProducto -> passesFilter(categoriaProducto.getNombre(), filterText)
+                || passesFilter(categoriaProducto.getDescripcion(), filterText)
+        );
+    }
 
-//    @Override
-//    public String getId(CategoriaProducto categoria) {
-//        Objects.requireNonNull(categoria,
-//                "Cannot provide an id for a null Categoria.");
-//
-//        return categoria.getId();
-//    }
-//
-//    private boolean passesFilter(Object object, String filterText) {
-//        return object != null && object.toString().toLowerCase(Locale.ENGLISH)
-//                .contains(filterText);
-//    }
+    @Override
+    public String getId(CategoriaProducto categoria) {
+        Objects.requireNonNull(categoria,
+                "No se puede obtener un Id para una Categoria Null.");
 
+        return categoria.getId();
+    }
+
+    private boolean passesFilter(Object object, String filterText) {
+        return object != null && object.toString().toLowerCase(Locale.ENGLISH)
+                .contains(filterText);
+    }
+
+    public Collection<CategoriaProducto> findAll() {
+        return icategoriaProductoService.findAll(CurrentUser.get().getEmpresa());
+    }
 }

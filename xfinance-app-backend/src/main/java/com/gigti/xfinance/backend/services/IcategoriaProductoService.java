@@ -14,6 +14,7 @@ public interface IcategoriaProductoService {
 
     public CategoriaProducto guardarCategoria(CategoriaProducto categoria);
 
+    public CategoriaProducto findById(String id);
 //    public static IcategoriaProductoService get() {
 //        return MockDataService.getInstance();
 //    }

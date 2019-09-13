@@ -31,7 +31,7 @@ import com.vaadin.flow.router.Route;
  * See also {@link ProductoCrudLogic} for fetching the data, the actual CRUD
  * operations and controlling the view based on events from outside.
  */
-@Route(value = "Productos", layout = MainLayout.class)
+@Route(value = "productos", layout = MainLayout.class)
 //@RouteAlias(value = "", layout = MainLayout.class)
 public class ProductoCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {

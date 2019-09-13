@@ -56,7 +56,7 @@
     display: none;
 }
 
-.product-form {
+.standard-form {
     position: absolute;
     right: 0;
     bottom: 0;
@@ -107,7 +107,7 @@
         display: block;
     }
 
-    .product-form {
+    .standard-form {
         height: calc(100% - var(--top-bar-height));
     }
 
@@ -115,7 +115,7 @@
 
 @media (max-width: 550px) {
 
-    .product-form {
+    .standard-form {
         width: 100%;
 
         /* Prevent text-fields from overflowing on narrow screens */
