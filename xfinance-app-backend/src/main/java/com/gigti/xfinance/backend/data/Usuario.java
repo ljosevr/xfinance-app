@@ -1,0 +1,72 @@
+/*
+ * Copyright (c) 2019. Propiedad Exclusiva de GigTi.
+ * Derechos reservados.
+ * Toda copia o utilización de este codigo debe estar sustentado por escrito por GigTi, si no será considerado plagio y pirateria. Por consiguiente será llevado ante la justicia correspondiente.
+ */
+
+package com.gigti.xfinance.backend.data;
+
+import lombok.Data;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+@Entity
+@Table(name = "usuarios")
+@Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+public class Usuario extends AbstractEntity {
+
+    @Column(name="nombre_usuario", unique = true)
+    @Size(min = 4, max = 25)
+    @NotNull
+    private String nombreUsuario;
+
+    @Column(name="password_usuario")
+    @NotNull
+    @Size(min = 4, max = 255)
+    private String passwordUsuario;
+
+    private Boolean activo;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Persona persona;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Empresa empresa;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Rol rol;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private TipoUsuario tipoUsuario;
+
+    public Usuario(){}
+
+    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuario tipoUsuario) {
+        this.nombreUsuario = nombreUsuario;
+        this.passwordUsuario = passwordUsuario;
+        this.activo = activo;
+        this.persona = persona;
+        this.empresa = empresa;
+        this.rol = rol;
+        this.tipoUsuario = tipoUsuario;
+    }
+
+    public static Usuario dummy(Usuario user, String current, double number){
+        if(user.getId().isEmpty()) {
+            return new Usuario(current,
+                    "1234",
+                    true,
+                    Persona.dummy(number),
+                    Empresa.dummy(),
+                    new Rol("Admin", "Administrador"),
+                    TipoUsuario.ROOT);
+        }else{
+            return user.getNombreUsuario().equals(current) ? user : null;
+        }
+    }
+}

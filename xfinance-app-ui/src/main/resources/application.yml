@@ -1,0 +1,26 @@
+server:
+  port: 9090
+
+# Ensure application is run in Vaadin 14/npm mode
+vaadin:
+  compatibilityMode : false
+  bowerMode : false
+  disableUsageStatistics : true
+
+# Workaround for https://github.com/vaadin/flow/issues/5947
+spring:
+  devtools:
+    restart:
+      additional-exclude : META-INF/VAADIN/config/**
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+  # enable H2 web console and set url for web console
+  # http://localhost:8080/console
+
+logging:
+  level:
+    org:
+      atmosphere : warn
+

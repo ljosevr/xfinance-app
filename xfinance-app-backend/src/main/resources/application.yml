@@ -1,0 +1,35 @@
+# Uncomment if using PostgreSQL
+        #jpa:
+        #hibernate:
+        #ddl-auto: create-drop #update
+        #properties:
+        #hibernate:
+        #temp:
+      #use_jdbc_metadata_defaults: false
+      #datasource:
+      #url: jdbc:postgresql://localhost:5432/bakery_flow_spring
+      #username: springuser
+      #password: ThePassword
+# Comment out if using anything else than H2 (e.g. MySQL or PostgreSQL)
+spring:
+  datasource:
+    url: jdbc:h2:mem:xfinancedb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    platform: h2
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+
+#logging:
+#  level:
+#    org:
+#      atmosphere : warn
