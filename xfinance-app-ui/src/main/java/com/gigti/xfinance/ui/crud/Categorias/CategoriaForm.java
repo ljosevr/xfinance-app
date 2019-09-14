@@ -96,10 +96,15 @@ public class CategoriaForm extends Div {
         content.add(tfCatDescripcion);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
+        binder.forField(tfCatNombre).bind(CategoriaProducto::getNombre,
+                CategoriaProducto::setNombre);
+        binder.forField(tfCatDescripcion).bind(CategoriaProducto::getDescripcion,
+                CategoriaProducto::setDescripcion);
         binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
         binder.addStatusChangeListener(event -> {
+            //binder.setBean(currentCategoria);
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
             btnSave.setEnabled(hasChanges && isValid);

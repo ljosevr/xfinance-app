@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -74,8 +75,9 @@ public class CategoriaCrudLogic implements Serializable {
         view.clearSelection();
         view.updateCategoria(categoria);
         setFragmentParameter("");
-        view.showSaveNotification(categoria.getNombre()
-                + (categoria.getId().isBlank() ? " created" : " updated"));
+        view.showSaveNotification(categoria.getNombre() + (StringUtils.isBlank(categoria.getId()) ? " created" : " updated"));
+        //TODO
+        //view.showSaveNotification("" + (categoria.getId().isBlank() ? " created" : " updated"));
     }
 
     public void deleteCategoria(CategoriaProducto categoria) {

@@ -48,6 +48,7 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
      *            the updated or new Categoria
      */
     public boolean save(CategoriaProducto categoria) {
+        categoria.setEmpresa(CurrentUser.get().getEmpresa());
         categoria = icategoriaProductoService.guardarCategoria(categoria);
         if(categoria != null){
             refreshItem(categoria);
