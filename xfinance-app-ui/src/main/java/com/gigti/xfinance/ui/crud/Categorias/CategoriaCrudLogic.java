@@ -75,6 +75,8 @@ public class CategoriaCrudLogic implements Serializable {
         view.clearSelection();
         view.updateCategoria(categoria);
         setFragmentParameter("");
+        view.refresh();
+        view.showForm(false);
         view.showSaveNotification(categoria.getNombre() + (StringUtils.isBlank(categoria.getId()) ? " created" : " updated"));
         //TODO
         //view.showSaveNotification("" + (categoria.getId().isBlank() ? " created" : " updated"));

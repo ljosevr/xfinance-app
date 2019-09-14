@@ -47,6 +47,7 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
 
         grid = new CategoriaGrid();
         grid.setDataProvider(dataProvider);
+        grid.setItems(dataProvider.findAll());
         grid.asSingleSelect().addValueChangeListener(
                 event -> viewLogic.rowSelected(event.getValue()));
 
@@ -146,4 +147,11 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         viewLogic.enter(parameter);
     }
 
+    public void refresh(){
+        grid.setItems(dataProvider.findAll());
+    }
+
+    public void refresh(CategoriaProducto categoria){
+        grid.refresh(categoria);
+    }
 }

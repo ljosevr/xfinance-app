@@ -7,6 +7,8 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.ui.MainLayout;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 
@@ -42,9 +44,6 @@ public final class CurrentUser {
     public static Usuario get() {
         Usuario currentUser = (Usuario) getCurrentRequest().getWrappedSession()
                 .getAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-
-//        String rolUsuario = (String) getCurrentRequest().getWrappedSession()
-//                .getAttribute(CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY);
 
         if (currentUser == null) {
             return null;
