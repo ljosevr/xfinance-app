@@ -15,6 +15,8 @@ public class CategoriaProducto extends AbstractEntity{
     @NotNull
     private String nombre;
     private String descripcion;
+    private boolean activo;
+    private boolean eliminado;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Empresa empresa;
@@ -26,5 +28,7 @@ public class CategoriaProducto extends AbstractEntity{
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.empresa = empresa;
+        this.activo = true;
+        this.eliminado = false;
     }
 }

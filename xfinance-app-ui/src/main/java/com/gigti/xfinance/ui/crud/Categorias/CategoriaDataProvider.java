@@ -25,14 +25,16 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
     private String filterText = "";
     private static IcategoriaProductoService icategoriaProductoService;
     private static CategoriaDataProvider categoriaDataProvider;
+    private static Empresa empresa;
 
 
     private CategoriaDataProvider() {
-        super(icategoriaProductoService.findAll(CurrentUser.get().getEmpresa()));
+        super(icategoriaProductoService.findAll(empresa));
     }
 
     public static CategoriaDataProvider getInstance(IcategoriaProductoService iService){
         icategoriaProductoService = iService;
+        empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
         if(categoriaDataProvider == null) {
             categoriaDataProvider = new CategoriaDataProvider();
         } else{
@@ -48,7 +50,7 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
      *            the updated or new Categoria
      */
     public boolean save(CategoriaProducto categoria) {
-        categoria.setEmpresa(CurrentUser.get().getEmpresa());
+        categoria.setEmpresa(empresa);
         categoria = icategoriaProductoService.guardarCategoria(categoria);
         if(categoria != null){
             refreshItem(categoria);
@@ -104,6 +106,6 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
     }
 
     public Collection<CategoriaProducto> findAll() {
-        return icategoriaProductoService.findAll(CurrentUser.get().getEmpresa());
+        return icategoriaProductoService.findAll(empresa);
     }
 }

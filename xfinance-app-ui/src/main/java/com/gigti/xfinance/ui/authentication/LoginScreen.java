@@ -15,6 +15,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
@@ -52,7 +53,10 @@ public class LoginScreen extends VerticalLayout /*implements HasUrlParameter<Str
     private void buildUI() {
         setSizeFull();
         setMargin(true);
-        //setClassName("login-screen");
+        setClassName("login-screen");
+        setJustifyContentMode(JustifyContentMode.CENTER);
+        setAlignItems(Alignment.CENTER);
+        setSpacing(false);
 
         // login form, centered in the available part of the screen
         LoginForm loginForm = new LoginForm();
@@ -68,8 +72,11 @@ public class LoginScreen extends VerticalLayout /*implements HasUrlParameter<Str
         centeringLayout.add(loginForm);
 
         // information text about logging in
-        add(buildLoginInformation());
-        add(centeringLayout);
+        H2 loginInfoHeader = new H2("X Finance App");
+        loginInfoHeader.setClassName("titleView");
+
+        add(loginInfoHeader);
+        add(loginForm);
     }
 
     private Component buildLoginInformation() {
@@ -78,8 +85,7 @@ public class LoginScreen extends VerticalLayout /*implements HasUrlParameter<Str
         loginInformation.setJustifyContentMode(JustifyContentMode.CENTER);
         loginInformation.setAlignItems(Alignment.CENTER);
 
-        H1 loginInfoHeader = new H1("X Finance App");
-        loginInformation.add(loginInfoHeader);
+
 
         return loginInformation;
     }

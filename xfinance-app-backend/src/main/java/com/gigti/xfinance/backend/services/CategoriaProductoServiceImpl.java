@@ -24,12 +24,19 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
 
     @Override
     public List<CategoriaProducto> findAll(Empresa empresa) {
-        return categoriaProductoRepository.findAll();
+        return categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa);
     }
 
     @Transactional
     @Override
     public boolean eliminarCategoria(String id) {
+
+        CategoriaProducto categoria = categoriaProductoRepository.findById(id).orElse(null);
+        if(categoria != null){
+            categoria.setEliminado(true);
+            categoria = categoriaProductoRepository.save(categoria);
+            return categoria != null;
+        }
         return false;
     }
 

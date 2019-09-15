@@ -5,12 +5,18 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.authentication.LoginScreen;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -20,7 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route(value = "categoria",layout = MainLayout.class)
 @RouteAlias(value = "categorias",layout = MainLayout.class)
 @RouteAlias(value = "cate",layout = MainLayout.class)
-public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String> {
+//@ParentLayout(value = MainLayout.class)
+public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String>/*, BeforeEnterObserver*/ {
 
     public static final String VIEW_NAME = "categoria";
     public static final String VIEW_TITLE = "Categorias Productos";
@@ -36,49 +43,63 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     private CategoriaDataProvider dataProvider;
 
     public CategoriaView(@Autowired IcategoriaProductoService iService) {
-        viewLogic = new CategoriaCrudLogic(iService,this);
+//        if(CurrentUser.get() != null) {
+            viewLogic = new CategoriaCrudLogic(iService,this);
 
-        setSizeFull();
-        HorizontalLayout topLayout = createTopBar();
+            setSizeFull();
+            HorizontalLayout topLayout = createTopBar();
 
-        empresa = CurrentUser.get().getEmpresa();
+            //empresa = CurrentUser.get().getEmpresa();
+            dataProvider = CategoriaDataProvider.getInstance(iService);//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
 
-        dataProvider = CategoriaDataProvider.getInstance(iService);//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
+            grid = new CategoriaGrid();
+            grid.setDataProvider(dataProvider);
+            grid.setItems(dataProvider.findAll());
+            grid.asSingleSelect().addValueChangeListener(
+                    event -> viewLogic.rowSelected(event.getValue()));
 
-        grid = new CategoriaGrid();
-        grid.setDataProvider(dataProvider);
-        grid.setItems(dataProvider.findAll());
-        grid.asSingleSelect().addValueChangeListener(
-                event -> viewLogic.rowSelected(event.getValue()));
+            form = new CategoriaForm(viewLogic);
+            //form.setCategories(dataProvider.findAll());
 
-        form = new CategoriaForm(viewLogic);
-        //form.setCategories(dataProvider.findAll());
+            H3 title = new H3(this.VIEW_TITLE);
+            title.setClassName("titleView");
 
-        VerticalLayout barAndGridLayout = new VerticalLayout();
-        barAndGridLayout.add(topLayout);
-        barAndGridLayout.add(grid);
-        barAndGridLayout.setFlexGrow(1, grid);
-        barAndGridLayout.setFlexGrow(0, topLayout);
-        barAndGridLayout.setSizeFull();
-        barAndGridLayout.expand(grid);
+            VerticalLayout barAndGridLayout = new VerticalLayout();
+            barAndGridLayout.add(title);
 
-        add(barAndGridLayout);
-        add(form);
+            barAndGridLayout.add(topLayout);
+            barAndGridLayout.add(grid);
+            barAndGridLayout.setFlexGrow(1, grid);
+            barAndGridLayout.setFlexGrow(0, topLayout);
+            barAndGridLayout.setSizeFull();
+            barAndGridLayout.expand(grid);
 
-        viewLogic.init();
+            add(barAndGridLayout);
+            add(form);
+
+            viewLogic.init();
+//        } else {
+//            UI.getCurrent().navigate(LoginScreen.class);
+//        }
     }
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setPlaceholder("Filtro Nombre, Categoria");
         // Apply the filter to grid's data provider. TextField value is never null
-        filter.addValueChangeListener(event -> dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue()));
+        filter.addValueChangeListener(event -> {
+            dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue());
+            refresh();
+            //System.out.println(CategoriaProducto::getNombre);
+            System.out.println(event.getValue());
+            }
+        );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
         btnNewCategoria = new Button("Categoria Nueva");
         btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewCategoria.addClickListener(click -> viewLogic.newCategoria());
+        btnNewCategoria.addClickListener(click -> viewLogic.nuevaCategoria());
         // CTRL+N will create a new window which is unavoidable
         btnNewCategoria.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
@@ -116,17 +137,15 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         return grid.getSelectedRow();
     }
 
-    public void updateCategoria(CategoriaProducto categoria) {
-        //TODO
-        dataProvider.save(categoria);
+    public boolean guardarCategoria(CategoriaProducto categoria) {
+        return dataProvider.save(categoria);
     }
 
-    public void removeCategoria(CategoriaProducto categoria) {
-        //TODO
-        dataProvider.delete(categoria);
+    public boolean eliminarCategoria(CategoriaProducto categoria) {
+        return dataProvider.delete(categoria);
     }
 
-    public void editCategoria(CategoriaProducto categoria) {
+    public void editarCategoria(CategoriaProducto categoria) {
         showForm(categoria != null);
         form.editCategoria(categoria);
     }
@@ -154,4 +173,12 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     public void refresh(CategoriaProducto categoria){
         grid.refresh(categoria);
     }
+
+//    @Override
+//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+//        System.out.println("BeforeEnter ***");
+//        if(CurrentUser.get() == null) {
+//            beforeEnterEvent.rerouteTo(LoginScreen.class);
+//        }
+//    }
 }

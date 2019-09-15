@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.vaadin.flow.component.notification.Notification;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,7 +22,7 @@ public class CategoriaCrudLogic implements Serializable {
     }
 
     public void init() {
-        editCategoria(null);
+        editarCategoria(null);
         // Hide and disable if not admin
         //TODO PERMISOS
 //        if (!AccessControlFactory.getInstance().createAccessControl()
@@ -30,9 +31,10 @@ public class CategoriaCrudLogic implements Serializable {
 //        }
     }
 
-    public void cancelProduct() {
+    public void cancelCategoria() {
         setFragmentParameter("");
         view.clearSelection();
+        view.showForm(false);
     }
 
     /**
@@ -52,7 +54,7 @@ public class CategoriaCrudLogic implements Serializable {
     public void enter(String categoriaId) {
         if (categoriaId != null && !categoriaId.isEmpty()) {
             if (categoriaId.equals("new")) {
-                newCategoria();
+                nuevaCategoria();
             } else {
                 // Ensure this is selected even if coming directly here from
                 // login
@@ -71,43 +73,52 @@ public class CategoriaCrudLogic implements Serializable {
         return icategoriaProductoService.findById(productId);
     }
 
-    public void saveCategoria(CategoriaProducto categoria) {
+    public void guardarCategoria(CategoriaProducto categoria) {
+        boolean result = view.guardarCategoria(categoria);
+        if(result){
+            String typOperation = StringUtils.isBlank(categoria.getId()) ? " Creada" : " Actualizada";
+            view.clearSelection();
+            view.showSaveNotification(categoria.getNombre() +" "+typOperation);
+            view.refresh();
+            view.showForm(false);
+            setFragmentParameter("");
+        } else {
+            Notification.show("Error al Guardar Categoria "+categoria.getNombre());
+        }
+    }
+
+    public void eliminarCategoria(CategoriaProducto categoria) {
         view.clearSelection();
-        view.updateCategoria(categoria);
-        setFragmentParameter("");
-        view.refresh();
-        view.showForm(false);
-        view.showSaveNotification(categoria.getNombre() + (StringUtils.isBlank(categoria.getId()) ? " created" : " updated"));
-        //TODO
-        //view.showSaveNotification("" + (categoria.getId().isBlank() ? " created" : " updated"));
+        boolean result = view.eliminarCategoria(categoria);
+
+        if(result){
+            view.showSaveNotification(categoria.getNombre() + " Eliminada");
+            view.refresh();
+            setFragmentParameter("");
+        } else {
+            Notification.show("Error al Eliminar Categoria "+categoria.getNombre());
+        }
     }
 
-    public void deleteCategoria(CategoriaProducto categoria) {
-//        view.clearSelection();
-//        view.removeProduct(product);
-//        setFragmentParameter("");
-//        view.showSaveNotification(product.getProductName() + " removed");
-    }
-
-    public void editCategoria(CategoriaProducto categoria) {
+    public void editarCategoria(CategoriaProducto categoria) {
         if (categoria == null) {
             setFragmentParameter("");
         } else {
             setFragmentParameter(categoria.getId() + "");
         }
-        view.editCategoria(categoria);
+        view.editarCategoria(categoria);
     }
 
-    public void newCategoria() {
+    public void nuevaCategoria() {
         view.clearSelection();
         setFragmentParameter("new");
-        view.editCategoria(new CategoriaProducto());
+        view.editarCategoria(new CategoriaProducto());
     }
 
     public void rowSelected(CategoriaProducto categoria) {
         if (AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(CurrentUser.get())) {
-            editCategoria(categoria);
+            editarCategoria(categoria);
         }
     }
 

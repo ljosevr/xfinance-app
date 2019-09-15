@@ -10,5 +10,9 @@ import java.util.List;
 @Repository
 public interface CategoriaProductoRepository extends JpaRepository<CategoriaProducto, String> {
 
-    public List<CategoriaProducto> findByEmpresa(Empresa empresa);
+    public List<CategoriaProducto> findByEmpresaAndEliminadoIsFalse(Empresa empresa);
+
+    public List<CategoriaProducto> findByEmpresaAndActivoTrue(Empresa empresa);
+
+    public List<CategoriaProducto> findByEmpresaAndActivoFalse(Empresa empresa);
 }

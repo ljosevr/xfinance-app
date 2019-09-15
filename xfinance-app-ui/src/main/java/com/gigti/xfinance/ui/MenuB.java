@@ -2,7 +2,6 @@ package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.crud.Categorias.CategoriaView;
-import com.gigti.xfinance.ui.crud.Categorias.CategoriaView_CrudUI;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dialog.Dialog;
