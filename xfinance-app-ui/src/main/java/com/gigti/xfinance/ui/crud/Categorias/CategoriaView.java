@@ -88,10 +88,10 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         filter.setPlaceholder("Filtro Nombre, Categoria");
         // Apply the filter to grid's data provider. TextField value is never null
         filter.addValueChangeListener(event -> {
-            dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue());
+            //dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue());
+            dataProvider.setFilter(event.getValue());
             refresh();
             //System.out.println(CategoriaProducto::getNombre);
-            System.out.println(event.getValue());
             }
         );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
@@ -99,7 +99,7 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         btnNewCategoria = new Button("Categoria Nueva");
         btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewCategoria.addClickListener(click -> viewLogic.nuevaCategoria());
+        btnNewCategoria.addClickListener(click -> viewLogic.newCategoria());
         // CTRL+N will create a new window which is unavoidable
         btnNewCategoria.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
@@ -137,15 +137,15 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         return grid.getSelectedRow();
     }
 
-    public boolean guardarCategoria(CategoriaProducto categoria) {
+    public boolean saveCategoria(CategoriaProducto categoria) {
         return dataProvider.save(categoria);
     }
 
-    public boolean eliminarCategoria(CategoriaProducto categoria) {
+    public boolean deleteCategoria(CategoriaProducto categoria) {
         return dataProvider.delete(categoria);
     }
 
-    public void editarCategoria(CategoriaProducto categoria) {
+    public void editCategoria(CategoriaProducto categoria) {
         showForm(categoria != null);
         form.editCategoria(categoria);
     }
@@ -173,12 +173,4 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     public void refresh(CategoriaProducto categoria){
         grid.refresh(categoria);
     }
-
-//    @Override
-//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-//        System.out.println("BeforeEnter ***");
-//        if(CurrentUser.get() == null) {
-//            beforeEnterEvent.rerouteTo(LoginScreen.class);
-//        }
-//    }
 }

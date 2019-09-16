@@ -117,7 +117,7 @@ public class CategoriaForm extends Div {
         btnSave.addClickListener(event -> {
             if (currentCategoria != null
                     && binder.writeBeanIfValid(currentCategoria)) {
-                viewLogic.guardarCategoria(currentCategoria);
+                viewLogic.saveCategoria(currentCategoria);
             }
         });
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
@@ -125,7 +125,7 @@ public class CategoriaForm extends Div {
         btnDiscard = new Button("Descartar Cambios");
         btnDiscard.setWidth("100%");
         btnDiscard.addClickListener(
-                event -> viewLogic.editarCategoria(currentCategoria));
+                event -> viewLogic.editCategoria(currentCategoria));
 
         btnCancel = new Button("Cancelar");
         btnCancel.setWidth("100%");
@@ -140,8 +140,7 @@ public class CategoriaForm extends Div {
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> {
             if (currentCategoria != null) {
-                System.out.println("** Eliminar: ID: "+currentCategoria.getId());
-                viewLogic.eliminarCategoria(currentCategoria);
+                viewLogic.deleteCategoria(currentCategoria);
             }
         });
 

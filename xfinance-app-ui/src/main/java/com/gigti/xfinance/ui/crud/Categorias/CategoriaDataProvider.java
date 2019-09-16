@@ -51,7 +51,7 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
      */
     public boolean save(CategoriaProducto categoria) {
         categoria.setEmpresa(empresa);
-        categoria = icategoriaProductoService.guardarCategoria(categoria);
+        categoria = icategoriaProductoService.saveCategoria(categoria);
         if(categoria != null){
             refreshItem(categoria);
             return true;
@@ -66,7 +66,7 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
      *            the CategoriaProducto to be deleted
      */
     public boolean delete(CategoriaProducto categoria) {
-        if(icategoriaProductoService.eliminarCategoria(categoria.getId())){
+        if(icategoriaProductoService.deleteCategoria(categoria.getId())){
             refreshAll();
             return true;
         }
@@ -82,11 +82,13 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
      *            the text to filter by, never null
      */
     public void setFilter(String filterText) {
+        System.out.println("Entro al setFilter");
         Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
             return;
         }
         this.filterText = filterText.trim();
+        System.out.println("Entro al setFilter2: "+filterText);
         setFilter(categoriaProducto -> passesFilter(categoriaProducto.getNombre(), filterText)
                 || passesFilter(categoriaProducto.getDescripcion(), filterText)
         );
@@ -101,8 +103,8 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
     }
 
     private boolean passesFilter(Object object, String filterText) {
-        return object != null && object.toString().toLowerCase(Locale.ENGLISH)
-                .contains(filterText);
+        System.out.println("Entro al PassesFilter: "+object +" - "+filterText);
+        return object != null && object.toString().toLowerCase().contains(filterText);
     }
 
     public Collection<CategoriaProducto> findAll() {

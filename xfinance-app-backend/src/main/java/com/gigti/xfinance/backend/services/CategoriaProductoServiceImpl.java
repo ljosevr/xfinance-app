@@ -29,20 +29,23 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
 
     @Transactional
     @Override
-    public boolean eliminarCategoria(String id) {
-
-        CategoriaProducto categoria = categoriaProductoRepository.findById(id).orElse(null);
-        if(categoria != null){
-            categoria.setEliminado(true);
-            categoria = categoriaProductoRepository.save(categoria);
-            return categoria != null;
+    public boolean deleteCategoria(String id) {
+        try {
+            CategoriaProducto categoria = categoriaProductoRepository.findById(id).orElse(null);
+            if (categoria != null) {
+                categoria.setEliminado(true);
+                categoria = categoriaProductoRepository.save(categoria);
+                return categoria != null;
+            }
+        } catch(Exception e) {
+            getLogger().debug("Error: "+e.getMessage(),e);
         }
         return false;
     }
 
     @Transactional
     @Override
-    public CategoriaProducto guardarCategoria(CategoriaProducto categoria) {
+    public CategoriaProducto saveCategoria(CategoriaProducto categoria) {
         try{
             Optional<Empresa> empresa = empresaRepository.findById(categoria.getEmpresa().getId());
             categoria.setEmpresa(empresa.get());

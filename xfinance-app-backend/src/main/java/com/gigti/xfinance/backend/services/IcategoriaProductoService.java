@@ -10,9 +10,9 @@ public interface IcategoriaProductoService {
 
     public List<CategoriaProducto> findAll(Empresa empresa);
 
-    public boolean eliminarCategoria(String id);
+    public boolean deleteCategoria(String id);
 
-    public CategoriaProducto guardarCategoria(CategoriaProducto categoria);
+    public CategoriaProducto saveCategoria(CategoriaProducto categoria);
 
     public CategoriaProducto findById(String id);
 //    public static IcategoriaProductoService get() {

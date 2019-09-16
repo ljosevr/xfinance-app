@@ -22,7 +22,7 @@ public class CategoriaCrudLogic implements Serializable {
     }
 
     public void init() {
-        editarCategoria(null);
+        editCategoria(null);
         // Hide and disable if not admin
         //TODO PERMISOS
 //        if (!AccessControlFactory.getInstance().createAccessControl()
@@ -47,14 +47,12 @@ public class CategoriaCrudLogic implements Serializable {
         } else {
             fragmentParameter = categoriaId;
         }
-
-        //UI.getCurrent().navigate(CategoriaView.class, fragmentParameter);
     }
 
     public void enter(String categoriaId) {
         if (categoriaId != null && !categoriaId.isEmpty()) {
             if (categoriaId.equals("new")) {
-                nuevaCategoria();
+                newCategoria();
             } else {
                 // Ensure this is selected even if coming directly here from
                 // login
@@ -73,8 +71,8 @@ public class CategoriaCrudLogic implements Serializable {
         return icategoriaProductoService.findById(productId);
     }
 
-    public void guardarCategoria(CategoriaProducto categoria) {
-        boolean result = view.guardarCategoria(categoria);
+    public void saveCategoria(CategoriaProducto categoria) {
+        boolean result = view.saveCategoria(categoria);
         if(result){
             String typOperation = StringUtils.isBlank(categoria.getId()) ? " Creada" : " Actualizada";
             view.clearSelection();
@@ -87,9 +85,9 @@ public class CategoriaCrudLogic implements Serializable {
         }
     }
 
-    public void eliminarCategoria(CategoriaProducto categoria) {
+    public void deleteCategoria(CategoriaProducto categoria) {
         view.clearSelection();
-        boolean result = view.eliminarCategoria(categoria);
+        boolean result = view.deleteCategoria(categoria);
 
         if(result){
             view.showSaveNotification(categoria.getNombre() + " Eliminada");
@@ -100,25 +98,25 @@ public class CategoriaCrudLogic implements Serializable {
         }
     }
 
-    public void editarCategoria(CategoriaProducto categoria) {
+    public void editCategoria(CategoriaProducto categoria) {
         if (categoria == null) {
             setFragmentParameter("");
         } else {
             setFragmentParameter(categoria.getId() + "");
         }
-        view.editarCategoria(categoria);
+        view.editCategoria(categoria);
     }
 
-    public void nuevaCategoria() {
+    public void newCategoria() {
         view.clearSelection();
         setFragmentParameter("new");
-        view.editarCategoria(new CategoriaProducto());
+        view.editCategoria(new CategoriaProducto());
     }
 
     public void rowSelected(CategoriaProducto categoria) {
         if (AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(CurrentUser.get())) {
-            editarCategoria(categoria);
+            editCategoria(categoria);
         }
     }
 
