@@ -23,6 +23,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collection;
+
 @Route(value = "categoria",layout = MainLayout.class)
 @RouteAlias(value = "categorias",layout = MainLayout.class)
 @RouteAlias(value = "cate",layout = MainLayout.class)
@@ -88,9 +90,10 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         filter.setPlaceholder("Filtro Nombre, Categoria");
         // Apply the filter to grid's data provider. TextField value is never null
         filter.addValueChangeListener(event -> {
+            //viewLogic.findCategoriaByNombreOrDescripcion(event.getValue(), empresa);
             //dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue());
-            dataProvider.setFilter(event.getValue());
-            refresh();
+            grid.setItems(dataProvider.setFilter(event.getValue()));
+            //refresh();
             //System.out.println(CategoriaProducto::getNombre);
             }
         );
@@ -173,4 +176,9 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     public void refresh(CategoriaProducto categoria){
         grid.refresh(categoria);
     }
+
+//    public void setItemsGrid(Collection<CategoriaProducto> lista){
+//        grid.setItems(lista);
+//    }
+
 }

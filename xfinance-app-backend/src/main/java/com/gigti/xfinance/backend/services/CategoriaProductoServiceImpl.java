@@ -61,4 +61,9 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
         Optional<CategoriaProducto> option = categoriaProductoRepository.findById(id);
         return option.orElse(null);
     }
+
+    @Override
+    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa) {
+        return categoriaProductoRepository.findByNombreOrDescripcion(filter, empresa);
+    }
 }

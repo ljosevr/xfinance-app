@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -118,6 +119,11 @@ public class CategoriaCrudLogic implements Serializable {
                 .isUserInRole(CurrentUser.get())) {
             editCategoria(categoria);
         }
+    }
+
+    public void findCategoriaByNombreOrDescripcion(String filterText, Empresa empresa) {
+
+       //view.refresh();
     }
 
 }

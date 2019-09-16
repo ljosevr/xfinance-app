@@ -19,7 +19,6 @@ import java.util.Locale;
 import java.util.Objects;
 
 public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
-//public class CategoriaDataProvider {
 
     /** Text filter that can be changed separately. */
     private String filterText = "";
@@ -76,22 +75,26 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
     /**
      * Sets the filter to use for this data provider and refreshes data.
      * <p>
-     * Filter is compared for product name, availability and category.
+     * Filter is compared for categoria: nombre y descripcion
      * 
      * @param filterText
      *            the text to filter by, never null
      */
-    public void setFilter(String filterText) {
+    public List<CategoriaProducto> setFilter(String filterText) {
         System.out.println("Entro al setFilter");
         Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
-            return;
+            categoriaDataProvider.refreshAll();
+            return null;
         }
         this.filterText = filterText.trim();
         System.out.println("Entro al setFilter2: "+filterText);
-        setFilter(categoriaProducto -> passesFilter(categoriaProducto.getNombre(), filterText)
-                || passesFilter(categoriaProducto.getDescripcion(), filterText)
-        );
+
+        return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa);
+
+//        setFilter(categoriaProducto -> passesFilter(categoriaProducto.getNombre(), filterText)
+//                || passesFilter(categoriaProducto.getDescripcion(), filterText)
+//        );
     }
 
     @Override
@@ -104,7 +107,7 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
 
     private boolean passesFilter(Object object, String filterText) {
         System.out.println("Entro al PassesFilter: "+object +" - "+filterText);
-        return object != null && object.toString().toLowerCase().contains(filterText);
+        return object != null && object.toString().toLowerCase().contains(filterText.toLowerCase());
     }
 
     public Collection<CategoriaProducto> findAll() {

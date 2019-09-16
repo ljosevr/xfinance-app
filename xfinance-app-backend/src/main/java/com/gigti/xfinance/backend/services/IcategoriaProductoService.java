@@ -15,6 +15,9 @@ public interface IcategoriaProductoService {
     public CategoriaProducto saveCategoria(CategoriaProducto categoria);
 
     public CategoriaProducto findById(String id);
+
+    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa);
+
 //    public static IcategoriaProductoService get() {
 //        return MockDataService.getInstance();
 //    }
