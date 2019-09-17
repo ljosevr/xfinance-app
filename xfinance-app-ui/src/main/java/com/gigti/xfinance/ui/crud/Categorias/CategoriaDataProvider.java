@@ -81,20 +81,13 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
      *            the text to filter by, never null
      */
     public List<CategoriaProducto> setFilter(String filterText) {
-        System.out.println("Entro al setFilter");
         Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
             categoriaDataProvider.refreshAll();
             return null;
         }
         this.filterText = filterText.trim();
-        System.out.println("Entro al setFilter2: "+filterText);
-
         return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa);
-
-//        setFilter(categoriaProducto -> passesFilter(categoriaProducto.getNombre(), filterText)
-//                || passesFilter(categoriaProducto.getDescripcion(), filterText)
-//        );
     }
 
     @Override
@@ -103,11 +96,6 @@ public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
                 "No se puede obtener un Id para una Categoria Null.");
 
         return categoria.getId();
-    }
-
-    private boolean passesFilter(Object object, String filterText) {
-        System.out.println("Entro al PassesFilter: "+object +" - "+filterText);
-        return object != null && object.toString().toLowerCase().contains(filterText.toLowerCase());
     }
 
     public Collection<CategoriaProducto> findAll() {

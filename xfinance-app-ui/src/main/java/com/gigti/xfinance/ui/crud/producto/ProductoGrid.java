@@ -8,6 +8,7 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 
 import java.text.DecimalFormat;
@@ -17,6 +18,7 @@ public class ProductoGrid extends Grid<Producto> {
 
     public ProductoGrid() {
         setSizeFull();
+        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         addColumn(Producto::getNombreProducto)
                 .setHeader("Nombre")
@@ -36,19 +38,23 @@ public class ProductoGrid extends Grid<Producto> {
                 .setSortable(true)
                 .setFlexGrow(5);
 
-
-
         addColumn(this::formatStock)
                 .setHeader("Cantidad")
+                .setSortable(true)
                 .setFlexGrow(3);
 
         addColumn(this::formatPrice)
-                .setHeader("Cantidad")
+                .setHeader("P. Costo")
+                .setFlexGrow(3);
+
+        addColumn(this::formatPrice)
+                .setHeader("P. Venta")
                 .setFlexGrow(3);
 
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories)
-                .setHeader("Category")
+                .setHeader("Categoria")
+                .setSortable(true)
                 .setFlexGrow(12);
     }
 
@@ -81,7 +87,6 @@ public class ProductoGrid extends Grid<Producto> {
         final DecimalFormat decimalFormat = new DecimalFormat();
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
-
 
         return "$ 0.0";
     }

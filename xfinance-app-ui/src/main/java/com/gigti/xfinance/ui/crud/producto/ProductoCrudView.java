@@ -41,8 +41,8 @@ public class ProductoCrudView extends HorizontalLayout
     private ProductoForm form;
     private TextField filter;
 
-    private ProductoCrudLogic viewLogic = new ProductoCrudLogic(this);
-    private Button newProduct;
+    private ProductoCrudLogic viewLogic;
+    private Button btnNewProduct;
     private Empresa empresa;
 
     private ProductoDataProvider dataProvider;

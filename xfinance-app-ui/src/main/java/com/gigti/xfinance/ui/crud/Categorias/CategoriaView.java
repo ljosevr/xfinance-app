@@ -28,11 +28,9 @@ import java.util.Collection;
 @Route(value = "categoria",layout = MainLayout.class)
 @RouteAlias(value = "categorias",layout = MainLayout.class)
 @RouteAlias(value = "cate",layout = MainLayout.class)
-//@ParentLayout(value = MainLayout.class)
-public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String>/*, BeforeEnterObserver*/ {
+public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String> {
 
-    public static final String VIEW_NAME = "categoria";
-    public static final String VIEW_TITLE = "Categorias Productos";
+    public static final String VIEW_NAME = "Categorias Productos";
 
     private CategoriaGrid grid;
     private CategoriaForm form;
@@ -63,7 +61,7 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
             form = new CategoriaForm(viewLogic);
             //form.setCategories(dataProvider.findAll());
 
-            H3 title = new H3(this.VIEW_TITLE);
+            H3 title = new H3(this.VIEW_NAME);
             title.setClassName("titleView");
 
             VerticalLayout barAndGridLayout = new VerticalLayout();
@@ -87,19 +85,14 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
-        filter.setPlaceholder("Filtro Nombre, Categoria");
-        // Apply the filter to grid's data provider. TextField value is never null
+        filter.setPlaceholder("Filtro por Nombre, Descripción de Categoria a Buscar");
         filter.addValueChangeListener(event -> {
-            //viewLogic.findCategoriaByNombreOrDescripcion(event.getValue(), empresa);
-            //dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue());
             grid.setItems(dataProvider.setFilter(event.getValue()));
-            //refresh();
-            //System.out.println(CategoriaProducto::getNombre);
             }
         );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
-        btnNewCategoria = new Button("Categoria Nueva");
+        btnNewCategoria = new Button("Nueva");
         btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNewCategoria.addClickListener(click -> viewLogic.newCategoria());

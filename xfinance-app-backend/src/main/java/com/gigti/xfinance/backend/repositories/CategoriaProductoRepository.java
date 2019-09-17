@@ -19,9 +19,9 @@ public interface CategoriaProductoRepository extends JpaRepository<CategoriaProd
     public List<CategoriaProducto> findByEmpresaAndActivoFalse(Empresa empresa);
 
     @Query("SELECT c FROM CategoriaProducto c " +
-            "WHERE UPPER(c.nombre) like %UPPER(?1)% OR " +
-            "UPPER(c.descripcion) like %UPPER(?1)% AND " +
-            "c.empresa = ?2 AND " +
+            "WHERE UPPER(c.nombre) LIKE CONCAT('%', UPPER(:filter),'%') OR " +
+            "UPPER(c.descripcion) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
+            "c.empresa =:empresa AND " +
             "c.eliminado = FALSE")
-    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa);
+    public List<CategoriaProducto> findByNombreOrDescripcion(@Param("filter") String filter, @Param("empresa") Empresa empresa);
 }

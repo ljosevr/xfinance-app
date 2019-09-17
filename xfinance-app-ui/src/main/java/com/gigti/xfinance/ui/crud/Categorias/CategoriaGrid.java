@@ -1,17 +1,14 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Producto;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
-
-import java.text.DecimalFormat;
-import java.util.Comparator;
+import com.vaadin.flow.component.grid.GridVariant;
 
 public class CategoriaGrid extends Grid<CategoriaProducto> {
 
     public CategoriaGrid() {
         setSizeFull();
+        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         addColumn(CategoriaProducto::getNombre)
                 .setHeader("Nombre")

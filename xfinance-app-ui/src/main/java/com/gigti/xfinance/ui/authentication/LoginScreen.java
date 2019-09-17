@@ -8,7 +8,6 @@ package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.services.IinitBackService;
 import com.gigti.xfinance.backend.services.IusuarioService;
-import com.gigti.xfinance.ui.AdminView;
 import com.gigti.xfinance.ui.HomeView;
 import com.gigti.xfinance.ui.MainLayout;
 import com.vaadin.flow.component.Component;
@@ -16,11 +15,14 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -30,7 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 //@Route(value = "Login", layout = MainLayout.class)
 @PageTitle("Login")
 @CssImport("./styles/shared-styles.css")
-public class LoginScreen extends VerticalLayout /*implements HasUrlParameter<String>*/ {
+public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>*/ {
 
     public static final String VIEW_NAME = "Login";
 
@@ -52,19 +54,13 @@ public class LoginScreen extends VerticalLayout /*implements HasUrlParameter<Str
 
     private void buildUI() {
         setSizeFull();
-        setMargin(true);
         setClassName("login-screen");
-        setJustifyContentMode(JustifyContentMode.CENTER);
-        setAlignItems(Alignment.CENTER);
-        setSpacing(false);
 
-        // login form, centered in the available part of the screen
         LoginForm loginForm = new LoginForm();
         loginForm.addLoginListener(event -> login(event));//this::login);
         loginForm.addForgotPasswordListener(
                 event -> Notification.show("Tip: Contacta al Admin del App"));
 
-        // layout to center login form when there is sufficient screen space
         FlexLayout centeringLayout = new FlexLayout();
         centeringLayout.setSizeFull();
         centeringLayout.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -72,22 +68,31 @@ public class LoginScreen extends VerticalLayout /*implements HasUrlParameter<Str
         centeringLayout.add(loginForm);
 
         // information text about logging in
-        H2 loginInfoHeader = new H2("X Finance App");
-        loginInfoHeader.setClassName("titleView");
 
-        add(loginInfoHeader);
+
+        add(buildLoginInformation());
         add(loginForm);
     }
 
     private Component buildLoginInformation() {
-        FlexLayout loginInformation = new FlexLayout();
-        loginInformation.setSizeFull();
-        loginInformation.setJustifyContentMode(JustifyContentMode.CENTER);
-        loginInformation.setAlignItems(Alignment.CENTER);
 
+        VerticalLayout loginInformation = new VerticalLayout();
+        loginInformation.setClassName("login-information");
 
+        H1 loginInfoHeader = new H1("X Finance App");
+        loginInfoHeader.setWidth("100%");
+//        Span loginInfoText = new Span(
+//                "X Finance App");
+//        loginInfoText.setWidth("100%");
+
+        H2 loginInfoText = new H2("X Finance App");
+        loginInfoText.setClassName("titleView");
+
+        loginInformation.add(loginInfoHeader);
+        //loginInformation.add(loginInfoText);
 
         return loginInformation;
+
     }
 
     private void login(LoginForm.LoginEvent event) {
