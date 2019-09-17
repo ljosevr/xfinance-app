@@ -87,17 +87,17 @@ public class ProductoCrudView extends HorizontalLayout
         //filter.addValueChangeListener(event -> dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue()));
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
-        newProduct = new Button("Producto Nuevo");
-        newProduct.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        newProduct.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        newProduct.addClickListener(click -> viewLogic.newProduct());
+        btnNewProduct = new Button("Producto Nuevo");
+        btnNewProduct.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnNewProduct.setIcon(VaadinIcon.PLUS_CIRCLE.create());
+        btnNewProduct.addClickListener(click -> viewLogic.newProduct());
         // CTRL+N will create a new window which is unavoidable
-        newProduct.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        btnNewProduct.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
         HorizontalLayout topLayout = new HorizontalLayout();
         topLayout.setWidth("100%");
         topLayout.add(filter);
-        topLayout.add(newProduct);
+        topLayout.add(btnNewProduct);
         topLayout.setVerticalComponentAlignment(Alignment.START, filter);
         topLayout.expand(filter);
         return topLayout;
@@ -112,7 +112,7 @@ public class ProductoCrudView extends HorizontalLayout
     }
 
     public void setNewProductEnabled(boolean enabled) {
-        newProduct.setEnabled(enabled);
+        btnNewProduct.setEnabled(enabled);
     }
 
     public void clearSelection() {
