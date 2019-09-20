@@ -21,7 +21,8 @@ import java.util.Set;
 @Table(name = "empresa")
 public class Empresa extends AbstractEntity {
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
     private TipoIde tipoIde;
 
     @NotNull
@@ -38,19 +39,19 @@ public class Empresa extends AbstractEntity {
 
     private String direccion;
 
-    //@OneToMany(mappedBy = "empresa",cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    @OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "empresa",cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Usuario> usuarios;
 
-    //@OneToMany(mappedBy = "empresa",cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    @OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "empresa", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Producto> productos;
 
-    @OneToMany(mappedBy = "empresa", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "empresa", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CategoriaProducto> categoriaProductos;
 
     private Boolean activo;
+    @Temporal(value = TemporalType.TIMESTAMP)
     private Date fechaActivacion;
+    @Temporal(value = TemporalType.TIMESTAMP)
     private Date fechaDesactivacion;
 
     public Empresa(){}

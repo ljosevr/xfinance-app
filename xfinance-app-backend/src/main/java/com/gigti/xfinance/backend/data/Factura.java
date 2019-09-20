@@ -34,12 +34,15 @@ public class Factura extends AbstractEntity {
     private Date fechaCreacion;
 
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "idUser")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
     private Usuario usuario;
 
     @OneToMany(mappedBy = "factura",fetch = FetchType.LAZY)
-    private List<ItemsFactura> items;
+    private List<ItemFactura> items;
+
+    @Transient
+    private Double totalFactura;
 
     public Factura() {
     }

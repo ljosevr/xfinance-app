@@ -20,6 +20,7 @@ import java.util.Date;
 public class ProductoValores extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Producto producto;
 
     @Column(name="precio_costo")

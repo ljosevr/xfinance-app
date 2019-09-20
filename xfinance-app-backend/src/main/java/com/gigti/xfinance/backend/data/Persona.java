@@ -21,6 +21,7 @@ public class Persona extends AbstractEntity{
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn
     private TipoIde tipoIde;
 
     @NotEmpty

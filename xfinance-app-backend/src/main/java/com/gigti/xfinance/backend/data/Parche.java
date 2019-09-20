@@ -22,7 +22,8 @@ public class Parche extends AbstractEntity {
 
     private boolean estado;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
     private Empresa empresa;
 
     public Parche() {

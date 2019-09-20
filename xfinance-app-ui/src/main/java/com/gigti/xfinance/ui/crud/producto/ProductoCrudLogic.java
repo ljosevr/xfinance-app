@@ -7,16 +7,10 @@
 package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.services.IProductoService;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.crud.Categorias.CategoriaView;
-import com.gigti.xfinance.ui.crud.inventario.InventarioCrudView;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.notification.Notification;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 
@@ -32,13 +26,9 @@ import java.io.Serializable;
 public class ProductoCrudLogic implements Serializable {
 
     private ProductoCrudView view;
-    private IProductoService iProductoService;
-    private IcategoriaProductoService iCategoriaService;
 
-    public ProductoCrudLogic(@Autowired IProductoService iServiceProd, @Autowired IcategoriaProductoService iServiceCat, ProductoCrudView simpleCrudView) {
+    public ProductoCrudLogic(ProductoCrudView simpleCrudView) {
         view = simpleCrudView;
-        this.iProductoService = iServiceProd;
-        this.iCategoriaService = iServiceCat;
     }
 
     public void init() {
@@ -86,7 +76,7 @@ public class ProductoCrudLogic implements Serializable {
     }
 
     private Producto findProducto(String productId) {
-        return iProductoService.findById(productId);
+        return view.findById(productId);
     }
 
     public void saveProducto(Producto producto) {

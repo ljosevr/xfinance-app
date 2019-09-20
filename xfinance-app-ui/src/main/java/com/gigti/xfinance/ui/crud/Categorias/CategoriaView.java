@@ -1,33 +1,27 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.authentication.LoginScreen;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-
+@SpringComponent
+@UIScope
 @Route(value = "categoria",layout = MainLayout.class)
 @RouteAlias(value = "categorias",layout = MainLayout.class)
-@RouteAlias(value = "cate",layout = MainLayout.class)
 public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String> {
 
     public static final String VIEW_NAME = "Categorias Productos";
@@ -39,15 +33,18 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     private CategoriaCrudLogic viewLogic;
     private Button btnNewCategoria;
 
+    @Autowired
     private CategoriaDataProvider dataProvider;
 
-    public CategoriaView(@Autowired IcategoriaProductoService iService) {
-            viewLogic = new CategoriaCrudLogic(iService,this);
+
+    //public CategoriaView(@Autowired IcategoriaProductoService iService) {
+    public CategoriaView() {
+            viewLogic = new CategoriaCrudLogic(this);
 
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
-            dataProvider = CategoriaDataProvider.getInstance(iService);//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
+            dataProvider = CategoriaDataProvider.getInstance();//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
 
             grid = new CategoriaGrid();
             grid.setDataProvider(dataProvider);
@@ -128,6 +125,10 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
 
     public boolean saveCategoria(CategoriaProducto categoria) {
         return dataProvider.save(categoria);
+    }
+
+    public CategoriaProducto findById(String categoriaId) {
+        return dataProvider.findById(categoriaId);
     }
 
     public boolean deleteCategoria(CategoriaProducto categoria) {

@@ -17,12 +17,16 @@ import java.util.Date;
 public class ProductoVenta extends AbstractEntity{
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Producto producto;
 
     private Integer quantitySell;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date sellDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Usuario usuario;
 
     public ProductoVenta() {

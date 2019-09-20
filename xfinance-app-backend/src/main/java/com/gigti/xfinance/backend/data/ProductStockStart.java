@@ -17,9 +17,11 @@ import java.util.Date;
 public class ProductStockStart extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Producto producto;
 
     private Integer quantity;
+
     @Temporal(TemporalType.DATE)
     private Date startDate;
 

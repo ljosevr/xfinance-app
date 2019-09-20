@@ -15,8 +15,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan({"com.gigti.xfinance"})
 @EnableJpaRepositories(basePackages = "com.gigti.xfinance.backend.repositories")
 @EntityScan(basePackages = "com.gigti.xfinance.backend.data")
-//public class Application extends SpringBootServletInitializer {
-public class Application {
+public class Application extends SpringBootServletInitializer {
+//public class Application {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

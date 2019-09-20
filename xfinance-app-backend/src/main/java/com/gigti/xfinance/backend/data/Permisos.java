@@ -22,7 +22,7 @@ public class Permisos extends AbstractEntity {
     private String nombrePermiso;
     private String nombreVista;
     private Boolean activo;
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActivacion;
 
     public Permisos() {

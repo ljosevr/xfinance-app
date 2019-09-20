@@ -11,11 +11,13 @@ import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.services.IProductoService;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
+//@SpringComponent
 public class ProductoDataProvider extends ListDataProvider<Producto> {
 
     /** Text filter that can be changed separately. */
@@ -96,5 +98,9 @@ public class ProductoDataProvider extends ListDataProvider<Producto> {
 
     public Collection<Producto> findAll() {
         return iProductoService.findAll(empresa);
+    }
+
+    public Producto findById(String productoId) {
+        return iProductoService.findById(productoId);
     }
 }

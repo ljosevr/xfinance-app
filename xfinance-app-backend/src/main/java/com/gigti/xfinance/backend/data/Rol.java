@@ -23,10 +23,10 @@ public class Rol extends AbstractEntity {
     private String nombre;
     private String descripcion;
 
-    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "rol",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Usuario> usuarios;
 
-    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "rol",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<RolPermisos> rolPermisos;
 
     public Rol() {

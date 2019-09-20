@@ -1,24 +1,18 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.services.IProductoService;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.notification.Notification;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 
 public class CategoriaCrudLogic implements Serializable {
 
     private CategoriaView view;
-    private IcategoriaProductoService icategoriaProductoService;
 
-    public CategoriaCrudLogic(@Autowired IcategoriaProductoService iservice, CategoriaView simpleCrudView) {
-        this.icategoriaProductoService = iservice;
+    public CategoriaCrudLogic(CategoriaView simpleCrudView) {
         view = simpleCrudView;
     }
 
@@ -68,8 +62,8 @@ public class CategoriaCrudLogic implements Serializable {
         }
     }
 
-    private CategoriaProducto findCategoria(String productId) {
-        return icategoriaProductoService.findById(productId);
+    private CategoriaProducto findCategoria(String categoriaId) {
+        return view.findById(categoriaId);
     }
 
     public void saveCategoria(CategoriaProducto categoria) {

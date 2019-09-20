@@ -48,7 +48,11 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
     public CategoriaProducto saveCategoria(CategoriaProducto categoria) {
         try{
             Optional<Empresa> empresa = empresaRepository.findById(categoria.getEmpresa().getId());
-            categoria.setEmpresa(empresa.get());
+            if(empresa.isPresent()){
+                categoria.setEmpresa(empresa.get());
+            }else{
+                return null;
+            }
             return categoriaProductoRepository.save(categoria);
         }catch(Exception e){
             getLogger().error(e.getMessage(), e);

@@ -19,6 +19,7 @@ public class CategoriaProducto extends AbstractEntity{
     private boolean eliminado;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
     private Empresa empresa;
 
     public CategoriaProducto() {

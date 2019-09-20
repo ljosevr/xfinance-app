@@ -10,6 +10,7 @@ import com.gigti.xfinance.backend.data.Producto;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
+import com.vaadin.flow.spring.annotation.UIScope;
 
 import java.text.DecimalFormat;
 import java.util.Comparator;

@@ -10,6 +10,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
@@ -26,24 +27,24 @@ public class Producto extends AbstractEntity {
     private boolean eliminado;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
     private Empresa empresa;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
     private CategoriaProducto categoria;
 
-    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY)
-    private Set<ProductoValores> productoValores;
+    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductoValores> productoValores;
 
-    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY)
-    private Set<ProductStockStart> productStockStart;
+    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductStockStart> productStockStart;
 
-    @OneToMany(mappedBy = "producto", fetch = FetchType.LAZY)
-    private Set<ProductStockDay> productsStockDay;
+    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ProductStockDay> productsStockDay;
 
-    @OneToMany(mappedBy = "producto",fetch = FetchType.LAZY)
-    private Set<ProductoVenta> productoVenta;
-
-    //TODO agregar factura correctamente
+    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL,fetch = FetchType.LAZY)
+    private List<ProductoVenta> productoVenta;
 
     public Producto(){}
 
@@ -53,7 +54,7 @@ public class Producto extends AbstractEntity {
         this.descripcion = descripcion;
         this.activo = activo;
         this.eliminado = false;
-        //this.empresa = empresa;
+        this.empresa = empresa;
     }
 
     public ProductoValores getPrecioActual(){

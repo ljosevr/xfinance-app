@@ -21,10 +21,9 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * operations and controlling the view based on events from outside.
  */
 @Route(value = "productos", layout = MainLayout.class)
-//@RouteAlias(value = "", layout = MainLayout.class)
+@RouteAlias(value = "producto", layout = MainLayout.class)
 public class ProductoCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
@@ -49,13 +48,13 @@ public class ProductoCrudView extends HorizontalLayout
     private ProductoDataProvider dataProvider;
     private CategoriaDataProvider categoriaDataProvider;
 
-    public ProductoCrudView(@Autowired IcategoriaProductoService iServiceCat, @Autowired IProductoService iServiceProd) {
+    public ProductoCrudView(@Autowired IcategoriaProductoService iServiceCat, @Autowired  IProductoService iServiceProd) {
         setSizeFull();
-        viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat, this);
+        viewLogic = new ProductoCrudLogic(this);
         HorizontalLayout topLayout = createTopBar();
 
         dataProvider = ProductoDataProvider.getInstance(iServiceProd);
-        categoriaDataProvider = CategoriaDataProvider.getInstance(iServiceCat);
+        categoriaDataProvider = CategoriaDataProvider.getInstance();
 
         grid = new ProductoGrid();
         grid.setDataProvider(dataProvider);
@@ -144,6 +143,10 @@ public class ProductoCrudView extends HorizontalLayout
     public void editProducto(Producto producto) {
         showForm(producto != null);
         form.editProducto(producto);
+    }
+
+    public Producto findById(String productoId) {
+        return dataProvider.findById(productoId);
     }
 
     public void showForm(boolean show) {
