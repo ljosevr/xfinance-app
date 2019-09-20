@@ -2,6 +2,7 @@ package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.crud.Categorias.CategoriaView;
+import com.gigti.xfinance.ui.crud.producto.ProductoCrudView;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -26,7 +27,7 @@ public class MenuB extends MenuBar {
 
 
         SubMenu sm_productos = m_productos.getSubMenu();
-        sm_productos.addItem("Administrar",event -> getUI().get().navigate("adminProd"));
+        sm_productos.addItem(new RouterLink("Administrar", ProductoCrudView.class));
         sm_productos.addItem("Compras",event -> getUI().get().navigate("adminProd"));
         sm_productos.addItem(new RouterLink("Categoria", CategoriaView.class));//event -> getUI().get().navigate(CategoriaView_CrudUI.class));
         sm_productos.addItem("Inventario Hoy",event -> getUI().get().navigate("adminProd"));

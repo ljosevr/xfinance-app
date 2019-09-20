@@ -8,16 +8,16 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
-@Service
-public class ProductoServiceImpl implements IProductoService {
+@Component
+public class ProductoServiceImpl implements IProductoService, HasLogger {
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -28,14 +28,21 @@ public class ProductoServiceImpl implements IProductoService {
     }
 
     @Transactional
-    public void delete(Producto producto){
-        if(!producto.getActivo()){
-            producto.setActivo(false);
+    public boolean delete(String id){
+        try {
+            Producto producto = productoRepository.findById(id).orElse(null);
+            if (producto != null) {
+                producto.setEliminado(true);
+                producto = productoRepository.save(producto);
+                return producto != null;
+            }
+        } catch(Exception e) {
+            getLogger().debug("Error: "+e.getMessage(),e);
         }
-        productoRepository.save(producto);
+        return false;
     }
 
-    public List<Producto> findByName(Empresa empresa, String productName){
+    public List<Producto> findByNombreProducto(Empresa empresa, String productName){
         return productoRepository.findByEmpresaAndNombreProducto(empresa, productName);
     }
 
@@ -52,7 +59,7 @@ public class ProductoServiceImpl implements IProductoService {
     }
 
     @Override
-    public Optional<Producto> findById(String id) {
-        return productoRepository.findById(id);
+    public Producto findById(String id) {
+        return productoRepository.findById(id).orElse(null);
     }
 }

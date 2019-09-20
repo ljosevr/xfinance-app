@@ -23,6 +23,7 @@ public class Producto extends AbstractEntity {
     private String codigoBarra;
     private String descripcion;
     private Boolean activo;
+    private boolean eliminado;
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Empresa empresa;
@@ -51,6 +52,7 @@ public class Producto extends AbstractEntity {
         this.codigoBarra = codigoBarra;
         this.descripcion = descripcion;
         this.activo = activo;
+        this.eliminado = false;
         //this.empresa = empresa;
     }
 

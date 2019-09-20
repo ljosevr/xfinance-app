@@ -53,7 +53,7 @@ public class InventarioCrudView extends HorizontalLayout
         setSizeFull();
         HorizontalLayout topLayout = createTopBar();
 
-        dataProvider = ProductoDataProvider.getInstance();
+        //dataProvider = ProductoDataProvider.getInstance();
 
         grid = new ProductoGrid();
         grid.setDataProvider(dataProvider);

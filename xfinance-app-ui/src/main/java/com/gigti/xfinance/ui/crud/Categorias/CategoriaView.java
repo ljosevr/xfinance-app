@@ -38,18 +38,15 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
 
     private CategoriaCrudLogic viewLogic;
     private Button btnNewCategoria;
-    private Empresa empresa;
 
     private CategoriaDataProvider dataProvider;
 
     public CategoriaView(@Autowired IcategoriaProductoService iService) {
-//        if(CurrentUser.get() != null) {
             viewLogic = new CategoriaCrudLogic(iService,this);
 
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
-            //empresa = CurrentUser.get().getEmpresa();
             dataProvider = CategoriaDataProvider.getInstance(iService);//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
 
             grid = new CategoriaGrid();
@@ -59,7 +56,6 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
                     event -> viewLogic.rowSelected(event.getValue()));
 
             form = new CategoriaForm(viewLogic);
-            //form.setCategories(dataProvider.findAll());
 
             H3 title = new H3(this.VIEW_NAME);
             title.setClassName("titleView");
@@ -78,9 +74,6 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
             add(form);
 
             viewLogic.init();
-//        } else {
-//            UI.getCurrent().navigate(LoginScreen.class);
-//        }
     }
 
     public HorizontalLayout createTopBar() {
@@ -148,11 +141,6 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
 
     public void showForm(boolean show) {
         form.setVisible(show);
-
-        /* FIXME The following line should be uncommented when the CheckboxGroup
-         * issue is resolved. The category CheckboxGroup throws an
-         * IllegalArgumentException when the form is disabled.
-         */
         form.setEnabled(show);
     }
 
@@ -169,9 +157,5 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     public void refresh(CategoriaProducto categoria){
         grid.refresh(categoria);
     }
-
-//    public void setItemsGrid(Collection<CategoriaProducto> lista){
-//        grid.setItems(lista);
-//    }
 
 }

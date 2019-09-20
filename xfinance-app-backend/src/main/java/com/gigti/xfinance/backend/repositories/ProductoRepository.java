@@ -9,6 +9,7 @@ package com.gigti.xfinance.backend.repositories;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -21,6 +22,10 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
 
     public List<Producto> findByEmpresa(Empresa empresa);
 
+    @Query("SELECT p FROM Producto p " +
+            "WHERE UPPER(p.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') " +
+            "AND p.empresa =:empresa AND " +
+            "p.eliminado = FALSE")
     public List<Producto> findByEmpresaAndNombreProducto(Empresa empresa, String productName);
 
     public Producto findByEmpresaAndCodigoBarra(Empresa empresa, String productBarCode);

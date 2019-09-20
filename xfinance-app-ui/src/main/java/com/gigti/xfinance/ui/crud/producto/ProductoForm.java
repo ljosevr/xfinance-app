@@ -16,8 +16,11 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
@@ -134,20 +137,20 @@ public class ProductoForm extends Div {
         category.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         content.add(category);
 
-//        price = new TextField("Price");
-//        price.setSuffixComponent(new Span("€"));
-//        price.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-//        price.setValueChangeMode(ValueChangeMode.EAGER);
-//
-//        stockCount = new TextField("In stock");
-//        stockCount.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-//        stockCount.setValueChangeMode(ValueChangeMode.EAGER);
-//
-//        HorizontalLayout horizontalLayout = new HorizontalLayout(price,
-//                stockCount);
-//        horizontalLayout.setWidth("100%");
-//        horizontalLayout.setFlexGrow(1, price, stockCount);
-//        content.add(horizontalLayout);
+        price = new TextField("Price");
+        price.setSuffixComponent(new Span("€"));
+        price.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        price.setValueChangeMode(ValueChangeMode.EAGER);
+
+        stockCount = new TextField("In stock");
+        stockCount.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        stockCount.setValueChangeMode(ValueChangeMode.EAGER);
+
+        HorizontalLayout horizontalLayout = new HorizontalLayout(price,
+                stockCount);
+        horizontalLayout.setWidth("100%");
+        horizontalLayout.setFlexGrow(1, price, stockCount);
+        content.add(horizontalLayout);
 
 //        availability = new Select<>();
 //        availability.setLabel("Availability");
@@ -158,10 +161,8 @@ public class ProductoForm extends Div {
 
 
         binder = new BeanValidationBinder<>(Producto.class);
-        binder.forField(price).withConverter(new PriceConverter())
-                .bind("price");
-        binder.forField(stockCount).withConverter(new StockCountConverter())
-                .bind("stockCount");
+        //binder.forField(price).withConverter(new PriceConverter()).bind("price");
+        //binder.forField(stockCount).withConverter(new StockCountConverter()).bind("stockCount");
         binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
@@ -178,7 +179,7 @@ public class ProductoForm extends Div {
         save.addClickListener(event -> {
             if (currentProduct != null
                     && binder.writeBeanIfValid(currentProduct)) {
-                viewLogic.saveProduct(currentProduct);
+                viewLogic.saveProducto(currentProduct);
             }
         });
         save.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
@@ -186,14 +187,14 @@ public class ProductoForm extends Div {
         discard = new Button("Descartar Cambios");
         discard.setWidth("100%");
         discard.addClickListener(
-                event -> viewLogic.editProduct(currentProduct));
+                event -> viewLogic.editProducto(currentProduct));
 
         cancel = new Button("Cancelar");
         cancel.setWidth("100%");
-        cancel.addClickListener(event -> viewLogic.cancelProduct());
+        cancel.addClickListener(event -> viewLogic.cancelProducto());
         cancel.addClickShortcut(Key.ESCAPE);
         getElement()
-                .addEventListener("keydown", event -> viewLogic.cancelProduct())
+                .addEventListener("keydown", event -> viewLogic.cancelProducto())
                 .setFilter("event.key == 'Escape'");
 
         delete = new Button("Eliminar");
@@ -201,7 +202,7 @@ public class ProductoForm extends Div {
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         delete.addClickListener(event -> {
             if (currentProduct != null) {
-                viewLogic.deleteProduct(currentProduct);
+                viewLogic.deleteProducto(currentProduct);
             }
         });
 
@@ -212,7 +213,7 @@ public class ProductoForm extends Div {
         category.setItems(categories);
     }
 
-    public void editProduct(Producto producto) {
+    public void editProducto(Producto producto) {
         if (producto == null) {
             producto = new Producto();
         }

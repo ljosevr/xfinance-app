@@ -8,10 +8,14 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.services.IProductoService;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.crud.Categorias.CategoriaView;
 import com.gigti.xfinance.ui.crud.inventario.InventarioCrudView;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.notification.Notification;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -28,25 +32,29 @@ import java.io.Serializable;
 public class ProductoCrudLogic implements Serializable {
 
     private ProductoCrudView view;
-    @Autowired
     private IProductoService iProductoService;
+    private IcategoriaProductoService iCategoriaService;
 
-    public ProductoCrudLogic(ProductoCrudView simpleCrudView) {
+    public ProductoCrudLogic(@Autowired IProductoService iServiceProd, @Autowired IcategoriaProductoService iServiceCat, ProductoCrudView simpleCrudView) {
         view = simpleCrudView;
+        this.iProductoService = iServiceProd;
+        this.iCategoriaService = iServiceCat;
     }
 
     public void init() {
-        editProduct(null);
+        editProducto(null);
         // Hide and disable if not admin
-        if (!AccessControlFactory.getInstance().createAccessControl()
-                .isUserInRole(CurrentUser.get())) {
-            view.setNewProductEnabled(false);
-        }
+        //TODO permisos
+//        if (!AccessControlFactory.getInstance().createAccessControl()
+//                .isUserInRole(CurrentUser.get())) {
+//            view.setNewProductEnabled(false);
+//        }
     }
 
-    public void cancelProduct() {
+    public void cancelProducto() {
         setFragmentParameter("");
         view.clearSelection();
+        view.showForm(false);
     }
 
     /**
@@ -59,19 +67,15 @@ public class ProductoCrudLogic implements Serializable {
         } else {
             fragmentParameter = productId;
         }
-
-        UI.getCurrent().navigate(InventarioCrudView.class, fragmentParameter);
     }
 
     public void enter(String productId) {
         if (productId != null && !productId.isEmpty()) {
             if (productId.equals("new")) {
-                newProduct();
+                newProducto();
             } else {
-                // Ensure this is selected even if coming directly here from
-                // login
                 try {
-                    Producto producto = findProduct(productId);
+                    Producto producto = findProducto(productId);
                     view.selectRow(producto);
                 } catch (NumberFormatException e) {
                 }
@@ -81,45 +85,56 @@ public class ProductoCrudLogic implements Serializable {
         }
     }
 
-    private Producto findProduct(String productId) {
-        return iProductoService.findById(productId).orElse(null);
+    private Producto findProducto(String productId) {
+        return iProductoService.findById(productId);
     }
 
-    public void     saveProduct(Producto producto) {
-//        boolean newProduct = product.isNewProduct();
-//        view.clearSelection();
-//        view.updateProduct(product);
-//        setFragmentParameter("");
-//        view.showSaveNotification(product.getProductName()
-//                + (newProduct ? " created" : " updated"));
+    public void saveProducto(Producto producto) {
+        boolean result = view.saveProducto(producto);
+        if(result){
+            String typOperation = StringUtils.isBlank(producto.getId()) ? " Creada" : " Actualizada";
+            view.clearSelection();
+            view.showSaveNotification(producto.getNombreProducto() +" "+typOperation);
+            view.refresh();
+            view.showForm(false);
+            setFragmentParameter("");
+        } else {
+            Notification.show("Error al Guardar Producto "+producto.getNombreProducto());
+        }
     }
 
-    public void deleteProduct(Producto producto) {
-//        view.clearSelection();
-//        view.removeProduct(product);
-//        setFragmentParameter("");
-//        view.showSaveNotification(product.getProductName() + " removed");
+    public void deleteProducto(Producto producto) {
+        view.clearSelection();
+        boolean result = view.deleteProducto(producto);
+
+        if(result){
+            view.showSaveNotification(producto.getNombreProducto() + " Eliminado");
+            view.refresh();
+            setFragmentParameter("");
+        } else {
+            Notification.show("Error al Eliminar Producto "+producto.getNombreProducto());
+        }
     }
 
-    public void editProduct(Producto producto) {
-//        if (product == null) {
-//            setFragmentParameter("");
-//        } else {
-//            setFragmentParameter(product.getId() + "");
-//        }
-//        view.editProduct(product);
+    public void editProducto(Producto producto) {
+        if (producto == null) {
+            setFragmentParameter("");
+        } else {
+            setFragmentParameter(producto.getId() + "");
+        }
+        view.editProducto(producto);
     }
 
-    public void newProduct() {
+    public void newProducto() {
         view.clearSelection();
         setFragmentParameter("new");
-        view.editProduct(new Producto());
+        view.editProducto(new Producto());
     }
 
     public void rowSelected(Producto producto) {
         if (AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(CurrentUser.get())) {
-            editProduct(producto);
+            editProducto(producto);
         }
     }
 }

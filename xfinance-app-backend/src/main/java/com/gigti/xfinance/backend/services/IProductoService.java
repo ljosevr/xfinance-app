@@ -16,10 +16,10 @@ import java.util.Optional;
 public interface IProductoService {
 
     public Producto saveProduct(Producto producto);
-    public void delete(Producto producto);
-    public List<Producto> findByName(Empresa empresa, String productName);
+    public boolean delete(String id);
+    public List<Producto> findByNombreProducto(Empresa empresa, String productName);
     public List<Producto> findAll(Empresa empresa);
     public Producto findByBarCode(Empresa empresa, String barCode);
     public List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
-    public Optional<Producto> findById(String id);
+    public Producto findById(String id);
 }

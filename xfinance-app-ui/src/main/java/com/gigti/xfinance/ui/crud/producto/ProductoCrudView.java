@@ -6,15 +6,16 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
-import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.services.IProductoService;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.crud.Categorias.CategoriaDataProvider;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,6 +25,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 import com.vaadin.flow.router.Route;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A view for performing create-read-update-delete operations on products.
@@ -43,29 +45,33 @@ public class ProductoCrudView extends HorizontalLayout
 
     private ProductoCrudLogic viewLogic;
     private Button btnNewProduct;
-    private Empresa empresa;
 
     private ProductoDataProvider dataProvider;
     private CategoriaDataProvider categoriaDataProvider;
 
-    public ProductoCrudView() {
+    public ProductoCrudView(@Autowired IcategoriaProductoService iServiceCat, @Autowired IProductoService iServiceProd) {
         setSizeFull();
+        viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat, this);
         HorizontalLayout topLayout = createTopBar();
 
-        empresa = CurrentUser.get().getEmpresa();
-
-        dataProvider = ProductoDataProvider.getInstance();//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
-        categoriaDataProvider = CategoriaDataProvider.getInstance(null);
+        dataProvider = ProductoDataProvider.getInstance(iServiceProd);
+        categoriaDataProvider = CategoriaDataProvider.getInstance(iServiceCat);
 
         grid = new ProductoGrid();
         grid.setDataProvider(dataProvider);
+        grid.setItems(dataProvider.findAll());
         grid.asSingleSelect().addValueChangeListener(
                 event -> viewLogic.rowSelected(event.getValue()));
 
         form = new ProductoForm(viewLogic);
         form.setCategories(categoriaDataProvider.findAll());
 
+        H3 title = new H3(this.VIEW_NAME);
+        title.setClassName("titleView");
+
         VerticalLayout barAndGridLayout = new VerticalLayout();
+        barAndGridLayout.add(title);
+
         barAndGridLayout.add(topLayout);
         barAndGridLayout.add(grid);
         barAndGridLayout.setFlexGrow(1, grid);
@@ -81,17 +87,17 @@ public class ProductoCrudView extends HorizontalLayout
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
-        filter.setPlaceholder("Filtro Nombre, Categoria");
-        // Apply the filter to grid's data provider. TextField value is never null
-        filter.addValueChangeListener(event -> dataProvider.setFilterByValue(Producto::getNombreProducto, event.getValue()));
-        //filter.addValueChangeListener(event -> dataProvider.setFilterByValue(CategoriaProducto::getNombre, event.getValue()));
+        //TODO Realizar Filtro por Categoria Tambien
+        filter.setPlaceholder("Filtro Nombre");
+        filter.addValueChangeListener(event -> {
+            grid.setItems(dataProvider.setFilter(event.getValue()));
+        });
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
-        btnNewProduct = new Button("Producto Nuevo");
+        btnNewProduct = new Button("Nuevo");
         btnNewProduct.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewProduct.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewProduct.addClickListener(click -> viewLogic.newProduct());
-        // CTRL+N will create a new window which is unavoidable
+        btnNewProduct.addClickListener(click -> viewLogic.newProducto());
         btnNewProduct.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
         HorizontalLayout topLayout = new HorizontalLayout();
@@ -127,31 +133,22 @@ public class ProductoCrudView extends HorizontalLayout
         return grid.getSelectedRow();
     }
 
-    public void updateProduct(Producto producto) {
-
-        //TODO
-        //dataProvider.save(product);
+    public boolean saveProducto(Producto producto) {
+        return dataProvider.save(producto);
     }
 
-    public void removeProduct(Producto producto) {
-
-        //TODO
-        // dataProvider.delete(product);
+    public boolean deleteProducto(Producto producto) {
+        return dataProvider.delete(producto);
     }
 
-    public void editProduct(Producto producto) {
+    public void editProducto(Producto producto) {
         showForm(producto != null);
-        form.editProduct(producto);
+        form.editProducto(producto);
     }
 
     public void showForm(boolean show) {
         form.setVisible(show);
-
-        /* FIXME The following line should be uncommented when the CheckboxGroup
-         * issue is resolved. The category CheckboxGroup throws an
-         * IllegalArgumentException when the form is disabled.
-         */
-        //form.setEnabled(show);
+        form.setEnabled(show);
     }
 
     @Override
@@ -159,4 +156,9 @@ public class ProductoCrudView extends HorizontalLayout
                              @OptionalParameter String parameter) {
         viewLogic.enter(parameter);
     }
+
+    public void refresh(){
+        grid.setItems(dataProvider.findAll());
+    }
+
 }

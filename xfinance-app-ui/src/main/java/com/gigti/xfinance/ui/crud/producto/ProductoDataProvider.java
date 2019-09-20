@@ -9,28 +9,29 @@ package com.gigti.xfinance.ui.crud.producto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.services.IProductoService;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Locale;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 public class ProductoDataProvider extends ListDataProvider<Producto> {
 
     /** Text filter that can be changed separately. */
     private String filterText = "";
-
     private static ProductoDataProvider productoDataProvider;
-
-    @Autowired
     private static IProductoService iProductoService;
+    private static Empresa empresa;
 
     private ProductoDataProvider() {
         //TODO Manejar paginador desde el Inicio
-        super(iProductoService.findAll(new Empresa()));
+        super(iProductoService.findAll(empresa));
     }
 
-    public static ProductoDataProvider getInstance(){
+    public static ProductoDataProvider getInstance(IProductoService iServiceProd){
+        iProductoService = iServiceProd;
+        empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
         if(productoDataProvider == null){
             productoDataProvider = new ProductoDataProvider();
         }else{
@@ -42,30 +43,29 @@ public class ProductoDataProvider extends ListDataProvider<Producto> {
     /**
      * Store given product to the backing data service.
      * 
-     * @param product
-     *            the updated or new product
+     * @param producto the updated or new product
      */
-    public void save(Producto product) {
-        //boolean newProduct = product.isNewProduct();
-
-        iProductoService.saveProduct(product);
-        refreshItem(product);
-//        if (newProduct) {
-//            refreshAll();
-//        } else {
-//            refreshItem(product);
-//        }
+    public boolean save(Producto producto) {
+        producto.setEmpresa(empresa);
+        producto = iProductoService.saveProduct(producto);
+        if(producto != null){
+            refreshItem(producto);
+            return true;
+        }
+        return false;
     }
 
     /**
      * Delete given product from the backing data service.
      * 
-     * @param product
-     *            the product to be deleted
+     * @param producto the product to be deleted
      */
-    public void delete(Producto product) {
-        //DataService.get().deleteProduct(product.getId());
-        refreshAll();
+    public boolean delete(Producto producto) {
+        if(iProductoService.delete(producto.getId())){
+            refreshAll();
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -76,29 +76,25 @@ public class ProductoDataProvider extends ListDataProvider<Producto> {
      * @param filterText
      *            the text to filter by, never null
      */
-    public void setFilter(String filterText) {
-        Objects.requireNonNull(filterText, "Filter text cannot be null.");
+    public List<Producto> setFilter(String filterText) {
+        Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
-            return;
+            productoDataProvider.refreshAll();
+            return null;
         }
         this.filterText = filterText.trim();
-        setFilter(producto -> passesFilter(producto.getNombreProducto(), filterText)
-                //|| passesFilter(product.getAvailability(), filterText)
-                //|| passesFilter(producto.getCategoria().getNombre(), filterText));
-        );
+        return iProductoService.findByNombreProducto(empresa, filterText);
     }
 
     @Override
     public String getId(Producto product) {
         Objects.requireNonNull(product,
-                "Cannot provide an id for a null product.");
+                "No se puede obtener un Id para un Producto Null");
 
         return product.getId();
     }
 
-    private boolean passesFilter(Object object, String filterText) {
-        return object != null && object.toString().toLowerCase(Locale.ENGLISH)
-                .contains(filterText);
+    public Collection<Producto> findAll() {
+        return iProductoService.findAll(empresa);
     }
-
 }
