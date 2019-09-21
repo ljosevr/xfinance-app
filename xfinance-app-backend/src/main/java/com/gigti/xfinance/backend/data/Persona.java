@@ -13,6 +13,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.Objects;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
@@ -63,6 +64,45 @@ public class Persona extends AbstractEntity{
         this.email = email;
         this.telefono = telefono;
         this.direccion = direccion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Persona persona = (Persona) o;
+        return Objects.equals(tipoIde, persona.tipoIde) &&
+                Objects.equals(identificacion, persona.identificacion) &&
+                Objects.equals(primerNombre, persona.primerNombre) &&
+                Objects.equals(segundoNombre, persona.segundoNombre) &&
+                Objects.equals(primerApellido, persona.primerApellido) &&
+                Objects.equals(segundoApellido, persona.segundoApellido) &&
+                Objects.equals(fechaNacimiento, persona.fechaNacimiento) &&
+                Objects.equals(email, persona.email) &&
+                Objects.equals(telefono, persona.telefono) &&
+                Objects.equals(direccion, persona.direccion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), tipoIde, identificacion, primerNombre, segundoNombre, primerApellido, segundoApellido, fechaNacimiento, email, telefono, direccion);
+    }
+
+    @Override
+    public String toString() {
+        return "Persona{" +
+                "tipoIde=" + tipoIde +
+                ", identificacion='" + identificacion + '\'' +
+                ", primerNombre='" + primerNombre + '\'' +
+                ", segundoNombre='" + segundoNombre + '\'' +
+                ", primerApellido='" + primerApellido + '\'' +
+                ", segundoApellido='" + segundoApellido + '\'' +
+                ", fechaNacimiento=" + fechaNacimiento +
+                ", email='" + email + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", direccion='" + direccion + '\'' +
+                '}';
     }
 
     public static Persona dummy(double number){

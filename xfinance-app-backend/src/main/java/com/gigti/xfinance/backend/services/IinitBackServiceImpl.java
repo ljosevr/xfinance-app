@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.*;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 @Service
+@UIScope
 public class IinitBackServiceImpl implements IinitBackService, HasLogger {
 
     @Autowired

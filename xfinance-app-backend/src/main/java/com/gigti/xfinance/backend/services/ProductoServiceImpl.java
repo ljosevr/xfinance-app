@@ -10,6 +10,7 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.ProductoRepository;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Component
+@UIScope
 public class ProductoServiceImpl implements IProductoService, HasLogger {
 
     @Autowired

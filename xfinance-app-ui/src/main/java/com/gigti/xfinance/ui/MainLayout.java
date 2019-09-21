@@ -25,7 +25,6 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-import org.springframework.context.annotation.Primary;
 
 /**
  * The main layout. Contains the navigation menu.
@@ -33,7 +32,6 @@ import org.springframework.context.annotation.Primary;
 //@Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @SpringComponent
 @UIScope
-@Primary
 @Route
 @PreserveOnRefresh
 @PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")

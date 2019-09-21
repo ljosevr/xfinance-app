@@ -50,13 +50,13 @@ public class XfinanceInitListener implements VaadinServiceInitListener {
         });
 
         event.getSource().addUIInitListener(uiInitEvent -> {
-//            uiInitEvent.getUI().addBeforeEnterListener(enterEvent -> {
-//                if (!accessControl.isUserSignedIn() && !LoginScreen.class
-//                        .equals(enterEvent.getNavigationTarget())) {
-//                    enterEvent.rerouteTo(LoginScreen.class);
-//                    //UI.getCurrent().navigate(LoginScreen.class);
-//                }
-//            });
+            uiInitEvent.getUI().addBeforeEnterListener(enterEvent -> {
+                if (!accessControl.isUserSignedIn() && !LoginScreen.class
+                        .equals(enterEvent.getNavigationTarget())) {
+                    enterEvent.rerouteTo(LoginScreen.class);
+                    //UI.getCurrent().navigate(LoginScreen.class);
+                }
+            });
         });
     }
 }

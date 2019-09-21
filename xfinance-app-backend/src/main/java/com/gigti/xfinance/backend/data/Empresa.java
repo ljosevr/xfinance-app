@@ -14,6 +14,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
@@ -64,6 +65,45 @@ public class Empresa extends AbstractEntity {
         this.activo = activo;
         this.fechaActivacion = fechaActivacion;
         this.fechaDesactivacion = fechaDesactivacion;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Empresa empresa = (Empresa) o;
+        return Objects.equals(tipoIde, empresa.tipoIde) &&
+                Objects.equals(identificacion, empresa.identificacion) &&
+                Objects.equals(nombreEmpresa, empresa.nombreEmpresa) &&
+                Objects.equals(direccion, empresa.direccion) &&
+                Objects.equals(usuarios, empresa.usuarios) &&
+                Objects.equals(productos, empresa.productos) &&
+                Objects.equals(categoriaProductos, empresa.categoriaProductos) &&
+                Objects.equals(activo, empresa.activo) &&
+                Objects.equals(fechaActivacion, empresa.fechaActivacion) &&
+                Objects.equals(fechaDesactivacion, empresa.fechaDesactivacion);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), tipoIde, identificacion, nombreEmpresa, direccion, usuarios, productos, categoriaProductos, activo, fechaActivacion, fechaDesactivacion);
+    }
+
+    @Override
+    public String toString() {
+        return "Empresa{" +
+                "tipoIde=" + tipoIde +
+                ", identificacion='" + identificacion + '\'' +
+                ", nombreEmpresa='" + nombreEmpresa + '\'' +
+                ", direccion='" + direccion + '\'' +
+                ", usuarios=" + usuarios +
+                ", productos=" + productos +
+                ", categoriaProductos=" + categoriaProductos +
+                ", activo=" + activo +
+                ", fechaActivacion=" + fechaActivacion +
+                ", fechaDesactivacion=" + fechaDesactivacion +
+                '}';
     }
 
     public static Empresa dummy(){

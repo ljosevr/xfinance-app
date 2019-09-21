@@ -37,4 +37,13 @@ public class TipoIde implements Serializable {
         this.nombre = nombre;
         this.descripcion = descripcion;
     }
+
+    @Override
+    public String toString() {
+        return "TipoIde{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                '}';
+    }
 }

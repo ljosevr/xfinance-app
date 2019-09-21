@@ -7,6 +7,7 @@
 package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.crud.Categorias.CategoriaDataProvider;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
@@ -23,6 +24,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.VaadinSessionScope;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Admin view that is registered dynamically on admin user login.
@@ -41,10 +43,11 @@ public class AdminView extends VerticalLayout {
     //TODO
     //Cambiar View Admin por otra cosa. Esta View debe ser Exclusiva para el
     // menu Admin - Categorias - Usuarios - Roles - Permisos
-    public AdminView() {
+    @Autowired
+    public AdminView(IcategoriaProductoService iService) {
         categoriesListing = new IronList<>();
 
-        dataProvider = CategoriaDataProvider.getInstance();
+        dataProvider = CategoriaDataProvider.getInstance(iService);
 
         //categoriesListing.setDataProvider(dataProvider);
         categoriesListing.setRenderer(new ComponentRenderer<>(this::createCategoryEditor));

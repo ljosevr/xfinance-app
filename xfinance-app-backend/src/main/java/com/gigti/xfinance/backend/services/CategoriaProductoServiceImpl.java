@@ -5,6 +5,7 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.CategoriaProductoRepository;
 import com.gigti.xfinance.backend.repositories.EmpresaRepository;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 
 @Component
+@UIScope
 public class CategoriaProductoServiceImpl implements IcategoriaProductoService, HasLogger {
 
     @Autowired

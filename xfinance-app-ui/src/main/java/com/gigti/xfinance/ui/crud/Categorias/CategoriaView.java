@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -16,12 +17,10 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@SpringComponent
-@UIScope
 @Route(value = "categoria",layout = MainLayout.class)
 @RouteAlias(value = "categorias",layout = MainLayout.class)
+@UIScope
 public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String> {
 
     public static final String VIEW_NAME = "Categorias Productos";
@@ -32,19 +31,16 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
 
     private CategoriaCrudLogic viewLogic;
     private Button btnNewCategoria;
-
-    @Autowired
     private CategoriaDataProvider dataProvider;
 
 
-    //public CategoriaView(@Autowired IcategoriaProductoService iService) {
-    public CategoriaView() {
+    public CategoriaView(@Autowired IcategoriaProductoService iService) {
             viewLogic = new CategoriaCrudLogic(this);
 
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
-            dataProvider = CategoriaDataProvider.getInstance();//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
+            dataProvider = CategoriaDataProvider.getInstance(iService);//.ofCollection(iProductoService.findAll(CurrentUser.get().getEmpresa()));
 
             grid = new CategoriaGrid();
             grid.setDataProvider(dataProvider);

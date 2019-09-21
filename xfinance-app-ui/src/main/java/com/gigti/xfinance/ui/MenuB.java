@@ -27,7 +27,8 @@ public class MenuB extends MenuBar {
 
 
         SubMenu sm_productos = m_productos.getSubMenu();
-        sm_productos.addItem(new RouterLink("Administrar", ProductoCrudView.class));
+        //sm_productos.addItem(new RouterLink("Administrar", ProductoCrudView.class));
+        sm_productos.addItem(new RouterLink("Administrar", ProductoCrudView.class));//"Administrar", event -> getUI().get().navigate(ProductoCrudView.class));
         sm_productos.addItem("Compras",event -> getUI().get().navigate("adminProd"));
         sm_productos.addItem(new RouterLink("Categoria", CategoriaView.class));//event -> getUI().get().navigate(CategoriaView_CrudUI.class));
         sm_productos.addItem("Inventario Hoy",event -> getUI().get().navigate("adminProd"));

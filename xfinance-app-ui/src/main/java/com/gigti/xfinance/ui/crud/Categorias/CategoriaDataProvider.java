@@ -11,6 +11,8 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,24 +20,22 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-@Component
+@SpringComponent
+@UIScope
 public class CategoriaDataProvider extends ListDataProvider<CategoriaProducto> {
 
     /** Text filter that can be changed separately. */
     private String filterText = "";
-    @Autowired
     private static IcategoriaProductoService icategoriaProductoService;
-    @Autowired
     private static CategoriaDataProvider categoriaDataProvider;
     private static Empresa empresa;
-
 
     private CategoriaDataProvider() {
         super(icategoriaProductoService.findAll(empresa));
     }
 
-    public static CategoriaDataProvider getInstance(){
-        //icategoriaProductoService = iService;
+    public static CategoriaDataProvider getInstance(IcategoriaProductoService iService){
+        icategoriaProductoService = iService;
         empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
         if(categoriaDataProvider == null) {
             categoriaDataProvider = new CategoriaDataProvider();

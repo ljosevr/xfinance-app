@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = "productos", layout = MainLayout.class)
 @RouteAlias(value = "producto", layout = MainLayout.class)
+@UIScope
 public class ProductoCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
@@ -48,13 +49,14 @@ public class ProductoCrudView extends HorizontalLayout
     private ProductoDataProvider dataProvider;
     private CategoriaDataProvider categoriaDataProvider;
 
-    public ProductoCrudView(@Autowired IcategoriaProductoService iServiceCat, @Autowired  IProductoService iServiceProd) {
+    @Autowired
+    public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
         setSizeFull();
         viewLogic = new ProductoCrudLogic(this);
         HorizontalLayout topLayout = createTopBar();
 
         dataProvider = ProductoDataProvider.getInstance(iServiceProd);
-        categoriaDataProvider = CategoriaDataProvider.getInstance();
+        categoriaDataProvider = CategoriaDataProvider.getInstance(iServiceCat);
 
         grid = new ProductoGrid();
         grid.setDataProvider(dataProvider);

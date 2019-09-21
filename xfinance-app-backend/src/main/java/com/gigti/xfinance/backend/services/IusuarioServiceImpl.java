@@ -3,10 +3,12 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.UsuarioRepository;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@UIScope
 public class IusuarioServiceImpl implements IusuarioService, HasLogger {
 
     @Autowired
