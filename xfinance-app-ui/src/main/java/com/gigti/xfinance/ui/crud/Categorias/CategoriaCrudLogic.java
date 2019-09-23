@@ -1,19 +1,33 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.vaadin.flow.component.notification.Notification;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 public class CategoriaCrudLogic implements Serializable {
 
     private CategoriaView view;
+    private IcategoriaProductoService icategoriaProductoService;
+    private static Empresa empresa;
+    private String filterText = "";
 
-    public CategoriaCrudLogic(CategoriaView simpleCrudView) {
+    public CategoriaCrudLogic(IcategoriaProductoService icategoriaProductoService) {
+        this.icategoriaProductoService = icategoriaProductoService;
+        empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+    }
+
+    public CategoriaCrudLogic(IcategoriaProductoService iService, CategoriaView simpleCrudView) {
+        icategoriaProductoService = iService;
         view = simpleCrudView;
+        empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
 
     public void init() {
@@ -49,13 +63,8 @@ public class CategoriaCrudLogic implements Serializable {
             if (categoriaId.equals("new")) {
                 newCategoria();
             } else {
-                // Ensure this is selected even if coming directly here from
-                // login
-                try {
-                    CategoriaProducto categoria = findCategoria(categoriaId);
-                    view.selectRow(categoria);
-                } catch (NumberFormatException e) {
-                }
+                CategoriaProducto categoria = findCategoria(categoriaId);
+                view.selectRow(categoria);
             }
         } else {
             view.showForm(false);
@@ -63,33 +72,34 @@ public class CategoriaCrudLogic implements Serializable {
     }
 
     private CategoriaProducto findCategoria(String categoriaId) {
-        return view.findById(categoriaId);
+        return icategoriaProductoService.findById(categoriaId);
     }
 
     public void saveCategoria(CategoriaProducto categoria) {
-        boolean result = view.saveCategoria(categoria);
-        if(result){
-            String typOperation = StringUtils.isBlank(categoria.getId()) ? " Creada" : " Actualizada";
+
+        String typOperation = StringUtils.isBlank(categoria.getId()) ? " Creada" : " Actualizada";
+        categoria.setEmpresa(empresa);
+        categoria = icategoriaProductoService.saveCategoria(categoria);
+        if(categoria != null){
+            view.refresh(categoria);
             view.clearSelection();
             view.showSaveNotification(categoria.getNombre() +" "+typOperation);
             view.refresh();
             view.showForm(false);
             setFragmentParameter("");
         } else {
-            Notification.show("Error al Guardar Categoria "+categoria.getNombre());
+            view.showError("Error al Guardar Categoria "+categoria.getNombre());
         }
     }
 
     public void deleteCategoria(CategoriaProducto categoria) {
         view.clearSelection();
-        boolean result = view.deleteCategoria(categoria);
-
-        if(result){
+        if(icategoriaProductoService.deleteCategoria(categoria.getId())){
             view.showSaveNotification(categoria.getNombre() + " Eliminada");
             view.refresh();
             setFragmentParameter("");
         } else {
-            Notification.show("Error al Eliminar Categoria "+categoria.getNombre());
+            view.showError("Error al Eliminar Categoria "+categoria.getNombre());
         }
     }
 
@@ -113,5 +123,32 @@ public class CategoriaCrudLogic implements Serializable {
                 .isUserInRole(CurrentUser.get())) {
             editCategoria(categoria);
         }
+    }
+
+    public Collection<CategoriaProducto> findAll() {
+        return icategoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+    }
+
+//    public Collection<CategoriaProducto> findPage() {
+//
+//        icategoriaProductoService
+//        CallbackDataProvider<CategoriaProducto, Void> provider = DataProvider
+//                .fromCallbacks(query -> icategoriaProductoService.fetch(query.getOffset(), query.getLimit()).stream(),
+//                        query -> icategoriaProductoService.count());
+//        return icategoriaProductoService.findAll(empresa);
+//    }
+
+    public List<CategoriaProducto> setFilter(String filterText) {
+        Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
+        if (Objects.equals(this.filterText, filterText.trim())) {
+            view.refresh();
+            return null;
+        }
+        this.filterText = filterText.trim();
+        return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa);
+    }
+
+    public CategoriaProducto findById(String categoriaId) {
+        return icategoriaProductoService.findById(categoriaId);
     }
 }

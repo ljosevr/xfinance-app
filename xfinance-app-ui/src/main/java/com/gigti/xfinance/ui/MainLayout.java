@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.ui;
 
+import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.LoginScreen;
@@ -17,6 +18,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinServletService;
@@ -25,18 +27,21 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
+import org.springframework.context.annotation.Primary;
 
 /**
  * The main layout. Contains the navigation menu.
  */
-//@Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
 @SpringComponent
 @UIScope
-@Route
+@Primary
+@Route("")
 @PreserveOnRefresh
 @PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
+@PageTitle(value = Constantes.VIEW_MAIN)
+@Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private MenuB menu;
     final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();

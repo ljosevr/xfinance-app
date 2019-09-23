@@ -6,13 +6,18 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.services.IProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.notification.Notification;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class provides an interface for the logical operations between the CRUD
@@ -26,19 +31,52 @@ import java.io.Serializable;
 public class ProductoCrudLogic implements Serializable {
 
     private ProductoCrudView view;
+    private IProductoService iProductoService;
+    private static Empresa empresa;
+    private String filterText = "";
 
-    public ProductoCrudLogic(ProductoCrudView simpleCrudView) {
+    public ProductoCrudLogic(IProductoService iProductoService) {
+        this.iProductoService = iProductoService;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+    }
+
+    public ProductoCrudLogic(IProductoService iProductoService, ProductoCrudView simpleCrudView) {
+        this.iProductoService = iProductoService;
         view = simpleCrudView;
+        empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
 
     public void init() {
         editProducto(null);
+    }
+
+    public boolean access(){
         // Hide and disable if not admin
+        return empresa != null ? true : false;
         //TODO permisos
 //        if (!AccessControlFactory.getInstance().createAccessControl()
 //                .isUserInRole(CurrentUser.get())) {
 //            view.setNewProductEnabled(false);
 //        }
+        //return true;
+    }
+
+    public Collection<Producto> findAll() {
+        return iProductoService.findAll(empresa);
+    }
+
+    public List<Producto> setFilter(String filterText) {
+        Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
+        if (Objects.equals(this.filterText, filterText.trim())) {
+            view.refresh();
+            return null;
+        }
+        this.filterText = filterText.trim();
+        return iProductoService.findByNombreProducto(empresa, filterText);
+    }
+
+    public Producto findById(String productoId) {
+        return iProductoService.findById(productoId);
     }
 
     public void cancelProducto() {
@@ -80,9 +118,11 @@ public class ProductoCrudLogic implements Serializable {
     }
 
     public void saveProducto(Producto producto) {
-        boolean result = view.saveProducto(producto);
-        if(result){
-            String typOperation = StringUtils.isBlank(producto.getId()) ? " Creada" : " Actualizada";
+        String typOperation = StringUtils.isBlank(producto.getId()) ? " Creado" : " Actualizada";
+        producto.setEmpresa(empresa);
+        producto = iProductoService.saveProduct(producto);
+        if(producto != null){
+            view.refresh(producto);
             view.clearSelection();
             view.showSaveNotification(producto.getNombreProducto() +" "+typOperation);
             view.refresh();
@@ -95,14 +135,12 @@ public class ProductoCrudLogic implements Serializable {
 
     public void deleteProducto(Producto producto) {
         view.clearSelection();
-        boolean result = view.deleteProducto(producto);
-
-        if(result){
-            view.showSaveNotification(producto.getNombreProducto() + " Eliminado");
+        if(iProductoService.delete(producto.getId())){
             view.refresh();
+            view.showSaveNotification("Producto: "+producto.getNombreProducto() + " Eliminado");
             setFragmentParameter("");
         } else {
-            Notification.show("Error al Eliminar Producto "+producto.getNombreProducto());
+            view.showError("Error al Eliminar Producto "+producto.getNombreProducto());
         }
     }
 

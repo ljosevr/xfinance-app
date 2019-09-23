@@ -10,20 +10,19 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.NativeButton;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 
+@SpringComponent
+@UIScope
 public class MenuB extends MenuBar {
-
-    private MenuItem m_ventas;
-    private MenuItem m_productos;
-    private MenuItem m_usuarios;
-    private MenuItem m_salir;
 
     public MenuB(){
         setClassName("menu-bar");
-        m_ventas = this.addItem("P. Venta", event -> getUI().get().navigate("pventa"));
-        m_productos = this.addItem("Productos");
-        m_usuarios = this.addItem("Usuarios");
-        m_salir = this.addItem("Salir", event -> signOut());
+        MenuItem m_ventas = this.addItem("P. Venta", event -> getUI().get().navigate("pventa"));
+        MenuItem m_productos = this.addItem("Productos");
+        MenuItem m_usuarios = this.addItem("Usuarios");
+        MenuItem m_salir = this.addItem("Salir", event -> signOut());
 
 
         SubMenu sm_productos = m_productos.getSubMenu();

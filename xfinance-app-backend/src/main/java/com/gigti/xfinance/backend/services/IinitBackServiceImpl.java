@@ -12,7 +12,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 @Service
-@UIScope
 public class IinitBackServiceImpl implements IinitBackService, HasLogger {
 
     @Autowired

@@ -5,17 +5,17 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.CategoriaProductoRepository;
 import com.gigti.xfinance.backend.repositories.EmpresaRepository;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 
-@Component
-@UIScope
+@Service
 public class CategoriaProductoServiceImpl implements IcategoriaProductoService, HasLogger {
 
     @Autowired
@@ -25,8 +25,9 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
     private EmpresaRepository empresaRepository;
 
     @Override
-    public List<CategoriaProducto> findAll(Empresa empresa) {
-        return categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa);
+    public List<CategoriaProducto> findAll(Empresa empresa, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
     }
 
     @Transactional

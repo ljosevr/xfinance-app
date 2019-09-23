@@ -2,6 +2,7 @@ package com.gigti.xfinance.backend.repositories;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,7 @@ import java.util.List;
 @Repository
 public interface CategoriaProductoRepository extends JpaRepository<CategoriaProducto, String> {
 
-    public List<CategoriaProducto> findByEmpresaAndEliminadoIsFalse(Empresa empresa);
+    public List<CategoriaProducto> findByEmpresaAndEliminadoIsFalse(Empresa empresa, Pageable pageable);
 
     public List<CategoriaProducto> findByEmpresaAndActivoTrue(Empresa empresa);
 

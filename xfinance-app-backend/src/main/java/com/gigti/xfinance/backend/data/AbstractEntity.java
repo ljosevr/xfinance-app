@@ -23,12 +23,9 @@ public abstract class AbstractEntity implements Serializable {
 	@GenericGenerator(name ="system-uuid", strategy = "uuid2")
 	protected String id;
 
-	@Version
-	private int version;
-
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, version);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -40,8 +37,7 @@ public abstract class AbstractEntity implements Serializable {
 			return false;
 		}
 		AbstractEntity that = (AbstractEntity) o;
-		return version == that.version &&
-				Objects.equals(id, that.id);
+		return Objects.equals(id, that.id);
 	}
 
 	public String getId() {
@@ -52,11 +48,4 @@ public abstract class AbstractEntity implements Serializable {
 		this.id = id;
 	}
 
-	public int getVersion() {
-		return version;
-	}
-
-	public void setVersion(int version) {
-		this.version = version;
-	}
 }

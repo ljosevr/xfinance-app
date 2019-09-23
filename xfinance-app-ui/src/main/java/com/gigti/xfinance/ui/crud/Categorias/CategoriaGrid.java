@@ -1,10 +1,10 @@
 package com.gigti.xfinance.ui.crud.Categorias;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import org.vaadin.klaudeta.PaginatedGrid;
 
-public class CategoriaGrid extends Grid<CategoriaProducto> {
+public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
 
     public CategoriaGrid() {
         setSizeFull();
@@ -20,6 +20,8 @@ public class CategoriaGrid extends Grid<CategoriaProducto> {
                 .setFlexGrow(30)
                 .setSortable(true);
 
+        setPageSize(10);
+        setPaginatorSize(3);
     }
 
     public CategoriaProducto getSelectedRow() {
@@ -29,4 +31,5 @@ public class CategoriaGrid extends Grid<CategoriaProducto> {
     public void refresh(CategoriaProducto categoria) {
         getDataCommunicator().refresh(categoria);
     }
+
 }

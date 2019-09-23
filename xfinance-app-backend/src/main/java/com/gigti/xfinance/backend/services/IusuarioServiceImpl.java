@@ -6,9 +6,9 @@ import com.gigti.xfinance.backend.repositories.UsuarioRepository;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-@UIScope
+@Service
 public class IusuarioServiceImpl implements IusuarioService, HasLogger {
 
     @Autowired

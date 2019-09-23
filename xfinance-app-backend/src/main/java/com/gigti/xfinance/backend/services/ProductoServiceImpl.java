@@ -13,12 +13,12 @@ import com.gigti.xfinance.backend.repositories.ProductoRepository;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
 
-@Component
-@UIScope
+@Service
 public class ProductoServiceImpl implements IProductoService, HasLogger {
 
     @Autowired

@@ -8,7 +8,6 @@ package com.gigti.xfinance.ui.crud.inventario;
 
 import com.gigti.xfinance.backend.services.IProductoService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.crud.producto.ProductoDataProvider;
 import com.gigti.xfinance.ui.crud.producto.ProductoForm;
 import com.gigti.xfinance.ui.crud.producto.ProductoGrid;
 import com.vaadin.flow.component.Key;
@@ -47,7 +46,7 @@ public class InventarioCrudView extends HorizontalLayout
 
     @Autowired
     private IProductoService iProductoService;
-    private ProductoDataProvider dataProvider;
+    //private ProductoDataProvider dataProvider;
 
     public InventarioCrudView() {
         setSizeFull();
@@ -56,7 +55,7 @@ public class InventarioCrudView extends HorizontalLayout
         //dataProvider = ProductoDataProvider.getInstance();
 
         grid = new ProductoGrid();
-        grid.setDataProvider(dataProvider);
+        //grid.setDataProvider(dataProvider);
 //        grid.asSingleSelect().addValueChangeListener(
 //                event -> viewLogic.rowSelected(event.getValue()));
 
@@ -81,7 +80,7 @@ public class InventarioCrudView extends HorizontalLayout
         filter = new TextField();
         filter.setPlaceholder("Filter name, availability or category");
         // Apply the filter to grid's data provider. TextField value is never null
-        filter.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
+        //filter.addValueChangeListener(event -> dataProvider.setFilter(event.getValue()));
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
         newProduct = new Button("New product");

@@ -8,7 +8,6 @@ package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
-import com.gigti.xfinance.ui.crud.Categorias.CategoriaDataProvider;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -23,7 +22,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.VaadinSessionScope;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,7 +35,7 @@ public class AdminView extends VerticalLayout {
     //public final String VIEW_NAME = "admin";
 
     private final IronList<CategoriaProducto> categoriesListing;
-    private final CategoriaDataProvider dataProvider;
+    //private final CategoriaDataProvider dataProvider;
     private final Button newCategoryButton;
 
     //TODO
@@ -47,14 +45,14 @@ public class AdminView extends VerticalLayout {
     public AdminView(IcategoriaProductoService iService) {
         categoriesListing = new IronList<>();
 
-        dataProvider = CategoriaDataProvider.getInstance(iService);
+        //dataProvider = CategoriaDataProvider.getInstance(iService);
 
         //categoriesListing.setDataProvider(dataProvider);
         categoriesListing.setRenderer(new ComponentRenderer<>(this::createCategoryEditor));
 
         newCategoryButton = new Button("Agregar Nueva Categoria", event -> {
             CategoriaProducto category = new CategoriaProducto();
-            dataProvider.findAll().add(category);
+            //dataProvider.findAll().add(category);
             //dataProvider.refreshAll();
         });
         newCategoryButton.setDisableOnClick(true);
@@ -69,14 +67,14 @@ public class AdminView extends VerticalLayout {
         }
 
         Button deleteButton = new Button(VaadinIcon.MINUS_CIRCLE_O.create(), event -> {
-            boolean  result = dataProvider.delete(category);
-            if(result) {
-                dataProvider.findAll().remove(category);
-                //dataProvider.refreshAll();
-                Notification.show("Categoria Eliminada");
-            }else{
-                Notification.show("Categoria NO pudo ser Eliminada");
-            }
+//            boolean  result = dataProvider.delete(category);
+//            if(result) {
+//                dataProvider.findAll().remove(category);
+//                //dataProvider.refreshAll();
+//                Notification.show("Categoria Eliminada");
+//            }else{
+//                Notification.show("Categoria NO pudo ser Eliminada");
+//            }
         });
         deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
@@ -86,7 +84,7 @@ public class AdminView extends VerticalLayout {
         binder.addValueChangeListener(event -> {
             if (binder.isValid()) {
                 //TODO
-                dataProvider.save(category);
+                //dataProvider.save(category);
                 deleteButton.setEnabled(true);
                 newCategoryButton.setEnabled(true);
                 Notification.show("Categoria Guardada.");
