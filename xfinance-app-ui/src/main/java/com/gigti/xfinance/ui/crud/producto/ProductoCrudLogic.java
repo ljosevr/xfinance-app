@@ -6,9 +6,11 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.services.IProductoService;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.notification.Notification;
@@ -32,22 +34,20 @@ public class ProductoCrudLogic implements Serializable {
 
     private ProductoCrudView view;
     private IProductoService iProductoService;
+    private IcategoriaProductoService icategoriaProductoService;
     private static Empresa empresa;
     private String filterText = "";
 
-    public ProductoCrudLogic(IProductoService iProductoService) {
+    public ProductoCrudLogic(IProductoService iProductoService, IcategoriaProductoService icategoriaService, ProductoCrudView simpleCrudView) {
         this.iProductoService = iProductoService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
-    }
-
-    public ProductoCrudLogic(IProductoService iProductoService, ProductoCrudView simpleCrudView) {
-        this.iProductoService = iProductoService;
+        this.icategoriaProductoService = icategoriaService;
         view = simpleCrudView;
         empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
 
     public void init() {
         editProducto(null);
+        view.refresh();
     }
 
     public boolean access(){
@@ -61,8 +61,12 @@ public class ProductoCrudLogic implements Serializable {
         //return true;
     }
 
-    public Collection<Producto> findAll() {
+    public List<Producto> findAll() {
         return iProductoService.findAll(empresa);
+    }
+
+    public List<CategoriaProducto> findAllCategoria() {
+        return icategoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
     public List<Producto> setFilter(String filterText) {

@@ -14,4 +14,10 @@ public class Constantes {
     public static final String VIEW_MAIN = "X Finance App";
     public static final String VIEW_CATEGORIA = "Categorias Productos";
     public static final String VIEW_PRODUCTO = "Productos";
+
+
+    //Paginador
+    public static final int PAGE_SIZE = 10;
+    public static final int PAGINATOR_SIZE = 3;
+
 }

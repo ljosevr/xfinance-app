@@ -54,7 +54,6 @@ public class XfinanceInitListener implements VaadinServiceInitListener {
                 if (!accessControl.isUserSignedIn() && !LoginScreen.class
                         .equals(enterEvent.getNavigationTarget())) {
                     enterEvent.rerouteTo(LoginScreen.class);
-                    //UI.getCurrent().navigate(LoginScreen.class);
                 }
             });
         });

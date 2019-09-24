@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Primary;
 @UIScope
 @Primary
 @Route("")
-@PreserveOnRefresh
+//@PreserveOnRefresh
 @PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
@@ -123,9 +123,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         // Check project source code for an example
         if (!accessControl.isUserSignedIn()) {
             beforeEnterEvent.rerouteTo(LoginScreen.class);
-        }else {
-            Notification.show("Usuario SI esta logueado");
         }
-
     }
 }

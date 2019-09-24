@@ -7,6 +7,7 @@ import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
@@ -16,29 +17,33 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 @Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
-//@UIScope
-public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String> {
+public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String>, BeforeEnterObserver {
 
     private CategoriaGrid grid;
     private CategoriaForm form;
     private TextField filter;
     private CategoriaCrudLogic viewLogic;
     private Button btnNewCategoria;
+    private List<CategoriaProducto> lista;
 
     @Autowired
     public CategoriaView(IcategoriaProductoService iService) {
             viewLogic = new CategoriaCrudLogic(iService,this);
-
+//        if(viewLogic.access()) {
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
             grid = new CategoriaGrid();
-            grid.setItems(viewLogic.findAll());
+            //lista = viewLogic.findAll();
+            //grid.setItems(lista);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
 
@@ -61,13 +66,17 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
             add(form);
 
             viewLogic.init();
+//        }else{
+//            UI.getCurrent().navigate(MainLayout.class);
+//        }
     }
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setPlaceholder("Filtro por Nombre, Descripción de Categoria a Buscar");
         filter.addValueChangeListener(event -> {
-            grid.setItems(viewLogic.setFilter(event.getValue()));
+            lista = viewLogic.setFilter(event.getValue());
+            grid.setItems(lista);
             }
         );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
@@ -130,21 +139,31 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
     }
 
     @Override
-    public void setParameter(BeforeEvent event,
-                             @OptionalParameter String parameter) {
-        viewLogic.enter(parameter);
+    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
+        //if(viewLogic.access()) {
+            viewLogic.enter(parameter);
+        //}
     }
 
     public void refresh(){
-        grid.setItems(viewLogic.findAll());
+        lista = viewLogic.findAll();
+        grid.setItems(lista);
     }
 
     public void refresh(CategoriaProducto categoria){
-        grid.getDataProvider().refreshItem(categoria);
+        lista.add(categoria);
+        grid.setItems(lista);
         grid.refresh(categoria);
     }
 
     public CategoriaGrid getGrid() {
         return grid;
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        if(lista.size() <= 0){
+            refresh();
+        }
     }
 }

@@ -8,6 +8,7 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
@@ -16,9 +17,12 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
+import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -26,12 +30,12 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.spring.annotation.UIScope;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -50,7 +54,7 @@ public class ProductoForm extends Div {
     private TextField stockCount;
 
     //private Select<Availability> availability;
-    private CheckboxGroup<CategoriaProducto> category;
+    private CheckboxGroup<CategoriaProducto> rBGroupcategory;
 
     private Button save;
     private Button discard;
@@ -101,8 +105,8 @@ public class ProductoForm extends Div {
         }
     }
 
-    public ProductoForm(ProductoCrudLogic productoCrudLogic) {
-        setClassName("standard-form");
+    public ProductoForm(ProductoCrudLogic productoCrudLogic, List<CategoriaProducto> listCategoria) {
+        //setClassName("standard-form");
 
         content = new VerticalLayout();
         content.setSizeUndefined();
@@ -128,15 +132,17 @@ public class ProductoForm extends Div {
         content.add(descripcion);
 
         activo = new Checkbox();
-        activo.setLabel("Categorias");
+        activo.setLabel("Activar");
         activo.setValue(true);
         content.add(activo);
 
-        category = new CheckboxGroup<>();
-        category.setLabel("Categoria Producto");
-        category.setId("category");
-        category.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        content.add(category);
+        rBGroupcategory = new CheckboxGroup<>();
+        rBGroupcategory.setItems(listCategoria);
+        rBGroupcategory.setLabel("Categoria Producto");
+        rBGroupcategory.setId("nombre");
+        rBGroupcategory.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+        rBGroupcategory.setVisible(true);
+        content.add(rBGroupcategory);
 
         price = new TextField("Price");
         price.setSuffixComponent(new Span("€"));
@@ -210,8 +216,8 @@ public class ProductoForm extends Div {
         content.add(save, discard, delete, cancel);
     }
 
-    public void setCategories(Collection<CategoriaProducto> categories) {
-        category.setItems(categories);
+    public void setCategories(List<CategoriaProducto> categories) {
+        rBGroupcategory.setItems(categories);
     }
 
     public void editProducto(Producto producto) {

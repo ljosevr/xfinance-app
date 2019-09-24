@@ -18,6 +18,7 @@ import com.vaadin.flow.spring.annotation.UIScope;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 
 public class CategoriaForm extends Div {
@@ -76,7 +77,7 @@ public class CategoriaForm extends Div {
     }
 
     public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
-        setClassName("standard-form");
+        //setClassName("standard-form");
 
         content = new VerticalLayout();
         content.setSizeUndefined();

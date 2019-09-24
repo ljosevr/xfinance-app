@@ -15,7 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
-@Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+@Data
 public class Usuario extends AbstractEntity {
 
     @Column(name="nombre_usuario", unique = true)

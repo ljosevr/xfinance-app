@@ -19,6 +19,7 @@ public class CategoriaCrudLogic implements Serializable {
     private static Empresa empresa;
     private String filterText = "";
 
+
     public CategoriaCrudLogic(IcategoriaProductoService icategoriaProductoService) {
         this.icategoriaProductoService = icategoriaProductoService;
         empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
@@ -32,12 +33,18 @@ public class CategoriaCrudLogic implements Serializable {
 
     public void init() {
         editCategoria(null);
+        view.refresh();
+    }
+
+    public boolean access(){
         // Hide and disable if not admin
-        //TODO PERMISOS
+        return empresa != null ? true : false;
+        //TODO permisos
 //        if (!AccessControlFactory.getInstance().createAccessControl()
 //                .isUserInRole(CurrentUser.get())) {
 //            view.setNewProductEnabled(false);
 //        }
+        //return true;
     }
 
     public void cancelCategoria() {
@@ -84,7 +91,7 @@ public class CategoriaCrudLogic implements Serializable {
             view.refresh(categoria);
             view.clearSelection();
             view.showSaveNotification(categoria.getNombre() +" "+typOperation);
-            view.refresh();
+            //view.refresh();
             view.showForm(false);
             setFragmentParameter("");
         } else {
@@ -125,7 +132,7 @@ public class CategoriaCrudLogic implements Serializable {
         }
     }
 
-    public Collection<CategoriaProducto> findAll() {
+    public List<CategoriaProducto> findAll() {
         return icategoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 

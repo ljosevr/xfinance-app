@@ -6,13 +6,12 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.IProductoService;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.authentication.LoginScreen;
-import com.gigti.xfinance.ui.crud.Categorias.CategoriaCrudLogic;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -26,7 +25,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 /**
  * A view for performing create-read-update-delete operations on products.
@@ -36,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 @Route(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
+//@UIScope
 public class ProductoCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
@@ -45,25 +48,27 @@ public class ProductoCrudView extends HorizontalLayout
 
     private ProductoCrudLogic viewLogic;
     private Button btnNewProduct;
-    private CategoriaCrudLogic categoriaCrudLogic;
+    private List<CategoriaProducto> listaCategoria;
+    private List<Producto> listaProducto;
+
 
     @Autowired
     public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
 
-        viewLogic = new ProductoCrudLogic(iServiceProd,this);
-        if(viewLogic.access()) {
+        viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat,this);
+//        if(viewLogic.access()) {
             setSizeFull();
-            categoriaCrudLogic = new CategoriaCrudLogic(iServiceCat);
-
             HorizontalLayout topLayout = createTopBar();
 
             grid = new ProductoGrid();
-            grid.setItems(viewLogic.findAll());
+            //listaProducto = viewLogic.findAll();
+            grid.setItems(listaProducto);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
 
-            form = new ProductoForm(viewLogic);
-            form.setCategories(categoriaCrudLogic.findAll());
+            listaCategoria = viewLogic.findAllCategoria();
+            form = new ProductoForm(viewLogic, listaCategoria);
+            form.setCategories(listaCategoria);
 
             H3 title = new H3(Constantes.VIEW_PRODUCTO);
             title.setClassName("titleView");
@@ -82,9 +87,9 @@ public class ProductoCrudView extends HorizontalLayout
             add(form);
 
             viewLogic.init();
-        }else{
-            UI.getCurrent().navigate(MainLayout.class);
-        }
+//        }else{
+//            UI.getCurrent().navigate(MainLayout.class);
+//        }
     }
 
     public HorizontalLayout createTopBar() {
@@ -92,7 +97,8 @@ public class ProductoCrudView extends HorizontalLayout
         //TODO Realizar Filtro por Categoria Tambien
         filter.setPlaceholder("Filtro Nombre");
         filter.addValueChangeListener(event -> {
-            grid.setItems(viewLogic.setFilter(event.getValue()));
+            listaProducto = viewLogic.setFilter(event.getValue());
+            grid.setItems(listaProducto);
         });
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 
@@ -127,6 +133,8 @@ public class ProductoCrudView extends HorizontalLayout
 
     public void editProducto(Producto producto) {
         showForm(producto != null);
+        listaCategoria = viewLogic.findAllCategoria();
+        form.setCategories(listaCategoria);
         form.editProducto(producto);
     }
 
@@ -141,16 +149,23 @@ public class ProductoCrudView extends HorizontalLayout
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
-        if(viewLogic.access()) {
+        //if(viewLogic.access()) {
             viewLogic.enter(parameter);
-        }
+        //}
     }
 
     public void refresh(){
-        grid.setItems(viewLogic.findAll());
+        listaProducto = viewLogic.findAll();
+        grid.setItems(listaProducto);
     }
 
     public void refresh(Producto producto){
+        listaProducto.add(producto);
+        grid.setItems(listaProducto);
         grid.refresh(producto);
+    }
+
+    public ProductoGrid getGrid() {
+        return grid;
     }
 }

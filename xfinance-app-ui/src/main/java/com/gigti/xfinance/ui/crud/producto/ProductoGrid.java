@@ -7,15 +7,17 @@
 package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.spring.annotation.UIScope;
+import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.text.DecimalFormat;
 import java.util.Comparator;
 
-public class ProductoGrid extends Grid<Producto> {
+public class ProductoGrid extends PaginatedGrid<Producto> {
 
     public ProductoGrid() {
         setSizeFull();
@@ -57,6 +59,9 @@ public class ProductoGrid extends Grid<Producto> {
                 .setHeader("Categoria")
                 .setSortable(true)
                 .setFlexGrow(12);
+
+        setPageSize(Constantes.PAGE_SIZE);
+        setPaginatorSize(Constantes.PAGINATOR_SIZE);
     }
 
     public Producto getSelectedRow() {
