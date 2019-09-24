@@ -61,7 +61,7 @@ public class ProductoCrudView extends HorizontalLayout
             HorizontalLayout topLayout = createTopBar();
 
             grid = new ProductoGrid();
-            //listaProducto = viewLogic.findAll();
+            listaProducto = viewLogic.findAll();
             grid.setItems(listaProducto);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
@@ -98,7 +98,8 @@ public class ProductoCrudView extends HorizontalLayout
         filter.setPlaceholder("Filtro Nombre");
         filter.addValueChangeListener(event -> {
             listaProducto = viewLogic.setFilter(event.getValue());
-            grid.setItems(listaProducto);
+            if(listaProducto != null)
+                grid.setItems(listaProducto);
         });
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
 

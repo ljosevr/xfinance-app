@@ -9,13 +9,31 @@ vaadin:
 
 # Workaround for https://github.com/vaadin/flow/issues/5947
 spring:
+  # Uncomment if using PostgreSQL
+  # Database
+  datasource:
+    url: jdbc:postgresql://localhost:5432/xfinance_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  # JPA properties
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
   devtools:
     restart:
       additional-exclude : META-INF/VAADIN/config/**
-  jpa:
-    properties:
-      hibernate:
-        enable_lazy_load_no_trans: true
+#  jpa:
+#    properties:
+#      hibernate:
+#        enable_lazy_load_no_trans: true
   # enable H2 web console and set url for web console
   # http://localhost:8080/console
 

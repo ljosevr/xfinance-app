@@ -25,7 +25,8 @@ import java.util.List;
 
 @Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
-public class CategoriaView extends HorizontalLayout implements HasUrlParameter<String>, BeforeEnterObserver {
+public class CategoriaView extends HorizontalLayout
+        implements HasUrlParameter<String>/*, BeforeEnterObserver , AfterNavigationObserver */ {
 
     private CategoriaGrid grid;
     private CategoriaForm form;
@@ -42,7 +43,7 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
             HorizontalLayout topLayout = createTopBar();
 
             grid = new CategoriaGrid();
-            //lista = viewLogic.findAll();
+            lista = viewLogic.findAll();
             //grid.setItems(lista);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
@@ -76,7 +77,8 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         filter.setPlaceholder("Filtro por Nombre, Descripción de Categoria a Buscar");
         filter.addValueChangeListener(event -> {
             lista = viewLogic.setFilter(event.getValue());
-            grid.setItems(lista);
+            if(lista != null)
+                grid.setItems(lista);
             }
         );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
@@ -160,10 +162,17 @@ public class CategoriaView extends HorizontalLayout implements HasUrlParameter<S
         return grid;
     }
 
-    @Override
-    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if(lista.size() <= 0){
-            refresh();
-        }
-    }
+//    @Override
+//    public void afterNavigation(AfterNavigationEvent event) {
+//        if(lista != null && lista.size() <= 0){
+//            refresh();
+//        }
+//    }
+//
+//    @Override
+//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+//        if(lista != null && lista.size() <= 0){
+//            refresh();
+//        }
+//    }
 }

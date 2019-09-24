@@ -8,7 +8,6 @@ import com.gigti.xfinance.ui.authentication.CurrentUser;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,12 +18,6 @@ public class CategoriaCrudLogic implements Serializable {
     private static Empresa empresa;
     private String filterText = "";
 
-
-    public CategoriaCrudLogic(IcategoriaProductoService icategoriaProductoService) {
-        this.icategoriaProductoService = icategoriaProductoService;
-        empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
-    }
-
     public CategoriaCrudLogic(IcategoriaProductoService iService, CategoriaView simpleCrudView) {
         icategoriaProductoService = iService;
         view = simpleCrudView;
@@ -33,7 +26,6 @@ public class CategoriaCrudLogic implements Serializable {
 
     public void init() {
         editCategoria(null);
-        view.refresh();
     }
 
     public boolean access(){
