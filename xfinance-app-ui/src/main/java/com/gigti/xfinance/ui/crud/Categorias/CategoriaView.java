@@ -44,7 +44,7 @@ public class CategoriaView extends HorizontalLayout
 
             grid = new CategoriaGrid();
             lista = viewLogic.findAll();
-            //grid.setItems(lista);
+            grid.setItems(lista);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
 
@@ -131,8 +131,8 @@ public class CategoriaView extends HorizontalLayout
 //    }
 
     public void editCategoria(CategoriaProducto categoria) {
-        showForm(categoria != null);
         form.editCategoria(categoria);
+        showForm(categoria != null);
     }
 
     public void showForm(boolean show) {

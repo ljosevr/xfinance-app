@@ -27,6 +27,9 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
     @Override
     public List<CategoriaProducto> findAll(Empresa empresa, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
+        System.out.println("Page: "+page);
+        System.out.println("Size: "+size);
+        System.out.println("Empresa: "+empresa);
         return categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
     }
 
@@ -70,7 +73,8 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
     }
 
     @Override
-    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa) {
-        return categoriaProductoRepository.findByNombreOrDescripcion(filter, empresa);
+    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoriaProductoRepository.findByNombreOrDescripcion(filter, empresa, pageable);
     }
 }

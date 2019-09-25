@@ -33,4 +33,8 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
         getDataCommunicator().refresh(categoria);
     }
 
+    @Override
+    public int getPage() {
+        return super.getPage()-1;
+    }
 }

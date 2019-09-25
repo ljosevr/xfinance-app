@@ -17,7 +17,7 @@ public interface IcategoriaProductoService {
 
     public CategoriaProducto findById(String id);
 
-    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa);
+    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa, int page, int size);
 
 //    public static IcategoriaProductoService get() {
 //        return MockDataService.getInstance();

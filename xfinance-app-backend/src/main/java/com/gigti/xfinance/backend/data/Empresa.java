@@ -50,6 +50,9 @@ public class Empresa extends AbstractEntity {
     private List<CategoriaProducto> categoriaProductos;
 
     private Boolean activo;
+
+    private Boolean eliminado;
+
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date fechaActivacion;
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -65,6 +68,7 @@ public class Empresa extends AbstractEntity {
         this.activo = activo;
         this.fechaActivacion = fechaActivacion;
         this.fechaDesactivacion = fechaDesactivacion;
+        this.eliminado = false;
     }
 
     @Override
@@ -81,26 +85,26 @@ public class Empresa extends AbstractEntity {
                 Objects.equals(productos, empresa.productos) &&
                 Objects.equals(categoriaProductos, empresa.categoriaProductos) &&
                 Objects.equals(activo, empresa.activo) &&
+                Objects.equals(eliminado, empresa.eliminado) &&
                 Objects.equals(fechaActivacion, empresa.fechaActivacion) &&
                 Objects.equals(fechaDesactivacion, empresa.fechaDesactivacion);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), tipoIde, identificacion, nombreEmpresa, direccion, usuarios, productos, categoriaProductos, activo, fechaActivacion, fechaDesactivacion);
+        return Objects.hash(super.hashCode(), tipoIde, identificacion, nombreEmpresa, direccion, usuarios, productos, categoriaProductos, activo, eliminado, fechaActivacion, fechaDesactivacion);
     }
 
     @Override
     public String toString() {
         return "Empresa{" +
-                "tipoIde=" + tipoIde +
+                "ID=" + id + + '\'' +
+                "tipoIde=" + tipoIde + '\'' +
                 ", identificacion='" + identificacion + '\'' +
                 ", nombreEmpresa='" + nombreEmpresa + '\'' +
                 ", direccion='" + direccion + '\'' +
-                ", usuarios=" + usuarios +
-                ", productos=" + productos +
-                ", categoriaProductos=" + categoriaProductos +
                 ", activo=" + activo +
+                ", eliminado=" + eliminado +
                 ", fechaActivacion=" + fechaActivacion +
                 ", fechaDesactivacion=" + fechaDesactivacion +
                 '}';

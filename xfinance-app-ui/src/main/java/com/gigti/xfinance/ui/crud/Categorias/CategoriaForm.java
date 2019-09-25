@@ -5,6 +5,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -13,12 +14,10 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.spring.annotation.UIScope;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 
 public class CategoriaForm extends Div {
@@ -26,6 +25,7 @@ public class CategoriaForm extends Div {
 
     private TextField tfCatNombre;
     private TextField tfCatDescripcion;
+    private Checkbox  cbCatActivo;
 
     private Button btnSave;
     private Button btnDiscard;
@@ -97,11 +97,17 @@ public class CategoriaForm extends Div {
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
         content.add(tfCatDescripcion);
 
+        cbCatActivo = new Checkbox("Activo");
+        cbCatActivo.setValue(true);
+        content.add(cbCatActivo);
+
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
         binder.forField(tfCatNombre).bind(CategoriaProducto::getNombre,
                 CategoriaProducto::setNombre);
         binder.forField(tfCatDescripcion).bind(CategoriaProducto::getDescripcion,
                 CategoriaProducto::setDescripcion);
+        binder.forField(cbCatActivo).bind(CategoriaProducto::isActivo,
+                CategoriaProducto::setActivo);
         binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
@@ -149,17 +155,14 @@ public class CategoriaForm extends Div {
         content.add(btnSave, btnDiscard, btnDelete, btnCancel);
     }
 
-//    public void setCategories(Collection<CategoriaProducto> categories) {
-//        //category.setItems(categories);
-//    }
-
     public void editCategoria(CategoriaProducto categoria) {
         if (categoria == null) {
             categoria = new CategoriaProducto();
+            categoria.setActivo(true);
+            btnDelete.setVisible(false);
         }
-        //delete.setVisible(!producto.isNewProduct());
+        btnDelete.setVisible(true);
         currentCategoria = categoria;
         binder.readBean(categoria);
     }
-
 }

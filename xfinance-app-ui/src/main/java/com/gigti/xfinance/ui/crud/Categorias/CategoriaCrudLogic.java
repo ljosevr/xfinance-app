@@ -30,7 +30,7 @@ public class CategoriaCrudLogic implements Serializable {
 
     public boolean access(){
         // Hide and disable if not admin
-        return empresa != null ? true : false;
+        return empresa != null;
         //TODO permisos
 //        if (!AccessControlFactory.getInstance().createAccessControl()
 //                .isUserInRole(CurrentUser.get())) {
@@ -128,15 +128,6 @@ public class CategoriaCrudLogic implements Serializable {
         return icategoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
-//    public Collection<CategoriaProducto> findPage() {
-//
-//        icategoriaProductoService
-//        CallbackDataProvider<CategoriaProducto, Void> provider = DataProvider
-//                .fromCallbacks(query -> icategoriaProductoService.fetch(query.getOffset(), query.getLimit()).stream(),
-//                        query -> icategoriaProductoService.count());
-//        return icategoriaProductoService.findAll(empresa);
-//    }
-
     public List<CategoriaProducto> setFilter(String filterText) {
         Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
@@ -144,7 +135,7 @@ public class CategoriaCrudLogic implements Serializable {
             return null;
         }
         this.filterText = filterText.trim();
-        return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa);
+        return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
     public CategoriaProducto findById(String categoriaId) {
