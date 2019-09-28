@@ -7,7 +7,6 @@ import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
@@ -16,9 +15,8 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -26,7 +24,7 @@ import java.util.List;
 @Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
 public class CategoriaView extends HorizontalLayout
-        implements HasUrlParameter<String>/*, BeforeEnterObserver , AfterNavigationObserver */ {
+        implements HasUrlParameter<String> {
 
     private CategoriaGrid grid;
     private CategoriaForm form;
@@ -75,6 +73,7 @@ public class CategoriaView extends HorizontalLayout
     public HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setPlaceholder("Filtro por Nombre, Descripción de Categoria a Buscar");
+        filter.setValueChangeMode(ValueChangeMode.LAZY);
         filter.addValueChangeListener(event -> {
             lista = viewLogic.setFilter(event.getValue());
             if(lista != null)
@@ -93,7 +92,6 @@ public class CategoriaView extends HorizontalLayout
         return new TopBarComponent(filter, btnNewCategoria);
     }
 
-
     public void showError(String msg) {
         Notification.show(msg);
     }
@@ -102,10 +100,6 @@ public class CategoriaView extends HorizontalLayout
         Notification.show(msg);
     }
 
-//    public void setNewCategoriaEnabled(boolean enabled) {
-//        btnNewCategoria.setEnabled(enabled);
-//    }
-
     public void clearSelection() {
         grid.getSelectionModel().deselectAll();
     }
@@ -113,22 +107,6 @@ public class CategoriaView extends HorizontalLayout
     public void selectRow(CategoriaProducto row) {
         grid.getSelectionModel().select(row);
     }
-
-//    public CategoriaProducto getSelectedRow() {
-//        return grid.getSelectedRow();
-//    }
-//
-//    public void saveCategoria(CategoriaProducto categoria) {
-//        viewLogic.saveCategoria(categoria);
-//    }
-//
-//    public CategoriaProducto findById(String categoriaId) {
-//        return viewLogic.findById(categoriaId);
-//    }
-//
-//    public void deleteCategoria(CategoriaProducto categoria) {
-//        viewLogic.deleteCategoria(categoria);
-//    }
 
     public void editCategoria(CategoriaProducto categoria) {
         form.editCategoria(categoria);
@@ -142,9 +120,7 @@ public class CategoriaView extends HorizontalLayout
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
-        //if(viewLogic.access()) {
-            viewLogic.enter(parameter);
-        //}
+        viewLogic.enter(parameter);
     }
 
     public void refresh(){
@@ -162,17 +138,4 @@ public class CategoriaView extends HorizontalLayout
         return grid;
     }
 
-//    @Override
-//    public void afterNavigation(AfterNavigationEvent event) {
-//        if(lista != null && lista.size() <= 0){
-//            refresh();
-//        }
-//    }
-//
-//    @Override
-//    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-//        if(lista != null && lista.size() <= 0){
-//            refresh();
-//        }
-//    }
 }

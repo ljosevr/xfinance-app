@@ -27,10 +27,12 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
     @Override
     public List<CategoriaProducto> findAll(Empresa empresa, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        System.out.println("Page: "+page);
-        System.out.println("Size: "+size);
-        System.out.println("Empresa: "+empresa);
         return categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+    }
+
+    public List<CategoriaProducto> findActivoOrInactivo(boolean activo, Empresa empresa, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return categoriaProductoRepository.findActivoOrInactivo(activo, empresa, pageable);
     }
 
     @Transactional

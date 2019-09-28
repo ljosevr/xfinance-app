@@ -8,10 +8,8 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.text.DecimalFormat;
@@ -33,11 +31,11 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setFlexGrow(20)
                 .setSortable(true);
 
-        final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.availability]]\"></iron-icon> [[item.availability]]";
+        final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
         addColumn(TemplateRenderer.<Producto>of(availabilityTemplate)
-                .withProperty("activo", Producto::getActivo))
+                .withProperty("activoS", Producto::getActivoS))
                 .setHeader("Activo")
-                .setComparator(Comparator.comparing(this::formatActivo))
+                .setComparator(Comparator.comparing(Producto::getActivoS))
                 .setSortable(true)
                 .setFlexGrow(5);
 
@@ -62,10 +60,7 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
 
         setPageSize(Constantes.PAGE_SIZE);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
-    }
-
-    public Producto getSelectedRow() {
-        return asSingleSelect().getValue();
+        getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
     public void refresh(Producto product) {
@@ -79,14 +74,6 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
 //
 //        return producto.getCategoria().getNombre();
         return "";
-    }
-
-    private String formatActivo(Producto producto) {
-        if (producto.getActivo()) {
-            return "Activo";
-        }else{
-            return "Inactivo";
-        }
     }
 
     private String formatPrice(Producto producto){
@@ -106,4 +93,8 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
         return "0";
     }
 
+    @Override
+    public int getPage() {
+        return super.getPage()-1;
+    }
 }

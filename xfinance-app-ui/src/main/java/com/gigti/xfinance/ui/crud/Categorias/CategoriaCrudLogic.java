@@ -94,9 +94,17 @@ public class CategoriaCrudLogic implements Serializable {
     public void deleteCategoria(CategoriaProducto categoria) {
         view.clearSelection();
         if(icategoriaProductoService.deleteCategoria(categoria.getId())){
-            view.showSaveNotification(categoria.getNombre() + " Eliminada");
-            view.refresh();
-            setFragmentParameter("");
+            view.showSaveNotification("Categoria: "+categoria.getNombre() + " Eliminada");
+            List<CategoriaProducto> lista = (List<CategoriaProducto>) view.getGrid().getDataProvider();
+            if(lista.remove(categoria)){
+                setFragmentParameter("");
+                //TODO mejorar
+                view.getGrid().setItems(lista);
+                //refresh(categoria);
+            } else{
+                view.showError("Error al Eliminar Categoria "+categoria.getNombre()+ " De la tabla");
+                view.refresh();
+            }
         } else {
             view.showError("Error al Eliminar Categoria "+categoria.getNombre());
         }
@@ -125,6 +133,7 @@ public class CategoriaCrudLogic implements Serializable {
     }
 
     public List<CategoriaProducto> findAll() {
+        //TODO aplicar al Filtro si es Activo O INACTIVO
         return icategoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
@@ -136,9 +145,5 @@ public class CategoriaCrudLogic implements Serializable {
         }
         this.filterText = filterText.trim();
         return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
-    }
-
-    public CategoriaProducto findById(String categoriaId) {
-        return icategoriaProductoService.findById(categoriaId);
     }
 }

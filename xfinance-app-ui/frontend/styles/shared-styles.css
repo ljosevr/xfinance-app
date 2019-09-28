@@ -123,17 +123,13 @@
     }
 }
 
-/* Color codes for the availability statuses of the products */
-.Available {
-    color: #2dd085;
+/* Color codes for the Activo statuses */
+.SI {
+    color: #2dd013;
 }
 
-.Coming {
-    color: #ffc66e;
-}
-
-.Discontinued {
-    color: #f54993;
+.NO {
+    color: #050103;
 }
 
 .titleView {

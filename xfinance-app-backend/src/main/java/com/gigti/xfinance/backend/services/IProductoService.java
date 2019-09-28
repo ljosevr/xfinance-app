@@ -18,7 +18,7 @@ public interface IProductoService {
     public Producto saveProduct(Producto producto);
     public boolean delete(String id);
     public List<Producto> findByNombreProducto(Empresa empresa, String productName);
-    public List<Producto> findAll(Empresa empresa);
+    public List<Producto> findAll(Empresa empresa, int page, int size);
     public Producto findByBarCode(Empresa empresa, String barCode);
     public List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
     public Producto findById(String id);

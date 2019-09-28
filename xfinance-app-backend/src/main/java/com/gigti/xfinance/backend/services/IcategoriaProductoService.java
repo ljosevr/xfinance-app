@@ -11,6 +11,8 @@ public interface IcategoriaProductoService {
 
     public List<CategoriaProducto> findAll(Empresa empresa, int page, int size);
 
+    public List<CategoriaProducto> findActivoOrInactivo(boolean activo, Empresa empresa, int page, int size);
+
     public boolean deleteCategoria(String id);
 
     public CategoriaProducto saveCategoria(CategoriaProducto categoria);

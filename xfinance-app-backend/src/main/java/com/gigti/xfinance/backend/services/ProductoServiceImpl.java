@@ -12,6 +12,8 @@ import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.ProductoRepository;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -48,8 +50,9 @@ public class ProductoServiceImpl implements IProductoService, HasLogger {
         return productoRepository.findByEmpresaAndNombreProducto(empresa, productName);
     }
 
-    public List<Producto> findAll(Empresa empresa){
-        return productoRepository.findByEmpresa(empresa);
+    public List<Producto> findAll(Empresa empresa, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return productoRepository.findByEmpresa(empresa, pageable);
     }
 
     public Producto findByBarCode(Empresa empresa, String barCode){

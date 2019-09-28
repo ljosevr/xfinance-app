@@ -15,7 +15,6 @@ import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H3;
@@ -25,20 +24,18 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 /**
  * A view for performing create-read-update-delete operations on products.
- *
+ * <p>
  * See also {@link ProductoCrudLogic} for fetching the data, the actual CRUD
  * operations and controlling the view based on events from outside.
  */
 @Route(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
-//@UIScope
 public class ProductoCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
@@ -55,38 +52,38 @@ public class ProductoCrudView extends HorizontalLayout
     @Autowired
     public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
 
-        viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat,this);
+        viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat, this);
 //        if(viewLogic.access()) {
-            setSizeFull();
-            HorizontalLayout topLayout = createTopBar();
+        setSizeFull();
+        HorizontalLayout topLayout = createTopBar();
 
-            grid = new ProductoGrid();
-            listaProducto = viewLogic.findAll();
-            grid.setItems(listaProducto);
-            grid.asSingleSelect().addValueChangeListener(
-                    event -> viewLogic.rowSelected(event.getValue()));
+        grid = new ProductoGrid();
+        listaProducto = viewLogic.findAll();
+        grid.setItems(listaProducto);
+        grid.asSingleSelect().addValueChangeListener(
+                event -> viewLogic.rowSelected(event.getValue()));
 
-            listaCategoria = viewLogic.findAllCategoria();
-            form = new ProductoForm(viewLogic, listaCategoria);
-            form.setCategories(listaCategoria);
+        listaCategoria = viewLogic.findAllCategoria();
+        form = new ProductoForm(viewLogic, listaCategoria);
+        form.setCategories(listaCategoria);
 
-            H3 title = new H3(Constantes.VIEW_PRODUCTO);
-            title.setClassName("titleView");
+        H3 title = new H3(Constantes.VIEW_PRODUCTO);
+        title.setClassName("titleView");
 
-            VerticalLayout barAndGridLayout = new VerticalLayout();
-            barAndGridLayout.add(title);
+        VerticalLayout barAndGridLayout = new VerticalLayout();
+        barAndGridLayout.add(title);
 
-            barAndGridLayout.add(topLayout);
-            barAndGridLayout.add(grid);
-            barAndGridLayout.setFlexGrow(1, grid);
-            barAndGridLayout.setFlexGrow(0, topLayout);
-            barAndGridLayout.setSizeFull();
-            barAndGridLayout.expand(grid);
+        barAndGridLayout.add(topLayout);
+        barAndGridLayout.add(grid);
+        barAndGridLayout.setFlexGrow(1, grid);
+        barAndGridLayout.setFlexGrow(0, topLayout);
+        barAndGridLayout.setSizeFull();
+        barAndGridLayout.expand(grid);
 
-            add(barAndGridLayout);
-            add(form);
+        add(barAndGridLayout);
+        add(form);
 
-            viewLogic.init();
+        viewLogic.init();
 //        }else{
 //            UI.getCurrent().navigate(MainLayout.class);
 //        }
@@ -98,7 +95,7 @@ public class ProductoCrudView extends HorizontalLayout
         filter.setPlaceholder("Filtro Nombre");
         filter.addValueChangeListener(event -> {
             listaProducto = viewLogic.setFilter(event.getValue());
-            if(listaProducto != null)
+            if (listaProducto != null)
                 grid.setItems(listaProducto);
         });
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
@@ -120,10 +117,6 @@ public class ProductoCrudView extends HorizontalLayout
         Notification.show(msg);
     }
 
-//    public void setNewProductEnabled(boolean enabled) {
-//        btnNewProduct.setEnabled(enabled);
-//    }
-
     public void clearSelection() {
         grid.getSelectionModel().deselectAll();
     }
@@ -133,14 +126,8 @@ public class ProductoCrudView extends HorizontalLayout
     }
 
     public void editProducto(Producto producto) {
-        showForm(producto != null);
-        listaCategoria = viewLogic.findAllCategoria();
-        form.setCategories(listaCategoria);
         form.editProducto(producto);
-    }
-
-    public Producto findById(String productoId) {
-        return viewLogic.findById(productoId);
+        showForm(producto != null);
     }
 
     public void showForm(boolean show) {
@@ -150,17 +137,15 @@ public class ProductoCrudView extends HorizontalLayout
 
     @Override
     public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
-        //if(viewLogic.access()) {
-            viewLogic.enter(parameter);
-        //}
+        viewLogic.enter(parameter);
     }
 
-    public void refresh(){
+    public void refresh() {
         listaProducto = viewLogic.findAll();
         grid.setItems(listaProducto);
     }
 
-    public void refresh(Producto producto){
+    public void refresh(Producto producto) {
         listaProducto.add(producto);
         grid.setItems(listaProducto);
         grid.refresh(producto);

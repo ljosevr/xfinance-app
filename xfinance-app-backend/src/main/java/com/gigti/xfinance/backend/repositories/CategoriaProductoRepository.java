@@ -19,9 +19,11 @@ public interface CategoriaProductoRepository extends PagingAndSortingRepository<
             "c.eliminado = False")
     public List<CategoriaProducto> findByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa, Pageable pageable);
 
-    public List<CategoriaProducto> findByEmpresaAndActivoTrue(Empresa empresa);
-
-    public List<CategoriaProducto> findByEmpresaAndActivoFalse(Empresa empresa);
+    @Query("SELECT c FROM CategoriaProducto  c " +
+            "WHERE c.empresa =:empresa AND " +
+            "c.activo =:activo AND " +
+            "c.eliminado = False")
+    public List<CategoriaProducto> findActivoOrInactivo(@Param("activo") boolean activo, @Param("empresa") Empresa empresa, Pageable pageable);
 
     @Query("SELECT c FROM CategoriaProducto c " +
             "WHERE UPPER(c.nombre) LIKE CONCAT('%', UPPER(:filter),'%') OR " +

@@ -8,7 +8,6 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
@@ -17,8 +16,8 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
@@ -29,12 +28,13 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,23 +43,11 @@ import java.util.Locale;
  */
 public class ProductoForm extends Div {
 
-    private VerticalLayout content;
+    private RadioButtonGroup<CategoriaProducto> rBGroupcategory;
 
-    private TextField productName;
-    private TextField codigobarra;
-    private TextField descripcion;
-    private Checkbox activo;
-
-    private TextField price;
-    private TextField stockCount;
-
-    //private Select<Availability> availability;
-    private CheckboxGroup<CategoriaProducto> rBGroupcategory;
-
-    private Button save;
-    private Button discard;
-    private Button cancel;
-    private Button delete;
+    private Button btnSave;
+    private Button btnDiscard;
+    private Button btnDelete;
 
     private ProductoCrudLogic viewLogic;
     private Binder<Producto> binder;
@@ -106,114 +94,113 @@ public class ProductoForm extends Div {
     }
 
     public ProductoForm(ProductoCrudLogic productoCrudLogic, List<CategoriaProducto> listCategoria) {
-        //setClassName("standard-form");
-
-        content = new VerticalLayout();
+        VerticalLayout content = new VerticalLayout();
         content.setSizeUndefined();
         add(content);
 
         viewLogic = productoCrudLogic;
 
-        productName = new TextField("Nombre Producto");
-        productName.setWidth("100%");
-        productName.setRequired(true);
-        productName.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(productName);
+        TextField tfProdNombre = new TextField("Nombre Producto");
+        tfProdNombre.setWidth("100%");
+        tfProdNombre.setRequired(true);
+        tfProdNombre.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfProdNombre);
 
-        codigobarra = new TextField("Codigo de barras");
-        codigobarra.setWidth("100%");
-        codigobarra.setRequired(true);
-        codigobarra.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(codigobarra);
+        TextField tfProdCodigoB = new TextField("Codigo de barras");
+        tfProdCodigoB.setWidth("100%");
+        tfProdCodigoB.setRequired(true);
+        tfProdCodigoB.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfProdCodigoB);
 
-        descripcion = new TextField("Descripción");
-        descripcion.setWidth("100%");
-        //descripcion.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(descripcion);
+        TextField tfProdDescripcion = new TextField("Descripción");
+        tfProdDescripcion.setWidth("100%");
+        //tfProdDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfProdDescripcion);
 
-        activo = new Checkbox();
-        activo.setLabel("Activar");
-        activo.setValue(true);
-        content.add(activo);
+        Checkbox chkActivo = new Checkbox("Activo");
+        chkActivo.setValue(true);
+        content.add(chkActivo);
 
-        rBGroupcategory = new CheckboxGroup<>();
-        rBGroupcategory.setItems(listCategoria);
+        rBGroupcategory = new RadioButtonGroup<>();
         rBGroupcategory.setLabel("Categoria Producto");
-        rBGroupcategory.setId("nombre");
-        rBGroupcategory.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        rBGroupcategory.setVisible(true);
+        rBGroupcategory.setItems(listCategoria);
+        rBGroupcategory.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
+        rBGroupcategory.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+        rBGroupcategory.setRequired(true);
+        //TODO corregir las categorias
+        rBGroupcategory.addValueChangeListener(event ->{
+            Notification.show(event.getValue().getNombre());
+        });
+        //rBGroupcategory.setId("nombre");
+        //rBGroupcategory.setVisible(true);
         content.add(rBGroupcategory);
 
-        price = new TextField("Price");
-        price.setSuffixComponent(new Span("€"));
-        price.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        price.setValueChangeMode(ValueChangeMode.EAGER);
+        TextField tfProdPrecio = new TextField("Precio");
+        tfProdPrecio.setSuffixComponent(new Span("€"));
+        tfProdPrecio.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        tfProdPrecio.setValueChangeMode(ValueChangeMode.EAGER);
 
-        stockCount = new TextField("In stock");
-        stockCount.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        stockCount.setValueChangeMode(ValueChangeMode.EAGER);
+        TextField tfProdStock = new TextField("Stock(cantidad)");
+        tfProdStock.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        tfProdStock.setValueChangeMode(ValueChangeMode.EAGER);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(price,
-                stockCount);
+        HorizontalLayout horizontalLayout = new HorizontalLayout(tfProdPrecio,
+                tfProdStock);
         horizontalLayout.setWidth("100%");
-        horizontalLayout.setFlexGrow(1, price, stockCount);
+        horizontalLayout.setFlexGrow(1, tfProdPrecio, tfProdStock);
         content.add(horizontalLayout);
 
-//        availability = new Select<>();
-//        availability.setLabel("Availability");
-//        availability.setWidth("100%");
-//        availability.setItems(Availability.values());
-//        content.add(availability);
-
-
-
         binder = new BeanValidationBinder<>(Producto.class);
-        //binder.forField(price).withConverter(new PriceConverter()).bind("price");
-        //binder.forField(stockCount).withConverter(new StockCountConverter()).bind("stockCount");
+        binder.forField(tfProdPrecio).withConverter(new PriceConverter()).bind(Producto::getPrecioVentaActual, Producto::setPrecioVentaActual);
+        binder.forField(tfProdStock).withConverter(new StockCountConverter()).bind(Producto::getStockActual, Producto::setStockActual);
+        binder.forField(tfProdNombre).bind(Producto::getNombreProducto, Producto::setNombreProducto);
+        binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
+        binder.forField(tfProdCodigoB).bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
+        binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
         binder.bindInstanceFields(this);
 
-        // enable/disable save button while editing
+        // enable/disable btnSave button while editing
         binder.addStatusChangeListener(event -> {
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
-            save.setEnabled(hasChanges && isValid);
-            discard.setEnabled(hasChanges);
+            btnSave.setEnabled(hasChanges && isValid);
+            btnDiscard.setEnabled(hasChanges);
         });
 
-        save = new Button("Guardar");
-        save.setWidth("100%");
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        save.addClickListener(event -> {
+        btnSave = new Button("Guardar");
+        btnSave.setWidth("100%");
+        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSave.addClickListener(event -> {
             if (currentProduct != null
                     && binder.writeBeanIfValid(currentProduct)) {
                 viewLogic.saveProducto(currentProduct);
             }
         });
-        save.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
+        btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
 
-        discard = new Button("Descartar Cambios");
-        discard.setWidth("100%");
-        discard.addClickListener(
+        btnDiscard = new Button("Descartar Cambios");
+        btnDiscard.setWidth("100%");
+        btnDiscard.addClickListener(
                 event -> viewLogic.editProducto(currentProduct));
 
-        cancel = new Button("Cancelar");
-        cancel.setWidth("100%");
-        cancel.addClickListener(event -> viewLogic.cancelProducto());
-        cancel.addClickShortcut(Key.ESCAPE);
+        Button btnCancel = new Button("Cancelar");
+        btnCancel.setWidth("100%");
+        btnCancel.addClickListener(event -> viewLogic.cancelProducto());
+        btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
                 .addEventListener("keydown", event -> viewLogic.cancelProducto())
                 .setFilter("event.key == 'Escape'");
 
-        delete = new Button("Eliminar");
-        delete.setWidth("100%");
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
-        delete.addClickListener(event -> {
+        btnDelete = new Button("Eliminar");
+        btnDelete.setWidth("100%");
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
+        btnDelete.addClickListener(event -> {
             if (currentProduct != null) {
                 viewLogic.deleteProducto(currentProduct);
             }
         });
 
-        content.add(save, discard, delete, cancel);
+        content.add(btnSave, btnDiscard, btnDelete, btnCancel);
     }
 
     public void setCategories(List<CategoriaProducto> categories) {
@@ -223,8 +210,14 @@ public class ProductoForm extends Div {
     public void editProducto(Producto producto) {
         if (producto == null) {
             producto = new Producto();
+            producto.setActivo(true);
+            btnDelete.setEnabled(false);
+        } else if(StringUtils.isBlank(producto.getId())){
+            producto.setActivo(true);
+            btnDelete.setEnabled(false);
+        } else {
+            btnDelete.setEnabled(true);
         }
-        //delete.setVisible(!producto.isNewProduct());
         currentProduct = producto;
         binder.readBean(producto);
     }
