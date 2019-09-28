@@ -138,4 +138,7 @@ public class CategoriaView extends HorizontalLayout
         return grid;
     }
 
+    public List<CategoriaProducto> getItemsGrid(){
+        return lista;
+    }
 }

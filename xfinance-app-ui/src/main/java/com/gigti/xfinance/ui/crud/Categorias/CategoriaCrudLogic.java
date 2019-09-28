@@ -95,12 +95,9 @@ public class CategoriaCrudLogic implements Serializable {
         view.clearSelection();
         if(icategoriaProductoService.deleteCategoria(categoria.getId())){
             view.showSaveNotification("Categoria: "+categoria.getNombre() + " Eliminada");
-            List<CategoriaProducto> lista = (List<CategoriaProducto>) view.getGrid().getDataProvider();
-            if(lista.remove(categoria)){
+            if(view.getItemsGrid().remove(categoria)){
                 setFragmentParameter("");
-                //TODO mejorar
-                view.getGrid().setItems(lista);
-                //refresh(categoria);
+                view.getGrid().setItems(view.getItemsGrid());
             } else{
                 view.showError("Error al Eliminar Categoria "+categoria.getNombre()+ " De la tabla");
                 view.refresh();
