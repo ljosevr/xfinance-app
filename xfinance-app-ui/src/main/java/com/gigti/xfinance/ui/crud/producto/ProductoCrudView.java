@@ -36,6 +36,7 @@ import java.util.List;
  */
 @Route(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
+@PageTitle(value = Constantes.VIEW_MAIN)
 public class ProductoCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
 

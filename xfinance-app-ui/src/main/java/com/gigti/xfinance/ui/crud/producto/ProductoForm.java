@@ -20,6 +20,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
 import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -42,7 +43,8 @@ import java.util.Locale;
  */
 public class ProductoForm extends Div {
 
-    private CheckboxGroup<CategoriaProducto> chkGroupCategorias;
+    //private CheckboxGroup<CategoriaProducto> rbGroupCategorias;
+    private RadioButtonGroup<CategoriaProducto> rbGroupCategorias;
 
     private Button btnSave;
     private Button btnDiscard;
@@ -120,37 +122,12 @@ public class ProductoForm extends Div {
         chkActivo.setValue(true);
         content.add(chkActivo);
 
-        chkGroupCategorias = new CheckboxGroup<>();
-        chkGroupCategorias.setLabel("Categoria Producto");
-        chkGroupCategorias.setItems(listCategoria);
-        //chkGroupCategorias.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
-        chkGroupCategorias.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        chkGroupCategorias.setRequired(true);
-        //TODO corregir las categorias
-        chkGroupCategorias.addValueChangeListener(event ->{
-            //TODO MEJORAR
-            //if(){
-                for(Object c : event.getValue().toArray()){
-                    CategoriaProducto cp = (CategoriaProducto) c;
-                    if(!cp.isActivo()){
-                        cp.setActivo(false);
-                    }
-                }
-            for(Object c : event.getOldValue().toArray()){
-                CategoriaProducto cp = (CategoriaProducto) c;
-                if(cp.isActivo()){
-                    cp.setActivo(false);
-                }
-            }
-            //}
-            //if(event.getValue() != null){
-                //event.getOldValue().clear();
-            //}
-            Notification.show(event.getHasValue().toString());
-        });
-        //rBGroupcategory.setId("nombre");
-        //rBGroupcategory.setVisible(true);
-        content.add(chkGroupCategorias);
+        rbGroupCategorias = new RadioButtonGroup<>();
+        rbGroupCategorias.setLabel("Categoria Producto");
+        rbGroupCategorias.setItems(listCategoria);
+        rbGroupCategorias.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
+        rbGroupCategorias.setRequired(true);
+        content.add(rbGroupCategorias);
 
         TextField tfProdPrecio = new TextField("Precio");
         tfProdPrecio.setSuffixComponent(new Span("€"));
@@ -221,7 +198,8 @@ public class ProductoForm extends Div {
     }
 
     public void setCategories(List<CategoriaProducto> categories) {
-        chkGroupCategorias.setItems(categories);
+        rbGroupCategorias.setItems(categories);
+        rbGroupCategorias.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
     }
 
     public void editProducto(Producto producto) {
