@@ -9,6 +9,7 @@ package com.gigti.xfinance.ui;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.authentication.LoginScreen;
 import com.vaadin.flow.component.*;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -45,15 +46,7 @@ import org.springframework.context.annotation.Primary;
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private MenuB menu;
     final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-
     public MainLayout() {
-//        setSizeFull();
-//        setClassName("main-layout");
-
-
-        VaadinSession vaadinSession = VaadinSession.getCurrent();
-        String username = (String) vaadinSession.getAttribute("username"/*ATTRIBUTE_USERNAME*/);
-
         addToNavbar(true, createHeader());
         setPrimarySection(Section.NAVBAR);
         //addToDrawer(new MenuB());
@@ -68,8 +61,8 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         top.setSpacing(true);
         top.setClassName("menu-header");
 
-        H4 title = new H4("X Finance App");
-        title.setClassName("titleBar");
+        H4 title = new H4((CurrentUser.get() != null ? CurrentUser.get().getNombreUsuario() +" - "+CurrentUser.get().getEmpresa().getNombreEmpresa() : ""));
+        title.setClassName("userNavBar");
         String resolvedImage = VaadinServletService.getCurrent()
                 .resolveResource("webapp/img/table-logo.png",
                         VaadinSession.getCurrent().getBrowser());
@@ -78,7 +71,13 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
 
         menu = new MenuB();
 
-        top.add(img, title, menu);
+        HorizontalLayout h1 = new HorizontalLayout();
+        h1.add(img, menu);
+
+        HorizontalLayout h2 = new HorizontalLayout();
+        h2.add(title);
+
+        top.add(h1,h2);
 
         return top;
     }

@@ -145,3 +145,10 @@
     margin: auto;
     text-align: center;
 }
+
+.userNavBar {
+    height: 20px;
+    border-spacing: 0.5px;
+    margin: auto;
+    text-align: right;
+}
