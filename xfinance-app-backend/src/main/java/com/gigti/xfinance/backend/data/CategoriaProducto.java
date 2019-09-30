@@ -50,4 +50,8 @@ public class CategoriaProducto extends AbstractEntity{
         return isActivo() ? "SI" : "NO";
     }
 
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

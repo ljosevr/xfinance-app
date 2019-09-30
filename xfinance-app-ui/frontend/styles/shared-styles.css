@@ -4,7 +4,7 @@
     background: var(--lumo-primary-color-50pct);
 }
 
-/* Stack login-screen vertically on narrow screen */
+/* Stack login-screen vertically standard-formon narrow screen */
 @media (max-width: 800px) {
 
     .login-screen {
@@ -108,7 +108,7 @@
     }
 
     .standard-form {
-        height: calc(100% - var(--top-bar-height));
+        height: calc(100% - var(--top-bar-height) - 20px);
     }
 
 }
