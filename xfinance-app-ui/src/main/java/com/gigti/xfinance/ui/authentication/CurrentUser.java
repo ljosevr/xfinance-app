@@ -22,6 +22,7 @@ import com.vaadin.flow.server.VaadinService;
  */
 public final class CurrentUser {
 
+    private static Usuario current;
     /**
      * The attribute key used to store the username in the session.
      */
@@ -46,7 +47,7 @@ public final class CurrentUser {
                 .getAttribute(CURRENT_USER_SESSION_ATTRIBUTE_KEY);
 
         if (currentUser == null) {
-            return null;
+            return current;
         }
 
         return currentUser;
@@ -70,7 +71,7 @@ public final class CurrentUser {
         } else {
             getCurrentRequest().getWrappedSession().setAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
-
+            current = currentUser;
 //            getCurrentRequest().getWrappedSession().setAttribute(
 //                    CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY, rolUsuario);
         }
