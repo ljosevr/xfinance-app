@@ -74,7 +74,6 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
 
     public MainLayout() {
         createMenu();
-
         //addToNavbar(true, createHeader());
         //setPrimarySection(AppLayout.Section.NAVBAR);
     }

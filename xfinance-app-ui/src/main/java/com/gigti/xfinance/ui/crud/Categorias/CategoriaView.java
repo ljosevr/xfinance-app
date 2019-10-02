@@ -32,6 +32,7 @@ public class CategoriaView extends HorizontalLayout
     private CategoriaCrudLogic viewLogic;
     private Button btnNewCategoria;
     private List<CategoriaProducto> lista;
+    private VerticalLayout barAndGridLayout;
 
     @Autowired
     public CategoriaView(IcategoriaProductoService iService) {
@@ -51,7 +52,7 @@ public class CategoriaView extends HorizontalLayout
             H3 title = new H3(Constantes.VIEW_CATEGORIA);
             title.setClassName("titleView");
 
-            VerticalLayout barAndGridLayout = new VerticalLayout();
+            barAndGridLayout = new VerticalLayout();
             barAndGridLayout.add(title);
 
             barAndGridLayout.add(topLayout);
@@ -114,6 +115,11 @@ public class CategoriaView extends HorizontalLayout
     }
 
     public void showForm(boolean show) {
+        if(show){
+            barAndGridLayout.setVisible(false);
+        }else{
+            barAndGridLayout.setVisible(true);
+        }
         form.setVisible(show);
         form.setEnabled(show);
     }

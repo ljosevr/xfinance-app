@@ -48,6 +48,7 @@ public class ProductoCrudView extends HorizontalLayout
     private Button btnNewProduct;
     private List<CategoriaProducto> listaCategoria;
     private List<Producto> listaProducto;
+    private VerticalLayout barAndGridLayout;
 
 
     @Autowired
@@ -71,7 +72,7 @@ public class ProductoCrudView extends HorizontalLayout
         H3 title = new H3(Constantes.VIEW_PRODUCTO);
         title.setClassName("titleView");
 
-        VerticalLayout barAndGridLayout = new VerticalLayout();
+        barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);
 
         barAndGridLayout.add(topLayout);
@@ -132,6 +133,11 @@ public class ProductoCrudView extends HorizontalLayout
     }
 
     public void showForm(boolean show) {
+        if(show){
+            barAndGridLayout.setVisible(false);
+        } else{
+            barAndGridLayout.setVisible(true);
+        }
         form.setVisible(show);
         form.setEnabled(show);
     }

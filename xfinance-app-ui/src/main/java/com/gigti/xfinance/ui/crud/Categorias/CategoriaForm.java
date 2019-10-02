@@ -7,6 +7,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -33,6 +34,8 @@ public class CategoriaForm extends Div {
     public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
         content = new VerticalLayout();
         content.setSizeUndefined();
+        H4 title = new H4("Crear o Editar Categoria");
+        content.add(title);
         add(content);
 
         viewLogic = categoriaCrudLogic;

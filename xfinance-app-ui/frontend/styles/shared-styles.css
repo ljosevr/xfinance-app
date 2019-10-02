@@ -20,7 +20,7 @@
     flex-direction: row;
 
     /* Used by the menu and form overlays */
-    /*--overlay-box-shadow: 0 0 3px 2px var(--lumo-contrast-10pct);*/
+    --overlay-box-shadow: 0 0 3px 2px var(--lumo-contrast-10pct);
 }
 
 .menu-bar {
@@ -57,12 +57,15 @@
 }
 
 .standard-form {
-    position: absolute;
+    flex-direction: column;
+    --overlay-box-shadow: 2px 2px var(--lumo-contrast-10pct);
+    position: initial;
     right: 0;
     bottom: 0;
     height: 100%;
-    overflow: auto;
+    overflow: initial;
     background: var(--lumo-base-color);
+    /*box-shadow: #7f7f7f 2px 2px ;*/
     box-shadow: var(--overlay-box-shadow);
 }
 
@@ -108,7 +111,7 @@
     }
 
     .standard-form {
-        height: calc(100% - var(--top-bar-height) - 20px);
+        height: calc(100% - var(--top-bar-height));
     }
 
 }
