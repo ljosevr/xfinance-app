@@ -109,6 +109,7 @@ public class ProductoForm extends Div {
         tfProdNombre.setWidth("100%");
         tfProdNombre.setRequired(true);
         tfProdNombre.setValueChangeMode(ValueChangeMode.EAGER);
+        tfProdNombre.focus();
         content.add(tfProdNombre);
 
         TextField tfProdCodigoB = new TextField("Codigo de barras");
