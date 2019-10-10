@@ -74,39 +74,22 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
 
     public MainLayout() {
         createMenu();
-        //addToNavbar(true, createHeader());
-        //setPrimarySection(AppLayout.Section.NAVBAR);
-    }
-
-    private Component createHeader(){
-        HorizontalLayout top = new HorizontalLayout();
-        top.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        top.setSpacing(true);
-        top.setClassName("menu-header");
-
-        H4 title = new H4();
-        title.setClassName("userNavBar");
-        String resolvedImage = VaadinServletService.getCurrent()
-                .resolveResource("webapp/img/table-logo.png",
-                        VaadinSession.getCurrent().getBrowser());
-        Image img = new Image(resolvedImage, "");
-        //img.setHeight("44px");
-
-        HorizontalLayout h2 = new HorizontalLayout();
-        h2.add(title);
-
-        //top.add(h1,h2);
-
-        return top;
     }
 
     private void createMenu(){
         //TODO PERMISOS
+
+        LeftAppMenuBuilder leftAppMenuBuilder = LeftAppMenuBuilder.get()
+                .addToSection(HEADER,
+                        new LeftHeaderItem("MENU", "", "/frontend/images/logo.png"));
+
         badge = new DefaultBadgeHolder(5);
         notifications.addClickListener(notification -> {/* ... */});
 
         LeftNavigationItem menuPVenta = new LeftNavigationItem("P. Venta", VaadinIcon.CART, ProductoCrudView.class);
-        badge.bind(menuPVenta.getBadge());
+        //badge.bind(menuPVenta.getBadge());
+
+        leftAppMenuBuilder.add(menuPVenta);
 
         LeftSubMenuBuilder menuProductos = LeftSubMenuBuilder.get("Productos", VaadinIcon.ABACUS.create());
         menuProductos.add(new LeftNavigationItem("Administrar", VaadinIcon.CLUSTER.create(), ProductoCrudView.class));
@@ -115,14 +98,22 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
         menuProductos.add(new LeftNavigationItem("Inventario Hoy", VaadinIcon.FILE_TEXT_O.create(), ProductoCrudView.class));
         menuProductos.add(new LeftNavigationItem("Inventario Inicial", VaadinIcon.FILE_START.create(), ProductoCrudView.class));
 
-        LeftAppMenuBuilder leftAppMenuBuilder = LeftAppMenuBuilder.get()
-                .addToSection(HEADER,
-                        new LeftHeaderItem("MENU", "", "/frontend/images/logo.png"));
-
-        leftAppMenuBuilder.add(menuPVenta);
         leftAppMenuBuilder.add(menuProductos.build());
-        leftAppMenuBuilder.addToSection(FOOTER, new LeftClickableItem("Salir", VaadinIcon.EXIT.create(), clickEvent -> signOut()));
 
+        LeftSubMenuBuilder menuUsuarios = LeftSubMenuBuilder.get("Usuarios", VaadinIcon.USERS.create());
+        menuUsuarios.add(new LeftNavigationItem("Adminisitrar", VaadinIcon.USERS.create(), ProductoCrudView.class));
+        menuUsuarios.add(new LeftNavigationItem("Roles", VaadinIcon.CONTROLLER.create(), ProductoCrudView.class));
+        menuUsuarios.add(new LeftNavigationItem("Permisos", VaadinIcon.ACCESSIBILITY.create(), CategoriaView.class));
+
+        leftAppMenuBuilder.add(menuUsuarios.build());
+
+        LeftSubMenuBuilder menuEmpresas = LeftSubMenuBuilder.get("Empresas", VaadinIcon.USERS.create());
+        menuEmpresas.add(new LeftNavigationItem("Adminisitrar", VaadinIcon.CLUSTER.create(), ProductoCrudView.class));
+        menuEmpresas.add(new LeftNavigationItem("Crear Usuario Admin", VaadinIcon.USER.create(), ProductoCrudView.class));
+
+        leftAppMenuBuilder.add(menuEmpresas.build());
+
+        leftAppMenuBuilder.addToSection(FOOTER, new LeftClickableItem("Salir", VaadinIcon.EXIT.create(), clickEvent -> signOut()));
 
         init(AppLayoutBuilder.get(LeftLayouts.LeftResponsive.class)
                 .withTitle("X Finance App")
@@ -131,13 +122,6 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
                         .add(new NotificationButton<>(VaadinIcon.BELL, notifications))
                         .build())
                 .withAppMenu(leftAppMenuBuilder.build()
-//                        LeftAppMenuBuilder.get()
-//                        .addToSection(HEADER,
-//                                new LeftHeaderItem("Menu", "Version 1.0.0", "/frontend/images/logo.png"))
-//                    .add(menuPVenta)
-//                    .add(menuProductos.build())
-//                    .addToSection(FOOTER, new LeftClickableItem("Salir", VaadinIcon.COG.create(), clickEvent -> Notification.show("onClick ...")))
-//                    .build()
                 )
                 .build());
     }

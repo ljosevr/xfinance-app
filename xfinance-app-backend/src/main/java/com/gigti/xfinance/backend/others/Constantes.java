@@ -9,12 +9,15 @@ public class Constantes {
     //VIEWS-ROUTE
     public static final String VIEW_R_CATEGORIA = "categoria";
     public static final String VIEW_R_PRODUCTO = "producto";
+    public static final String VIEW_R_VENTA = "pventa";
+    public static final String VIEW_R_EMPRESA = "empresa";
 
     //VIEW-NAME
     public static final String VIEW_MAIN = "X Finance App";
     public static final String VIEW_CATEGORIA = "Categorias Productos";
     public static final String VIEW_PRODUCTO = "Productos";
-
+    public static final String VIEW_PVENTA = "Punto de Venta";
+    public static final String VIEW_EMPRESA = "Empresas";
 
     //Paginador
     public static final int PAGE_SIZE = 10;

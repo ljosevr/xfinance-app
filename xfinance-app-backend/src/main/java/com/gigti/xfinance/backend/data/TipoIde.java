@@ -40,10 +40,6 @@ public class TipoIde implements Serializable {
 
     @Override
     public String toString() {
-        return "TipoIde{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                '}';
+        return nombre;
     }
 }

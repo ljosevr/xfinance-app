@@ -6,14 +6,33 @@
 
 package com.gigti.xfinance.backend.repositories;
 
+import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, String> {
+
+    //@Query("SELECT e FROM Empresa  e " +
+    //        "WHERE c.eliminado = False")
+    public List<Empresa> findByEliminadoIsFalse(Pageable pageable);
+
+    @Query("SELECT e FROM Empresa e " +
+            "WHERE UPPER(e.nombreEmpresa) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
+            "c.eliminado = FALSE")
+    public List<Empresa> findByNombreOrDescripcion(@Param("filter") String filter, Pageable pageable);
+
+    @Query("SELECT e FROM Empresa e " +
+            "WHERE c.activo =:activo AND " +
+            "c.eliminado = False")
+    public List<Empresa> findActivoOrInactivo(@Param("activo") boolean activo, Pageable pageable);
+
     public Empresa findByIdentificacion(String identificacionCli);
     public Empresa findByNombreEmpresa(String companyName);
     public List<Empresa> findByNombreEmpresaContaining(String companyName);

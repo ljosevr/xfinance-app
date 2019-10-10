@@ -6,8 +6,11 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.Data;
+
 import javax.persistence.*;
 
+@Data
 @Entity
 @Table(name = "items_factura")
 public class ItemFactura extends AbstractEntity {

@@ -46,11 +46,11 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
 
         addColumn(this::formatPrice)
                 .setHeader("P. Costo")
-                .setFlexGrow(3);
+                .setFlexGrow(5);
 
         addColumn(this::formatPrice)
                 .setHeader("P. Venta")
-                .setFlexGrow(3);
+                .setFlexGrow(5);
 
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories)

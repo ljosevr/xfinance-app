@@ -1,5 +1,6 @@
 .login-information {
-    min-width: 300px;
+    /*min-width: 300px;*/
+    width: 100%;
     flex: 0;
     background: var(--lumo-primary-color-50pct);
 }
@@ -8,7 +9,9 @@
 @media (max-width: 800px) {
 
     .login-screen {
-        flex-direction: row;
+        alignment: center;
+        align-content: center;
+        flex-direction: column;
     }
 
     .login-information {

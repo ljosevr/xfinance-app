@@ -12,14 +12,20 @@ import com.gigti.xfinance.ui.HomeView;
 import com.gigti.xfinance.ui.MainLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteConfiguration;
@@ -55,43 +61,26 @@ public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>
         setSizeFull();
         setClassName("login-screen");
 
+        VerticalLayout loginLayout = new VerticalLayout();
+        loginLayout.setClassName("login-information");
+
+        H1 loginInfoHeader = new H1("X Finance App");
+        loginInfoHeader.setWidth("100%");
+
+        H2 loginInfoText = new H2("Iniciar Sesión");
+        loginInfoText.setClassName("titleView");
+
+        loginLayout.add(loginInfoHeader);
+        //loginLayout.add(loginInfoText);
+
         LoginForm loginForm = new LoginForm();
         loginForm.addLoginListener(event -> login(event));//this::login);
         loginForm.addForgotPasswordListener(
                 event -> Notification.show("Tip: Contacta al Admin del App"));
+        loginForm.setI18n(createSpanishI18n());
+        loginLayout.add(loginForm);
 
-        FlexLayout centeringLayout = new FlexLayout();
-        centeringLayout.setSizeFull();
-        centeringLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-        centeringLayout.setAlignItems(Alignment.CENTER);
-        centeringLayout.add(loginForm);
-
-        // information text about logging in
-
-
-        add(buildLoginInformation());
-        add(loginForm);
-    }
-
-    private Component buildLoginInformation() {
-
-        VerticalLayout loginInformation = new VerticalLayout();
-        loginInformation.setClassName("login-information");
-
-        H1 loginInfoHeader = new H1("X Finance App");
-        loginInfoHeader.setWidth("100%");
-//        Span loginInfoText = new Span(
-//                "X Finance App");
-//        loginInfoText.setWidth("100%");
-
-        H2 loginInfoText = new H2("X Finance App");
-        loginInfoText.setClassName("titleView");
-
-        loginInformation.add(loginInfoHeader);
-        //loginInformation.add(loginInfoText);
-
-        return loginInformation;
-
+        add(loginLayout);
     }
 
     private void login(LoginForm.LoginEvent event) {
@@ -107,18 +96,22 @@ public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>
         }
     }
 
-    private void registerHomeViewIfApplicable() {
-        // register the admin view dynamically only for any admin user logged in
-        if (accessControl.isUserInRole(CurrentUser.get())) {
-            RouteConfiguration.forSessionScope().setRoute(HomeView.VIEW_NAME,HomeView.class, MainLayout.class);
+    private LoginI18n createSpanishI18n() {
+        final LoginI18n i18n = LoginI18n.createDefault();
 
-            // as logout will purge the session route registry, no need to
-            // unregister the view on logout
-        }
+        i18n.setHeader(new LoginI18n.Header());
+        i18n.getHeader().setTitle("X Finance App");
+        i18n.getHeader().setDescription("Aplicativo Contable Multi-Dispositivo");
+        i18n.getForm().setUsername("Usuario");
+        i18n.getForm().setTitle("Iniciar Sesión");
+        i18n.getForm().setSubmit("Ingresar");
+        i18n.getForm().setPassword("Clave");
+        i18n.getForm().setForgotPassword("Olvide Mi clave");
+        i18n.getErrorMessage().setTitle("Usuario/Clave Invalido");
+        i18n.getErrorMessage().setMessage("Confirma tu usuario y Contraseña e Intente nuevamente.");
+//        i18n.setAdditionalInformation(
+//                "Caso necessite apresentar alguma informação extra para o usuário"
+//                        + " (como credenciais padrão), este é o lugar.");
+        return i18n;
     }
-
-//    @Override
-//    public void setParameter(BeforeEvent beforeEvent, String parameter) {
-//        this.parameter = parameter;
-//    }
 }
