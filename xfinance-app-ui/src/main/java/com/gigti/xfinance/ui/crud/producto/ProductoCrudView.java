@@ -49,7 +49,6 @@ public class ProductoCrudView extends HorizontalLayout
     private List<Producto> listaProducto;
     private VerticalLayout barAndGridLayout;
 
-
     @Autowired
     public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
 

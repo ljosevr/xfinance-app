@@ -28,6 +28,8 @@ public class ProductoServiceImpl implements IProductoService, HasLogger {
 
     @Transactional
     public Producto saveProduct(Producto producto){
+        //TODO Guardar Valores de Costos y Venta - así como la Cantidad del producto
+
         return productoRepository.save(producto);
     }
 

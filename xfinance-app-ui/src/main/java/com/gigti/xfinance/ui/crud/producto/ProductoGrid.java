@@ -68,12 +68,11 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
     }
 
     private String formatCategories(Producto producto) {
-//        if (producto.getCategoria() == null || producto.getCategoria().getNombre().isEmpty()) {
-//            return "";
-//        }
-//
-//        return producto.getCategoria().getNombre();
-        return "";
+        if (producto.getCategoria() == null || producto.getCategoria().getNombre().isEmpty()) {
+            return "";
+        }
+
+        return producto.getCategoria().getNombre();
     }
 
     private String formatPrice(Producto producto){
