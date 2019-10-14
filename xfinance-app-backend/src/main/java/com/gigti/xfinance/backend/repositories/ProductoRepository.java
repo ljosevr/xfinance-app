@@ -33,7 +33,7 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
             "p.eliminado = FALSE")
     public List<Producto> findByEmpresaAndNombreProducto(Empresa empresa, String productName);
 
-    public Producto findByEmpresaAndCodigoBarra(Empresa empresa, String productBarCode);
+    public Producto findByEmpresaAndCodigoBarra(Empresa empresa, String codigoBarra);
 
     //@Query("Select p From Producto p Where p.empresa =: empresa AND p.nombreProducto like %:anything% OR p.codigoBarra like %:anything%")
     public List<Producto> findByEmpresaAndNombreProductoContainingOrCodigoBarraContaining(Empresa empresa, String anything, String anything2);

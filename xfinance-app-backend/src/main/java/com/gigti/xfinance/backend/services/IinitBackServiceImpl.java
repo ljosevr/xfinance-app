@@ -4,7 +4,6 @@ import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.*;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +80,8 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
                         "Calle 191A # 11A-92",
                         true,
                         java.sql.Date.valueOf(LocalDate.now()),
-                        null);
+                        null,
+                        Empresa.TipoEmpresa.ROOT);
 
                 emp = empresaRepository.save(emp);
 
@@ -119,7 +119,6 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
             }
         }catch(Exception e){
             getLogger().error("Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
-
         }
     }
 }

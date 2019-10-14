@@ -1,0 +1,133 @@
+package com.gigti.xfinance.ui.crud.Empresa;
+
+import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.TipoIde;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import org.apache.commons.lang3.StringUtils;
+
+public class EmpresaForm extends Div {
+    private VerticalLayout content;
+
+    private TextField tfNombreEmpresa;
+    private ComboBox<TipoIde> cbTipoIde;
+    private TextField tfIdentificacion;
+    private TextField tfDireccion;
+    private TextField tfTelefono;
+
+    private Checkbox  cbCatActivo;
+
+    private Button btnSave;
+    private Button btnDiscard;
+    private Button btnCancel;
+    private Button btnDelete;
+
+    private EmpresaCrudLogic viewLogic;
+    private Binder<Empresa> binder;
+    private Empresa currentEmpresa;
+
+    public EmpresaForm(EmpresaCrudLogic empresaCrudLogic) {
+        content = new VerticalLayout();
+        content.setSizeUndefined();
+        H4 title = new H4("Crear o Editar Categoria");
+        content.add(title);
+        add(content);
+
+        viewLogic = empresaCrudLogic;
+
+        tfNombreEmpresa = new TextField("Nombre Categoria");
+        tfNombreEmpresa.setWidth("100%");
+        tfNombreEmpresa.setRequired(true);
+        tfNombreEmpresa.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfNombreEmpresa);
+
+        tfCatDescripcion = new TextField("Descripción Categoria");
+        tfCatDescripcion.setWidth("100%");
+        tfCatDescripcion.setRequired(false);
+        tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfCatDescripcion);
+
+        cbCatActivo = new Checkbox("Activo");
+        cbCatActivo.setValue(true);
+        content.add(cbCatActivo);
+
+        binder = new BeanValidationBinder<>(CategoriaProducto.class);
+        binder.forField(tfNombreEmpresa).bind(CategoriaProducto::getNombre,
+                CategoriaProducto::setNombre);
+        binder.forField(tfCatDescripcion).bind(CategoriaProducto::getDescripcion,
+                CategoriaProducto::setDescripcion);
+        binder.forField(cbCatActivo).bind(CategoriaProducto::isActivo,
+                CategoriaProducto::setActivo);
+        binder.bindInstanceFields(this);
+
+        // enable/disable save button while editing
+        binder.addStatusChangeListener(event -> {
+            boolean isValid = !event.hasValidationErrors();
+            boolean hasChanges = binder.hasChanges();
+            btnSave.setEnabled(hasChanges && isValid);
+            btnDiscard.setEnabled(hasChanges);
+        });
+
+        btnSave = new Button("Guardar");
+        btnSave.setWidth("100%");
+        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSave.addClickListener(event -> {
+            if (currentEmpresa != null
+                    && binder.writeBeanIfValid(currentEmpresa)) {
+                viewLogic.saveCategoria(currentEmpresa);
+            }
+        });
+        btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
+
+        btnDiscard = new Button("Descartar Cambios");
+        btnDiscard.setWidth("100%");
+        btnDiscard.addClickListener(
+                event -> viewLogic.editCategoria(currentEmpresa));
+
+        btnCancel = new Button("Cancelar");
+        btnCancel.setWidth("100%");
+        btnCancel.addClickListener(event -> viewLogic.cancelCategoria());
+        btnCancel.addClickShortcut(Key.ESCAPE);
+        getElement()
+                .addEventListener("keydown", event -> viewLogic.cancelCategoria())
+                .setFilter("event.key == 'Escape'");
+
+        btnDelete = new Button("Eliminar");
+        btnDelete.setWidth("100%");
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
+        btnDelete.addClickListener(event -> {
+            if (currentEmpresa != null) {
+                viewLogic.deleteCategoria(currentEmpresa);
+            }
+        });
+
+        content.add(btnSave, btnDiscard, btnDelete, btnCancel);
+    }
+
+    public void edit(Empresa empresa) {
+        if (empresa == null) {
+            empresa = new Empresa();
+            empresa.setActivo(true);
+            btnDelete.setEnabled(false);
+        } else if(StringUtils.isBlank(empresa.getId())){
+            empresa.setActivo(true);
+            btnDelete.setEnabled(false);
+        } else {
+            btnDelete.setEnabled(true);
+        }
+        currentEmpresa = empresa;
+        binder.readBean(empresa);
+    }
+}
