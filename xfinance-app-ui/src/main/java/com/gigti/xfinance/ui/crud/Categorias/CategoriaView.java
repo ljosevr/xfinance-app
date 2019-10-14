@@ -88,7 +88,7 @@ public class CategoriaView extends HorizontalLayout
         Button btnNewCategoria = new Button("Nueva");
         btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewCategoria.addClickListener(click -> viewLogic.newCategoria());
+        btnNewCategoria.addClickListener(click -> viewLogic.nuevo());
         // CTRL+N will create a new window which is unavoidable
         btnNewCategoria.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
