@@ -26,6 +26,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -45,11 +46,8 @@ public class ProductoCrudView extends HorizontalLayout
     private TextField filter;
 
     private ProductoCrudLogic viewLogic;
-    private Button btnNewProduct;
-    private List<CategoriaProducto> listaCategoria;
     private List<Producto> listaProducto;
     private VerticalLayout barAndGridLayout;
-
 
     @Autowired
     public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
@@ -65,7 +63,7 @@ public class ProductoCrudView extends HorizontalLayout
         grid.asSingleSelect().addValueChangeListener(
                 event -> viewLogic.rowSelected(event.getValue()));
 
-        listaCategoria = viewLogic.findAllCategoria();
+        List<CategoriaProducto> listaCategoria = viewLogic.findAllCategoria();
         form = new ProductoForm(viewLogic, listaCategoria);
         form.setCategories(listaCategoria);
 
@@ -101,8 +99,9 @@ public class ProductoCrudView extends HorizontalLayout
                 grid.setItems(listaProducto);
         });
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
+        filter.focus();
 
-        btnNewProduct = new Button("Nuevo");
+        Button btnNewProduct = new Button("Nuevo");
         btnNewProduct.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewProduct.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNewProduct.addClickListener(click -> viewLogic.newProducto());
@@ -137,6 +136,7 @@ public class ProductoCrudView extends HorizontalLayout
             barAndGridLayout.setVisible(false);
         } else{
             barAndGridLayout.setVisible(true);
+            filter.focus();
         }
         form.setVisible(show);
         form.setEnabled(show);
@@ -153,6 +153,14 @@ public class ProductoCrudView extends HorizontalLayout
     }
 
     public void refresh(Producto producto) {
+        for(Iterator<Producto> it = listaProducto.iterator(); it.hasNext();){
+            Producto p = it.next();
+            if(p.getId().equals(producto.getId())) {
+                it.remove();
+                listaProducto.remove(p);
+                break;
+            }
+        }
         listaProducto.add(producto);
         grid.setItems(listaProducto);
         grid.refresh(producto);
@@ -160,5 +168,9 @@ public class ProductoCrudView extends HorizontalLayout
 
     public ProductoGrid getGrid() {
         return grid;
+    }
+
+    public TextField getFilter() {
+        return filter;
     }
 }

@@ -42,8 +42,6 @@ import java.util.Locale;
  * A form for editing a single product.
  */
 public class ProductoForm extends Div {
-
-    //private CheckboxGroup<CategoriaProducto> rbGroupCategorias;
     private RadioButtonGroup<CategoriaProducto> rbGroupCategorias;
 
     private Button btnSave;
@@ -57,7 +55,7 @@ public class ProductoForm extends Div {
     private static class PriceConverter extends StringToBigDecimalConverter {
 
         public PriceConverter() {
-            super(BigDecimal.ZERO, "Cannot convert value to a number.");
+            super(BigDecimal.ZERO, "No se puede convertir el valor a Número.");
         }
 
         @Override
@@ -75,7 +73,7 @@ public class ProductoForm extends Div {
     private static class StockCountConverter extends StringToIntegerConverter {
 
         public StockCountConverter() {
-            super(0, "Could not convert value to " + Integer.class.getName()
+            super(0, "No se puede convertir el valor a " + Integer.class.getName()
                     + ".");
         }
 
@@ -109,6 +107,7 @@ public class ProductoForm extends Div {
         tfProdNombre.setWidth("100%");
         tfProdNombre.setRequired(true);
         tfProdNombre.setValueChangeMode(ValueChangeMode.EAGER);
+        tfProdNombre.focus();
         content.add(tfProdNombre);
 
         TextField tfProdCodigoB = new TextField("Codigo de barras");
@@ -131,30 +130,41 @@ public class ProductoForm extends Div {
         rbGroupCategorias.setItems(listCategoria);
         rbGroupCategorias.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
         rbGroupCategorias.setRequired(true);
+        rbGroupCategorias.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
+        rbGroupCategorias.setRequiredIndicatorVisible(true);
         content.add(rbGroupCategorias);
 
-        TextField tfProdPrecio = new TextField("Precio");
-        tfProdPrecio.setSuffixComponent(new Span("€"));
-        tfProdPrecio.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfProdPrecio.setValueChangeMode(ValueChangeMode.EAGER);
+        TextField tfPrecioCosto = new TextField("Precio Costo");
+        tfPrecioCosto.setPrefixComponent(new Span("$"));
+        tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        tfPrecioCosto.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfPrecioCosto);
+
+        TextField tfPrecioVenta = new TextField("Precio Venta");
+        tfPrecioVenta.setPrefixComponent(new Span("$"));
+        tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+        tfPrecioVenta.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfPrecioVenta);
 
         TextField tfProdStock = new TextField("Stock(cantidad)");
         tfProdStock.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         tfProdStock.setValueChangeMode(ValueChangeMode.EAGER);
+        content.add(tfProdStock);
 
-        HorizontalLayout horizontalLayout = new HorizontalLayout(tfProdPrecio,
-                tfProdStock);
-        horizontalLayout.setWidth("100%");
-        horizontalLayout.setFlexGrow(1, tfProdPrecio, tfProdStock);
-        content.add(horizontalLayout);
+//        HorizontalLayout priceLayout = new HorizontalLayout(tfPrecioCosto,tfPrecioVenta);
+//        priceLayout.setWidth("100%");
+//        priceLayout.setFlexGrow(1, tfPrecioVenta, tfProdStock);
+//        content.add(priceLayout);
 
         binder = new BeanValidationBinder<>(Producto.class);
-        binder.forField(tfProdPrecio).withConverter(new PriceConverter()).bind(Producto::getPrecioVentaActual, Producto::setPrecioVentaActual);
+        binder.forField(tfPrecioCosto).withConverter(new PriceConverter()).bind(Producto::getPrecioCostoActual, Producto::setPrecioCostoActual);
+        binder.forField(tfPrecioVenta).withConverter(new PriceConverter()).bind(Producto::getPrecioVentaActual, Producto::setPrecioVentaActual);
         binder.forField(tfProdStock).withConverter(new StockCountConverter()).bind(Producto::getStockActual, Producto::setStockActual);
         binder.forField(tfProdNombre).bind(Producto::getNombreProducto, Producto::setNombreProducto);
         binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
         binder.forField(tfProdCodigoB).bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
         binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
+        binder.forField(rbGroupCategorias).asRequired("Debe Seleccionar Categoria").bind(Producto::getCategoria, Producto::setCategoria);
         binder.bindInstanceFields(this);
 
         // enable/disable btnSave button while editing
@@ -174,7 +184,7 @@ public class ProductoForm extends Div {
                 viewLogic.saveProducto(currentProduct);
             }
         });
-        btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
+        btnSave.addClickShortcut(Key.ENTER);
 
         btnDiscard = new Button("Descartar Cambios");
         btnDiscard.setWidth("100%");

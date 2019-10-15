@@ -19,10 +19,12 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
+@PageTitle(value = Constantes.VIEW_MAIN)
 public class CategoriaView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
@@ -30,7 +32,6 @@ public class CategoriaView extends HorizontalLayout
     private CategoriaForm form;
     private TextField filter;
     private CategoriaCrudLogic viewLogic;
-    private Button btnNewCategoria;
     private List<CategoriaProducto> lista;
     private VerticalLayout barAndGridLayout;
 
@@ -82,8 +83,9 @@ public class CategoriaView extends HorizontalLayout
             }
         );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
+        filter.focus();
 
-        btnNewCategoria = new Button("Nueva");
+        Button btnNewCategoria = new Button("Nueva");
         btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNewCategoria.addClickListener(click -> viewLogic.nuevo());
@@ -119,6 +121,7 @@ public class CategoriaView extends HorizontalLayout
             barAndGridLayout.setVisible(false);
         }else{
             barAndGridLayout.setVisible(true);
+            filter.focus();
         }
         form.setVisible(show);
         form.setEnabled(show);
@@ -135,6 +138,14 @@ public class CategoriaView extends HorizontalLayout
     }
 
     public void refresh(CategoriaProducto categoria){
+        for(Iterator<CategoriaProducto> it = lista.iterator(); it.hasNext();){
+            CategoriaProducto p = it.next();
+            if(p.getId().equals(categoria.getId())) {
+                it.remove();
+                lista.remove(p);
+                break;
+            }
+        }
         lista.add(categoria);
         grid.setItems(lista);
         grid.refresh(categoria);
@@ -146,5 +157,9 @@ public class CategoriaView extends HorizontalLayout
 
     public List<CategoriaProducto> getItemsGrid(){
         return lista;
+    }
+
+    public TextField getFilter() {
+        return filter;
     }
 }

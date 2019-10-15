@@ -20,13 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 public class CategoriaForm extends Div {
     private VerticalLayout content;
 
-    private TextField tfCatNombre;
-    private TextField tfCatDescripcion;
-    private Checkbox  cbCatActivo;
-
     private Button btnSave;
     private Button btnDiscard;
-    private Button btnCancel;
     private Button btnDelete;
 
     private CategoriaCrudLogic viewLogic;
@@ -51,19 +46,20 @@ public class CategoriaForm extends Div {
 
         viewLogic = categoriaCrudLogic;
 
-        tfCatNombre = new TextField("Nombre Categoria");
+        TextField tfCatNombre = new TextField("Nombre Categoria");
         tfCatNombre.setWidth("100%");
         tfCatNombre.setRequired(true);
         tfCatNombre.setValueChangeMode(ValueChangeMode.EAGER);
+        tfCatNombre.focus();
         content.add(tfCatNombre);
 
-        tfCatDescripcion = new TextField("Descripción Categoria");
+        TextField tfCatDescripcion = new TextField("Descripción Categoria");
         tfCatDescripcion.setWidth("100%");
         tfCatDescripcion.setRequired(false);
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
         content.add(tfCatDescripcion);
 
-        cbCatActivo = new Checkbox("Activo");
+        Checkbox cbCatActivo = new Checkbox("Activo");
         cbCatActivo.setValue(true);
         content.add(cbCatActivo);
 
@@ -100,7 +96,7 @@ public class CategoriaForm extends Div {
         btnDiscard.addClickListener(
                 event -> viewLogic.editar(currentCategoria));
 
-        btnCancel = new Button("Cancelar");
+        Button btnCancel = new Button("Cancelar");
         btnCancel.setWidth("100%");
         btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
