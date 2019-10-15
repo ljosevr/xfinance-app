@@ -20,6 +20,7 @@ import java.util.List;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
+    @Query("Select u From Usuario u Where u.nombreUsuario =:nombreUsuario")
     public Usuario findByNombreUsuario(String nombreUsuario);
 
     public List<Usuario> findByNombreUsuarioContaining(String nombreUsuario);

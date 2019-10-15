@@ -52,6 +52,7 @@ public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>
         this.iusuarioService = iusuario;
         iinitBackService.initBackTipos();
         iinitBackService.initBackObjetos();
+        iinitBackService.initBackTipoEmpresa();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();

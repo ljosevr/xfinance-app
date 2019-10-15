@@ -1,6 +1,8 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.TipoEmpresa;
+import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.EmpresaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 
@@ -21,7 +25,7 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
     @Override
     public List<Empresa> findAll(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return empresaRepository.findByEliminadoIsFalse(pageable);
+        return empresaRepository.findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresa.NORMAL, pageable);
     }
 
     @Override
@@ -50,6 +54,16 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
     @Override
     public Empresa saveEmpresa(Empresa empresa) {
         try{
+            if(empresa.getFechaActivacion() == null) {
+                empresa.setFechaActivacion(new Date());
+            }
+            if(empresa.getTipoEmpresa() == null){
+                empresa.setTipoEmpresa(TipoEmpresa.NORMAL);
+            }
+            if(empresa.getTipoIde() == null){
+                empresa.setTipoIde(TipoIde.NIT);
+            }
+
             return empresaRepository.save(empresa);
         }catch(Exception e){
             getLogger().error(e.getMessage(), e);

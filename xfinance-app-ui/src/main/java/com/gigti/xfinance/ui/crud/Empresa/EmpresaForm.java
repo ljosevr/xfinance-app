@@ -1,6 +1,5 @@
 package com.gigti.xfinance.ui.crud.Empresa;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.vaadin.flow.component.Key;
@@ -19,19 +18,9 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
 public class EmpresaForm extends Div {
-    private VerticalLayout content;
-
-    private TextField tfNombreEmpresa;
-    private ComboBox<TipoIde> cbTipoIde;
-    private TextField tfIdentificacion;
-    private TextField tfDireccion;
-    private TextField tfTelefono;
-
-    private Checkbox  cbCatActivo;
 
     private Button btnSave;
     private Button btnDiscard;
-    private Button btnCancel;
     private Button btnDelete;
 
     private EmpresaCrudLogic viewLogic;
@@ -39,37 +28,52 @@ public class EmpresaForm extends Div {
     private Empresa currentEmpresa;
 
     public EmpresaForm(EmpresaCrudLogic empresaCrudLogic) {
-        content = new VerticalLayout();
+        VerticalLayout content = new VerticalLayout();
         content.setSizeUndefined();
-        H4 title = new H4("Crear o Editar Categoria");
+        H4 title = new H4("Crear o Editar Empresa");
         content.add(title);
         add(content);
 
         viewLogic = empresaCrudLogic;
 
-        tfNombreEmpresa = new TextField("Nombre Categoria");
+        TextField tfNombreEmpresa = new TextField("Nombre Empresa");
         tfNombreEmpresa.setWidth("100%");
         tfNombreEmpresa.setRequired(true);
         tfNombreEmpresa.setValueChangeMode(ValueChangeMode.EAGER);
         content.add(tfNombreEmpresa);
 
-        tfCatDescripcion = new TextField("Descripción Categoria");
-        tfCatDescripcion.setWidth("100%");
-        tfCatDescripcion.setRequired(false);
-        tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfCatDescripcion);
+        ComboBox<TipoIde> cbTipoIde = new ComboBox<>();
+        cbTipoIde.setLabel("Tipo Ide");
+        cbTipoIde.setItems(TipoIde.getListTipos());
+        cbTipoIde.setRequired(true);
+        content.add(cbTipoIde);
 
-        cbCatActivo = new Checkbox("Activo");
-        cbCatActivo.setValue(true);
-        content.add(cbCatActivo);
+        TextField tfIdentificacion = new TextField("Identificación");
+        tfIdentificacion.setWidth("100%");
+        tfIdentificacion.setRequired(true);
+        content.add(tfIdentificacion);
 
-        binder = new BeanValidationBinder<>(CategoriaProducto.class);
-        binder.forField(tfNombreEmpresa).bind(CategoriaProducto::getNombre,
-                CategoriaProducto::setNombre);
-        binder.forField(tfCatDescripcion).bind(CategoriaProducto::getDescripcion,
-                CategoriaProducto::setDescripcion);
-        binder.forField(cbCatActivo).bind(CategoriaProducto::isActivo,
-                CategoriaProducto::setActivo);
+        TextField tfDireccion = new TextField("Dirección");
+        tfDireccion.setWidth("100%");
+        tfDireccion.setRequired(false);
+        content.add(tfDireccion);
+
+        TextField tfTelefono = new TextField("Telefono");
+        tfTelefono.setWidth("100%");
+        tfTelefono.setRequired(false);
+        content.add(tfTelefono);
+
+        Checkbox cbActivo = new Checkbox("Activo");
+        cbActivo.setValue(true);
+        content.add(cbActivo);
+
+        binder = new BeanValidationBinder<>(Empresa.class);
+        binder.forField(tfNombreEmpresa).bind(Empresa::getNombreEmpresa, Empresa::setNombreEmpresa);
+        binder.forField(cbTipoIde).bind(Empresa::getTipoIde, Empresa::setTipoIde);
+        binder.forField(tfIdentificacion).bind(Empresa::getIdentificacion, Empresa::setIdentificacion);
+        binder.forField(tfDireccion).bind(Empresa::getDireccion, Empresa::setDireccion);
+        binder.forField(tfTelefono).bind(Empresa::getTelefono, Empresa::setTelefono);
+        binder.forField(cbActivo).bind(Empresa::isActivo, Empresa::setActivo);
         binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
@@ -84,9 +88,8 @@ public class EmpresaForm extends Div {
         btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> {
-            if (currentEmpresa != null
-                    && binder.writeBeanIfValid(currentEmpresa)) {
-                viewLogic.saveCategoria(currentEmpresa);
+            if (currentEmpresa != null && binder.writeBeanIfValid(currentEmpresa)) {
+                viewLogic.guardar(currentEmpresa);
             }
         });
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
@@ -94,14 +97,14 @@ public class EmpresaForm extends Div {
         btnDiscard = new Button("Descartar Cambios");
         btnDiscard.setWidth("100%");
         btnDiscard.addClickListener(
-                event -> viewLogic.editCategoria(currentEmpresa));
+                event -> viewLogic.editar(currentEmpresa));
 
-        btnCancel = new Button("Cancelar");
+        Button btnCancel = new Button("Cancelar");
         btnCancel.setWidth("100%");
-        btnCancel.addClickListener(event -> viewLogic.cancelCategoria());
+        btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
-                .addEventListener("keydown", event -> viewLogic.cancelCategoria())
+                .addEventListener("keydown", event -> viewLogic.cancelar())
                 .setFilter("event.key == 'Escape'");
 
         btnDelete = new Button("Eliminar");
@@ -109,7 +112,7 @@ public class EmpresaForm extends Div {
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> {
             if (currentEmpresa != null) {
-                viewLogic.deleteCategoria(currentEmpresa);
+                viewLogic.eliminar(currentEmpresa);
             }
         });
 

@@ -6,12 +6,15 @@
 
 package com.gigti.xfinance.ui;
 
+import com.gigti.xfinance.backend.data.TipoUsuario;
+import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.authentication.LoginScreen;
 import com.gigti.xfinance.ui.crud.Categorias.CategoriaView;
+import com.gigti.xfinance.ui.crud.Empresa.EmpresaView;
 import com.gigti.xfinance.ui.crud.producto.ProductoCrudView;
 import com.github.appreciated.app.layout.addons.notification.DefaultNotificationHolder;
 import com.github.appreciated.app.layout.addons.notification.component.NotificationButton;
@@ -66,51 +69,70 @@ import static com.github.appreciated.app.layout.entity.Section.HEADER;
 @PageTitle(value = Constantes.VIEW_MAIN)
 @Push
 public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive> implements RouterLayout, BeforeEnterObserver {
-    //private MenuB menu;
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
 
     private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
     private DefaultBadgeHolder badge;
+    private LeftNavigationItem menuPVenta;
+    private LeftNavigationItem menuAdminEmpresa;
+    private LeftNavigationItem menuCrearAdminUserEmpresa;
+    private LeftSubMenuBuilder menuEmpresas;
+    private LeftNavigationItem menuUserAdmin;
+    private LeftNavigationItem menuUserRol;
+    private LeftNavigationItem menuUserPermisos;
+    private LeftNavigationItem menuProdAdmin;
+    private LeftNavigationItem menuProdCompras;
+    private LeftNavigationItem menuProdCategoria;
+    private LeftNavigationItem menuProdInvHoy;
+    private LeftNavigationItem menuProdInvInicial;
 
     public MainLayout() {
         createMenu();
     }
 
-    private void createMenu(){
+    private void createMenu() {
         //TODO PERMISOS
-
         LeftAppMenuBuilder leftAppMenuBuilder = LeftAppMenuBuilder.get()
                 .addToSection(HEADER,
                         new LeftHeaderItem("MENU", "", "/frontend/images/logo.png"));
 
-        badge = new DefaultBadgeHolder(5);
-        notifications.addClickListener(notification -> {/* ... */});
-
-        LeftNavigationItem menuPVenta = new LeftNavigationItem("P. Venta", VaadinIcon.CART, ProductoCrudView.class);
+        menuPVenta = new LeftNavigationItem("P. Venta", VaadinIcon.CART, ProductoCrudView.class);
         //badge.bind(menuPVenta.getBadge());
 
         leftAppMenuBuilder.add(menuPVenta);
 
         LeftSubMenuBuilder menuProductos = LeftSubMenuBuilder.get("Productos", VaadinIcon.ABACUS.create());
-        menuProductos.add(new LeftNavigationItem("Administrar", VaadinIcon.CLUSTER.create(), ProductoCrudView.class));
-        menuProductos.add(new LeftNavigationItem("Compras", VaadinIcon.CART.create(), ProductoCrudView.class));
-        menuProductos.add(new LeftNavigationItem("Categorias", VaadinIcon.BOOK.create(), CategoriaView.class));
-        menuProductos.add(new LeftNavigationItem("Inventario Hoy", VaadinIcon.FILE_TEXT_O.create(), ProductoCrudView.class));
-        menuProductos.add(new LeftNavigationItem("Inventario Inicial", VaadinIcon.FILE_START.create(), ProductoCrudView.class));
-
+        menuProdAdmin = new LeftNavigationItem("Administrar", VaadinIcon.CLUSTER.create(), ProductoCrudView.class);
+        menuProductos.add(menuProdAdmin);
+        menuProdCompras = new LeftNavigationItem("Compras", VaadinIcon.CART.create(), ProductoCrudView.class);
+        menuProductos.add(menuProdCompras);
+        menuProdCategoria = new LeftNavigationItem("Categorias", VaadinIcon.BOOK.create(), CategoriaView.class);
+        menuProductos.add(menuProdCategoria);
+        menuProdInvHoy = new LeftNavigationItem("Inventario Hoy", VaadinIcon.FILE_TEXT_O.create(), ProductoCrudView.class);
+        menuProductos.add(menuProdInvHoy);
+        menuProdInvInicial = new LeftNavigationItem("Inventario Inicial", VaadinIcon.FILE_START.create(), ProductoCrudView.class);
+        menuProductos.add(menuProdInvInicial);
         leftAppMenuBuilder.add(menuProductos.build());
 
         LeftSubMenuBuilder menuUsuarios = LeftSubMenuBuilder.get("Usuarios", VaadinIcon.USERS.create());
-        menuUsuarios.add(new LeftNavigationItem("Adminisitrar", VaadinIcon.USERS.create(), ProductoCrudView.class));
-        menuUsuarios.add(new LeftNavigationItem("Roles", VaadinIcon.CONTROLLER.create(), ProductoCrudView.class));
-        menuUsuarios.add(new LeftNavigationItem("Permisos", VaadinIcon.ACCESSIBILITY.create(), CategoriaView.class));
+        menuUserAdmin = new LeftNavigationItem("Adminisitrar", VaadinIcon.USERS.create(), ProductoCrudView.class);
+        menuUsuarios.add(menuUserAdmin);
+        menuUserRol = new LeftNavigationItem("Roles", VaadinIcon.CONTROLLER.create(), ProductoCrudView.class);
+        menuUsuarios.add(menuUserRol);
+        menuUserPermisos = new LeftNavigationItem("Permisos", VaadinIcon.ACCESSIBILITY.create(), CategoriaView.class);
+        menuUsuarios.add(menuUserPermisos);
 
         leftAppMenuBuilder.add(menuUsuarios.build());
 
-        LeftSubMenuBuilder menuEmpresas = LeftSubMenuBuilder.get("Empresas", VaadinIcon.USERS.create());
-        menuEmpresas.add(new LeftNavigationItem("Adminisitrar", VaadinIcon.CLUSTER.create(), ProductoCrudView.class));
-        menuEmpresas.add(new LeftNavigationItem("Crear Usuario Admin", VaadinIcon.USER.create(), ProductoCrudView.class));
+        badge = new DefaultBadgeHolder(5);
+        notifications.addClickListener(notification -> {/* ... */});
 
+        // Usuario Root
+        menuEmpresas = LeftSubMenuBuilder.get("Empresas", VaadinIcon.BUILDING.create());
+        menuAdminEmpresa = new LeftNavigationItem("Adminisitrar", VaadinIcon.BUILDING_O.create(), EmpresaView.class);
+        menuEmpresas.add(menuAdminEmpresa);
+        menuCrearAdminUserEmpresa = new LeftNavigationItem("Crear Usuario Admin", VaadinIcon.USER.create(), ProductoCrudView.class);
+        menuEmpresas.add(menuCrearAdminUserEmpresa);
         leftAppMenuBuilder.add(menuEmpresas.build());
 
         leftAppMenuBuilder.addToSection(FOOTER, new LeftClickableItem("Salir", VaadinIcon.EXIT.create(), clickEvent -> signOut()));
@@ -118,11 +140,10 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
         init(AppLayoutBuilder.get(LeftLayouts.LeftResponsive.class)
                 .withTitle("X Finance App")
                 .withAppBar(AppBarBuilder.get()
-                        .add(new Label((CurrentUser.get() != null ? CurrentUser.get().getNombreUsuario() +" - "+CurrentUser.get().getEmpresa().getNombreEmpresa() : "NO CARGO")))
+                        .add(new Label((CurrentUser.get() != null ? CurrentUser.get().getNombreUsuario() + " - " + CurrentUser.get().getEmpresa().getNombreEmpresa() : "NO CARGO")))
                         .add(new NotificationButton<>(VaadinIcon.BELL, notifications))
                         .build())
-                .withAppMenu(leftAppMenuBuilder.build()
-                )
+                .withAppMenu(leftAppMenuBuilder.build())
                 .build());
     }
 
@@ -146,6 +167,8 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
 
         if (!accessControl.isUserSignedIn()) {
             UI.getCurrent().navigate(LoginScreen.class);
+        } else {
+            accessShowMenu();
         }
     }
 
@@ -171,5 +194,37 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
         });
         dialog.add(confirmButton, cancelButton);
         dialog.open();
+    }
+
+    private void accessShowMenu() {
+        if(CurrentUser.get() != null) {
+            Usuario user = CurrentUser.get();
+
+            if(user.getTipoUsuario().equals(TipoUsuario.ROOT)){
+                menuPVenta.setVisible(false);
+                menuAdminEmpresa.setVisible(true);
+                menuCrearAdminUserEmpresa.setVisible(false);
+                menuUserAdmin.setVisible(false);
+                menuUserRol.setVisible(false);
+                menuUserPermisos.setVisible(false);
+                menuProdAdmin.setVisible(false);
+                menuProdCompras.setVisible(false);
+                menuProdCategoria.setVisible(false);
+                menuProdInvHoy.setVisible(false);
+                menuProdInvInicial.setVisible(false);
+            } else{
+                menuPVenta.setVisible(true);
+                menuAdminEmpresa.setVisible(false);
+                menuCrearAdminUserEmpresa.setVisible(false);
+                menuUserAdmin.setVisible(true);
+                menuUserRol.setVisible(true);
+                menuUserPermisos.setVisible(true);
+                menuProdAdmin.setVisible(true);
+                menuProdCompras.setVisible(true);
+                menuProdCategoria.setVisible(true);
+                menuProdInvHoy.setVisible(true);
+                menuProdInvInicial.setVisible(true);
+            }
+        }
     }
 }

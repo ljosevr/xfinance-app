@@ -6,8 +6,8 @@
 
 package com.gigti.xfinance.backend.data;
 
-import com.gigti.xfinance.backend.others.TipoEmpresa;
 import lombok.Data;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -17,10 +17,12 @@ import java.util.List;
 
 @Data
 @Entity
+//@Table(name = "empresa")
 public class Empresa extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
+    @JoinColumn(name = "tipo_ide_id")
+    //@JoinColumn
     private TipoIde tipoIde;
 
     @NotNull
@@ -51,7 +53,9 @@ public class Empresa extends AbstractEntity {
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date fechaDesactivacion;
 
-    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    //@JoinColumn
+    @JoinColumn(name = "tipo_empresa_id")
     private TipoEmpresa tipoEmpresa;
 
     @Transient
@@ -98,17 +102,7 @@ public class Empresa extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Empresa{" +
-                "ID=" + id + + '\'' +
-                "tipoIde=" + tipoIde + '\'' +
-                ", identificacion='" + identificacion + '\'' +
-                ", nombreEmpresa='" + nombreEmpresa + '\'' +
-                ", direccion='" + direccion + '\'' +
-                ", activo=" + activo +
-                ", eliminado=" + eliminado +
-                ", fechaActivacion=" + fechaActivacion +
-                ", fechaDesactivacion=" + fechaDesactivacion +
-                '}';
+        return nombreEmpresa;
     }
 
     public static Empresa dummy(){

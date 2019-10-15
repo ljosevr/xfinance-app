@@ -49,7 +49,7 @@ public class EmpresaView extends HorizontalLayout
 
             form = new EmpresaForm(viewLogic);
 
-            H3 title = new H3(Constantes.VIEW_CATEGORIA);
+            H3 title = new H3(Constantes.VIEW_EMPRESA);
             title.setClassName("titleView");
 
             barAndGridLayout = new VerticalLayout();

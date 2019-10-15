@@ -30,7 +30,8 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private ParcheRepository parcheRepository;
-
+    @Autowired
+    private TipoEmpresaRepository tipoEmpresaRepository;
     //private PasswordEncoder passwordEncoder;
 
 
@@ -81,7 +82,7 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
                         true,
                         java.sql.Date.valueOf(LocalDate.now()),
                         null,
-                        Empresa.TipoEmpresa.ROOT);
+                        TipoEmpresa.ROOT);
 
                 emp = empresaRepository.save(emp);
 
@@ -119,6 +120,24 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
             }
         }catch(Exception e){
             getLogger().error("Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void initBackTipoEmpresa() {
+        try {
+            Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT3, null);
+            if (parche == null) {
+                //Tipo Ide
+                tipoEmpresaRepository.save(TipoEmpresa.ROOT);
+                tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
+
+                parche = new Parche(Constantes.INIT3,java.sql.Date.valueOf(LocalDate.now()),true, null);
+                parcheRepository.save(parche);
+            }
+        } catch (Exception e) {
+            getLogger().error("Error al Crear InitBackend - Tipo Empresa: " + e.getMessage(), e);
         }
     }
 }

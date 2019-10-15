@@ -12,6 +12,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
@@ -42,4 +44,15 @@ public class TipoIde implements Serializable {
     public String toString() {
         return nombre;
     }
+
+    public static List<TipoIde> getListTipos(){
+        List<TipoIde> list = new ArrayList<>();
+        list.add(CEDULA);
+        list.add(NIT);
+        list.add(EXTRANJERIA);
+        list.add(TIDENTIDAD);
+
+        return list;
+    }
+
 }

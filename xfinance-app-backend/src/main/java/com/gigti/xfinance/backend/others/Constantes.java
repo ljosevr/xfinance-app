@@ -5,6 +5,7 @@ public class Constantes {
     //PARCHES
     public static final String INIT1 = "PI Back - 1 - Tipos";
     public static final String INIT2 = "PI Back - 2 - Objetos";
+    public static final String INIT3 = "PI Back - 3 - TipoEmpresa";
 
     //VIEWS-ROUTE
     public static final String VIEW_R_CATEGORIA = "categoria";

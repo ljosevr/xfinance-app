@@ -28,24 +28,28 @@ public class Usuario extends AbstractEntity {
     @Size(min = 4, max = 255)
     private String passwordUsuario;
 
-    private Boolean activo;
+    private boolean activo;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "persona_id")
+    //@JoinColumn(name = "persona_id")
+    @JoinColumn
     private Persona persona;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
+    //@JoinColumn(name = "empresa_id")
     @JoinColumn
     private Empresa empresa;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
+    //@JoinColumn(name = "rol_id")
     @JoinColumn
     private Rol rol;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    //@JoinColumn(name = "tipo_usuario_id")
     @JoinColumn
     private TipoUsuario tipoUsuario;
 

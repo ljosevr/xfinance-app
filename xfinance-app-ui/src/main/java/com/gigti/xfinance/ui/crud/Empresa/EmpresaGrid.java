@@ -1,6 +1,5 @@
 package com.gigti.xfinance.ui.crud.Empresa;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -48,7 +47,7 @@ public class EmpresaGrid extends PaginatedGrid<Empresa> {
                 .setSortable(true);
 
         String activoTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
-        addColumn(TemplateRenderer.<CategoriaProducto>of(activoTemplate)
+        addColumn(TemplateRenderer.<Empresa>of(activoTemplate)
                 .withProperty("activoS", Empresa::getActivoS))
                 .setHeader("Activo")
                 .setComparator(Comparator.comparing(Empresa::getActivoS))
