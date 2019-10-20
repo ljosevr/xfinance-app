@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -79,6 +78,6 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
     @Override
     public List<Empresa> findByNombreOrDescripcion(String filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return empresaRepository.findByNombreOrDescripcion(filter, pageable);
+        return empresaRepository.findByNombreOrDescripcionAndTipoEmpresa(filter, TipoEmpresa.NORMAL, pageable);
     }
 }
