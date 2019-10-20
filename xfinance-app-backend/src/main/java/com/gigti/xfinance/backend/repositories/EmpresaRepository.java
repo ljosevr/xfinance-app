@@ -20,14 +20,13 @@ import java.util.List;
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, String> {
 
-    //@Query("SELECT e FROM Empresa  e " +
-    //        "WHERE e.eliminado = False")
     public List<Empresa> findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresa tipoEmpresa,Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE UPPER(e.nombreEmpresa) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
-            "e.eliminado = FALSE")
-    public List<Empresa> findByNombreOrDescripcion(@Param("filter") String filter, Pageable pageable);
+            "e.eliminado = FALSE AND "+
+            "e.tipoEmpresa =:tipoEmpresa")
+    public List<Empresa> findByNombreOrDescripcionAndTipoEmpresa(@Param("filter") String filter, TipoEmpresa tipoEmpresa, Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE e.activo =:activo AND " +

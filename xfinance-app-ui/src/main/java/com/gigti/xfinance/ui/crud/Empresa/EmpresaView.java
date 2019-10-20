@@ -1,5 +1,6 @@
 package com.gigti.xfinance.ui.crud.Empresa;
 
+import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.IEmpresaService;
@@ -19,6 +20,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Route(value = Constantes.VIEW_R_EMPRESA,layout = MainLayout.class)
@@ -135,6 +137,15 @@ public class EmpresaView extends HorizontalLayout
     }
 
     public void refresh(Empresa empresa){
+        for(Iterator<Empresa> it = lista.iterator(); it.hasNext();){
+            Empresa e = it.next();
+            if(e.getId().equals(empresa.getId())) {
+                it.remove();
+                lista.remove(e);
+                break;
+            }
+        }
+
         lista.add(empresa);
         grid.setItems(lista);
         grid.refresh(empresa);

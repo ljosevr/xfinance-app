@@ -16,33 +16,20 @@ import com.gigti.xfinance.ui.authentication.LoginScreen;
 import com.gigti.xfinance.ui.crud.Categorias.CategoriaView;
 import com.gigti.xfinance.ui.crud.Empresa.EmpresaView;
 import com.gigti.xfinance.ui.crud.producto.ProductoCrudView;
-import com.github.appreciated.app.layout.addons.notification.DefaultNotificationHolder;
-import com.github.appreciated.app.layout.addons.notification.component.NotificationButton;
-import com.github.appreciated.app.layout.component.appbar.AppBarBuilder;
-import com.github.appreciated.app.layout.component.applayout.LeftLayouts;
-import com.github.appreciated.app.layout.component.builder.AppLayoutBuilder;
-import com.github.appreciated.app.layout.component.menu.left.builder.LeftAppMenuBuilder;
-import com.github.appreciated.app.layout.component.menu.left.builder.LeftSubMenuBuilder;
-import com.github.appreciated.app.layout.component.menu.left.items.LeftClickableItem;
-import com.github.appreciated.app.layout.component.menu.left.items.LeftHeaderItem;
-import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigationItem;
-import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
-import com.github.appreciated.app.layout.entity.DefaultBadgeHolder;
+import com.gigti.xfinance.ui.crud.pventa.PventaView;
 import com.vaadin.flow.component.*;
+import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.NativeButton;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.RouterLayout;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinServletService;
 import com.vaadin.flow.server.VaadinSession;
@@ -52,107 +39,92 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.context.annotation.Primary;
 
-import static com.github.appreciated.app.layout.entity.Section.FOOTER;
-import static com.github.appreciated.app.layout.entity.Section.HEADER;
-
 /**
  * The main layout. Contains the navigation menu.
  */
 @SpringComponent
 @UIScope
 @Primary
-//@Route("")
+@Route("")
 //@PreserveOnRefresh
 @PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
 @Push
-public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive> implements RouterLayout, BeforeEnterObserver {
+public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-
-    private DefaultNotificationHolder notifications = new DefaultNotificationHolder();
-    private DefaultBadgeHolder badge;
-    private LeftNavigationItem menuPVenta;
-    private LeftNavigationItem menuAdminEmpresa;
-    private LeftNavigationItem menuCrearAdminUserEmpresa;
-    private LeftSubMenuBuilder menuEmpresas;
-    private LeftNavigationItem menuUserAdmin;
-    private LeftNavigationItem menuUserRol;
-    private LeftNavigationItem menuUserPermisos;
-    private LeftNavigationItem menuProdAdmin;
-    private LeftNavigationItem menuProdCompras;
-    private LeftNavigationItem menuProdCategoria;
-    private LeftNavigationItem menuProdInvHoy;
-    private LeftNavigationItem menuProdInvInicial;
+    private MenuBar menu;
+    private MenuItem m_ventas;
+    private MenuItem m_productos;
+    private MenuItem m_usuarios;
+    private MenuItem m_empresas;
+    private MenuItem m_salir;
 
     public MainLayout() {
-        createMenu();
+        //String username = CurrentUser.get() != null ? .getNombreUsuario();
+
+        Image img = new Image("/frontend/images/logo.png", "Logo");
+        img.addClassName("hide-on-mobile");
+        img.setHeight("45px");
+        img.setWidth("45px");
+        this.addToNavbar(true, img);
+        menu = createMenu();
+        this.addToNavbar(true, menu);
+        this.setPrimarySection(Section.NAVBAR);
+        this.setDrawerOpened(false);
     }
 
-    private void createMenu() {
-        //TODO PERMISOS
-        LeftAppMenuBuilder leftAppMenuBuilder = LeftAppMenuBuilder.get()
-                .addToSection(HEADER,
-                        new LeftHeaderItem("MENU", "", "/frontend/images/logo.png"));
+    private Component createHeader(){
+        HorizontalLayout top = new HorizontalLayout();
+        top.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        top.setSpacing(true);
+        //top.setClassName("menu-header");
 
-        menuPVenta = new LeftNavigationItem("P. Venta", VaadinIcon.CART, ProductoCrudView.class);
-        //badge.bind(menuPVenta.getBadge());
+        H4 title = new H4("X Finance App");
+        title.setClassName("titleBar");
+        String resolvedImage = VaadinServletService.getCurrent()
+                //.resolveResource("/frontend/images/logo.png", VaadinSession.getCurrent().getBrowser());
+                .resolveResource("/icons/icon2.png", VaadinSession.getCurrent().getBrowser());
 
-        leftAppMenuBuilder.add(menuPVenta);
-
-        LeftSubMenuBuilder menuProductos = LeftSubMenuBuilder.get("Productos", VaadinIcon.ABACUS.create());
-        menuProdAdmin = new LeftNavigationItem("Administrar", VaadinIcon.CLUSTER.create(), ProductoCrudView.class);
-        menuProductos.add(menuProdAdmin);
-        menuProdCompras = new LeftNavigationItem("Compras", VaadinIcon.CART.create(), ProductoCrudView.class);
-        menuProductos.add(menuProdCompras);
-        menuProdCategoria = new LeftNavigationItem("Categorias", VaadinIcon.BOOK.create(), CategoriaView.class);
-        menuProductos.add(menuProdCategoria);
-        menuProdInvHoy = new LeftNavigationItem("Inventario Hoy", VaadinIcon.FILE_TEXT_O.create(), ProductoCrudView.class);
-        menuProductos.add(menuProdInvHoy);
-        menuProdInvInicial = new LeftNavigationItem("Inventario Inicial", VaadinIcon.FILE_START.create(), ProductoCrudView.class);
-        menuProductos.add(menuProdInvInicial);
-        leftAppMenuBuilder.add(menuProductos.build());
-
-        LeftSubMenuBuilder menuUsuarios = LeftSubMenuBuilder.get("Usuarios", VaadinIcon.USERS.create());
-        menuUserAdmin = new LeftNavigationItem("Adminisitrar", VaadinIcon.USERS.create(), ProductoCrudView.class);
-        menuUsuarios.add(menuUserAdmin);
-        menuUserRol = new LeftNavigationItem("Roles", VaadinIcon.CONTROLLER.create(), ProductoCrudView.class);
-        menuUsuarios.add(menuUserRol);
-        menuUserPermisos = new LeftNavigationItem("Permisos", VaadinIcon.ACCESSIBILITY.create(), CategoriaView.class);
-        menuUsuarios.add(menuUserPermisos);
-
-        leftAppMenuBuilder.add(menuUsuarios.build());
-
-        badge = new DefaultBadgeHolder(5);
-        notifications.addClickListener(notification -> {/* ... */});
-
-        // Usuario Root
-        menuEmpresas = LeftSubMenuBuilder.get("Empresas", VaadinIcon.BUILDING.create());
-        menuAdminEmpresa = new LeftNavigationItem("Adminisitrar", VaadinIcon.BUILDING_O.create(), EmpresaView.class);
-        menuEmpresas.add(menuAdminEmpresa);
-        menuCrearAdminUserEmpresa = new LeftNavigationItem("Crear Usuario Admin", VaadinIcon.USER.create(), ProductoCrudView.class);
-        menuEmpresas.add(menuCrearAdminUserEmpresa);
-        leftAppMenuBuilder.add(menuEmpresas.build());
-
-        leftAppMenuBuilder.addToSection(FOOTER, new LeftClickableItem("Salir", VaadinIcon.EXIT.create(), clickEvent -> signOut()));
-
-        init(AppLayoutBuilder.get(LeftLayouts.LeftResponsive.class)
-                .withTitle("X Finance App")
-                .withAppBar(AppBarBuilder.get()
-                        .add(new Label((CurrentUser.get() != null ? CurrentUser.get().getNombreUsuario() + " - " + CurrentUser.get().getEmpresa().getNombreEmpresa() : "NO CARGO")))
-                        .add(new NotificationButton<>(VaadinIcon.BELL, notifications))
-                        .build())
-                .withAppMenu(leftAppMenuBuilder.build())
-                .build());
+        return top;
     }
 
-    public DefaultNotificationHolder getNotifications() {
-        return notifications;
-    }
+    private MenuBar createMenu() {
+        menu = new MenuBar();
+        menu.addItem(new Hr());
+        m_ventas = menu.addItem(new RouterLink("Ventas", PventaView.class));
+        m_productos = menu.addItem("Productos");
+        m_usuarios = menu.addItem("Usuarios");
+        m_empresas = menu.addItem("Empresas");
+        m_salir = menu.addItem("Salir", event -> signOut());
 
-    public DefaultBadgeHolder getBadge() {
-        return badge;
+
+        SubMenu sm_productos = m_productos.getSubMenu();
+        sm_productos.addItem(new RouterLink("Administrar", ProductoCrudView.class));//"Administrar", event -> getUI().get().navigate(ProductoCrudView.class));
+        sm_productos.addItem("Compras",event -> getUI().get().navigate("adminProd"));
+        sm_productos.addItem(new RouterLink("Categoria", CategoriaView.class));//event -> getUI().get().navigate(CategoriaView_CrudUI.class));
+        sm_productos.addItem("Inventario Hoy",event -> getUI().get().navigate("adminProd"));
+        sm_productos.addItem("Inv. Inicial",event -> getUI().get().navigate("adminProd"));
+
+        SubMenu sm_usuarios = m_usuarios.getSubMenu();
+        sm_usuarios.addItem("Administrar",event -> getUI().get().navigate("adminUserView"));
+        sm_usuarios.addItem("Roles",event -> getUI().get().navigate("rolView"));
+        sm_usuarios.addItem("Permisos",event -> getUI().get().navigate("permisoView"));
+
+        SubMenu sm_empresas = m_empresas.getSubMenu();
+        sm_empresas.addItem(new RouterLink("Administrar", EmpresaView.class));
+        sm_empresas.addItem("Usuario Admin",event -> getUI().get().navigate("adminProd"));
+
+        /**menu.addItem(m_ventas);
+        menu.addItem(m_productos);
+        menu.addItem(m_usuarios);
+        menu.addItem(m_empresas);
+        menu.addItem(m_salir);*/
+
+        menu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
+
+        return menu;
     }
 
     @Override
@@ -179,6 +151,26 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
         }
     }
 
+
+    private void accessShowMenu() {
+        if(CurrentUser.get() != null) {
+            Usuario user = CurrentUser.get();
+
+            if(user.getTipoUsuario().equals(TipoUsuario.ROOT)){
+                m_ventas.setVisible(false);
+                m_empresas.setVisible(true);
+                m_productos.setVisible(true);
+                m_usuarios.setVisible(false);
+
+            } else{
+                m_ventas.setVisible(true);
+                m_empresas.setVisible(false);
+                m_productos.setVisible(true);
+                m_usuarios.setVisible(true);
+            }
+        }
+    }
+
     private void signOut(){
         Dialog dialog = new Dialog(new Label("¿Está Seguro de Salir?"));
 
@@ -194,37 +186,5 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftResponsive
         });
         dialog.add(confirmButton, cancelButton);
         dialog.open();
-    }
-
-    private void accessShowMenu() {
-        if(CurrentUser.get() != null) {
-            Usuario user = CurrentUser.get();
-
-            if(user.getTipoUsuario().equals(TipoUsuario.ROOT)){
-                menuPVenta.setVisible(false);
-                menuAdminEmpresa.setVisible(true);
-                menuCrearAdminUserEmpresa.setVisible(false);
-                menuUserAdmin.setVisible(false);
-                menuUserRol.setVisible(false);
-                menuUserPermisos.setVisible(false);
-                menuProdAdmin.setVisible(false);
-                menuProdCompras.setVisible(false);
-                menuProdCategoria.setVisible(false);
-                menuProdInvHoy.setVisible(false);
-                menuProdInvInicial.setVisible(false);
-            } else{
-                menuPVenta.setVisible(true);
-                menuAdminEmpresa.setVisible(false);
-                menuCrearAdminUserEmpresa.setVisible(false);
-                menuUserAdmin.setVisible(true);
-                menuUserRol.setVisible(true);
-                menuUserPermisos.setVisible(true);
-                menuProdAdmin.setVisible(true);
-                menuProdCompras.setVisible(true);
-                menuProdCategoria.setVisible(true);
-                menuProdInvHoy.setVisible(true);
-                menuProdInvInicial.setVisible(true);
-            }
-        }
     }
 }

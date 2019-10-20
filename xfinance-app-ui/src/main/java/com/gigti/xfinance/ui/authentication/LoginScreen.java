@@ -91,7 +91,8 @@ public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>
             //Permisos y Roles
             //registerHomeViewIfApplicable();
             //getUI().get().navigate("");
-            UI.getCurrent().navigate(HomeView.class);
+            //UI.getCurrent().navigate(HomeView.class);
+            UI.getCurrent().navigate(MainLayout.class);
         } else {
             event.getSource().setError(true);
         }
