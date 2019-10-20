@@ -8,28 +8,21 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.checkbox.CheckboxGroup;
-import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.*;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.radiobutton.RadioButtonGroup;
-import com.vaadin.flow.component.radiobutton.RadioGroupVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,8 +36,8 @@ import java.util.Locale;
  * A form for editing a single product.
  */
 public class ProductoForm extends FormLayout {
-    private RadioButtonGroup<CategoriaProducto> rbGroupCategorias;
 
+    private ComboBox<CategoriaProducto>  cbCategorias;
     private Button btnSave;
     private Button btnDiscard;
     private Button btnDelete;
@@ -119,13 +112,10 @@ public class ProductoForm extends FormLayout {
         Checkbox chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
 
-        rbGroupCategorias = new RadioButtonGroup<>();
-        rbGroupCategorias.setLabel("Categoria Producto");
-        rbGroupCategorias.setItems(listCategoria);
-        rbGroupCategorias.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
-        rbGroupCategorias.setRequired(true);
-        rbGroupCategorias.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
-        rbGroupCategorias.setRequiredIndicatorVisible(true);
+        cbCategorias = new ComboBox<>();
+        cbCategorias.setLabel("Categoria");
+        cbCategorias.setItems(listCategoria);
+        cbCategorias.setRequired(true);
 
         TextField tfPrecioCosto = new TextField("Precio Costo");
         tfPrecioCosto.setPrefixComponent(new Span("$"));
@@ -149,7 +139,7 @@ public class ProductoForm extends FormLayout {
         binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
         binder.forField(tfProdCodigoB).bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
         binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
-        binder.forField(rbGroupCategorias).asRequired("Debe Seleccionar Categoria").bind(Producto::getCategoria, Producto::setCategoria);
+        binder.forField(cbCategorias).bind(Producto::getCategoria, Producto::setCategoria);
         binder.bindInstanceFields(this);
 
         // enable/disable btnSave button while editing
@@ -198,13 +188,11 @@ public class ProductoForm extends FormLayout {
         HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete,btnCancel);
 
-        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,chkActivo,rbGroupCategorias,tfPrecioCosto,tfPrecioVenta,tfProdStock,actionsLayout,actionsLayout2);
-        this.setColspan(rbGroupCategorias,2);
+        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,chkActivo,cbCategorias,tfProdStock,tfPrecioCosto,tfPrecioVenta,actionsLayout,actionsLayout2);
     }
 
     public void setCategories(List<CategoriaProducto> categories) {
-        rbGroupCategorias.setItems(categories);
-        rbGroupCategorias.setRenderer(new TextRenderer<>(CategoriaProducto::getNombre));
+        cbCategorias.setItems(categories);
     }
 
     public void editProducto(Producto producto) {
@@ -220,5 +208,6 @@ public class ProductoForm extends FormLayout {
         }
         currentProduct = producto;
         binder.readBean(producto);
+        cbCategorias.setValue(producto.getCategoria());
     }
 }
