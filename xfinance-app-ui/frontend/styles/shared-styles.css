@@ -158,3 +158,8 @@
     margin: auto;
     text-align: right;
 }
+
+.form-layout {
+    border-spacing: 2px;
+    margin: 2px;
+}

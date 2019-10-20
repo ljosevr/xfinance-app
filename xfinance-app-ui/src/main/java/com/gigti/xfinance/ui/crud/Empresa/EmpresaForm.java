@@ -8,8 +8,10 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -17,7 +19,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
-public class EmpresaForm extends Div {
+public class EmpresaForm extends FormLayout {
 
     private Button btnSave;
     private Button btnDiscard;
@@ -28,44 +30,36 @@ public class EmpresaForm extends Div {
     private Empresa currentEmpresa;
 
     public EmpresaForm(EmpresaCrudLogic empresaCrudLogic) {
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeUndefined();
+
+        this.setResponsiveSteps(
+                new ResponsiveStep("25em", 1),
+                new ResponsiveStep("32em", 2),
+                new ResponsiveStep("40em", 3));
+
         H4 title = new H4("Crear o Editar Empresa");
-        content.add(title);
-        add(content);
+        this.add(title,3);
 
         viewLogic = empresaCrudLogic;
 
         TextField tfNombreEmpresa = new TextField("Nombre Empresa");
-        tfNombreEmpresa.setWidth("100%");
         tfNombreEmpresa.setRequired(true);
-        tfNombreEmpresa.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfNombreEmpresa);
 
         ComboBox<TipoIde> cbTipoIde = new ComboBox<>();
         cbTipoIde.setLabel("Tipo Ide");
         cbTipoIde.setItems(TipoIde.getListTipos());
         cbTipoIde.setRequired(true);
-        content.add(cbTipoIde);
 
         TextField tfIdentificacion = new TextField("Identificación");
-        tfIdentificacion.setWidth("100%");
         tfIdentificacion.setRequired(true);
-        content.add(tfIdentificacion);
 
         TextField tfDireccion = new TextField("Dirección");
-        tfDireccion.setWidth("100%");
         tfDireccion.setRequired(false);
-        content.add(tfDireccion);
 
         TextField tfTelefono = new TextField("Telefono");
-        tfTelefono.setWidth("100%");
         tfTelefono.setRequired(false);
-        content.add(tfTelefono);
 
         Checkbox cbActivo = new Checkbox("Activo");
         cbActivo.setValue(true);
-        content.add(cbActivo);
 
         binder = new BeanValidationBinder<>(Empresa.class);
         binder.forField(tfNombreEmpresa).bind(Empresa::getNombreEmpresa, Empresa::setNombreEmpresa);
@@ -85,7 +79,6 @@ public class EmpresaForm extends Div {
         });
 
         btnSave = new Button("Guardar");
-        btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> {
             if (currentEmpresa != null && binder.writeBeanIfValid(currentEmpresa)) {
@@ -95,12 +88,10 @@ public class EmpresaForm extends Div {
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
 
         btnDiscard = new Button("Descartar Cambios");
-        btnDiscard.setWidth("100%");
         btnDiscard.addClickListener(
                 event -> viewLogic.editar(currentEmpresa));
 
         Button btnCancel = new Button("Cancelar");
-        btnCancel.setWidth("100%");
         btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
@@ -108,7 +99,6 @@ public class EmpresaForm extends Div {
                 .setFilter("event.key == 'Escape'");
 
         btnDelete = new Button("Eliminar");
-        btnDelete.setWidth("100%");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> {
             if (currentEmpresa != null) {
@@ -116,7 +106,13 @@ public class EmpresaForm extends Div {
             }
         });
 
-        content.add(btnSave, btnDiscard, btnDelete, btnCancel);
+        HorizontalLayout actionsLayout = new HorizontalLayout();
+        actionsLayout.add(btnSave,btnDiscard);
+        HorizontalLayout actionsLayout2 = new HorizontalLayout();
+        actionsLayout.add(btnDelete,btnCancel);
+        this.add(tfNombreEmpresa,cbTipoIde,tfIdentificacion,tfDireccion, tfTelefono,cbActivo,actionsLayout,actionsLayout2);
+        this.setColspan(actionsLayout, 3);
+        this.setColspan(actionsLayout2,2);
     }
 
     public void edit(Empresa empresa) {

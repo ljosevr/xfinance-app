@@ -16,6 +16,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -41,7 +42,7 @@ import java.util.Locale;
 /**
  * A form for editing a single product.
  */
-public class ProductoForm extends Div {
+public class ProductoForm extends FormLayout {
     private RadioButtonGroup<CategoriaProducto> rbGroupCategorias;
 
     private Button btnSave;
@@ -93,37 +94,30 @@ public class ProductoForm extends Div {
     }
 
     public ProductoForm(ProductoCrudLogic productoCrudLogic, List<CategoriaProducto> listCategoria) {
-//        setClassName("standard-form");
-        VerticalLayout content = new VerticalLayout();
-        content.setSizeUndefined();
-        add(content);
+        this.setResponsiveSteps(
+                new ResponsiveStep("25em", 1),
+                new ResponsiveStep("32em", 2),
+                new ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Producto");
-        content.add(title);
+        this.add(title,3);
 
         viewLogic = productoCrudLogic;
 
         TextField tfProdNombre = new TextField("Nombre Producto");
-        tfProdNombre.setWidth("100%");
         tfProdNombre.setRequired(true);
         tfProdNombre.setValueChangeMode(ValueChangeMode.EAGER);
         tfProdNombre.focus();
-        content.add(tfProdNombre);
 
         TextField tfProdCodigoB = new TextField("Codigo de barras");
-        tfProdCodigoB.setWidth("100%");
         tfProdCodigoB.setRequired(true);
         tfProdCodigoB.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfProdCodigoB);
 
         TextField tfProdDescripcion = new TextField("Descripción");
         tfProdDescripcion.setWidth("100%");
-        //tfProdDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfProdDescripcion);
 
         Checkbox chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
-        content.add(chkActivo);
 
         rbGroupCategorias = new RadioButtonGroup<>();
         rbGroupCategorias.setLabel("Categoria Producto");
@@ -132,29 +126,20 @@ public class ProductoForm extends Div {
         rbGroupCategorias.setRequired(true);
         rbGroupCategorias.addThemeVariants(RadioGroupVariant.LUMO_VERTICAL);
         rbGroupCategorias.setRequiredIndicatorVisible(true);
-        content.add(rbGroupCategorias);
 
         TextField tfPrecioCosto = new TextField("Precio Costo");
         tfPrecioCosto.setPrefixComponent(new Span("$"));
         tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         tfPrecioCosto.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfPrecioCosto);
 
         TextField tfPrecioVenta = new TextField("Precio Venta");
         tfPrecioVenta.setPrefixComponent(new Span("$"));
         tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         tfPrecioVenta.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfPrecioVenta);
 
         TextField tfProdStock = new TextField("Stock(cantidad)");
         tfProdStock.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
         tfProdStock.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfProdStock);
-
-//        HorizontalLayout priceLayout = new HorizontalLayout(tfPrecioCosto,tfPrecioVenta);
-//        priceLayout.setWidth("100%");
-//        priceLayout.setFlexGrow(1, tfPrecioVenta, tfProdStock);
-//        content.add(priceLayout);
 
         binder = new BeanValidationBinder<>(Producto.class);
         binder.forField(tfPrecioCosto).withConverter(new PriceConverter()).bind(Producto::getPrecioCostoActual, Producto::setPrecioCostoActual);
@@ -208,7 +193,13 @@ public class ProductoForm extends Div {
             }
         });
 
-        content.add(btnSave, btnDiscard, btnDelete, btnCancel);
+        HorizontalLayout actionsLayout = new HorizontalLayout();
+        actionsLayout.add(btnSave,btnDiscard);
+        HorizontalLayout actionsLayout2 = new HorizontalLayout();
+        actionsLayout.add(btnDelete,btnCancel);
+
+        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,chkActivo,rbGroupCategorias,tfPrecioCosto,tfPrecioVenta,tfProdStock,actionsLayout,actionsLayout2);
+        this.setColspan(rbGroupCategorias,2);
     }
 
     public void setCategories(List<CategoriaProducto> categories) {

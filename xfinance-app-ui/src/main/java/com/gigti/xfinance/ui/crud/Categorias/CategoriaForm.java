@@ -3,22 +3,20 @@ package com.gigti.xfinance.ui.crud.Categorias;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
-public class CategoriaForm extends Div {
-    private VerticalLayout content;
+public class CategoriaForm extends FormLayout {
+    //private VerticalLayout content;
 
     private Button btnSave;
     private Button btnDiscard;
@@ -29,39 +27,32 @@ public class CategoriaForm extends Div {
     private CategoriaProducto currentCategoria;
 
     public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
+        //this.setClassName("form-layout");
+        //this.setSizeFull();
+        this.setResponsiveSteps(
+                new ResponsiveStep("25em", 1),
+                new ResponsiveStep("32em", 2),
+                new ResponsiveStep("40em", 3));
 
-        //TODO Layout Mobile o PC
-//        UI.getCurrent()
-//                .getPage()
-//                .retrieveExtendedClientDetails(details -> {
-//                    add(new Span("Client resolution: "));
-//                    add(new Span(details.getScreenWidth() + "x" + details.getScreenHeight()));
-//                });
-
-        content = new VerticalLayout();
-        content.setSizeUndefined();
         H4 title = new H4("Crear o Editar Categoria");
-        content.add(title);
-        add(content);
+        this.add(title, 3);
 
         viewLogic = categoriaCrudLogic;
 
         TextField tfCatNombre = new TextField("Nombre Categoria");
-        tfCatNombre.setWidth("100%");
         tfCatNombre.setRequired(true);
         tfCatNombre.setValueChangeMode(ValueChangeMode.EAGER);
         tfCatNombre.focus();
-        content.add(tfCatNombre);
 
         TextField tfCatDescripcion = new TextField("Descripción Categoria");
-        tfCatDescripcion.setWidth("100%");
         tfCatDescripcion.setRequired(false);
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
-        content.add(tfCatDescripcion);
+
+        this.add(tfCatNombre, tfCatDescripcion);
 
         Checkbox cbCatActivo = new Checkbox("Activo");
         cbCatActivo.setValue(true);
-        content.add(cbCatActivo);
+        this.add(cbCatActivo, 3);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
         binder.forField(tfCatNombre).bind(CategoriaProducto::getNombre,
@@ -81,7 +72,7 @@ public class CategoriaForm extends Div {
         });
 
         btnSave = new Button("Guardar");
-        btnSave.setWidth("100%");
+        //btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> {
             if (currentCategoria != null
@@ -92,12 +83,12 @@ public class CategoriaForm extends Div {
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
 
         btnDiscard = new Button("Descartar Cambios");
-        btnDiscard.setWidth("100%");
+        //btnDiscard.setWidth("100%");
         btnDiscard.addClickListener(
                 event -> viewLogic.editar(currentCategoria));
 
         Button btnCancel = new Button("Cancelar");
-        btnCancel.setWidth("100%");
+        //btnCancel.setWidth("100%");
         btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
@@ -105,7 +96,7 @@ public class CategoriaForm extends Div {
                 .setFilter("event.key == 'Escape'");
 
         btnDelete = new Button("Eliminar");
-        btnDelete.setWidth("100%");
+        //btnDelete.setWidth("100%");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> {
             if (currentCategoria != null) {
@@ -113,7 +104,12 @@ public class CategoriaForm extends Div {
             }
         });
 
-        content.add(btnSave, btnDiscard, btnDelete, btnCancel);
+        HorizontalLayout actionsLayout = new HorizontalLayout();
+        actionsLayout.add(btnSave, btnDiscard);
+        HorizontalLayout actionsLayout2 = new HorizontalLayout();
+        actionsLayout.add(btnDelete, btnCancel);
+        this.add(actionsLayout,3);
+        this.add(actionsLayout2,3);
     }
 
     public void editCategoria(CategoriaProducto categoria) {
