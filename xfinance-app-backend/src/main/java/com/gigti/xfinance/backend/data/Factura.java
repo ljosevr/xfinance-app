@@ -16,6 +16,7 @@ import java.util.List;
 
 @Data
 @Entity
+@Table(name="facturas")
 public class Factura extends AbstractEntity {
 
     @NotEmpty

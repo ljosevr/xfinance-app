@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * operations and controlling the view based on events from outside.
  */
 @Route(value = "Invetario", layout = MainLayout.class)
-//@RouteAlias(value = "", layout = MainLayout.class)
 public class InventarioCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
 

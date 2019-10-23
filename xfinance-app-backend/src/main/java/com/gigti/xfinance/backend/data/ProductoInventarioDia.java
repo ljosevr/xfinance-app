@@ -13,22 +13,22 @@ import java.util.Date;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
-@Table(name = "product_stock_day")
-public class ProductStockDay extends AbstractEntity {
+@Table(name = "producto_inventario_dia")
+public class ProductoInventarioDia extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Producto producto;
 
-    private Integer quantity;
+    private double quantity;
 
     @Temporal(TemporalType.DATE)
     private Date trackingDate;
 
-    public ProductStockDay() {
+    public ProductoInventarioDia() {
     }
 
-    public ProductStockDay(Producto producto, Integer quantity, Date trackingDate) {
+    public ProductoInventarioDia(Producto producto, double quantity, Date trackingDate) {
         this.producto = producto;
         this.quantity = quantity;
         this.trackingDate = trackingDate;

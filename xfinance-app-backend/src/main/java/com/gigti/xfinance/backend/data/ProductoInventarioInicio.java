@@ -11,26 +11,31 @@ import lombok.Data;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+@Data
 @Entity
-@Table(name = "product_stock_start")
-public class ProductStockStart extends AbstractEntity {
+@Table(name = "producto_inventario_inicio")
+public class ProductoInventarioInicio extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(unique = true)
     private Producto producto;
 
-    private Integer quantity;
+    private double quantity;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    public ProductStockStart(Producto producto, Integer quantity, Date startDate) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    private Usuario usuario;
+
+    public ProductoInventarioInicio(Producto producto, double quantity, Date startDate, Usuario usuario) {
         this.producto = producto;
         this.quantity = quantity;
         this.startDate = startDate;
+        this.usuario = usuario;
     }
 
-    public ProductStockStart() {
+    public ProductoInventarioInicio() {
     }
 }

@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
@@ -35,13 +35,13 @@ public class Producto extends AbstractEntity {
     private String activoS;
 
     @Transient
-    private BigDecimal precioCostoActual;
+    private BigDecimal precioCostoActual = BigDecimal.ZERO;
 
     @Transient
-    private BigDecimal precioVentaActual;
+    private BigDecimal precioVentaActual = BigDecimal.ZERO;
 
     @Transient
-    private int stockActual;
+    private double stockActual;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
@@ -55,10 +55,10 @@ public class Producto extends AbstractEntity {
     private List<ProductoValores> productoValores;
 
     @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductStockStart> productStockStart;
+    private List<ProductoInventarioInicio> productoInventarioInicio;
 
     @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductStockDay> productsStockDay;
+    private List<ProductoInventarioDia> productsStockDay;
 
     @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL,fetch = FetchType.LAZY)
     private List<ProductoVenta> productoVenta;
@@ -76,50 +76,6 @@ public class Producto extends AbstractEntity {
 
     public String getActivoS() {
         return isActivo() ? "SI" : "NO";
-    }
-
-    public BigDecimal getPrecioVentaActual(){
-
-        LocalDate maxDate = null;
-        ProductoValores pro = null;
-//        for(ProductoValores p : getProductsFinance()){
-//            if(p.getActive()) {
-//                if (maxDate == null) {
-//                    maxDate = p.getActiveDate();
-//                    pro = p;
-//                }else{
-//                    if(p.getActiveDate().isAfter(maxDate)){
-//                        maxDate = p.getActiveDate();
-//                        pro = p;
-//                    }
-//                }
-//            }
-//        }
-        return BigDecimal.valueOf(0.0);
-    }
-
-    public BigDecimal getPrecioCostoActual(){
-
-        LocalDate maxDate = null;
-        ProductoValores pro = null;
-//        for(ProductoValores p : getProductsFinance()){
-//            if(p.getActive()) {
-//                if (maxDate == null) {
-//                    maxDate = p.getActiveDate();
-//                    pro = p;
-//                }else{
-//                    if(p.getActiveDate().isAfter(maxDate)){
-//                        maxDate = p.getActiveDate();
-//                        pro = p;
-//                    }
-//                }
-//            }
-//        }
-        return BigDecimal.valueOf(0.0);
-    }
-
-    public int getStockActual(){
-        return 0;
     }
 
 }

@@ -20,7 +20,7 @@ public class ProductoVenta extends AbstractEntity{
     @JoinColumn
     private Producto producto;
 
-    private Integer quantitySell;
+    private double quantitySell;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date sellDate;

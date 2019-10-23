@@ -97,7 +97,7 @@ public class ProductoCrudLogic implements Serializable {
     void saveProducto(Producto producto) {
         String typOperation = StringUtils.isBlank(producto.getId()) ? " Creado" : " Actualizada";
         producto.setEmpresa(empresa);
-        producto = iProductoService.saveProduct(producto);
+        producto = iProductoService.saveProduct(producto, CurrentUser.get());
         if (producto != null) {
             view.refresh(producto);
             view.clearSelection();

@@ -25,12 +25,10 @@ public class ProductoValores extends AbstractEntity {
 
     @Column(name="precio_costo")
     @NotNull
-    @Size(message = "Precio de Costo No puede ser menor a Cero (0)")
     private BigDecimal precioCosto;
 
     @Column(name="precio_venta")
     @NotNull
-    @Size(message = "Precio de Venta No puede ser menor a Cero (0)")
     private BigDecimal precioVenta;
 
     @Temporal(TemporalType.TIMESTAMP)

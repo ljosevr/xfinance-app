@@ -7,8 +7,8 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
-
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Data
 @Entity
@@ -23,22 +23,22 @@ public class ItemFactura extends AbstractEntity {
     @JoinColumn
     private Producto producto;
 
-    private Integer cantidad;
+    private double cantidad;
 
-    private Double precioVenta;
+    private BigDecimal precioVenta;
 
-    private Double precioCosto;
-
-    @Transient
-    private Double precioTotalCosto;
+    private BigDecimal precioCosto;
 
     @Transient
-    private Double precioTotalVenta;
+    private BigDecimal precioTotalCosto;
+
+    @Transient
+    private BigDecimal precioTotalVenta;
 
     public ItemFactura() {
     }
 
-    public ItemFactura(Factura factura, Producto producto, Integer cantidad, Double precioVenta, Double precioCosto) {
+    public ItemFactura(Factura factura, Producto producto, double cantidad, BigDecimal precioVenta, BigDecimal precioCosto) {
         this.factura = factura;
         this.producto = producto;
         this.cantidad = cantidad;

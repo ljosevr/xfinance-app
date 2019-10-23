@@ -62,8 +62,8 @@ public class PventaServiceImpl implements PventaService, HasLogger {
             item.setFactura(factura);
             item.setProducto(productoRepository.getOne(pv.getIdProducto()));
             item.setCantidad(pv.getCantidadVenta());
-            item.setPrecioCosto(pv.getPrecioCostoActual().doubleValue());
-            item.setPrecioVenta(pv.getPrecioVentaActual().doubleValue());
+            item.setPrecioCosto(pv.getPrecioCostoActual());
+            item.setPrecioVenta(pv.getPrecioVentaActual());
             listItems.add(item);
         }
 

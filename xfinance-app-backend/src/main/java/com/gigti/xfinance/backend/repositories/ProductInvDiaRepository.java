@@ -6,10 +6,15 @@
 
 package com.gigti.xfinance.backend.repositories;
 
-import com.gigti.xfinance.backend.data.ProductStockStart;
+import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.ProductoInventarioDia;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
+
 @Repository
-public interface ProductStockStartRepository extends JpaRepository<ProductStockStart, String> {
+public interface ProductInvDiaRepository extends JpaRepository<ProductoInventarioDia, String> {
+
+    public ProductoInventarioDia findByProductoAndTrackingDateIsGreaterThanEqual(Producto producto, Date today);
 }

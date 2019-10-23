@@ -44,11 +44,11 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setSortable(true)
                 .setFlexGrow(3);
 
-        addColumn(this::formatPrice)
+        addColumn(this::formatCostPrice)
                 .setHeader("P. Costo")
                 .setFlexGrow(5);
 
-        addColumn(this::formatPrice)
+        addColumn(this::formatSellPrice)
                 .setHeader("P. Venta")
                 .setFlexGrow(5);
 
@@ -75,12 +75,20 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
         return producto.getCategoria().getNombre();
     }
 
-    private String formatPrice(Producto producto){
+    private String formatCostPrice(Producto producto){
         final DecimalFormat decimalFormat = new DecimalFormat();
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
 
-        return "$ 0.0";
+        return "$ "+decimalFormat.format(producto.getPrecioCostoActual());
+    }
+
+    private String formatSellPrice(Producto producto){
+        final DecimalFormat decimalFormat = new DecimalFormat();
+        decimalFormat.setMaximumFractionDigits(2);
+        decimalFormat.setMinimumFractionDigits(2);
+
+        return "$ "+decimalFormat.format(producto.getPrecioVentaActual());
     }
 
     private String formatStock(Producto producto){
@@ -88,8 +96,7 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
         decimalFormat.setMaximumFractionDigits(2);
         decimalFormat.setMinimumFractionDigits(2);
 
-
-        return "0";
+        return decimalFormat.format(producto.getStockActual());
     }
 
     @Override
