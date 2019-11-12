@@ -32,24 +32,20 @@ public class Usuario extends AbstractEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "persona_id")
     @JoinColumn
     private Persona persona;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "empresa_id")
     @JoinColumn
     private Empresa empresa;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "rol_id")
     @JoinColumn
     private Rol rol;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn(name = "tipo_usuario_id")
     @JoinColumn
     private TipoUsuario tipoUsuario;
 
@@ -75,7 +71,7 @@ public class Usuario extends AbstractEntity {
                     true,
                     Persona.dummy(number),
                     Empresa.dummy(),
-                    new Rol("Admin", "Administrador"),
+                    Rol.ADMIN,
                     TipoUsuario.ROOT);
         }else{
             return user.getNombreUsuario().equals(current) ? user : null;

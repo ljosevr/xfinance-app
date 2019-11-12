@@ -6,7 +6,10 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -17,7 +20,9 @@ import java.util.List;
 
 @Data
 @Entity
-//@Table(name = "empresa")
+//@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Empresa extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -70,8 +75,6 @@ public class Empresa extends AbstractEntity {
     @OneToMany(mappedBy = "empresa", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CategoriaProducto> categoriaProductos;
 
-    public Empresa(){}
-
     public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo) {
         this.tipoIde = tipoIde;
         this.identificacion = identificacion;
@@ -96,10 +99,6 @@ public class Empresa extends AbstractEntity {
         this.tipoEmpresa = tipo;
     }
 
-    public String getActivoS() {
-        return isActivo() ? "SI" : "NO";
-    }
-
     @Override
     public String toString() {
         return nombreEmpresa;
@@ -115,4 +114,5 @@ public class Empresa extends AbstractEntity {
                 null,
                 TipoEmpresa.ROOT);
     }
+
 }

@@ -1,9 +1,8 @@
-package com.gigti.xfinance.ui.crud.Empresa;
+package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IEmpresaService;
+import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
@@ -23,35 +22,35 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Iterator;
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_EMPRESA,layout = MainLayout.class)
-@RouteAlias(value = Constantes.VIEW_R_EMPRESA,layout = MainLayout.class)
-public class EmpresaView extends HorizontalLayout
+@Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
+@RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
+@PageTitle(value = Constantes.VIEW_MAIN)
+public class CategoriaView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
-    private EmpresaGrid grid;
-    private EmpresaForm form;
+    private CategoriaGrid grid;
+    private CategoriaForm form;
     private TextField filter;
-    private EmpresaCrudLogic viewLogic;
-    private Button btnNewEmpresa;
-    private List<Empresa> lista;
+    private CategoriaCrudLogic viewLogic;
+    private List<CategoriaProducto> lista;
     private VerticalLayout barAndGridLayout;
 
     @Autowired
-    public EmpresaView(IEmpresaService iService) {
-            viewLogic = new EmpresaCrudLogic(iService,this);
+    public CategoriaView(IcategoriaProductoService iService) {
+            viewLogic = new CategoriaCrudLogic(iService,this);
 //        if(viewLogic.access()) {
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
-            grid = new EmpresaGrid();
+            grid = new CategoriaGrid();
             lista = viewLogic.findAll();
             grid.setItems(lista);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
 
-            form = new EmpresaForm(viewLogic);
+            form = new CategoriaForm(viewLogic);
 
-            H3 title = new H3(Constantes.VIEW_EMPRESA);
+            H3 title = new H3(Constantes.VIEW_CATEGORIA);
             title.setClassName("titleView");
 
             barAndGridLayout = new VerticalLayout();
@@ -75,7 +74,7 @@ public class EmpresaView extends HorizontalLayout
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
-        filter.setPlaceholder("Buscar Empresa por Nombre ó NIT");
+        filter.setPlaceholder("Filtro por Nombre, Descripción de Categoria a Buscar");
         filter.setValueChangeMode(ValueChangeMode.LAZY);
         filter.addValueChangeListener(event -> {
             lista = viewLogic.setFilter(event.getValue());
@@ -84,15 +83,16 @@ public class EmpresaView extends HorizontalLayout
             }
         );
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
+        filter.focus();
 
-        btnNewEmpresa = new Button("Nueva");
-        btnNewEmpresa.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNewEmpresa.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewEmpresa.addClickListener(click -> viewLogic.nuevo());
+        Button btnNewCategoria = new Button("Nueva");
+        btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
+        btnNewCategoria.addClickListener(click -> viewLogic.nuevo());
         // CTRL+N will create a new window which is unavoidable
-        btnNewEmpresa.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        btnNewCategoria.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
-        return new TopBarComponent(filter, btnNewEmpresa);
+        return new TopBarComponent(filter, btnNewCategoria);
     }
 
     public void showError(String msg) {
@@ -107,13 +107,13 @@ public class EmpresaView extends HorizontalLayout
         grid.getSelectionModel().deselectAll();
     }
 
-    public void selectRow(Empresa row) {
+    public void selectRow(CategoriaProducto row) {
         grid.getSelectionModel().select(row);
     }
 
-    public void edit(Empresa empresa) {
-        form.edit(empresa);
-        showForm(empresa != null);
+    public void editCategoria(CategoriaProducto categoria) {
+        form.editCategoria(categoria);
+        showForm(categoria != null);
     }
 
     public void showForm(boolean show) {
@@ -121,6 +121,7 @@ public class EmpresaView extends HorizontalLayout
             barAndGridLayout.setVisible(false);
         }else{
             barAndGridLayout.setVisible(true);
+            filter.focus();
         }
         form.setVisible(show);
         form.setEnabled(show);
@@ -136,26 +137,29 @@ public class EmpresaView extends HorizontalLayout
         grid.setItems(lista);
     }
 
-    public void refresh(Empresa empresa){
-        for(Iterator<Empresa> it = lista.iterator(); it.hasNext();){
-            Empresa e = it.next();
-            if(e.getId().equals(empresa.getId())) {
+    public void refresh(CategoriaProducto categoria){
+        for(Iterator<CategoriaProducto> it = lista.iterator(); it.hasNext();){
+            CategoriaProducto p = it.next();
+            if(p.getId().equals(categoria.getId())) {
                 it.remove();
-                lista.remove(e);
+                lista.remove(p);
                 break;
             }
         }
-
-        lista.add(empresa);
+        lista.add(categoria);
         grid.setItems(lista);
-        grid.refresh(empresa);
+        grid.refresh(categoria);
     }
 
-    public EmpresaGrid getGrid() {
+    public CategoriaGrid getGrid() {
         return grid;
     }
 
-    public List<Empresa> getItemsGrid(){
+    public List<CategoriaProducto> getItemsGrid(){
         return lista;
+    }
+
+    public TextField getFilter() {
+        return filter;
     }
 }

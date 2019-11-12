@@ -7,9 +7,9 @@ import com.gigti.xfinance.backend.data.dto.PventaDTO;
 
 import java.util.List;
 
-public interface PventaService {
+public interface IventaService {
 
-    public List<PventaDTO> find50MostImportant(Empresa empresa, int page, int size);
+    public List<PventaDTO> find100MostImportant(Empresa empresa);
 
     public List<PventaDTO> findAll(Empresa empresa, int page, int size);
 

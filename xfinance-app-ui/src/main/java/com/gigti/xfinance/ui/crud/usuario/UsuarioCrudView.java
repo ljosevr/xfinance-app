@@ -4,13 +4,13 @@
  * Toda copia o utilización de este codigo debe estar sustentado por escrito por GigTi, si no será considerado plagio y pirateria. Por consiguiente será llevado ante la justicia correspondiente.
  */
 
-package com.gigti.xfinance.ui.crud.producto;
+package com.gigti.xfinance.ui.crud.usuario;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IProductoService;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.IusuarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
@@ -30,41 +30,43 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A view for performing create-read-update-delete operations on products.
+ * A view for performing create-read-update-delete operations on Usuario Admin.
  * <p>
- * See also {@link ProductoCrudLogic} for fetching the data, the actual CRUD
+ * See also {@link UsuarioCrudLogic} for fetching the data, the actual CRUD
  * operations and controlling the view based on events from outside.
  */
-@Route(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
-@RouteAlias(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
+//@Route(value = Constantes.VIEW_R_USUARIOADMIN, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
-public class ProductoCrudView extends HorizontalLayout
+public class UsuarioCrudView extends HorizontalLayout
         implements HasUrlParameter<String> {
+    @Override
+    public void setParameter(BeforeEvent beforeEvent, String s) {
 
-    private ProductoGrid grid;
-    private ProductoForm form;
+    }
+
+   /* private UsuarioGrid grid;
+    private UsuarioForm form;
     private TextField filter;
 
-    private ProductoCrudLogic viewLogic;
-    private List<Producto> listaProducto;
+    private UsuarioCrudLogic viewLogic;
+    private List<Usuario> listUsuarioAdmin;
     private VerticalLayout barAndGridLayout;
 
     @Autowired
-    public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
+    public UsuarioCrudView(IusuarioService iService) {
 
-        viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat, this);
-//        if(viewLogic.access()) {
+        viewLogic = new UsuarioCrudLogic(iService, this);
         setSizeFull();
         HorizontalLayout topLayout = createTopBar();
 
-        grid = new ProductoGrid();
+        grid = new UsuarioGrid();
         listaProducto = viewLogic.findAll();
         grid.setItems(listaProducto);
         grid.asSingleSelect().addValueChangeListener(
                 event -> viewLogic.rowSelected(event.getValue()));
 
         List<CategoriaProducto> listaCategoria = viewLogic.findAllCategoria();
-        form = new ProductoForm(viewLogic, listaCategoria);
+        form = new UsuarioForm(viewLogic, listaCategoria);
         form.setCategories(listaCategoria);
 
         H3 title = new H3(Constantes.VIEW_PRODUCTO);
@@ -95,9 +97,8 @@ public class ProductoCrudView extends HorizontalLayout
         filter.setPlaceholder("Filtro Nombre");
         filter.addValueChangeListener(event -> {
             listaProducto = viewLogic.setFilter(event.getValue());
-            if (listaProducto != null) {
+            if (listaProducto != null)
                 grid.setItems(listaProducto);
-            }
         });
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
         filter.focus();
@@ -167,11 +168,11 @@ public class ProductoCrudView extends HorizontalLayout
         grid.refresh(producto);
     }
 
-    public ProductoGrid getGrid() {
+    public UsuarioGrid getGrid() {
         return grid;
     }
 
     public TextField getFilter() {
         return filter;
-    }
+    }*/
 }

@@ -1,4 +1,4 @@
-package com.gigti.xfinance.ui.crud.Categorias;
+package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;

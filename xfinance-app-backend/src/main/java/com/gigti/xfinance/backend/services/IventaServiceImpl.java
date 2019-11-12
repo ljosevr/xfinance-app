@@ -9,12 +9,14 @@ import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class PventaServiceImpl implements PventaService, HasLogger {
+@Service
+public class IventaServiceImpl implements IventaService, HasLogger {
 
     @Autowired
     private FacturaRepository facturaRepository;
@@ -26,12 +28,8 @@ public class PventaServiceImpl implements PventaService, HasLogger {
     private ProductoValoresRepository productoValoresRepository;
 
     @Override
-    public List<PventaDTO> find50MostImportant(Empresa empresa, int page, int size) {
-        if(size != 50){
-            size = 50;
-            page = 0;
-        }
-        Pageable pageable = PageRequest.of(page, size);
+    public List<PventaDTO> find100MostImportant(Empresa empresa) {
+        Pageable pageable = PageRequest.of(0, 100);
         return getListPventaDTO(empresa, pageable);
     }
 

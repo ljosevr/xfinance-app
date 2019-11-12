@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.ui.authentication;
 
+import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.IinitBackService;
 import com.gigti.xfinance.backend.services.IusuarioService;
 import com.gigti.xfinance.ui.HomeView;
@@ -35,14 +36,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * UI content when the user is not logged in yet.
  */
 @Route(value = "Login")
-@PageTitle("Login")
+@PageTitle(value = Constantes.VIEW_MAIN)
 @CssImport("./styles/shared-styles.css")
-public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>*/ {
+public class LoginScreen extends FlexLayout {
 
     public static final String VIEW_NAME = "Login";
 
     private AccessControl accessControl;
-    //private String parameter = "";
     private IinitBackService iinitBackService;
     private IusuarioService iusuarioService;
 
@@ -53,9 +53,11 @@ public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>
         iinitBackService.initBackTipos();
         iinitBackService.initBackObjetos();
         iinitBackService.initBackTipoEmpresa();
+        iinitBackService.initRoles();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();
+        UI.getCurrent().getPage().executeJavaScript("document.getElementById(\"vaadinLoginUsername\").focus();");
     }
 
     private void buildUI() {
@@ -86,12 +88,6 @@ public class LoginScreen extends FlexLayout /*implements HasUrlParameter<String>
 
     private void login(LoginForm.LoginEvent event) {
         if (accessControl.signIn(event.getUsername(), event.getPassword(), iusuarioService)) {
-
-            //TODO
-            //Permisos y Roles
-            //registerHomeViewIfApplicable();
-            //getUI().get().navigate("");
-            //UI.getCurrent().navigate(HomeView.class);
             UI.getCurrent().navigate(MainLayout.class);
         } else {
             event.getSource().setError(true);

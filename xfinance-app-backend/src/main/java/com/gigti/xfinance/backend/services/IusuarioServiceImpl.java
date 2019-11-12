@@ -3,10 +3,7 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.UsuarioRepository;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,7 +44,6 @@ public class IusuarioServiceImpl implements IusuarioService, HasLogger {
             }
         } catch(Exception e){
             getLogger().error("Error al hacer Login: "+e.getMessage(), e);
-            Notification.show("Error al Iniciar Sesión");
         }
         return null;
     }

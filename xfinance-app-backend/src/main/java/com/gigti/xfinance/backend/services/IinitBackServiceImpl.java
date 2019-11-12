@@ -140,4 +140,21 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
             getLogger().error("Error al Crear InitBackend - Tipo Empresa: " + e.getMessage(), e);
         }
     }
+
+    @Transactional
+    public void initRoles(){
+
+        try {
+            Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT4, null);
+            if (parche == null) {
+                //Roles
+                rolRepository.save(Rol.ADMIN);
+                rolRepository.save(Rol.AUXILIAR);
+                rolRepository.save(Rol.VENDEDOR);
+                rolRepository.save(Rol.CONTADOR);
+            }
+        } catch (Exception e) {
+            getLogger().error("Error al Crear InitBackend - Roles: " + e.getMessage(), e);
+        }
+    }
 }

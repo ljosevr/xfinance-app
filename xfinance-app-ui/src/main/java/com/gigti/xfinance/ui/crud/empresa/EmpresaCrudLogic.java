@@ -1,9 +1,8 @@
-package com.gigti.xfinance.ui.crud.Empresa;
+package com.gigti.xfinance.ui.crud.empresa;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.services.IEmpresaService;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudLogic;
@@ -64,7 +63,7 @@ public class EmpresaCrudLogic implements Serializable, ICrudLogic {
             if (id.equals("new")) {
                 nuevo();
             } else {
-                Empresa empresa = find(id);
+                EmpresaDTO empresa = find(id);
                 view.selectRow(empresa);
             }
         } else {
@@ -72,14 +71,14 @@ public class EmpresaCrudLogic implements Serializable, ICrudLogic {
         }
     }
 
-    public Empresa find(String id) {
+    public EmpresaDTO find(String id) {
         return iEmpresaService.findById(id);
     }
 
     @Override
     public void guardar(Object object) {
-        Empresa empresa = (Empresa) object;
-        String typeOperation = StringUtils.isBlank(empresa.getId()) ? " Creada" : " Actualizada";
+        EmpresaDTO empresa = (EmpresaDTO) object;
+        String typeOperation = StringUtils.isBlank(empresa.getEmpresaId()) ? " Creada" : " Actualizada";
         empresa = iEmpresaService.saveEmpresa(empresa);
         if(empresa != null){
             view.refresh(empresa);
@@ -94,9 +93,9 @@ public class EmpresaCrudLogic implements Serializable, ICrudLogic {
     }
 
     public void eliminar(Object object) {
-        Empresa empresa = (Empresa) object;
+        EmpresaDTO empresa = (EmpresaDTO) object;
         view.clearSelection();
-        if(iEmpresaService.deleteEmpresa(empresa.getId())){
+        if(iEmpresaService.deleteEmpresa(empresa.getEmpresaId())){
             view.showSaveNotification("Empresa: "+empresa.getNombreEmpresa() + " Eliminada");
             if(view.getItemsGrid().remove(empresa)){
                 setFragmentParameter("");
@@ -111,11 +110,11 @@ public class EmpresaCrudLogic implements Serializable, ICrudLogic {
     }
 
     public void editar(Object object) {
-        Empresa empresa = (Empresa) object;
+        EmpresaDTO empresa = (EmpresaDTO) object;
         if (empresa == null) {
             setFragmentParameter("");
         } else {
-            setFragmentParameter(empresa.getId() + "");
+            setFragmentParameter(empresa.getEmpresaId() + "");
         }
         view.edit(empresa);
     }
@@ -123,23 +122,23 @@ public class EmpresaCrudLogic implements Serializable, ICrudLogic {
     public void nuevo() {
         view.clearSelection();
         setFragmentParameter("new");
-        view.edit(new Empresa());
+        view.edit(new EmpresaDTO());
     }
 
     public void rowSelected(Object object) {
-        Empresa empresa = (Empresa) object;
+        EmpresaDTO empresa = (EmpresaDTO) object;
         if (AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(CurrentUser.get())) {
             editar(empresa);
         }
     }
 
-    public List<Empresa> findAll() {
+    public List<EmpresaDTO> findAll() {
         //TODO aplicar al Filtro si es Activo O INACTIVO
         return iEmpresaService.findAll(view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
-    public List<Empresa> setFilter(String filterText) {
+    public List<EmpresaDTO> setFilter(String filterText) {
         Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
             view.refresh();

@@ -4,13 +4,15 @@
  * Toda copia o utilización de este codigo debe estar sustentado por escrito por GigTi, si no será considerado plagio y pirateria. Por consiguiente será llevado ante la justicia correspondiente.
  */
 
-package com.gigti.xfinance.ui.crud.producto;
+package com.gigti.xfinance.ui.crud.usuarioAdmin;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.services.IProductoService;
 import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.IusuarioService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.notification.Notification;
@@ -20,26 +22,16 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * This class provides an interface for the logical operations between the CRUD
- * view, its parts like the product editor form and the data source, including
- * fetching and saving products.
- * <p>
- * Having this separate from the view makes it easier to test various parts of
- * the system separately, and to e.g. provide alternative views for the same
- * data.
- */
-public class ProductoCrudLogic implements Serializable {
+public class UsuarioAdminCrudLogic implements Serializable {
 
-    private ProductoCrudView view;
-    private IProductoService iProductoService;
-    private IcategoriaProductoService icategoriaProductoService;
+   /* private UsuarioAdminCrudView view;
+    private IusuarioService iusuarioService;
+    //private static Usuario usuario;
     private static Empresa empresa;
     private String filterText = "";
 
-    public ProductoCrudLogic(IProductoService iProductoService, IcategoriaProductoService icategoriaService, ProductoCrudView simpleCrudView) {
-        this.iProductoService = iProductoService;
-        this.icategoriaProductoService = icategoriaService;
+    public UsuarioAdminCrudLogic(IusuarioService iusuarioService, UsuarioAdminCrudView simpleCrudView) {
+        this.iusuarioService = iusuarioService;
         view = simpleCrudView;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
@@ -51,24 +43,15 @@ public class ProductoCrudLogic implements Serializable {
     public boolean access() {
         // Hide and disable if not admin
         return empresa != null;
-        //TODO permisos
-//        if (!AccessControlFactory.getInstance().createAccessControl()
-//                .isUserInRole(CurrentUser.get())) {
-//            view.setNewProductEnabled(false);
-//        }
-        //return true;
     }
 
-    void cancelProducto() {
+    void cancelUsuario() {
         setFragmentParameter("");
         view.clearSelection();
         view.showForm(false);
     }
 
-    /**
-     * Update the fragment without causing navigator to change view
-     */
-    private void setFragmentParameter(String productId) {
+    private void setFragmentParameter(String usuarioId) {
         String fragmentParameter;
         if (productId == null || productId.isEmpty()) {
             fragmentParameter = "";
@@ -166,5 +149,5 @@ public class ProductoCrudLogic implements Serializable {
         }
         this.filterText = filterText.trim();
         return iProductoService.findByNombreProducto(empresa, filterText);
-    }
+    }*/
 }

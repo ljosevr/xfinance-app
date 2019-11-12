@@ -4,9 +4,10 @@
  * Toda copia o utilización de este codigo debe estar sustentado por escrito por GigTi, si no será considerado plagio y pirateria. Por consiguiente será llevado ante la justicia correspondiente.
  */
 
-package com.gigti.xfinance.ui.crud.producto;
+package com.gigti.xfinance.ui.crud.usuario;
 
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
@@ -15,18 +16,18 @@ import org.vaadin.klaudeta.PaginatedGrid;
 import java.text.DecimalFormat;
 import java.util.Comparator;
 
-public class ProductoGrid extends PaginatedGrid<Producto> {
+public class UsuarioGrid extends PaginatedGrid<Usuario> {
 
-    public ProductoGrid() {
+    /*public UsuarioGrid() {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
-        addColumn(Producto::getNombreProducto)
-                .setHeader("Nombre")
+        addColumn(Usuario::getNombreUsuario)
+                .setHeader("Usuario")
                 .setFlexGrow(20)
                 .setSortable(true);
 
-        addColumn(Producto::getCodigoBarra)
+        addColumn(Usuario::getPer)
                 .setHeader("Codigo Barras")
                 .setFlexGrow(20)
                 .setSortable(true);
@@ -38,22 +39,6 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setComparator(Comparator.comparing(Producto::getActivoS))
                 .setSortable(true)
                 .setFlexGrow(5);
-
-        //TODO
-//        grid.addComponentColumn(item -> {
-//            Icon icon;
-//            if(item.isAdult()){
-//                icon = VaadinIcon.CHECK_CIRCLE.create();
-//                icon.setColor("green");
-//            } else {
-//                icon = VaadinIcon.CLOSE_CIRCLE.create();
-//                icon.setColor("red");
-//            }
-//            return icon;
-//        })
-//                .setKey("adult")
-//                .setHeader("Adult")
-//                .setComparator(Comparator.comparing(Person::isAdult));
 
         addColumn(this::formatStock)
                 .setHeader("Cantidad")
@@ -118,5 +103,5 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
     @Override
     public int getPage() {
         return super.getPage()-1;
-    }
+    }*/
 }

@@ -10,14 +10,17 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
 @Table(name = "roles")
 public class Rol extends AbstractEntity {
 
-    public static final Rol ROOT = new Rol("Default", "rol por defecto - Acceso todo");
+    public static final Rol ROOT = new Rol("1","Root", "rol por defecto - Acceso todo");
+    public static final Rol ADMIN = new Rol("2","Administrador", "rol por defecto - Acceso Usuario Admin");
+    public static final Rol AUXILIAR = new Rol("3","Auxiliar", "Auxiliar");
+    public static final Rol VENDEDOR = new Rol("4","Vendedor", "Vendedor");
+    public static final Rol CONTADOR = new Rol("5","Contador", "Contador");
 
     @Column(unique = true)
     private String nombre;
@@ -32,7 +35,8 @@ public class Rol extends AbstractEntity {
     public Rol() {
     }
 
-    public Rol(String nombre, String descripcion) {
+    public Rol(String id, String nombre, String descripcion) {
+        this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
     }
