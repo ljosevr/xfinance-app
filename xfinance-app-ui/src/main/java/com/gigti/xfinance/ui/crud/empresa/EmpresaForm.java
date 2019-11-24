@@ -14,6 +14,7 @@ import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +45,8 @@ public class EmpresaForm extends FormLayout {
 
         TextField tfNombreEmpresa = new TextField("Nombre Empresa");
         tfNombreEmpresa.setRequired(true);
+        tfNombreEmpresa.focus();
+        tfNombreEmpresa.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         ComboBox<TipoIde> cbTipoIde = new ComboBox<>();
         cbTipoIde.setLabel("Tipo Ide");
@@ -52,12 +55,15 @@ public class EmpresaForm extends FormLayout {
 
         TextField tfIdentificacion = new TextField("N° Identificación");
         tfIdentificacion.setRequired(true);
+        tfIdentificacion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfDireccion = new TextField("Dirección");
         tfDireccion.setRequired(false);
+        tfDireccion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfTelefono = new TextField("Telefono");
         tfTelefono.setRequired(false);
+        tfTelefono.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         Checkbox cbActivo = new Checkbox("Activo");
         cbActivo.setValue(true);
@@ -65,36 +71,46 @@ public class EmpresaForm extends FormLayout {
 
         TextField tfUsuarioAdmin = new TextField("Usuario Admin");
         tfUsuarioAdmin.setRequired(true);
+        tfUsuarioAdmin.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         ComboBox<TipoIde> cbTipoIdePersona = new ComboBox<>();
         cbTipoIdePersona.setLabel("Tipo Ide Usuario");
         cbTipoIdePersona.setItems(TipoIde.getListTipos());
         cbTipoIdePersona.setRequired(true);
+        cbTipoIdePersona.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
         TextField tfIdentificacionPersona = new TextField("N° Identificación Usuario");
         tfIdentificacionPersona.setRequired(true);
+        tfIdentificacionPersona.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfprimerNombreUsuario = new TextField("Primer Nombre Usuario");
         tfprimerNombreUsuario.setRequired(true);
+        tfprimerNombreUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfSegundoNombreUsuario = new TextField("Segundo Nombre Usuario");
         tfSegundoNombreUsuario.setRequired(true);
+        tfSegundoNombreUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfPrimerApellidoUsuario = new TextField("Primer Apellido Usuario");
         tfPrimerApellidoUsuario.setRequired(true);
+        tfPrimerApellidoUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfSegundoApellidoUsuario = new TextField("Segundo Apellido Usuario");
         tfSegundoApellidoUsuario.setRequired(true);
+        tfSegundoApellidoUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfUserDireccion = new TextField("Dirección Usuario");
         tfUserDireccion.setRequired(true);
+        tfUserDireccion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         TextField tfUserPhone = new TextField("Telefono Usuario");
         tfUserPhone.setRequired(true);
+        tfUserPhone.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         EmailField tfUserEmail = new EmailField("Email Usuario");
         tfUserEmail.setClearButtonVisible(true);
         tfUserEmail.setErrorMessage("Agregue un Email Valido");
+        tfUserEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         binder = new BeanValidationBinder<>(EmpresaDTO.class);
         binder.forField(tfNombreEmpresa).bind(EmpresaDTO::getNombreEmpresa, EmpresaDTO::setNombreEmpresa);

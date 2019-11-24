@@ -7,6 +7,10 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import java.net.http.HttpRequest;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Comparator;
 
 public class EmpresaGrid extends PaginatedGrid<EmpresaDTO> {
@@ -37,12 +41,12 @@ public class EmpresaGrid extends PaginatedGrid<EmpresaDTO> {
                 .setHeader("Telefono")
                 .setFlexGrow(5);
 
-        addColumn(EmpresaDTO::getFechaActivacion)
+        addColumn(this::formatDateActivation)
                 .setHeader("Fecha Activo")
                 .setFlexGrow(8)
                 .setSortable(true);
 
-        addColumn(EmpresaDTO::getFechaDesactivacion)
+        addColumn(this::formatDateDesactivation)
                 .setHeader("Fecha Inactivo")
                 .setFlexGrow(8)
                 .setSortable(true);
@@ -70,4 +74,13 @@ public class EmpresaGrid extends PaginatedGrid<EmpresaDTO> {
         return super.getPage()-1;
     }
 
+    private String formatDateActivation(EmpresaDTO empresa){
+        DateFormat df = new SimpleDateFormat("dd-mm-yyyy");
+        return empresa.getFechaActivacion() != null ? df.format(empresa.getFechaActivacion()) : "";
+    }
+
+    private String formatDateDesactivation(EmpresaDTO empresa){
+        DateFormat df = new SimpleDateFormat("dd-mm-yyyy");
+        return empresa.getFechaDesactivacion() != null ? df.format(empresa.getFechaDesactivacion()) : "";
+    }
 }

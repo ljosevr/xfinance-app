@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
-@Table(name="tipo_usuario")
+@Table(name="tipos_usuario")
 public class TipoUsuario implements Serializable {
 
     public static final TipoUsuario ROOT = new TipoUsuario(1,"ROOT","Usuario Admin del Sistema");

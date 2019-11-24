@@ -15,13 +15,13 @@ public class RolPermisos extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
-    private Permisos permisos;
+    private Permiso permiso;
 
     public RolPermisos() {
     }
 
-    public RolPermisos(Rol rol, Permisos permisos) {
+    public RolPermisos(Rol rol, Permiso permiso) {
         this.rol = rol;
-        this.permisos = permisos;
+        this.permiso = permiso;
     }
 }

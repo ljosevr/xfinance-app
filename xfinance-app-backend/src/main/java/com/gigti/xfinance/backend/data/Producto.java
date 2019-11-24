@@ -60,9 +60,6 @@ public class Producto extends AbstractEntity {
     @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ProductoInventarioDia> productsStockDay;
 
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL,fetch = FetchType.LAZY)
-    private List<ProductoVenta> productoVenta;
-
     public Producto(){}
 
     public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa) {

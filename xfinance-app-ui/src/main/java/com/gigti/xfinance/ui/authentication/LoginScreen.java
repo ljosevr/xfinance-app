@@ -52,8 +52,6 @@ public class LoginScreen extends FlexLayout {
         this.iusuarioService = iusuario;
         iinitBackService.initBackTipos();
         iinitBackService.initBackObjetos();
-        iinitBackService.initBackTipoEmpresa();
-        iinitBackService.initRoles();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();

@@ -13,9 +13,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "usuarios")
-@Data
 public class Usuario extends AbstractEntity {
 
     @Column(name="nombre_usuario", unique = true)
@@ -64,17 +64,4 @@ public class Usuario extends AbstractEntity {
         this.tipoUsuario = tipoUsuario;
     }
 
-    public static Usuario dummy(Usuario user, String current, double number){
-        if(user.getId().isEmpty()) {
-            return new Usuario(current,
-                    "1234",
-                    true,
-                    Persona.dummy(number),
-                    Empresa.dummy(),
-                    Rol.ADMIN,
-                    TipoUsuario.ROOT);
-        }else{
-            return user.getNombreUsuario().equals(current) ? user : null;
-        }
-    }
 }

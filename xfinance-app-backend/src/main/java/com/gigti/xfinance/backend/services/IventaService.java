@@ -13,6 +13,6 @@ public interface IventaService {
 
     public List<PventaDTO> findAll(Empresa empresa, int page, int size);
 
-    public Factura registerSell(Usuario usuario, List<PventaDTO> listVenta);
+    public Factura registrarFactura(Usuario usuario, List<PventaDTO> listVenta);
 
 }

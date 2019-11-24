@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
  */
 public class BasicAccessControl implements AccessControl {
 
-    //public static final long
     private IusuarioService iusuarioService;
 
     @Override
@@ -68,6 +67,7 @@ public class BasicAccessControl implements AccessControl {
     @Override
     public void signOut() {
         CurrentUser.set(null);
+        VaadinSession.getCurrent().close();
         UI.getCurrent().navigate(LoginScreen.class);
     }
 }

@@ -17,36 +17,32 @@ import com.gigti.xfinance.ui.crud.categoria.CategoriaView;
 import com.gigti.xfinance.ui.crud.empresa.EmpresaView;
 import com.gigti.xfinance.ui.crud.producto.ProductoCrudView;
 import com.gigti.xfinance.ui.crud.pventa.PventaView;
-import com.vaadin.flow.component.*;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.KeyModifier;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.server.VaadinServletService;
-import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.springframework.context.annotation.Primary;
+
+import java.util.Objects;
 
 /**
  * The main layout. Contains the navigation menu.
@@ -61,7 +57,7 @@ import org.springframework.context.annotation.Primary;
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
-//@Push
+@Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
     private MenuBar menu;
@@ -216,27 +212,18 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     }
 
     private void signOut(){
-        Dialog dialog = new Dialog();
-        dialog.setCloseOnEsc(true);
-        dialog.setCloseOnOutsideClick(false);
-        dialog.addDialogCloseActionListener(event -> m_salir.setEnabled(true));
 
-        Button confirmButton = new Button("SI", event -> {
+        NotificacionesUtil.openConfirmationDialog("¿Está Seguro de Salir?", true, false);
+        Objects.requireNonNull(NotificacionesUtil.getDialogConfirmation()).addDialogCloseActionListener(event -> m_salir.setEnabled(true));
+        NotificacionesUtil.getConfirmButton().addClickListener(event -> {
+            if(NotificacionesUtil.getDialogConfirmation().isOpened())
+                NotificacionesUtil.getDialogConfirmation().close();
             AccessControlFactory.getInstance().createAccessControl().signOut();
-            dialog.close();
         });
-        confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        Button cancelButton = new Button("NO", event -> {
-            dialog.close();
+        NotificacionesUtil.getCancelButton().addClickListener(event -> {
+            if(NotificacionesUtil.getDialogConfirmation().isOpened())
+                NotificacionesUtil.getDialogConfirmation().close();
             m_salir.setEnabled(true);
         });
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-        VerticalLayout layout = new VerticalLayout();
-        layout.add(new Label("¿Está Seguro de Salir?"));
-        HorizontalLayout hlayout = new HorizontalLayout();
-        hlayout.add(confirmButton,cancelButton);
-        layout.add(hlayout);
-        dialog.add(layout);
-        dialog.open();
     }
 }

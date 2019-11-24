@@ -17,7 +17,7 @@ import java.util.List;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
-@Table(name = "tipo_ide")
+@Table(name = "tipos_ide")
 public class TipoIde implements Serializable {
 
     public static final TipoIde CEDULA = new TipoIde(1,"CC","Cedula de Ciudadania");

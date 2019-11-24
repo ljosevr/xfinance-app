@@ -90,7 +90,7 @@ public class CategoriaView extends HorizontalLayout
         btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNewCategoria.addClickListener(click -> viewLogic.nuevo());
         // CTRL+N will create a new window which is unavoidable
-        btnNewCategoria.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        btnNewCategoria.addClickShortcut(Key.F4);
 
         return new TopBarComponent(filter, btnNewCategoria);
     }

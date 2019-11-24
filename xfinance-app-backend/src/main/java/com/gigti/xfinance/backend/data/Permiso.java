@@ -17,7 +17,7 @@ import java.util.Date;
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
 @Table(name = "permisos")
-public class Permisos extends AbstractEntity {
+public class Permiso extends AbstractEntity {
 
     private String nombrePermiso;
     private String nombreVista;
@@ -25,10 +25,10 @@ public class Permisos extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActivacion;
 
-    public Permisos() {
+    public Permiso() {
     }
 
-    public Permisos(String nombrePermiso, String nombreVista, Boolean activo, Date fechaActivacion) {
+    public Permiso(String nombrePermiso, String nombreVista, Boolean activo, Date fechaActivacion) {
         this.nombrePermiso = nombrePermiso;
         this.nombreVista = nombreVista;
         this.activo = activo;

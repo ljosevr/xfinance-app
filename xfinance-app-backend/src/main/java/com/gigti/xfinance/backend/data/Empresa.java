@@ -8,7 +8,6 @@ package com.gigti.xfinance.backend.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -23,11 +22,11 @@ import java.util.List;
 //@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "empresas")
 public class Empresa extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tipo_ide_id")
-    //@JoinColumn
     private TipoIde tipoIde;
 
     @NotNull
@@ -35,6 +34,9 @@ public class Empresa extends AbstractEntity {
     @Size(min= 4)
     @Column(unique = true)
     private String identificacion;
+
+    @Column(name = "id_interno", unique = true, updatable = false, nullable = false)
+    private Long idInterno;
 
     @NotNull
     @NotEmpty()
@@ -87,7 +89,7 @@ public class Empresa extends AbstractEntity {
         this.tipoEmpresa = tipo;
     }
 
-    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Boolean activo, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo) {
+    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Boolean activo, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo, Long idInterno) {
         this.tipoIde = tipoIde;
         this.identificacion = identificacion;
         this.nombreEmpresa = nombreEmpresa;
@@ -97,22 +99,12 @@ public class Empresa extends AbstractEntity {
         this.fechaDesactivacion = fechaDesactivacion;
         this.eliminado = false;
         this.tipoEmpresa = tipo;
+        this.idInterno = idInterno;
     }
 
     @Override
     public String toString() {
         return nombreEmpresa;
-    }
-
-    public static Empresa dummy(){
-        return new Empresa(TipoIde.NIT,
-                "9000800500",
-                "GigTi S.A.S",
-                "Bogota Laplace",
-                true,
-                new Date(),
-                null,
-                TipoEmpresa.ROOT);
     }
 
 }

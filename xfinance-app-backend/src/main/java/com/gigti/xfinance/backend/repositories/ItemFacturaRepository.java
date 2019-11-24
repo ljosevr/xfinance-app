@@ -6,10 +6,12 @@
 
 package com.gigti.xfinance.backend.repositories;
 
-import com.gigti.xfinance.backend.data.ProductoVenta;
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Factura;
+import com.gigti.xfinance.backend.data.ItemFactura;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductoVentaRepository extends JpaRepository<ProductoVenta, String> {
+public interface ItemFacturaRepository extends JpaRepository<ItemFactura, String> {
 }

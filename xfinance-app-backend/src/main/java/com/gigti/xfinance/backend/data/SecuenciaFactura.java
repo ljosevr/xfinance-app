@@ -4,10 +4,12 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 @Data
 @Entity
+@Table(name = "secuencias_facturas")
 public class SecuenciaFactura implements Serializable {
 
     @Id

@@ -55,6 +55,17 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
                 tipoUsuarioRepository.save(TipoUsuario.ROOT);
                 tipoUsuarioRepository.save(TipoUsuario.SELLER);
 
+                //Tipo Empresa
+                tipoEmpresaRepository.save(TipoEmpresa.ROOT);
+                tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
+
+                //Roles
+                rolRepository.save(Rol.ADMIN);
+                rolRepository.save(Rol.AUXILIAR);
+                rolRepository.save(Rol.VENDEDOR);
+                rolRepository.save(Rol.CONTADOR);
+
+
                 parche = new Parche(Constantes.INIT1,java.sql.Date.valueOf(LocalDate.now()),true, null);
                 parcheRepository.save(parche);
             }
@@ -82,7 +93,7 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
                         true,
                         java.sql.Date.valueOf(LocalDate.now()),
                         null,
-                        TipoEmpresa.ROOT);
+                        TipoEmpresa.ROOT, 0L);
 
                 emp = empresaRepository.save(emp);
 
@@ -123,38 +134,4 @@ public class IinitBackServiceImpl implements IinitBackService, HasLogger {
         }
     }
 
-    @Transactional
-    @Override
-    public void initBackTipoEmpresa() {
-        try {
-            Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT3, null);
-            if (parche == null) {
-                //Tipo Ide
-                tipoEmpresaRepository.save(TipoEmpresa.ROOT);
-                tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
-
-                parche = new Parche(Constantes.INIT3,java.sql.Date.valueOf(LocalDate.now()),true, null);
-                parcheRepository.save(parche);
-            }
-        } catch (Exception e) {
-            getLogger().error("Error al Crear InitBackend - Tipo Empresa: " + e.getMessage(), e);
-        }
-    }
-
-    @Transactional
-    public void initRoles(){
-
-        try {
-            Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT4, null);
-            if (parche == null) {
-                //Roles
-                rolRepository.save(Rol.ADMIN);
-                rolRepository.save(Rol.AUXILIAR);
-                rolRepository.save(Rol.VENDEDOR);
-                rolRepository.save(Rol.CONTADOR);
-            }
-        } catch (Exception e) {
-            getLogger().error("Error al Crear InitBackend - Roles: " + e.getMessage(), e);
-        }
-    }
 }

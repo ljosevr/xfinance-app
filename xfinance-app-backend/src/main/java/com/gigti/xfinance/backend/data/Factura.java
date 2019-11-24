@@ -7,6 +7,7 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -23,9 +24,9 @@ public class Factura extends AbstractEntity {
     @Column(name="numero_factura",unique = true)
     private String numeroFactura;
 
-    @NotEmpty
-    @Column(name="numero_factura_interno",unique = true)
-    private String numeroFacturaInterno;
+    @Column(name="numero_factura_interno", unique = true, updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long numeroFacturaInterno;
 
     private String descripcion;
 
@@ -48,7 +49,7 @@ public class Factura extends AbstractEntity {
     public Factura() {
     }
 
-    public Factura(String numeroFactura, String numeroFacturaInterno, String descripcion, Date fechaCreacion, Usuario usuario) {
+    public Factura(String numeroFactura, long numeroFacturaInterno, String descripcion, Date fechaCreacion, Usuario usuario) {
         this.numeroFactura = numeroFactura;
         this.numeroFacturaInterno = numeroFacturaInterno;
         this.descripcion = descripcion;

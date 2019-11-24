@@ -17,7 +17,7 @@ import java.util.Objects;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
-@Table(name = "persona")
+@Table(name = "personas")
 public class Persona extends AbstractEntity{
 
     @NotNull

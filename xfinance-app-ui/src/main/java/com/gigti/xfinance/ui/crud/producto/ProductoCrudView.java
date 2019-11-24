@@ -106,7 +106,7 @@ public class ProductoCrudView extends HorizontalLayout
         btnNewProduct.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewProduct.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNewProduct.addClickListener(click -> viewLogic.newProducto());
-        btnNewProduct.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        btnNewProduct.addClickShortcut(Key.F4);
 
         return new TopBarComponent(filter, btnNewProduct);
     }

@@ -37,8 +37,4 @@ public interface EmpresaRepository extends JpaRepository<Empresa, String> {
     public Empresa findByNombreEmpresa(String companyName);
     public List<Empresa> findByNombreEmpresaContaining(String companyName);
 
-//    @Query("select c from Empresa c where r.companyName like %:companyName%")
-//    public List<Empresa> findByNameExp(@Param("companyName") String companyName);
-
-
 }

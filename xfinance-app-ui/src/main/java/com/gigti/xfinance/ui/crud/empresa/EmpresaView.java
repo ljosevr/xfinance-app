@@ -1,6 +1,5 @@
 package com.gigti.xfinance.ui.crud.empresa;
 
-import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.IEmpresaService;
@@ -90,7 +89,7 @@ public class EmpresaView extends HorizontalLayout
         btnNewEmpresa.setIcon(VaadinIcon.PLUS_CIRCLE.create());
         btnNewEmpresa.addClickListener(click -> viewLogic.nuevo());
         // CTRL+N will create a new window which is unavoidable
-        btnNewEmpresa.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        btnNewEmpresa.addClickShortcut(Key.F4);
 
         return new TopBarComponent(filter, btnNewEmpresa);
     }

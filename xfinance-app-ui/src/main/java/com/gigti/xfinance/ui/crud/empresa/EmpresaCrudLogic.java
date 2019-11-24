@@ -84,7 +84,6 @@ public class EmpresaCrudLogic implements Serializable, ICrudLogic {
             view.refresh(empresa);
             view.clearSelection();
             view.showSaveNotification(empresa.getNombreEmpresa() +" "+typeOperation);
-            //view.refresh();
             view.showForm(false);
             setFragmentParameter("");
         } else {

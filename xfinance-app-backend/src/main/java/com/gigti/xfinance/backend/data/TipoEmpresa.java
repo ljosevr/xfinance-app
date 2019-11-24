@@ -15,7 +15,7 @@ import java.io.Serializable;
 
 @Data
 @Entity
-@Table(name="tipo_empresa")
+@Table(name="tipos_empresa")
 public class TipoEmpresa implements Serializable {
 
     public static final TipoEmpresa ROOT = new TipoEmpresa(1,"ROOT","Empresa ROOT Admin del Sistema");

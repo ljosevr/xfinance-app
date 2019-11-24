@@ -133,8 +133,11 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
     @Override
     public EmpresaDTO saveEmpresa(EmpresaDTO empresa) {
         try{
-
             Empresa empresaEnt = ConvertEmpresa.convertDtoToEntity(empresa);
+
+            if(empresaEnt.getIdInterno() == null){
+                empresaEnt.setIdInterno(empresaRepository.count());
+            }
 
             if(empresaEnt.getFechaActivacion() == null) {
                 empresaEnt.setFechaActivacion(new Date());
@@ -150,6 +153,7 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
             empresaEnt = empresaRepository.save(empresaEnt);
 
             empresa.setEmpresaId(empresaEnt.getId());
+            empresa.setFechaActivacion(empresaEnt.getFechaActivacion());
 
             Usuario usuarioAdmin = new Usuario();
             usuarioAdmin.setId(empresa.getUsuarioId());
@@ -180,6 +184,7 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
 
             usuarioAdmin = usuarioRepository.save(usuarioAdmin);
             empresa.setUsuarioId(usuarioAdmin.getId());
+
             return empresa;
 
         }catch(Exception e){

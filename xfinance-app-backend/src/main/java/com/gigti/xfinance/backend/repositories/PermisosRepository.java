@@ -6,18 +6,18 @@
 
 package com.gigti.xfinance.backend.repositories;
 
-import com.gigti.xfinance.backend.data.Permisos;
+import com.gigti.xfinance.backend.data.Permiso;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface PermisosRepository extends JpaRepository<Permisos, String> {
+public interface PermisosRepository extends JpaRepository<Permiso, String> {
 
-    public List<Permisos> findByNombrePermiso(String accessName);
+    public List<Permiso> findByNombrePermiso(String accessName);
 
-    public List<Permisos> findAllByActivoIsTrue();
+    public List<Permiso> findAllByActivoIsTrue();
 
-    public List<Permisos> findAllByActivoIsFalse();
+    public List<Permiso> findAllByActivoIsFalse();
 }

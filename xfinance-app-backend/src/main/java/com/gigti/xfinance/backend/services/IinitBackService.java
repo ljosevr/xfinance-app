@@ -4,6 +4,4 @@ public interface IinitBackService {
 
     void initBackTipos();
     void initBackObjetos();
-    void initBackTipoEmpresa();
-    void initRoles();
 }

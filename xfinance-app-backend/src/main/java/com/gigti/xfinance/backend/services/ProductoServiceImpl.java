@@ -8,8 +8,8 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.HasLogger;
-import com.gigti.xfinance.backend.repositories.ProductInvDiaRepository;
-import com.gigti.xfinance.backend.repositories.ProductInvInicioRepository;
+import com.gigti.xfinance.backend.repositories.ProductoInvDiaRepository;
+import com.gigti.xfinance.backend.repositories.ProductoInvInicioRepository;
 import com.gigti.xfinance.backend.repositories.ProductoRepository;
 import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -31,10 +31,10 @@ public class ProductoServiceImpl implements IProductoService, HasLogger {
     private ProductoRepository productoRepository;
 
     @Autowired
-    private ProductInvDiaRepository productInvDiaRepository;
+    private ProductoInvDiaRepository productoInvDiaRepository;
 
     @Autowired
-    private ProductInvInicioRepository productInvInicioRepository;
+    private ProductoInvInicioRepository productoInvInicioRepository;
 
     @Autowired
     private ProductoValoresRepository productoValoresRepository;
@@ -48,7 +48,7 @@ public class ProductoServiceImpl implements IProductoService, HasLogger {
             if (isNew) {
                 //Guarda el Inventario Inicial al Crear el Producto
                 ProductoInventarioInicio pid = new ProductoInventarioInicio(result, producto.getStockActual(), new Date(), usuario);
-                pid = productInvInicioRepository.save(pid);
+                pid = productoInvInicioRepository.save(pid);
                 result.setStockActual(pid.getQuantity());
             }
             // Se guarda Valores de Costo y Venta
@@ -112,11 +112,11 @@ public class ProductoServiceImpl implements IProductoService, HasLogger {
         List<Producto> result = new ArrayList<>();
         //Calcula la Cantidad Actual
         for (Producto p : productoRepository.findByEmpresa(empresa, pageable)) {
-            ProductoInventarioDia pid = productInvDiaRepository.findByProductoAndTrackingDateIsGreaterThanEqual(p, new Date());
+            ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(p);
             if (pid != null) {
                 p.setStockActual(pid.getQuantity());
             } else {
-                ProductoInventarioInicio pii = productInvInicioRepository.findByProducto(p);
+                ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(p);
                 if (pii != null) {
                     p.setStockActual(pii.getQuantity());
                 } else {
