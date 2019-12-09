@@ -59,23 +59,19 @@ public class LoginScreen extends FlexLayout {
     }
 
     private void buildUI() {
-        setSizeFull();
-        setClassName("login-screen");
+        setClassName("login-screen-flex");
 
         VerticalLayout loginLayout = new VerticalLayout();
-        loginLayout.setClassName("login-information");
+        loginLayout.setClassName("login-screen");
 
         H1 loginInfoHeader = new H1("X Finance App");
-        loginInfoHeader.setWidth("100%");
-
-        H2 loginInfoText = new H2("Iniciar Sesión");
-        loginInfoText.setClassName("titleView");
-
+        loginInfoHeader.setClassName("h1-login");
         loginLayout.add(loginInfoHeader);
-        //loginLayout.add(loginInfoText);
 
         LoginForm loginForm = new LoginForm();
-        loginForm.addLoginListener(event -> login(event));//this::login);
+        loginForm.getElement().setAttribute("border"," 1px solid black");
+        loginForm.getElement().setAttribute("border-radius","7px");
+        loginForm.addLoginListener(this::login);
         loginForm.addForgotPasswordListener(
                 event -> Notification.show("Tip: Contacta al Admin del App"));
         loginForm.setI18n(createSpanishI18n());

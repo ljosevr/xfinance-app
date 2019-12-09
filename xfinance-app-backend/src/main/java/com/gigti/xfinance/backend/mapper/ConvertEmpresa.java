@@ -39,6 +39,7 @@ public class ConvertEmpresa {
             empresaDTO.setDireccionPersona(usuario.getPersona().getDireccion());
             empresaDTO.setTelefonoPersona(usuario.getPersona().getTelefono());
             empresaDTO.setEmailPersona(usuario.getPersona().getEmail());
+            empresaDTO.setRol(usuario.getRol());
         }
         return empresaDTO;
     }

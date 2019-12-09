@@ -12,14 +12,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class EmpresaCrudLogic implements Serializable, ICrudLogic {
+public class EmpresaMasterCrudLogic implements Serializable, ICrudLogic {
 
-    private EmpresaView view;
+    private EmpresaMasterView view;
     private IEmpresaService iEmpresaService;
     private static Empresa empresa;
     private String filterText = "";
 
-    public EmpresaCrudLogic(IEmpresaService iService, EmpresaView simpleCrudView) {
+    public EmpresaMasterCrudLogic(IEmpresaService iService, EmpresaMasterView simpleCrudView) {
         this.iEmpresaService = iService;
         view = simpleCrudView;
         empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;

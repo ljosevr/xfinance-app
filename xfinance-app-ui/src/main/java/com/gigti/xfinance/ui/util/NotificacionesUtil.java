@@ -64,9 +64,11 @@ public class NotificacionesUtil {
     }
 
     public static Dialog getDialogConfirmation() {
-        if(dialogConfirmation.isOpened())
+        if (dialogConfirmation.isOpened()){
             return dialogConfirmation;
-        Notification.show("Debes Abrir primero una Notificación, Error de Sistema");
-        return null;
+        }else {
+            Notification.show("Debes Abrir primero una Notificación, Error de Sistema");
+            return null;
+        }
     }
 }

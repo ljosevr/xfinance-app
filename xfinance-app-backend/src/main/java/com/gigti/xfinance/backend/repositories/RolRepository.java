@@ -6,10 +6,12 @@
 
 package com.gigti.xfinance.backend.repositories;
 
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RolRepository extends JpaRepository<Rol, String> {
+    public Rol findByNombreAndEmpresa(String nombre, Empresa empresa);
 }

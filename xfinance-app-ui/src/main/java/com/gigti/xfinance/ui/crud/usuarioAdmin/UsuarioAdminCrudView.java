@@ -37,14 +37,11 @@ import java.util.List;
  * See also {@link UsuarioAdminCrudLogic} for fetching the data, the actual CRUD
  * operations and controlling the view based on events from outside.
  */
-//@Route(value = Constantes.VIEW_R_USUARIOADMIN, layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_USUARIOADMIN, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
 public class UsuarioAdminCrudView extends HorizontalLayout
-        implements HasUrlParameter<String> {
-    @Override
-    public void setParameter(BeforeEvent beforeEvent, String s) {
+         {
 
-    }
 
     /*private UsuarioAdminGrid grid;
     private UsuarioAdminForm form;

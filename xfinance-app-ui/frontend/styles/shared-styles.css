@@ -1,54 +1,127 @@
-.login-information {
-    /*min-width: 300px;*/
-    width: 100%;
-    flex: 0;
-    background: var(--lumo-primary-color-50pct);
-}
+/* WEB */
+@media (min-width: 600px) {
+    * {
+        box-sizing: border-box;
+    }
 
-/* Stack login-screen vertically standard-formon narrow screen */
-@media (max-width: 800px) {
+    .login-screen-flex{
+        width: 60%;
+        margin:auto;
+        padding: 40px 20px;
+    }
 
     .login-screen {
-        alignment: center;
-        align-content: center;
+        width: 50%;
+        height: 85%;
+        align-items: center;
         flex-direction: column;
+        border: 2px solid mediumseagreen;
+        border-radius: 7px;
+        padding: 0;
+    }
+    .h1-login {
+        width: 35%;
+        height: 10%;
+        text-align: center;
+        align-self: center;
+        color: blue;
+        border: 1px solid mediumseagreen;
+        border-radius: 7px;
+        padding: 0;
+        margin: 50px 5px 5px 5px;
+        /*visibility: visible;*/
     }
 
-    .login-information {
-        display: block;
+    .main-layout {
+        flex-direction: row;
+        --top-bar-height: 75px;
+        --top-bar-align: center;
+        --top-bar-margin: 5vw;
+
+        /* Used by the menu and form overlays */
+        --overlay-box-shadow: 0 0 3px 2px var(--lumo-contrast-10pct);
+    }
+
+    .standard-form {
+        height: calc(100% - var(--top-bar-height));
+        flex-direction: column;
+        --overlay-box-shadow: 2px 2px var(--lumo-contrast-10pct);
+        position: initial;
+        right: 0;
+        bottom: 0;
+        overflow: initial;
+        background: var(--lumo-base-color);
+        /*box-shadow: #7f7f7f 2px 2px ;*/
+        box-shadow: var(--overlay-box-shadow);
+    }
+    .titleBar {
+        height: 20px;
+        margin: 5px 0px 5px;
+        text-align: center;
+    }
+
+    .titleMenu {
+        margin: 14px 0px 14px;
+        text-align: center;
     }
 }
 
-.main-layout {
-    flex-direction: row;
+/* MOBILE*/
+@media (max-width: 550px) {
 
-    /* Used by the menu and form overlays */
-    --overlay-box-shadow: 0 0 3px 2px var(--lumo-contrast-10pct);
+    .login-screen-flex{
+        width: 90%;
+        padding: 0;
+        margin: auto;
+    }
+
+    .login-screen {
+        width: 90%;
+        height: 90%;
+        align-items: center;
+        flex-direction: column;
+        border: 2px solid mediumseagreen;
+        border-radius: 7px;
+        padding: 0;
+    }
+
+    .standard-form {
+        width: 100%;
+
+        /* Prevent text-fields from overflowing on narrow screens */
+        --vaadin-text-field-default-width: 6em;
+    }
+    .h1-login {
+        width: 80%;
+        height: 50%;
+        align-items: center;
+        color: blue;
+        border: 1px solid mediumseagreen;
+        border-radius: 7px;
+        text-align: center;
+        /*visibility: hidden;*/
+    }
+    .titleBar {
+        height: 15em;
+        margin: 14px 0px 14px;
+        text-align: center;
+    }
+
+    .titleMenu {
+        margin: 5px 0px 5px;
+        text-align: center;
+    }
 }
 
-.menu-bar {
-    flex-direction: column;
-    flex-shrink: 0;
-    background: var(--lumo-base-color);
-    box-shadow: var(--overlay-box-shadow);
-}
 
 .menu-header {
     padding: 11px 16px;
 }
 
-.menu-bar vaadin-tabs {
-    align-items: flex-start;
-    transition: transform 300ms;
-}
-
-.menu-bar vaadin-tab {
-    padding: 0;
-}
 
 .menu-link {
     margin: 0 auto;
-    padding: 10px 37px;
+    padding: 5px 5px;
 }
 
 .menu-link > span {
@@ -59,75 +132,7 @@
     display: none;
 }
 
-.standard-form {
-    flex-direction: column;
-    --overlay-box-shadow: 2px 2px var(--lumo-contrast-10pct);
-    position: initial;
-    right: 0;
-    bottom: 0;
-    height: 100%;
-    overflow: initial;
-    background: var(--lumo-base-color);
-    /*box-shadow: #7f7f7f 2px 2px ;*/
-    box-shadow: var(--overlay-box-shadow);
-}
 
-/* On narrow screens, move the side bar to the top,
- * except for the link-tabs, which are hidden but
- * can be opened via a button.
- */
-@media (max-width: 800px) {
-
-    .main-layout {
-        flex-direction: row;
-        --top-bar-height: 75px;
-        --top-bar-align: center;
-        --top-bar-margin: 5vw;
-
-    }
-
-    .menu-bar {
-        align-items: center;
-        justify-content: space-between;
-        height: var(--top-bar-height);
-        margin: 0 var(--top-bar-margin);
-        background: none;
-        box-shadow: none;
-    }
-
-    .menu-bar vaadin-tabs {
-        transform: translateX(calc(-100% - var(--top-bar-margin)));
-        position: absolute;
-        top: var(--top-bar-height);
-        height: calc(100% - var(--top-bar-height));
-        z-index: 100;
-        box-shadow: var(--overlay-box-shadow);
-        background: var(--lumo-base-color);
-    }
-
-    .menu-bar .show-tabs {
-        transform: translateX(calc(0% - var(--top-bar-margin)));
-    }
-
-    .menu-button {
-        display: block;
-    }
-
-    .standard-form {
-        height: calc(100% - var(--top-bar-height));
-    }
-
-}
-
-@media (max-width: 550px) {
-
-    .standard-form {
-        width: 100%;
-
-        /* Prevent text-fields from overflowing on narrow screens */
-        --vaadin-text-field-default-width: 6em;
-    }
-}
 
 /* Color codes for the Activo statuses */
 .SI {
@@ -142,14 +147,8 @@
     height: 20px;
     border-spacing: 0.5px;
     margin: auto;
-    text-align: center;
-}
-
-.titleBar {
-    height: 20px;
-    border-spacing: 0.5px;
-    margin: auto;
-    text-align: center;
+    text-align: left;
+    color: #2dd013;
 }
 
 .userNavBar {
@@ -162,4 +161,30 @@
 .form-layout {
     border-spacing: 2px;
     margin: 2px;
+}
+.menubutton {
+    padding: 0;
+}
+
+.menuAccordion {
+    padding: 0;
+}
+
+.menuLayout {
+    margin: 2px;
+    padding: 1px;
+    border: 2px solid mediumseagreen;
+    border-radius: 7px;
+}
+
+.subMenu-Layout {
+    margin: 1px;
+    padding: 1px;
+    border: 1px solid blue;
+    border-radius: 7px;
+}
+
+.drawerLayout {
+    margin: 2px;
+    padding: 2px;
 }

@@ -13,9 +13,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Comparator;
 
-public class EmpresaGrid extends PaginatedGrid<EmpresaDTO> {
+public class EmpresaMasterGrid extends PaginatedGrid<EmpresaDTO> {
 
-    public EmpresaGrid() {
+    public EmpresaMasterGrid() {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 

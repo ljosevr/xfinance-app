@@ -2,9 +2,10 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
-import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class IventaServiceImpl implements IventaService, HasLogger {
+public class IventaServiceImpl implements IventaService {
+
+    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
 
     @Autowired
     private FacturaRepository facturaRepository;
@@ -104,7 +107,7 @@ public class IventaServiceImpl implements IventaService, HasLogger {
             itemFacturaRepository.saveAll(listItems);
             return factura;
         }catch(Exception e){
-            getLogger().error("Error: al generar Factura: "+e.getMessage(), e);
+            logger.error("Error: al generar Factura: "+e.getMessage(), e);
             return null;
         }
     }

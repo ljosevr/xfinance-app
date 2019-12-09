@@ -120,4 +120,7 @@ public class Persona extends AbstractEntity{
         return persona;
     }
 
+    public String getCompleteName(){
+        return String.format("%s %s %s %s", primerNombre, segundoNombre, primerApellido, segundoApellido);
+    }
 }

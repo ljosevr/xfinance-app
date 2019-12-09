@@ -7,12 +7,13 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
-import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.ProductoInvDiaRepository;
 import com.gigti.xfinance.backend.repositories.ProductoInvInicioRepository;
 import com.gigti.xfinance.backend.repositories.ProductoRepository;
 import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,9 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ProductoServiceImpl implements IProductoService, HasLogger {
+public class ProductoServiceImpl implements IProductoService {
+
+    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -98,7 +101,7 @@ public class ProductoServiceImpl implements IProductoService, HasLogger {
                 return producto != null;
             }
         } catch (Exception e) {
-            getLogger().debug("Error: " + e.getMessage(), e);
+            logger.debug("Error: " + e.getMessage(), e);
         }
         return false;
     }

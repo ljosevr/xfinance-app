@@ -3,10 +3,9 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.mapper.ConvertEmpresa;
-import com.gigti.xfinance.backend.others.HasLogger;
-import com.gigti.xfinance.backend.repositories.EmpresaRepository;
-import com.gigti.xfinance.backend.repositories.PersonaRepository;
-import com.gigti.xfinance.backend.repositories.UsuarioRepository;
+import com.gigti.xfinance.backend.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,8 +18,9 @@ import java.util.List;
 
 
 @Service
-public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
+public class EmpresaServiceImpl implements IEmpresaService {
 
+    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
     @Autowired
     private EmpresaRepository empresaRepository;
 
@@ -29,6 +29,9 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private RolRepository rolRepository;
 
     @Override
     public List<EmpresaDTO> findAll(int page, int size) {
@@ -46,6 +49,7 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
                         }
                     }
                 }
+                //rolPermisoRepository.fin
                 EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
                 listResult.add(empresaDTO);
             }
@@ -124,7 +128,7 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
                 return empresa != null;
             }
         } catch(Exception e) {
-            getLogger().debug("Error: "+e.getMessage(),e);
+            logger.debug("Error: "+e.getMessage(),e);
         }
         return false;
     }
@@ -176,8 +180,12 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
             persona.setId(empresa.getPersonaId());
             persona = personaRepository.save(persona);
 
+            Rol rolAdminPorDefecto = rolRepository.findByNombreAndEmpresa(Rol.ADMIN.getNombre(), null);
+
+            //TODO Copia los Roles x Defecto a Cada Empresa ?
+
             usuarioAdmin.setPersona(persona);
-            usuarioAdmin.setRol(Rol.ADMIN);
+            usuarioAdmin.setRol(rolAdminPorDefecto);
             usuarioAdmin.setTipoUsuario(TipoUsuario.ADMIN);
             //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
             usuarioAdmin.setPasswordUsuario("1234");
@@ -188,9 +196,8 @@ public class EmpresaServiceImpl implements IEmpresaService, HasLogger {
             return empresa;
 
         }catch(Exception e){
-            getLogger().error("Error - saveEmpresa: "+e.getMessage(), e);
+            logger.error("Error - saveEmpresa: "+e.getMessage(), e);
             return null;
         }
     }
-
 }

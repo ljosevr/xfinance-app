@@ -22,35 +22,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Iterator;
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_EMPRESA,layout = MainLayout.class)
-@RouteAlias(value = Constantes.VIEW_R_EMPRESA,layout = MainLayout.class)
-public class EmpresaView extends HorizontalLayout
+@Route(value = Constantes.VIEW_R_EMPRESA_MASTER, layout = MainLayout.class)
+public class EmpresaMasterView extends HorizontalLayout
         implements HasUrlParameter<String> {
 
-    private EmpresaGrid grid;
-    private EmpresaForm form;
+    private EmpresaMasterGrid grid;
+    private EmpresaMasterForm form;
     private TextField filter;
-    private EmpresaCrudLogic viewLogic;
+    private EmpresaMasterCrudLogic viewLogic;
     private Button btnNewEmpresa;
     private List<EmpresaDTO> lista;
     private VerticalLayout barAndGridLayout;
 
     @Autowired
-    public EmpresaView(IEmpresaService iService) {
-            viewLogic = new EmpresaCrudLogic(iService,this);
+    public EmpresaMasterView(IEmpresaService iService) {
+            viewLogic = new EmpresaMasterCrudLogic(iService,this);
 //        if(viewLogic.access()) {
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
-            grid = new EmpresaGrid();
+            grid = new EmpresaMasterGrid();
             lista = viewLogic.findAll();
             grid.setItems(lista);
             grid.asSingleSelect().addValueChangeListener(
                     event -> viewLogic.rowSelected(event.getValue()));
 
-            form = new EmpresaForm(viewLogic);
+            form = new EmpresaMasterForm(viewLogic);
 
-            H3 title = new H3(Constantes.VIEW_EMPRESA);
+            H3 title = new H3(Constantes.VIEW_EMPRESAS);
             title.setClassName("titleView");
 
             barAndGridLayout = new VerticalLayout();
@@ -150,7 +149,7 @@ public class EmpresaView extends HorizontalLayout
         grid.refresh(empresa);
     }
 
-    public EmpresaGrid getGrid() {
+    public EmpresaMasterGrid getGrid() {
         return grid;
     }
 

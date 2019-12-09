@@ -1,12 +1,14 @@
 package com.gigti.xfinance.backend.data.dto;
 
+import com.gigti.xfinance.backend.data.Vista;
+import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.TipoEmpresa;
 import com.gigti.xfinance.backend.data.TipoIde;
 import lombok.Data;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class EmpresaDTO implements Serializable {
@@ -27,7 +29,8 @@ public class EmpresaDTO implements Serializable {
 
     private String usuarioId;
     private String usuarioNombre;
-
+    private Rol rol;
+    private List<Vista> vistas;
     private boolean activoUsuario;
 
     private boolean eliminadoUsuario;

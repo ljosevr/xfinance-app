@@ -1,13 +1,16 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class IusuarioServiceImpl implements IusuarioService, HasLogger {
+public class IusuarioServiceImpl implements IusuarioService {
+
+    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -35,15 +38,15 @@ public class IusuarioServiceImpl implements IusuarioService, HasLogger {
                 if(password.equals(usuario.getPasswordUsuario())){
                     //TODO
                     //Ejecutar parches de initBackend - De Compañia
-                    getLogger().debug("Iniciando App Backend");
-                    getLogger().debug("Finalizando App Backend");
+                    logger.debug("Iniciando App Backend");
+                    logger.debug("Finalizando App Backend");
                     return usuario;
                 }else{
                     return null;
                 }
             }
         } catch(Exception e){
-            getLogger().error("Error al hacer Login: "+e.getMessage(), e);
+            logger.error("Error al hacer Login: "+e.getMessage(), e);
         }
         return null;
     }

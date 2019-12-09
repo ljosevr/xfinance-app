@@ -2,9 +2,10 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.others.HasLogger;
 import com.gigti.xfinance.backend.repositories.CategoriaProductoRepository;
 import com.gigti.xfinance.backend.repositories.EmpresaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,9 @@ import java.util.Optional;
 
 
 @Service
-public class CategoriaProductoServiceImpl implements IcategoriaProductoService, HasLogger {
+public class CategoriaProductoServiceImpl implements IcategoriaProductoService {
+
+    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
 
     @Autowired
     private CategoriaProductoRepository categoriaProductoRepository;
@@ -46,7 +49,7 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
                 return categoria != null;
             }
         } catch(Exception e) {
-            getLogger().debug("Error: "+e.getMessage(),e);
+            logger.debug("Error: "+e.getMessage(),e);
         }
         return false;
     }
@@ -63,7 +66,7 @@ public class CategoriaProductoServiceImpl implements IcategoriaProductoService, 
             }
             return categoriaProductoRepository.save(categoria);
         }catch(Exception e){
-            getLogger().error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             return null;
         }
     }

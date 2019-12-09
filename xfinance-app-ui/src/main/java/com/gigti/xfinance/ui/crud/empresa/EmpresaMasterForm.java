@@ -19,19 +19,19 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import org.apache.commons.lang3.StringUtils;
 
-public class EmpresaForm extends FormLayout {
+public class EmpresaMasterForm extends FormLayout {
 
     private Button btnSave;
     private Button btnDiscard;
     private Button btnDelete;
 
-    private EmpresaCrudLogic viewLogic;
+    private EmpresaMasterCrudLogic viewLogic;
     private Binder<EmpresaDTO> binder;
     private Binder<Usuario> binderUser;
     private EmpresaDTO currentEmpresa;
     private Usuario usuarioAdmin;
 
-    public EmpresaForm(EmpresaCrudLogic empresaCrudLogic) {
+    public EmpresaMasterForm(EmpresaMasterCrudLogic empresaMasterCrudLogic) {
 
         this.setResponsiveSteps(
                 new ResponsiveStep("25em", 1),
@@ -41,7 +41,7 @@ public class EmpresaForm extends FormLayout {
         H4 title = new H4("Crear o Editar Empresa");
         this.add(title,3);
 
-        viewLogic = empresaCrudLogic;
+        viewLogic = empresaMasterCrudLogic;
 
         TextField tfNombreEmpresa = new TextField("Nombre Empresa");
         tfNombreEmpresa.setRequired(true);
