@@ -63,12 +63,8 @@ public class EmpresaMasterView extends HorizontalLayout
             barAndGridLayout.expand(grid);
 
             add(barAndGridLayout);
-            add(form);
 
             viewLogic.init();
-//        }else{
-//            UI.getCurrent().navigate(MainLayout.class);
-//        }
     }
 
     public HorizontalLayout createTopBar() {
@@ -116,12 +112,12 @@ public class EmpresaMasterView extends HorizontalLayout
 
     public void showForm(boolean show) {
         if(show){
-            barAndGridLayout.setVisible(false);
+            form.open();
+            form.getTfNombreEmpresa().focus();
         }else{
-            barAndGridLayout.setVisible(true);
+            form.close();
+            filter.focus();
         }
-        form.setVisible(show);
-        form.setEnabled(show);
     }
 
     @Override

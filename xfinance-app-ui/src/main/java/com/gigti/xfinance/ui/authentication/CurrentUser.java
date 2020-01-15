@@ -64,7 +64,7 @@ public final class CurrentUser {
         if (currentUser == null) {
             getCurrentRequest().getWrappedSession().removeAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-
+            current = null;
 //            getCurrentRequest().getWrappedSession().removeAttribute(
 //                    CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY);
 

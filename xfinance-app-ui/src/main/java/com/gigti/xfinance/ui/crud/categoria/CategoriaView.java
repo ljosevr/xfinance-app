@@ -119,6 +119,7 @@ public class CategoriaView extends HorizontalLayout
     public void showForm(boolean show) {
         if(show){
             form.open();
+            form.getTfCatNombre().focus();
         }else{
             filter.focus();
             form.close();

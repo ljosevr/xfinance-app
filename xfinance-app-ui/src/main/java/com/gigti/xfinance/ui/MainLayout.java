@@ -68,16 +68,8 @@ import java.util.stream.Collectors;
 @Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-    private Button menu_venta;
     private Accordion menus_varios;
     private Button menu_salir;
-    private VerticalLayout menuUsuarios;
-    private VerticalLayout menuEmpresas;
-    private VerticalLayout menu_productos;
-    private Tab tabVentas;
-    private Tab tabMenusVarios;
-    private Tabs tabsMenuGeneral;
-    private VerticalLayout layoutDrawer;
 
     public MainLayout() {
         String username = "";
@@ -105,7 +97,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
 
     private void createDrawer(){
         if(CurrentUser.get() != null) {
-            layoutDrawer = new VerticalLayout();
+            VerticalLayout layoutDrawer = new VerticalLayout();
 
             Image logo = new Image("/frontend/images/icon.png", "Logo");
             //logo.addClassName("hide-on-mobile");
@@ -194,7 +186,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
                         Key.KEY_L, KeyModifier.CONTROL);
 
         if (!accessControl.isUserSignedIn()) {
-            UI.getCurrent().navigate(LoginScreen.class);
+                UI.getCurrent().navigate(LoginScreen.class);
         } else {
             createDrawer();
         }
