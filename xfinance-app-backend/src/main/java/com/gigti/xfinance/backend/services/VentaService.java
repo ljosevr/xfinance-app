@@ -7,7 +7,7 @@ import com.gigti.xfinance.backend.data.dto.PventaDTO;
 
 import java.util.List;
 
-public interface IventaService {
+public interface VentaService {
 
     public List<PventaDTO> find100MostImportant(Empresa empresa);
 

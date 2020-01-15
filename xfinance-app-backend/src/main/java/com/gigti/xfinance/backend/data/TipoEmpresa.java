@@ -7,6 +7,7 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 
 @Data
 @Entity
+@ToString
 @Table(name="tipos_empresa")
 public class TipoEmpresa implements Serializable {
 

@@ -6,11 +6,12 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.services.IProductoService;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.ProductoService;
+import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.notification.Notification;
@@ -32,14 +33,14 @@ import java.util.Objects;
 public class ProductoCrudLogic implements Serializable {
 
     private ProductoCrudView view;
-    private IProductoService iProductoService;
-    private IcategoriaProductoService icategoriaProductoService;
+    private ProductoService productoService;
+    private CategoriaProductoService categoriaProductoService;
     private static Empresa empresa;
     private String filterText = "";
 
-    public ProductoCrudLogic(IProductoService iProductoService, IcategoriaProductoService icategoriaService, ProductoCrudView simpleCrudView) {
-        this.iProductoService = iProductoService;
-        this.icategoriaProductoService = icategoriaService;
+    public ProductoCrudLogic(ProductoService productoService, CategoriaProductoService icategoriaService, ProductoCrudView simpleCrudView) {
+        this.productoService = productoService;
+        this.categoriaProductoService = icategoriaService;
         view = simpleCrudView;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
@@ -91,13 +92,13 @@ public class ProductoCrudLogic implements Serializable {
     }
 
     private Producto findProducto(String productId) {
-        return iProductoService.findById(productId);
+        return productoService.findById(productId);
     }
 
     void saveProducto(Producto producto) {
         String typOperation = StringUtils.isBlank(producto.getId()) ? " Creado" : " Actualizada";
         producto.setEmpresa(empresa);
-        producto = iProductoService.saveProduct(producto, CurrentUser.get());
+        producto = productoService.saveProduct(producto, CurrentUser.get());
         if (producto != null) {
             view.refresh(producto);
             view.clearSelection();
@@ -111,7 +112,7 @@ public class ProductoCrudLogic implements Serializable {
 
     void deleteProducto(Producto producto) {
         view.clearSelection();
-        if (iProductoService.delete(producto.getId())) {
+        if (productoService.delete(producto.getId())) {
             view.refresh();
             view.showSaveNotification("Producto: " + producto.getNombreProducto() + " Eliminado");
             List<Producto> lista = (List<Producto>) view.getGrid().getDataProvider();
@@ -150,12 +151,12 @@ public class ProductoCrudLogic implements Serializable {
     }
 
     public List<Producto> findAll() {
-        return iProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+        return productoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
     public List<CategoriaProducto> findAllCategoria() {
         //TODO aplicar al Filtro si es Activo O INACTIVO
-        return icategoriaProductoService.findActivoOrInactivo(true, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+        return categoriaProductoService.findActivoOrInactivo(true, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
     public List<Producto> setFilter(String filterText) {
@@ -165,6 +166,10 @@ public class ProductoCrudLogic implements Serializable {
             return null;
         }
         this.filterText = filterText.trim();
-        return iProductoService.findByNombreProducto(empresa, filterText);
+        return productoService.findByNombreProducto(empresa, filterText);
+    }
+
+    public List<TipoMedidaEnum> getAllTipoMedidaEnum(){
+        return productoService.getAllTipoMedidaEnum();
     }
 }

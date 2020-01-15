@@ -2,7 +2,7 @@ package com.gigti.xfinance.ui.crud.empresa;
 
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IEmpresaService;
+import com.gigti.xfinance.backend.services.EmpresaService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
@@ -35,7 +35,7 @@ public class EmpresaMasterView extends HorizontalLayout
     private VerticalLayout barAndGridLayout;
 
     @Autowired
-    public EmpresaMasterView(IEmpresaService iService) {
+    public EmpresaMasterView(EmpresaService iService) {
             viewLogic = new EmpresaMasterCrudLogic(iService,this);
 //        if(viewLogic.access()) {
             setSizeFull();

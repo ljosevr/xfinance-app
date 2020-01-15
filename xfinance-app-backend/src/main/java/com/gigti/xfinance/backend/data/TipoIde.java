@@ -7,6 +7,7 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+@ToString
 @Entity
 @Table(name = "tipos_ide")
 public class TipoIde implements Serializable {

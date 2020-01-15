@@ -7,12 +7,14 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
+@ToString
 @Table(name = "producto_inventario_dia")
 public class ProductoInventarioDia extends AbstractEntity {
 

@@ -173,67 +173,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             layoutMenu.add(menus_varios);
         }
 
-//
-//
-//        menu_venta = new Button("Punto de Venta", VaadinIcon.ANGLE_RIGHT.create());
-//        menu_venta.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-//        menu_venta.addClickListener(l -> UI.getCurrent().navigate(PventaView.class));
-//        menu_venta.setClassName("menubutton");
-//
-//        menu_productos = new VerticalLayout();
-//        Button submenu_prod_administrar = new Button("Administrar", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_prod_administrar.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-//        submenu_prod_administrar.addClickListener(l -> UI.getCurrent().navigate(ProductoCrudView.class));
-//        submenu_prod_administrar.setClassName("menubutton");
-//
-//        Button submenu_prod_categoria = new Button("Categorias", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_prod_categoria.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-//        submenu_prod_categoria.addClickListener(l -> UI.getCurrent().navigate(CategoriaView.class));
-//        submenu_prod_categoria.setClassName("menubutton");
-//
-//        Button submenu_prod_compras = new Button("Compras", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_prod_compras.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-//        submenu_prod_compras.addClickListener(l -> UI.getCurrent().navigate(CategoriaView.class));
-//        submenu_prod_compras.setClassName("menubutton");
-//        //CART_O
-//        //STOCK
-//        Button submenu_prod_invInicial = new Button("Inventario Inicial", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_prod_invInicial.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-//        submenu_prod_invInicial.addClickListener(l -> UI.getCurrent().navigate(CategoriaView.class));
-//        submenu_prod_invInicial.setClassName("menubutton");
-//        //STORAGE
-//        menu_productos.add(submenu_prod_administrar, submenu_prod_categoria, submenu_prod_compras, submenu_prod_invInicial);
-//        //menus_varios.add("Productos", menu_productos).addThemeVariants(DetailsVariant.REVERSE);
-//        menus_varios.add("Productos", menu_productos);
-//
-//        menuUsuarios = new VerticalLayout();
-//        Button submenu_usu_administrar = new Button("Administrar", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_usu_administrar.addThemeVariants(ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_TERTIARY);
-//        submenu_usu_administrar.addClickListener(l -> UI.getCurrent().navigate(UsuarioAdminCrudView.class));
-//        submenu_usu_administrar.setClassName("menubutton");
-//
-//        Button submenu_usu_roles = new Button("Roles", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_usu_roles.addThemeVariants(ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_TERTIARY);
-//        submenu_usu_roles.addClickListener(l -> UI.getCurrent().navigate(UsuarioAdminCrudView.class));
-//        submenu_usu_roles.setClassName("menubutton");
-//
-//        menuUsuarios.add(submenu_usu_administrar, submenu_usu_roles);
-//        menus_varios.add("Usuarios", menuUsuarios);
-//
-//        menuEmpresas = new VerticalLayout();
-//        Button submenu_emp_administrar = new Button("Administrar", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_emp_administrar.addThemeVariants(ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_TERTIARY);
-//        submenu_emp_administrar.addClickListener(l -> UI.getCurrent().navigate(EmpresaView.class));
-//        submenu_emp_administrar.setClassName("menubutton");
-//        //OFFICE
-//        Button submenu_emp_usuarios = new Button("Usuarios Empresas", new Icon(VaadinIcon.ANGLE_RIGHT));
-//        submenu_emp_usuarios.addThemeVariants(ButtonVariant.LUMO_SMALL,ButtonVariant.LUMO_TERTIARY);
-//        submenu_emp_usuarios.addClickListener(l -> UI.getCurrent().navigate(EmpresaView.class));
-//        submenu_emp_usuarios.setClassName("menubutton");
-//        //GROUP
-//        menuEmpresas.add(submenu_emp_administrar, submenu_emp_usuarios);
-//        menus_varios.add("Empresas", menuEmpresas);
-
         menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
         menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
         menu_salir.addClickListener(listener -> signOut());
@@ -258,7 +197,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             UI.getCurrent().navigate(LoginScreen.class);
         } else {
             createDrawer();
-            //accessShowMenu();
         }
     }
 
@@ -266,26 +204,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         if (!accessControl.isUserSignedIn()) {
             beforeEnterEvent.rerouteTo(LoginScreen.class);
-        }
-    }
-
-    private void accessShowMenu() {
-        if(CurrentUser.get() != null) {
-            Usuario user = CurrentUser.get();
-            menu_salir.setEnabled(true);
-
-            if(user.getTipoUsuario().equals(TipoUsuario.ROOT)){
-                menuEmpresas.setVisible(true);
-                menu_venta.setVisible(false);
-                //tabsMenuGeneral.remove(tabVentas);
-                menus_varios.remove(menu_productos);
-                menus_varios.remove(menuUsuarios);
-            } else{
-                menu_venta.setVisible(true);
-                menu_productos.setVisible(true);
-                menuUsuarios.setVisible(true);
-                menus_varios.remove(menuEmpresas);
-            }
         }
     }
 

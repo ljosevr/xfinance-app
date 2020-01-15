@@ -44,7 +44,6 @@ public class Persona extends AbstractEntity{
     private Date fechaNacimiento;
 
     @NotEmpty
-    @Email
     @Column(unique = true)
     private String email;
 

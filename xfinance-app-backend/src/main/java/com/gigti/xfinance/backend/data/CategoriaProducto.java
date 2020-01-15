@@ -1,6 +1,7 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import javax.validation.constraints.Size;
 
 @Data
 @Entity
+@ToString
 @Table(name="categoria_producto")
 public class CategoriaProducto extends AbstractEntity{
 

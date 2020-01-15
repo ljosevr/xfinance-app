@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 
 @Service
-public class IinitBackServiceImpl implements IinitBackService {
+public class InitBackServiceImpl implements InitBackService {
 
-    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     @Autowired
     private EmpresaRepository empresaRepository;
@@ -46,7 +47,7 @@ public class IinitBackServiceImpl implements IinitBackService {
     @Transactional
     @Override
     public void initBackTipos() {
-        logger.debug("--> initBackTipos");
+        logger.info("--> initBackTipos");
         try {
             Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT1, null);
             if (parche == null) {
@@ -55,18 +56,18 @@ public class IinitBackServiceImpl implements IinitBackService {
                 tipoIdeRepository.save(TipoIde.EXTRANJERIA);
                 tipoIdeRepository.save(TipoIde.NIT);
                 tipoIdeRepository.save(TipoIde.TIDENTIDAD);
-                logger.debug("--> Tipos IDE");
+                logger.info("--> Tipos IDE");
 
                 //Tipo Usuarios
                 tipoUsuarioRepository.save(TipoUsuario.ADMIN);
                 tipoUsuarioRepository.save(TipoUsuario.NORMAL);
                 tipoUsuarioRepository.save(TipoUsuario.ROOT);
                 tipoUsuarioRepository.save(TipoUsuario.SELLER);
-                logger.debug("--> Tipos Usu");
+                logger.info("--> Tipos Usu");
                 //Tipo Empresa
                 tipoEmpresaRepository.save(TipoEmpresa.ROOT);
                 tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
-                logger.debug("--> Tipos EMP");
+                logger.info("--> Tipos EMP");
 
                 //Vistas
                 Vista vista_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
@@ -99,7 +100,7 @@ public class IinitBackServiceImpl implements IinitBackService {
                 Vista vista_invHoy = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO,Constantes.VIEW_R_INVENTARIO,vista_reportes, 61, "STORAGE"));
                 Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_R_GANANCIAS_Y_PERDIDAS,vista_reportes, 62,"CHART_LINE"));
 
-                logger.debug("--> Vistas");
+                logger.info("--> Vistas");
 
                 //Roles
                 //1. ROOT
@@ -107,9 +108,10 @@ public class IinitBackServiceImpl implements IinitBackService {
                 Rol.ROOT.getVistas().add(vista_empresaMaster);
                 Rol.ROOT.getVistas().add(vista_admin_empMaster);
                 Rol.ROOT.getVistas().add(vista_usuario_emp);
+                Rol.ROOT.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ROOT);
 
-                logger.debug("--> Rol Root");
+                logger.info("--> Rol Root");
 
                 //2. ADMIN
                 Rol.ADMIN.setVistas(new HashSet<>());
@@ -126,15 +128,17 @@ public class IinitBackServiceImpl implements IinitBackService {
                 Rol.ADMIN.getVistas().add(vista_reportes);
                 Rol.ADMIN.getVistas().add(vista_invHoy);
                 Rol.ADMIN.getVistas().add(vista_balance);
+                Rol.ADMIN.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ADMIN);
-                logger.debug("--> Rol Admin");
+                logger.info("--> Rol Admin");
 
                 //3.VENDEDOR
                 Rol.VENDEDOR.setVistas(new HashSet<>());
                 Rol.VENDEDOR.getVistas().add(vista_venta);
                 Rol.VENDEDOR.getVistas().add(vista_vender);
+                Rol.VENDEDOR.setFechaActivacion(new Date());
                 rolRepository.save(Rol.VENDEDOR);
-                logger.debug("--> Rol Vendedor");
+                logger.info("--> Rol Vendedor");
 
                 //4.AUXILIAR
                 Rol.AUXILIAR.setVistas(new HashSet<>());
@@ -142,14 +146,15 @@ public class IinitBackServiceImpl implements IinitBackService {
                 Rol.AUXILIAR.getVistas().add(vista_admin_prod);
                 Rol.AUXILIAR.getVistas().add(vista_categoria);
                 Rol.AUXILIAR.getVistas().add(vista_compras);
+                Rol.AUXILIAR.setFechaActivacion(new Date());
                 rolRepository.save(Rol.AUXILIAR);
-                logger.debug("--> Rol Auxiliar");
+                logger.info("--> Rol Auxiliar");
 
                 parche = new Parche(Constantes.INIT1,java.sql.Date.valueOf(LocalDate.now()),true, null);
                 parcheRepository.save(parche);
-                logger.debug("--> Parche creado");
+                logger.info("--> Parche creado");
 
-                logger.debug("<-- initBackTipos");
+                logger.info("<-- initBackTipos");
             }
         } catch (Exception e) {
             logger.error("Error al Crear InitBackend - Tipos: " + e.getMessage(), e);
@@ -160,7 +165,7 @@ public class IinitBackServiceImpl implements IinitBackService {
     @Transactional
     @Override
     public void initBackObjetos() {
-        logger.debug("--> initBackObjetos");
+        logger.info("--> initBackObjetos");
         try{
             Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT2, null);
             if (parche == null) {
@@ -177,7 +182,7 @@ public class IinitBackServiceImpl implements IinitBackService {
                         TipoEmpresa.ROOT, 0L);
 
                 emp = empresaRepository.save(emp);
-                logger.debug("--> Empresa Root Creado");
+                logger.info("--> Empresa Root Creado");
 
                 Persona persona = new Persona(
                         TipoIde.CEDULA,
@@ -193,10 +198,10 @@ public class IinitBackServiceImpl implements IinitBackService {
                 );
 
                 persona = personaRepository.save(persona);
-                logger.debug("--> Persona Root Creado");
+                logger.info("--> Persona Root Creado");
 
                 //Usuario Root
-                Rol rolRoot = rolRepository.findByNombreAndEmpresa(Rol.ROOT.getNombre(), null);
+                Rol rolRoot = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ROOT.getNombre(), null, false);
                 Usuario userRoot = new Usuario(
                         "Root",
                         //passwordEncoder.encode("1234"),
@@ -209,15 +214,16 @@ public class IinitBackServiceImpl implements IinitBackService {
                 );
 
                 usuarioRepository.save(userRoot);
-                logger.debug("--> Usuario Root Creado");
+                logger.info("--> Usuario Root Creado");
 
                 parche = new Parche(Constantes.INIT2,java.sql.Date.valueOf(LocalDate.now()),true, null);
-                logger.debug("--> Parche Creado");
+                logger.info("--> Parche Creado");
                 parcheRepository.save(parche);
             }
-            logger.debug("<-- initBackObjetos");
+            logger.info("<-- initBackObjetos");
         }catch(Exception e){
             logger.error("Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
+            e.printStackTrace();
         }
     }
 }

@@ -2,7 +2,7 @@ package com.gigti.xfinance.ui.crud.pventa;
 
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IventaService;
+import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
@@ -46,14 +46,14 @@ public class PventaView extends HorizontalLayout {
     private FormLayout formActions;
 
     //@Autowired
-    public PventaView(IventaService iventaService) {
+    public PventaView(VentaService ventaService) {
         formActions = new FormLayout();
         formActions.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
                 new FormLayout.ResponsiveStep("32em", 2),
                 new FormLayout.ResponsiveStep("40em", 4));
 
-        viewLogic = new PventaLogic(iventaService,this);
+        viewLogic = new PventaLogic(ventaService,this);
         lista = viewLogic.findAll();
         createTopBar();
 

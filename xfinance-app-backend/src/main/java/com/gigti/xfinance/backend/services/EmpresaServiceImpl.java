@@ -12,15 +12,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Service
-public class EmpresaServiceImpl implements IEmpresaService {
+public class EmpresaServiceImpl implements EmpresaService {
 
-    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
     @Autowired
     private EmpresaRepository empresaRepository;
 
@@ -32,6 +30,9 @@ public class EmpresaServiceImpl implements IEmpresaService {
 
     @Autowired
     private RolRepository rolRepository;
+
+    @Autowired
+    private CategoriaProductoRepository categoriaProductoRepository;
 
     @Override
     public List<EmpresaDTO> findAll(int page, int size) {
@@ -128,7 +129,7 @@ public class EmpresaServiceImpl implements IEmpresaService {
                 return empresa != null;
             }
         } catch(Exception e) {
-            logger.debug("Error: "+e.getMessage(),e);
+            logger.error("deleteEmpresa: "+e.getMessage(),e);
         }
         return false;
     }
@@ -180,12 +181,31 @@ public class EmpresaServiceImpl implements IEmpresaService {
             persona.setId(empresa.getPersonaId());
             persona = personaRepository.save(persona);
 
-            Rol rolAdminPorDefecto = rolRepository.findByNombreAndEmpresa(Rol.ADMIN.getNombre(), null);
+            List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndEliminado(null,true, false);
 
-            //TODO Copia los Roles x Defecto a Cada Empresa ?
+            List<Rol> listaRolesDestino = new ArrayList<>();
+            for(Rol r : listaRolesOrigen){
+                Rol rol = new Rol();
+                rol.setFechaActivacion(new Date());
+
+                rol.setEmpresa(empresaEnt);
+                rol.setPorDefecto(r.isPorDefecto());
+                rol.setEliminado(r.isEliminado());
+                rol.setDescripcion(r.getDescripcion());
+                rol.setNombre(r.getNombre());
+                Set<Vista> newVistas = new HashSet<>();
+                newVistas.addAll(r.getVistas());
+                rol.setVistas(newVistas);
+
+                listaRolesDestino.add(rol);
+            }
+
+            rolRepository.saveAll(listaRolesDestino);
+
+            Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
 
             usuarioAdmin.setPersona(persona);
-            usuarioAdmin.setRol(rolAdminPorDefecto);
+            usuarioAdmin.setRol(rolAdmin);
             usuarioAdmin.setTipoUsuario(TipoUsuario.ADMIN);
             //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
             usuarioAdmin.setPasswordUsuario("1234");
@@ -193,10 +213,20 @@ public class EmpresaServiceImpl implements IEmpresaService {
             usuarioAdmin = usuarioRepository.save(usuarioAdmin);
             empresa.setUsuarioId(usuarioAdmin.getId());
 
+            //Categoria de Productos
+            CategoriaProducto categoria = new CategoriaProducto();
+            categoria.setActivo(true);
+            categoria.setDescripcion("Categoria x Defecto");
+            categoria.setEliminado(false);
+            categoria.setEmpresa(empresaEnt);
+            categoria.setNombre("Normal");
+
+            categoriaProductoRepository.save(categoria);
+
             return empresa;
 
         }catch(Exception e){
-            logger.error("Error - saveEmpresa: "+e.getMessage(), e);
+            logger.error("saveEmpresa: "+e.getMessage(), e);
             return null;
         }
     }

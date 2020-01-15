@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.backend.services;
 
+import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.repositories.ProductoInvDiaRepository;
 import com.gigti.xfinance.backend.repositories.ProductoInvInicioRepository;
@@ -26,9 +27,9 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class ProductoServiceImpl implements IProductoService {
+public class ProductoServiceImpl implements ProductoService {
 
-    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -153,5 +154,15 @@ public class ProductoServiceImpl implements IProductoService {
     @Override
     public Producto findById(String id) {
         return productoRepository.findById(id).orElse(null);
+    }
+
+    public List<TipoMedidaEnum> getAllTipoMedidaEnum(){
+        List<TipoMedidaEnum> lista = new ArrayList<>();
+        lista.add(TipoMedidaEnum.UNIDAD);
+        lista.add(TipoMedidaEnum.PAQUETE);
+        lista.add(TipoMedidaEnum.KILO);
+        lista.add(TipoMedidaEnum.LIBRA);
+
+        return lista;
     }
 }

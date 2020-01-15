@@ -64,6 +64,11 @@
         margin: 14px 0px 14px;
         text-align: center;
     }
+
+    .formLayout{
+        margin: 20px 20px 20px 30px;
+        padding: 10px;
+    }
 }
 
 /* MOBILE*/
@@ -110,6 +115,10 @@
     .titleMenu {
         margin: 5px 0px 5px;
         text-align: center;
+    }
+
+    .formLayout{
+        padding: 10px;
     }
 }
 

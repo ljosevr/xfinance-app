@@ -1,6 +1,6 @@
 package com.gigti.xfinance.backend.services;
 
-public interface IinitBackService {
+public interface InitBackService {
 
     void initBackTipos();
     void initBackObjetos();

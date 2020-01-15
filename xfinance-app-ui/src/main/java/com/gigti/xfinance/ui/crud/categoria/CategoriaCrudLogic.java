@@ -2,7 +2,7 @@ package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudLogic;
@@ -15,12 +15,12 @@ import java.util.Objects;
 public class CategoriaCrudLogic implements Serializable, ICrudLogic {
 
     private CategoriaView view;
-    private IcategoriaProductoService icategoriaProductoService;
+    private CategoriaProductoService categoriaProductoService;
     private static Empresa empresa;
     private String filterText = "";
 
-    public CategoriaCrudLogic(IcategoriaProductoService iService, CategoriaView simpleCrudView) {
-        icategoriaProductoService = iService;
+    public CategoriaCrudLogic(CategoriaProductoService iService, CategoriaView simpleCrudView) {
+        categoriaProductoService = iService;
         view = simpleCrudView;
         empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
@@ -30,14 +30,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
     }
 
     public boolean acceder(){
-        // Hide and disable if not admin
         return empresa != null;
-        //TODO permisos
-//        if (!AccessControlFactory.getInstance().createAccessControl()
-//                .isUserInRole(CurrentUser.get())) {
-//            view.setNewProductEnabled(false);
-//        }
-        //return true;
     }
 
     public void cancelar() {
@@ -72,14 +65,14 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
     }
 
     public CategoriaProducto find(String id) {
-        return icategoriaProductoService.findById(id);
+        return categoriaProductoService.findById(id);
     }
 
     public void guardar(Object object) {
         CategoriaProducto categoria = (CategoriaProducto) object;
         String typOperation = StringUtils.isBlank(categoria.getId()) ? " Creada" : " Actualizada";
         categoria.setEmpresa(empresa);
-        categoria = icategoriaProductoService.saveCategoria(categoria);
+        categoria = categoriaProductoService.saveCategoria(categoria);
         if(categoria != null){
             view.refresh(categoria);
             view.clearSelection();
@@ -95,7 +88,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
     public void eliminar(Object object) {
         CategoriaProducto categoria = (CategoriaProducto) object;
         view.clearSelection();
-        if(icategoriaProductoService.deleteCategoria(categoria.getId())){
+        if(categoriaProductoService.deleteCategoria(categoria.getId())){
             view.showSaveNotification("Categoria: "+categoria.getNombre() + " Eliminada");
             if(view.getItemsGrid().remove(categoria)){
                 setFragmentParameter("");
@@ -135,7 +128,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
 
     public List<CategoriaProducto> findAll() {
         //TODO aplicar al Filtro si es Activo O INACTIVO
-        return icategoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+        return categoriaProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
     public List<CategoriaProducto> setFilter(String filterText) {
@@ -145,6 +138,6 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
             return null;
         }
         this.filterText = filterText.trim();
-        return icategoriaProductoService.findByNombreOrDescripcion(filterText, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+        return categoriaProductoService.findByNombreOrDescripcion(filterText, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 }

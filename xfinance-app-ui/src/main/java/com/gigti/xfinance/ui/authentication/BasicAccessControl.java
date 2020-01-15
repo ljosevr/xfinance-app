@@ -7,12 +7,10 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.services.IusuarioService;
-import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.backend.services.UsuarioService;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Default mock implementation of {@link AccessControl}. This implementation
@@ -21,12 +19,12 @@ import org.springframework.stereotype.Component;
  */
 public class BasicAccessControl implements AccessControl {
 
-    private IusuarioService iusuarioService;
+    private UsuarioService usuarioService;
 
     @Override
-    public boolean signIn(String username, String password, @Autowired IusuarioService iusu) {
+    public boolean signIn(String username, String password, @Autowired UsuarioService iusu) {
 
-        this.iusuarioService = iusu;
+        this.usuarioService = iusu;
 
         if (username == null || username.isEmpty())
             return false;
@@ -34,7 +32,7 @@ public class BasicAccessControl implements AccessControl {
         if (password == null || password.isEmpty())
             return false;
 
-        Usuario usuario = iusuarioService.login(username,password);
+        Usuario usuario = usuarioService.login(username,password);
 
         if(usuario != null){
             CurrentUser.set(usuario);

@@ -7,6 +7,7 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,12 +15,12 @@ import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+@Data
 @Entity
 @Table(name = "producto_valores")
 public class ProductoValores extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Producto producto;
 
@@ -48,5 +49,17 @@ public class ProductoValores extends AbstractEntity {
         this.fechaActivacion = fechaActivacion;
         this.activo = activo;
         this.impuestos = impuestos;
+    }
+
+    @Override
+    public String toString() {
+        return "ProductoValores{" +
+                "producto=" + producto +
+                ", precioCosto=" + precioCosto +
+                ", precioVenta=" + precioVenta +
+                ", fechaActivacion=" + fechaActivacion +
+                ", activo=" + activo +
+                ", impuestos=" + impuestos +
+                '}';
     }
 }

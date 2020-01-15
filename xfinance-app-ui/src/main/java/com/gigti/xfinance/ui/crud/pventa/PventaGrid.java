@@ -42,6 +42,11 @@ public class PventaGrid extends Grid<PventaDTO> {
                 .setFlexGrow(3)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
+        addColumn(PventaDTO::getUnidadMedida)
+                .setHeader("Medida")
+                .setFlexGrow(3)
+                .setTextAlign(ColumnTextAlign.CENTER);
+
         total = BigDecimal.ZERO;
 
         addColumn(this::formatPrice)

@@ -7,29 +7,19 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IinitBackService;
-import com.gigti.xfinance.backend.services.IusuarioService;
-import com.gigti.xfinance.ui.HomeView;
+import com.gigti.xfinance.backend.services.InitBackService;
+import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -43,15 +33,15 @@ public class LoginScreen extends FlexLayout {
     public static final String VIEW_NAME = "Login";
 
     private AccessControl accessControl;
-    private IinitBackService iinitBackService;
-    private IusuarioService iusuarioService;
+    private InitBackService initBackService;
+    private UsuarioService usuarioService;
 
     @Autowired
-    public LoginScreen(IinitBackService init, IusuarioService iusuario) {
-        this.iinitBackService = init;
-        this.iusuarioService = iusuario;
-        iinitBackService.initBackTipos();
-        iinitBackService.initBackObjetos();
+    public LoginScreen(InitBackService init, UsuarioService iusuario) {
+        this.initBackService = init;
+        this.usuarioService = iusuario;
+        initBackService.initBackTipos();
+        initBackService.initBackObjetos();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();
@@ -81,7 +71,7 @@ public class LoginScreen extends FlexLayout {
     }
 
     private void login(LoginForm.LoginEvent event) {
-        if (accessControl.signIn(event.getUsername(), event.getPassword(), iusuarioService)) {
+        if (accessControl.signIn(event.getUsername(), event.getPassword(), usuarioService)) {
             UI.getCurrent().navigate(MainLayout.class);
         } else {
             event.getSource().setError(true);

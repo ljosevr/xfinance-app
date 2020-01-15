@@ -17,9 +17,9 @@ import java.util.Optional;
 
 
 @Service
-public class CategoriaProductoServiceImpl implements IcategoriaProductoService {
+public class CategoriaProductoServiceImpl implements CategoriaProductoService {
 
-    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     @Autowired
     private CategoriaProductoRepository categoriaProductoRepository;

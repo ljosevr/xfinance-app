@@ -2,7 +2,7 @@ package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
@@ -36,7 +36,7 @@ public class CategoriaView extends HorizontalLayout
     private VerticalLayout barAndGridLayout;
 
     @Autowired
-    public CategoriaView(IcategoriaProductoService iService) {
+    public CategoriaView(CategoriaProductoService iService) {
             viewLogic = new CategoriaCrudLogic(iService,this);
 //        if(viewLogic.access()) {
             setSizeFull();
@@ -64,7 +64,7 @@ public class CategoriaView extends HorizontalLayout
             barAndGridLayout.expand(grid);
 
             add(barAndGridLayout);
-            add(form);
+            //add(form);
 
             viewLogic.init();
 //        }else{
@@ -118,13 +118,11 @@ public class CategoriaView extends HorizontalLayout
 
     public void showForm(boolean show) {
         if(show){
-            barAndGridLayout.setVisible(false);
+            form.open();
         }else{
-            barAndGridLayout.setVisible(true);
             filter.focus();
+            form.close();
         }
-        form.setVisible(show);
-        form.setEnabled(show);
     }
 
     @Override

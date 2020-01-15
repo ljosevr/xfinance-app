@@ -18,25 +18,24 @@ import java.util.Set;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", uniqueConstraints={@UniqueConstraint(columnNames={"nombre","empresa_id"})})
 public class Rol extends AbstractEntity implements Serializable {
 
-    public static final Rol ROOT = new Rol("root_1","Root", "rol por defecto - Acceso todo", true, null , true, java.sql.Date.valueOf(LocalDate.now()));
-    public static final Rol ADMIN = new Rol("Administrador", "rol por defecto - Acceso Usuario Admin", true, null , true, java.sql.Date.valueOf(LocalDate.now()));
-    public static final Rol AUXILIAR = new Rol("Auxiliar", "Auxiliar", true, null , true, java.sql.Date.valueOf(LocalDate.now()));
-    public static final Rol VENDEDOR = new Rol("Vendedor", "Vendedor", true, null , true, java.sql.Date.valueOf(LocalDate.now()));
-    public static final Rol CONTADOR = new Rol("Contador", "Contador", true, null , true, java.sql.Date.valueOf(LocalDate.now()));
+    public static final Rol ROOT = new Rol("Root", "ROOT", true, null , false, null);
+    public static final Rol ADMIN = new Rol("Administrador", "ADMIN", true, null , false, null);
+    public static final Rol AUXILIAR = new Rol("Auxiliar", "Auxiliar", true, null , false, null);
+    public static final Rol VENDEDOR = new Rol("Vendedor", "Vendedor", true, null , false, null);
+    public static final Rol CONTADOR = new Rol("Contador", "Contador", true, null , false, null);
 
-    @Column(unique = true)
     private String nombre;
     private String descripcion;
-    private boolean porDefecto = true;
+    private boolean porDefecto;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Empresa empresa;
 
-    private Boolean activo;
+    private boolean eliminado;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActivacion;
@@ -51,22 +50,22 @@ public class Rol extends AbstractEntity implements Serializable {
     public Rol() {
     }
 
-    public Rol(String id, String nombre, String descripcion, boolean porDefecto, Empresa empresa, Boolean activo, Date fechaActivacion) {
+    public Rol(String id, String nombre, String descripcion, boolean porDefecto, Empresa empresa, boolean eliminado, Date fechaActivacion) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.porDefecto = porDefecto;
         this.empresa = empresa;
-        this.activo = activo;
+        this.eliminado = eliminado;
         this.fechaActivacion = fechaActivacion;
     }
 
-    public Rol(String nombre, String descripcion, boolean porDefecto, Empresa empresa, Boolean activo, Date fechaActivacion) {
+    public Rol(String nombre, String descripcion, boolean porDefecto, Empresa empresa, boolean eliminado, Date fechaActivacion) {
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.porDefecto = porDefecto;
         this.empresa = empresa;
-        this.activo = activo;
+        this.eliminado = eliminado;
         this.fechaActivacion = fechaActivacion;
     }
 
@@ -80,7 +79,7 @@ public class Rol extends AbstractEntity implements Serializable {
                 Objects.equals(nombre, rol.nombre) &&
                 Objects.equals(descripcion, rol.descripcion) &&
                 Objects.equals(empresa, rol.empresa) &&
-                Objects.equals(activo, rol.activo) &&
+                Objects.equals(eliminado, rol.eliminado) &&
                 Objects.equals(fechaActivacion, rol.fechaActivacion) &&
                 Objects.equals(usuarios, rol.usuarios) &&
                 Objects.equals(vistas, rol.vistas);

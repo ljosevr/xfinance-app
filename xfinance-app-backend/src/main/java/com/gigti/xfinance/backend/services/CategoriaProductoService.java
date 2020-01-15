@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-public interface IcategoriaProductoService {
+public interface CategoriaProductoService {
 
     public List<CategoriaProducto> findAll(Empresa empresa, int page, int size);
 

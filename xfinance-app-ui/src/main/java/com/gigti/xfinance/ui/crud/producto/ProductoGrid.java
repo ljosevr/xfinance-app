@@ -55,6 +55,11 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
 //                .setHeader("Adult")
 //                .setComparator(Comparator.comparing(Person::isAdult));
 
+        addColumn(Producto::getTipoMedida)
+                .setHeader("Medida")
+                .setSortable(true)
+                .setFlexGrow(5);
+
         addColumn(this::formatStock)
                 .setHeader("Cantidad")
                 .setSortable(true)

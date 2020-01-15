@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
 import com.vaadin.flow.component.Key;
@@ -17,7 +18,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -25,14 +25,14 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
-import com.vaadin.flow.data.converter.StringToDoubleConverter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
@@ -42,9 +42,11 @@ import java.util.Locale;
  */
 public class ProductoForm extends FormLayout {
 
-    private final NumberField tfProdStock;
-    private final TextField tfPrecioVenta;
-    private final TextField tfPrecioCosto;
+    Logger logger = LoggerFactory.getLogger(ProductoForm.class);
+    private NumberField tfProdStock;
+    private TextField tfPrecioVenta;
+    private TextField tfPrecioCosto;
+    private ComboBox<TipoMedidaEnum> cbTipoMedida;
     private ComboBox<CategoriaProducto>  cbCategorias;
     private Button btnSave;
     private Button btnDiscard;
@@ -94,7 +96,8 @@ public class ProductoForm extends FormLayout {
         }
     }
 
-    public ProductoForm(ProductoCrudLogic productoCrudLogic, List<CategoriaProducto> listCategoria) {
+    public ProductoForm(ProductoCrudLogic productoCrudLogic, List<CategoriaProducto> listCategoria, List<TipoMedidaEnum> listaTipoMedida) {
+        this.setClassName("formLayout");
         this.setResponsiveSteps(
                 new ResponsiveStep("25em", 1),
                 new ResponsiveStep("32em", 2),
@@ -113,6 +116,11 @@ public class ProductoForm extends FormLayout {
         tfProdCodigoB.setRequired(false);
 
         TextField tfProdDescripcion = new TextField("Descripción");
+
+        cbTipoMedida = new ComboBox<>();
+        cbTipoMedida.setItems(listaTipoMedida);
+        cbTipoMedida.setLabel("Tipo Medida");
+        cbTipoMedida.setRequired(true);
 
         Checkbox chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
@@ -173,6 +181,8 @@ public class ProductoForm extends FormLayout {
         binder.forField(tfProdCodigoB).asRequired("Digite el Codigo de Barras").bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
         binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
         binder.forField(cbCategorias).asRequired("Seleccione una Categoria").bind(Producto::getCategoria, Producto::setCategoria);
+        binder.forField(cbTipoMedida).asRequired("Seleccione una Unidad de Medida").bind(Producto::getTipoMedida, Producto::setTipoMedida);
+
         binder.bindInstanceFields(this);
 
         // enable/disable btnSave button while editing
@@ -184,7 +194,6 @@ public class ProductoForm extends FormLayout {
         });
 
         btnSave = new Button("Guardar");
-        btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> {
             if (currentProduct != null
@@ -196,13 +205,11 @@ public class ProductoForm extends FormLayout {
         });
         btnSave.addClickShortcut(Key.ENTER);
 
-        btnDiscard = new Button("Descartar Cambios");
-        btnDiscard.setWidth("100%");
+        btnDiscard = new Button("Descartar");
         btnDiscard.addClickListener(
                 event -> viewLogic.editProducto(currentProduct));
 
         Button btnCancel = new Button("Cancelar");
-        btnCancel.setWidth("100%");
         btnCancel.addClickListener(event -> viewLogic.cancelProducto());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
@@ -210,7 +217,6 @@ public class ProductoForm extends FormLayout {
                 .setFilter("event.key == 'Escape'");
 
         btnDelete = new Button("Eliminar");
-        btnDelete.setWidth("100%");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> {
             if (currentProduct != null) {
@@ -220,11 +226,11 @@ public class ProductoForm extends FormLayout {
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave,btnDiscard);
-        HorizontalLayout actionsLayout2 = new HorizontalLayout();
+        //HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete,btnCancel);
 
-        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,tfProdStock,tfPrecioCosto,tfPrecioVenta,cbCategorias,chkActivo,actionsLayout,actionsLayout2);
-        this.setColspan(chkActivo,2);
+        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,cbTipoMedida,cbCategorias,tfProdStock,tfPrecioCosto,tfPrecioVenta,chkActivo,actionsLayout);
+        this.setColspan(actionsLayout,2);
     }
 
     public void setCategories(List<CategoriaProducto> categories) {
@@ -232,6 +238,7 @@ public class ProductoForm extends FormLayout {
     }
 
     public void editProducto(Producto producto) {
+        logger.info("Producto: "+producto);
         if (producto == null) {
             producto = new Producto();
             producto.setActivo(true);
@@ -244,10 +251,10 @@ public class ProductoForm extends FormLayout {
         } else {
             btnDelete.setEnabled(true);
             tfProdStock.setEnabled(false);
-
         }
         currentProduct = producto;
         binder.readBean(producto);
         cbCategorias.setValue(producto.getCategoria());
+        cbTipoMedida.setValue(producto.getTipoMedida());
     }
 }

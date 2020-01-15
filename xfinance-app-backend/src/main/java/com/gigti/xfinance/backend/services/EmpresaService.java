@@ -6,7 +6,7 @@ import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 
 import java.util.List;
 
-public interface IEmpresaService {
+public interface EmpresaService {
 
     public List<EmpresaDTO> findAll(int page, int size);
 

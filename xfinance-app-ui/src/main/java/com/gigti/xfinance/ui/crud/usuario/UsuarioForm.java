@@ -92,6 +92,7 @@ public class UsuarioForm extends FormLayout {
     }
 
     public UsuarioForm(UsuarioCrudLogic usuarioCrudLogic, List<CategoriaProducto> listCategoria) {
+        this.setClassName("formLayout");
         this.setResponsiveSteps(
                 new ResponsiveStep("25em", 1),
                 new ResponsiveStep("32em", 2),

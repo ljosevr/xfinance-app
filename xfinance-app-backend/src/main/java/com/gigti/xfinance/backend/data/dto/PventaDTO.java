@@ -21,6 +21,7 @@ public class PventaDTO implements Serializable {
     private BigDecimal precioVentaActual;
     private double cantidadVenta;
     private double inStock;
+    private String unidadMedida;
 
     public BigDecimal getSubTotal(){
         return  precioVentaActual.multiply(BigDecimal.valueOf(cantidadVenta));

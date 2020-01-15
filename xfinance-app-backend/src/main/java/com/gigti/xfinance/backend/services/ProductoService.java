@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.backend.services;
 
+import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.Usuario;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-public interface IProductoService {
+public interface ProductoService {
 
     public Producto saveProduct(Producto producto, Usuario usuario);
     public boolean delete(String id);
@@ -23,4 +24,5 @@ public interface IProductoService {
     public Producto findByBarCode(Empresa empresa, String barCode);
     public List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
     public Producto findById(String id);
+    public List<TipoMedidaEnum> getAllTipoMedidaEnum();
 }

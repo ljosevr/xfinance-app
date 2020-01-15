@@ -11,7 +11,16 @@ import com.gigti.xfinance.backend.data.Rol;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface RolRepository extends JpaRepository<Rol, String> {
-    public Rol findByNombreAndEmpresa(String nombre, Empresa empresa);
+
+    public Rol findByNombreAndEmpresaAndEliminado(String nombre, Empresa empresa, boolean eliminado);
+
+    public List<Rol> findAllByEmpresaAndEliminado(Empresa empresa, boolean eliminado);
+
+    public Rol findAllByIdAndEmpresaAndEliminado(String id, Empresa empresa, boolean eliminado);
+
+    public List<Rol> findAllByEmpresaAndPorDefectoAndEliminado(Empresa empresa, boolean porDefecto, boolean eliminado);
 }

@@ -6,8 +6,10 @@
 
 package com.gigti.xfinance.backend.data;
 
+import com.gigti.xfinance.backend.TipoMedidaEnum;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -30,6 +32,11 @@ public class Producto extends AbstractEntity {
     private boolean activo;
     @NotNull
     private boolean eliminado;
+
+    @NotNull
+    private TipoMedidaEnum tipoMedida = TipoMedidaEnum.UNIDAD;
+//    @NotNull
+//    private Integer cantidadMedida = 1;
 
     @Transient
     private String activoS;
@@ -62,17 +69,35 @@ public class Producto extends AbstractEntity {
 
     public Producto(){}
 
-    public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa) {
+    public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa, TipoMedidaEnum tipoMedida) {
         this.nombreProducto = nombreProducto;
         this.codigoBarra = codigoBarra;
         this.descripcion = descripcion;
         this.activo = activo;
         this.eliminado = false;
         this.empresa = empresa;
+        this.tipoMedida = tipoMedida;
     }
 
     public String getActivoS() {
         return isActivo() ? "SI" : "NO";
     }
 
+    @Override
+    public String toString() {
+        return "Producto{" +
+                "nombreProducto='" + nombreProducto + '\'' +
+                ", codigoBarra='" + codigoBarra + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", activo=" + activo +
+                ", eliminado=" + eliminado +
+                ", tipoMedida=" + tipoMedida +
+                ", activoS='" + activoS + '\'' +
+                ", precioCostoActual=" + precioCostoActual +
+                ", precioVentaActual=" + precioVentaActual +
+                ", stockActual=" + stockActual +
+                ", empresa=" + empresa +
+                ", categoria=" + categoria +
+                 '}';
+    }
 }

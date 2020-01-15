@@ -7,6 +7,7 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "usuarios")
+@ToString
 public class Usuario extends AbstractEntity {
 
     @Column(name="nombre_usuario", unique = true)

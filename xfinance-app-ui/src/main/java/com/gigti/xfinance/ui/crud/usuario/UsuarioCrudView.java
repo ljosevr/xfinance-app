@@ -6,28 +6,9 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IusuarioService;
-import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.util.TopBarComponent;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * A view for performing create-read-update-delete operations on Usuario Admin.

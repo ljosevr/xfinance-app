@@ -6,18 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.services.IusuarioService;
-import com.gigti.xfinance.ui.authentication.AccessControlFactory;
-import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.vaadin.flow.component.notification.Notification;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
 
 /**
  * This class provides an interface for the logical operations between the CRUD

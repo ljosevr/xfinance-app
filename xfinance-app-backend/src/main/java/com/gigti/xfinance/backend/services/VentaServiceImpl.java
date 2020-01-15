@@ -17,9 +17,9 @@ import java.util.Date;
 import java.util.List;
 
 @Service
-public class IventaServiceImpl implements IventaService {
+public class VentaServiceImpl implements VentaService {
 
-    Logger logger = LoggerFactory.getLogger(IinitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     @Autowired
     private FacturaRepository facturaRepository;
@@ -149,6 +149,7 @@ public class IventaServiceImpl implements IventaService {
         pv.setPrecioCostoActual(pvalores.getPrecioCosto());
         pv.setPrecioVentaActual(pvalores.getPrecioVenta());
         pv.setInStock(inStock);
+        pv.setUnidadMedida(p.getTipoMedida() == null ? "NE" : p.getTipoMedida().toString());
 
         return pv;
     }

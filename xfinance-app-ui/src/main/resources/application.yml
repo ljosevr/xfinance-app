@@ -20,9 +20,9 @@ spring:
   jpa:
     hibernate:
      ddl-auto: update
- #    ddl-auto: update
+      #ddl-auto: create-drop
     show-sql: false
-    generate-ddl: true
+    generate-ddl: false
     properties:
       hibernate:
         jdbc:

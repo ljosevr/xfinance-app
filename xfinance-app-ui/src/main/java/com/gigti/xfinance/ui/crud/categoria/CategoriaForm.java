@@ -6,6 +6,7 @@ import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -15,8 +16,8 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
-public class CategoriaForm extends FormLayout {
-    //private VerticalLayout content;
+public class CategoriaForm extends Dialog {
+    private FormLayout content;
 
     private Button btnSave;
     private Button btnDiscard;
@@ -27,15 +28,15 @@ public class CategoriaForm extends FormLayout {
     private CategoriaProducto currentCategoria;
 
     public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
-        //this.setClassName("form-layout");
-        //this.setSizeFull();
-        this.setResponsiveSteps(
-                new ResponsiveStep("25em", 1),
-                new ResponsiveStep("32em", 2),
-                new ResponsiveStep("40em", 3));
+        content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("25em", 1),
+                new FormLayout.ResponsiveStep("32em", 2),
+                new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Categoria");
-        this.add(title, 3);
+        content.add(title, 3);
 
         viewLogic = categoriaCrudLogic;
 
@@ -48,11 +49,11 @@ public class CategoriaForm extends FormLayout {
         tfCatDescripcion.setRequired(false);
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
 
-        this.add(tfCatNombre, tfCatDescripcion);
+        content.add(tfCatNombre, tfCatDescripcion);
 
         Checkbox cbCatActivo = new Checkbox("Activo");
         cbCatActivo.setValue(true);
-        this.add(cbCatActivo, 3);
+        content.add(cbCatActivo, 3);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
         binder.forField(tfCatNombre).bind(CategoriaProducto::getNombre,
@@ -108,8 +109,12 @@ public class CategoriaForm extends FormLayout {
         actionsLayout.add(btnSave, btnDiscard);
         HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete, btnCancel);
-        this.add(actionsLayout,3);
-        this.add(actionsLayout2,3);
+        content.add(actionsLayout,3);
+        content.add(actionsLayout2,3);
+
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
     public void editCategoria(CategoriaProducto categoria) {

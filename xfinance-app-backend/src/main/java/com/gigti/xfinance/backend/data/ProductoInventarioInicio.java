@@ -7,12 +7,14 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Data
 @Entity
+@ToString
 @Table(name = "producto_inventario_inicio")
 public class ProductoInventarioInicio extends AbstractEntity {
 

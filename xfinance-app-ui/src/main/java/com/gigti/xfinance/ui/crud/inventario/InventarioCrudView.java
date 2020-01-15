@@ -6,7 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.inventario;
 
-import com.gigti.xfinance.backend.services.IProductoService;
+import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.crud.producto.ProductoForm;
 import com.gigti.xfinance.ui.crud.producto.ProductoGrid;
@@ -44,7 +44,7 @@ public class InventarioCrudView extends HorizontalLayout
     private Button newProduct;
 
     @Autowired
-    private IProductoService iProductoService;
+    private ProductoService productoService;
     //private ProductoDataProvider dataProvider;
 
     public InventarioCrudView() {

@@ -32,7 +32,7 @@ public class EmpresaMasterForm extends FormLayout {
     private Usuario usuarioAdmin;
 
     public EmpresaMasterForm(EmpresaMasterCrudLogic empresaMasterCrudLogic) {
-
+        this.setClassName("formLayout");
         this.setResponsiveSteps(
                 new ResponsiveStep("25em", 1),
                 new ResponsiveStep("32em", 2),

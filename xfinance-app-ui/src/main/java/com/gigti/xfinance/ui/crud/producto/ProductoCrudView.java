@@ -6,11 +6,12 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.IProductoService;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.ProductoService;
+import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
@@ -50,7 +51,7 @@ public class ProductoCrudView extends HorizontalLayout
     private VerticalLayout barAndGridLayout;
 
     @Autowired
-    public ProductoCrudView(IcategoriaProductoService iServiceCat, IProductoService iServiceProd) {
+    public ProductoCrudView(CategoriaProductoService iServiceCat, ProductoService iServiceProd) {
 
         viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat, this);
 //        if(viewLogic.access()) {
@@ -64,8 +65,9 @@ public class ProductoCrudView extends HorizontalLayout
                 event -> viewLogic.rowSelected(event.getValue()));
 
         List<CategoriaProducto> listaCategoria = viewLogic.findAllCategoria();
-        form = new ProductoForm(viewLogic, listaCategoria);
-        form.setCategories(listaCategoria);
+        List<TipoMedidaEnum> tipoMedidaEnums = viewLogic.getAllTipoMedidaEnum();
+        form = new ProductoForm(viewLogic, listaCategoria, tipoMedidaEnums);
+        //form.setCategories(listaCategoria);
 
         H3 title = new H3(Constantes.VIEW_PRODUCTO);
         title.setClassName("titleView");

@@ -9,6 +9,7 @@ package com.gigti.xfinance.backend.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Data
 @Entity
-//@Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "empresas")
