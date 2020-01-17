@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
-@RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
+@RouteAlias(value = "categoria", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
 public class CategoriaView extends HorizontalLayout
         implements HasUrlParameter<String> {

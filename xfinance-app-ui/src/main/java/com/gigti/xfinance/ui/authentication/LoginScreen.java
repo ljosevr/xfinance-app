@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * UI content when the user is not logged in yet.
  */
-@Route(value = "Login")
+@Route(value = Constantes.VIEW_R_LOGIN)
 @PageTitle(value = Constantes.VIEW_MAIN)
 @CssImport("./styles/shared-styles.css")
 public class LoginScreen extends FlexLayout {

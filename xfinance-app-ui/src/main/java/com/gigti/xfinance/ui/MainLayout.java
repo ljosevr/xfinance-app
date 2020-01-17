@@ -6,10 +6,10 @@
 
 package com.gigti.xfinance.ui;
 
-import com.gigti.xfinance.backend.data.TipoUsuario;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.services.InitBackServiceImpl;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -25,31 +25,29 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
-import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.details.DetailsVariant;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -70,6 +68,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
     private Accordion menus_varios;
     private Button menu_salir;
+    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     public MainLayout() {
         String username = "";
@@ -185,9 +184,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
                                 .createAccessControl().signOut(),
                         Key.KEY_L, KeyModifier.CONTROL);
 
-        if (!accessControl.isUserSignedIn()) {
-                UI.getCurrent().navigate(LoginScreen.class);
-        } else {
+        if (accessControl.isUserSignedIn()) {
             createDrawer();
         }
     }
@@ -195,7 +192,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         if (!accessControl.isUserSignedIn()) {
-            beforeEnterEvent.rerouteTo(LoginScreen.class);
+            beforeEnterEvent.forwardTo(LoginScreen.class);
         }
     }
 

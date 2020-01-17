@@ -9,6 +9,8 @@ public class Constantes {
     public static final String INIT4 = "PI Back - 4 - Roles";
 
     //VIEWS-ROUTE
+    public static final String VIEW_R_LOGIN = "Login";
+
     public static final String VIEW_R_VENTA = "pventa";
 
     public static final String VIEW_R_PRODUCTO = "productos";
