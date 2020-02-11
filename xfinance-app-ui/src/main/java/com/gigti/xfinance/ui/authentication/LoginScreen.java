@@ -20,7 +20,6 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * UI content when the user is not logged in yet.
@@ -36,7 +35,7 @@ public class LoginScreen extends FlexLayout {
     private InitBackService initBackService;
     private UsuarioService usuarioService;
 
-    @Autowired
+    //@Autowired
     public LoginScreen(InitBackService init, UsuarioService iusuario) {
         this.initBackService = init;
         this.usuarioService = iusuario;

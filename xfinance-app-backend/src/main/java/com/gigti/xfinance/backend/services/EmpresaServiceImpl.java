@@ -14,11 +14,9 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 @Service
 public class EmpresaServiceImpl implements EmpresaService {
 
-    //Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
     private static final Logger logger = Logger.getLogger(EmpresaServiceImpl.class.getName());
     @Autowired
     private EmpresaRepository empresaRepository;

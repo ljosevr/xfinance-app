@@ -3,8 +3,6 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.repositories.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,11 +10,13 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class InitBackServiceImpl implements InitBackService {
 
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    private static final java.util.logging.Logger logger = Logger.getLogger(InitBackServiceImpl.class.getName());
 
     @Autowired
     private EmpresaRepository empresaRepository;
@@ -56,18 +56,18 @@ public class InitBackServiceImpl implements InitBackService {
                 tipoIdeRepository.save(TipoIde.EXTRANJERIA);
                 tipoIdeRepository.save(TipoIde.NIT);
                 tipoIdeRepository.save(TipoIde.TIDENTIDAD);
-                logger.info("--> Tipos IDE");
+                logger.info("Tipos IDE");
 
                 //Tipo Usuarios
                 tipoUsuarioRepository.save(TipoUsuario.ADMIN);
                 tipoUsuarioRepository.save(TipoUsuario.NORMAL);
                 tipoUsuarioRepository.save(TipoUsuario.ROOT);
                 tipoUsuarioRepository.save(TipoUsuario.SELLER);
-                logger.info("--> Tipos Usu");
+                logger.info("Tipos Usuarios");
                 //Tipo Empresa
                 tipoEmpresaRepository.save(TipoEmpresa.ROOT);
                 tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
-                logger.info("--> Tipos EMP");
+                logger.info("Tipos Empresas");
 
                 //Vistas
                 Vista vista_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
@@ -100,7 +100,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_invHoy = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO,Constantes.VIEW_R_INVENTARIO,vista_reportes, 61, "STORAGE"));
                 Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_R_GANANCIAS_Y_PERDIDAS,vista_reportes, 62,"CHART_LINE"));
 
-                logger.info("--> Vistas");
+                logger.info("Vistas");
 
                 //Roles
                 //1. ROOT
@@ -111,7 +111,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ROOT.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ROOT);
 
-                logger.info("--> Rol Root");
+                logger.info("Rol Root");
 
                 //2. ADMIN
                 Rol.ADMIN.setVistas(new HashSet<>());
@@ -130,7 +130,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ADMIN.getVistas().add(vista_balance);
                 Rol.ADMIN.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ADMIN);
-                logger.info("--> Rol Admin");
+                logger.info("Rol Admin");
 
                 //3.VENDEDOR
                 Rol.VENDEDOR.setVistas(new HashSet<>());
@@ -138,7 +138,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.VENDEDOR.getVistas().add(vista_vender);
                 Rol.VENDEDOR.setFechaActivacion(new Date());
                 rolRepository.save(Rol.VENDEDOR);
-                logger.info("--> Rol Vendedor");
+                logger.info("Rol Vendedor");
 
                 //4.AUXILIAR
                 Rol.AUXILIAR.setVistas(new HashSet<>());
@@ -148,20 +148,18 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.AUXILIAR.getVistas().add(vista_compras);
                 Rol.AUXILIAR.setFechaActivacion(new Date());
                 rolRepository.save(Rol.AUXILIAR);
-                logger.info("--> Rol Auxiliar");
+                logger.info("Rol Auxiliar");
 
                 parche = new Parche(Constantes.INIT1,java.sql.Date.valueOf(LocalDate.now()),true, null);
                 parcheRepository.save(parche);
-                logger.info("--> Parche creado");
-
+                logger.info("Parche creado");
                 logger.info("<-- initBackTipos");
             }
         } catch (Exception e) {
-            logger.error("Error al Crear InitBackend - Tipos: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Error al Crear InitBackend - Tipos: " + e.getMessage(), e);
         }
     }
-    //Usuarios Root y Admin
-    // Dummys de Pruebas ETC.
+
     @Transactional
     @Override
     public void initBackObjetos() {
@@ -182,7 +180,7 @@ public class InitBackServiceImpl implements InitBackService {
                         TipoEmpresa.ROOT, 0L);
 
                 emp = empresaRepository.save(emp);
-                logger.info("--> Empresa Root Creado");
+                logger.info("Empresa Root Creado");
 
                 Persona persona = new Persona(
                         TipoIde.CEDULA,
@@ -198,7 +196,7 @@ public class InitBackServiceImpl implements InitBackService {
                 );
 
                 persona = personaRepository.save(persona);
-                logger.info("--> Persona Root Creado");
+                logger.info("Persona Root Creado");
 
                 //Usuario Root
                 Rol rolRoot = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ROOT.getNombre(), null, false);
@@ -214,15 +212,15 @@ public class InitBackServiceImpl implements InitBackService {
                 );
 
                 usuarioRepository.save(userRoot);
-                logger.info("--> Usuario Root Creado");
+                logger.info("Usuario Root Creado");
 
                 parche = new Parche(Constantes.INIT2,java.sql.Date.valueOf(LocalDate.now()),true, null);
-                logger.info("--> Parche Creado");
+                logger.info("Parche Creado");
                 parcheRepository.save(parche);
             }
             logger.info("<-- initBackObjetos");
         }catch(Exception e){
-            logger.error("Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
+            logger.log(Level.SEVERE, "Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
             e.printStackTrace();
         }
     }
