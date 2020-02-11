@@ -9,9 +9,9 @@ package com.gigti.xfinance.backend.data;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.util.Date;
 import java.util.Objects;
 
@@ -41,6 +41,7 @@ public class Persona extends AbstractEntity{
 
     @Column(name = "fecha_nacimiento")
     @Temporal(TemporalType.DATE)
+    @Null
     private Date fechaNacimiento;
 
     @NotEmpty

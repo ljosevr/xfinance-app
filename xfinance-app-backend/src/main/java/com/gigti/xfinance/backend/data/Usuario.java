@@ -7,7 +7,6 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,6 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "usuarios")
-@ToString
 public class Usuario extends AbstractEntity {
 
     @Column(name="nombre_usuario", unique = true)
@@ -31,6 +29,9 @@ public class Usuario extends AbstractEntity {
     private String passwordUsuario;
 
     private boolean activo;
+
+    @NotNull
+    private boolean eliminado = false;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
@@ -47,6 +48,8 @@ public class Usuario extends AbstractEntity {
     @JoinColumn
     private Rol rol;
 
+    private boolean adminDefecto;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private TipoUsuario tipoUsuario;
@@ -54,7 +57,9 @@ public class Usuario extends AbstractEntity {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Factura> facturas;
 
-    public Usuario(){}
+    public Usuario(){
+        super();
+    }
 
     public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuario tipoUsuario) {
         this.nombreUsuario = nombreUsuario;
@@ -64,6 +69,15 @@ public class Usuario extends AbstractEntity {
         this.empresa = empresa;
         this.rol = rol;
         this.tipoUsuario = tipoUsuario;
+        this.eliminado = false;
     }
 
+    public String getActivoS() {
+        return isActivo() ? "SI" : "NO";
+    }
+
+    @Override
+    public String toString() {
+        return nombreUsuario;
+    }
 }

@@ -10,6 +10,7 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.Usuario;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,7 +29,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     @Query("Select u From Usuario u where u.persona.identificacion =: identificacion")
     public List<Usuario> findByIdentificacion(@Param("identificacion") String identificacion);
 
-    public List<Usuario> findByEmpresa(Empresa empresa);
+    @Query("SELECT u FROM Usuario  u " +
+            "WHERE u.empresa =:empresa AND " +
+            "u.eliminado = false")
+    public List<Usuario> findByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa, Pageable pageable);
 
     public List<Usuario> findByRol(Rol role);
 

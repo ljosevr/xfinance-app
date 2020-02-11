@@ -22,5 +22,10 @@ public interface RolRepository extends JpaRepository<Rol, String> {
 
     public Rol findAllByIdAndEmpresaAndEliminado(String id, Empresa empresa, boolean eliminado);
 
-    public List<Rol> findAllByEmpresaAndPorDefectoAndEliminado(Empresa empresa, boolean porDefecto, boolean eliminado);
+//    @Query("SELECT r FROM Rol  r " +
+//            "WHERE r.empresa =:empresa AND " +
+//            "r.eliminado = false AND "+
+//            "r.porDefecto =: porDefecto AND "+
+//            "r.nombre != " + "ROOT" );
+    public List<Rol> findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(Empresa empresa, boolean porDefecto, String nombreNot);
 }

@@ -6,13 +6,10 @@
 
 package com.gigti.xfinance.backend.data;
 
-import com.vaadin.flow.component.icon.VaadinIcon;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,13 +24,14 @@ public class Vista extends AbstractEntity {
 
     private String routeVista;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Vista vistaPadre;
+
     private int orderVista;
 
     private String iconMenu;
 
-    @OneToMany(mappedBy="vistaPadre",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy="vistaPadre",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Collection<Vista> subVistas;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, mappedBy ="vistas")
@@ -68,5 +66,10 @@ public class Vista extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), nombreVista, routeVista, vistaPadre, orderVista, iconMenu, subVistas, roles);
+    }
+
+    @Override
+    public String toString() {
+        return nombreVista;
     }
 }

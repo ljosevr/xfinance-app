@@ -6,19 +6,17 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-import java.text.DecimalFormat;
 import java.util.Comparator;
 
 public class UsuarioGrid extends PaginatedGrid<Usuario> {
 
-    /*public UsuarioGrid() {
+    public UsuarioGrid() {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
@@ -27,81 +25,141 @@ public class UsuarioGrid extends PaginatedGrid<Usuario> {
                 .setFlexGrow(20)
                 .setSortable(true);
 
-        addColumn(Usuario::getPer)
-                .setHeader("Codigo Barras")
-                .setFlexGrow(20)
+        addColumn(this::getTipoIde)
+                .setHeader("Tipo Ide")
+                .setFlexGrow(5)
+                .setSortable(true);
+
+        addColumn(this::getIdentificacion)
+                .setHeader("Identificacion")
+                .setFlexGrow(11)
+                .setSortable(true);
+
+
+        addColumn(this::getPrimerNombre)
+                .setHeader("Primer Nombre")
+                .setFlexGrow(10)
+                .setSortable(true);
+
+
+        addColumn(this::getPrimerApellido)
+                .setHeader("Primer Apellido")
+                .setFlexGrow(10)
                 .setSortable(true);
 
         final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
-        addColumn(TemplateRenderer.<Producto>of(availabilityTemplate)
-                .withProperty("activoS", Producto::getActivoS))
+        addColumn(TemplateRenderer.<Usuario>of(availabilityTemplate)
+                .withProperty("activoS", Usuario::getActivoS))
                 .setHeader("Activo")
-                .setComparator(Comparator.comparing(Producto::getActivoS))
+                .setComparator(Comparator.comparing(Usuario::getActivoS))
                 .setSortable(true)
                 .setFlexGrow(5);
 
-        addColumn(this::formatStock)
+        addColumn(this::getTelefono)
                 .setHeader("Cantidad")
                 .setSortable(true)
                 .setFlexGrow(3);
 
-        addColumn(this::formatCostPrice)
-                .setHeader("P. Costo")
-                .setFlexGrow(5);
-
-        addColumn(this::formatSellPrice)
-                .setHeader("P. Venta")
-                .setFlexGrow(5);
+        addColumn(this::getEmail)
+                .setHeader("Email")
+                .setFlexGrow(10);
 
         // Show all categories the product is in, separated by commas
-        addColumn(this::formatCategories)
-                .setHeader("Categoria")
+        addColumn(this::formatRol)
+                .setHeader("Rol")
                 .setSortable(true)
-                .setFlexGrow(12);
+                .setFlexGrow(5);
 
         setPageSize(Constantes.PAGE_SIZE);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(Producto product) {
-        getDataCommunicator().refresh(product);
+    public void refresh(Usuario usuario) {
+        getDataCommunicator().refresh(usuario);
     }
 
-    private String formatCategories(Producto producto) {
-        if (producto.getCategoria() == null || producto.getCategoria().getNombre().isEmpty()) {
+    private String formatRol(Usuario usuario) {
+        if (usuario.getRol() == null || usuario.getRol().getNombre().isEmpty()) {
             return "";
         }
-
-        return producto.getCategoria().getNombre();
+        return usuario.getRol().getNombre();
     }
 
-    private String formatCostPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioCostoActual());
+    private String getTipoIde(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getTipoIde().getNombre();
+        }
     }
 
-    private String formatSellPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioVentaActual());
+    private String getIdentificacion(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getIdentificacion();
+        }
     }
 
-    private String formatStock(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
+    private String getPrimerNombre(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getPrimerNombre();
+        }
+    }
 
-        return decimalFormat.format(producto.getStockActual());
+    private String getSegundoNombre(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getSegundoNombre();
+        }
+    }
+
+    private String getPrimerApellido(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getPrimerApellido();
+        }
+    }
+
+    private String getSegundoApellido(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getSegundoApellido();
+        }
+    }
+
+    private String getDireccion(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getDireccion();
+        }
+    }
+
+    private String getTelefono(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getTelefono();
+        }
+    }
+
+    private String getEmail(Usuario usuario){
+        if (usuario.getPersona() == null) {
+            return "";
+        } else {
+            return usuario.getPersona().getEmail();
+        }
     }
 
     @Override
     public int getPage() {
         return super.getPage()-1;
-    }*/
+    }
 }

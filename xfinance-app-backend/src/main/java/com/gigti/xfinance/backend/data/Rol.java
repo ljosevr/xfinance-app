@@ -10,7 +10,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +42,7 @@ public class Rol extends AbstractEntity implements Serializable {
     @OneToMany(mappedBy = "rol",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Usuario> usuarios;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(name="rolesvistas", joinColumns={@JoinColumn(name="roles_id")}, inverseJoinColumns={@JoinColumn(name="vistas_id")})
     private Set<Vista> vistas;
 
@@ -88,5 +87,10 @@ public class Rol extends AbstractEntity implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode());
+    }
+
+    @Override
+    public String toString() {
+        return nombre;
     }
 }

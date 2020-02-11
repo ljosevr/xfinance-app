@@ -16,7 +16,10 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEvent;
+import com.vaadin.flow.router.HasUrlParameter;
+import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
@@ -63,12 +66,8 @@ public class EmpresaMasterView extends HorizontalLayout
             barAndGridLayout.expand(grid);
 
             add(barAndGridLayout);
-            add(form);
 
             viewLogic.init();
-//        }else{
-//            UI.getCurrent().navigate(MainLayout.class);
-//        }
     }
 
     public HorizontalLayout createTopBar() {
@@ -116,12 +115,11 @@ public class EmpresaMasterView extends HorizontalLayout
 
     public void showForm(boolean show) {
         if(show){
-            barAndGridLayout.setVisible(false);
+            form.open();
         }else{
-            barAndGridLayout.setVisible(true);
+            filter.focus();
+            form.close();
         }
-        form.setVisible(show);
-        form.setEnabled(show);
     }
 
     @Override

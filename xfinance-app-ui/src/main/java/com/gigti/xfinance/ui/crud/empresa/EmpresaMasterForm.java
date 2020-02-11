@@ -9,6 +9,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -19,7 +20,8 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import org.apache.commons.lang3.StringUtils;
 
-public class EmpresaMasterForm extends FormLayout {
+public class EmpresaMasterForm extends Dialog {
+    private FormLayout content;
 
     private Button btnSave;
     private Button btnDiscard;
@@ -32,14 +34,15 @@ public class EmpresaMasterForm extends FormLayout {
     private Usuario usuarioAdmin;
 
     public EmpresaMasterForm(EmpresaMasterCrudLogic empresaMasterCrudLogic) {
-        this.setClassName("formLayout");
-        this.setResponsiveSteps(
-                new ResponsiveStep("25em", 1),
-                new ResponsiveStep("32em", 2),
-                new ResponsiveStep("40em", 3));
+        content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("25em", 1),
+                new FormLayout.ResponsiveStep("32em", 2),
+                new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Empresa");
-        this.add(title,3);
+        content.add(title,3);
 
         viewLogic = empresaMasterCrudLogic;
 
@@ -170,13 +173,17 @@ public class EmpresaMasterForm extends FormLayout {
         actionsLayout.add(btnSave,btnDiscard);
         HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete,btnCancel);
-        this.add(tfNombreEmpresa,cbTipoIde,tfIdentificacion,tfDireccion, tfTelefono,cbActivo,
+        content.add(tfNombreEmpresa,cbTipoIde,tfIdentificacion,tfDireccion, tfTelefono,cbActivo,
                 tfUsuarioAdmin,cbTipoIdePersona, tfIdentificacionPersona,tfprimerNombreUsuario,
                 tfSegundoNombreUsuario,tfPrimerApellidoUsuario,
                 tfSegundoApellidoUsuario,tfUserDireccion,tfUserPhone,tfUserEmail
                 ,actionsLayout,actionsLayout2);
-        this.setColspan(actionsLayout, 3);
-        this.setColspan(actionsLayout2,2);
+        content.setColspan(actionsLayout, 3);
+        content.setColspan(actionsLayout2,2);
+
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
     public void edit(EmpresaDTO empresa) {

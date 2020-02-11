@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 
 @Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
-@RouteAlias(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
+@RouteAlias(value = "categoria",layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
 public class CategoriaView extends HorizontalLayout
         implements HasUrlParameter<String> {
@@ -42,11 +42,7 @@ public class CategoriaView extends HorizontalLayout
             setSizeFull();
             HorizontalLayout topLayout = createTopBar();
 
-            grid = new CategoriaGrid();
-            lista = viewLogic.findAll();
-            grid.setItems(lista);
-            grid.asSingleSelect().addValueChangeListener(
-                    event -> viewLogic.rowSelected(event.getValue()));
+            configureGrid();
 
             form = new CategoriaForm(viewLogic);
 
@@ -72,9 +68,19 @@ public class CategoriaView extends HorizontalLayout
 //        }
     }
 
-    public HorizontalLayout createTopBar() {
+    private void configureGrid() {
+        grid = new CategoriaGrid();
+        lista = viewLogic.findAll();
+        grid.setItems(lista);
+        grid.asSingleSelect().addValueChangeListener(
+                event -> viewLogic.rowSelected(event.getValue()));
+
+        grid.getColumns().forEach(col -> col.setAutoWidth(true)); //
+    }
+
+    private HorizontalLayout createTopBar() {
         filter = new TextField();
-        filter.setPlaceholder("Filtro por Nombre, Descripción de Categoria a Buscar");
+        filter.setPlaceholder("Filtro por Nombre");
         filter.setValueChangeMode(ValueChangeMode.LAZY);
         filter.addValueChangeListener(event -> {
             lista = viewLogic.setFilter(event.getValue());

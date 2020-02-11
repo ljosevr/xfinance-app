@@ -10,8 +10,8 @@ import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.backend.services.CategoriaProductoService;
+import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
@@ -54,7 +54,6 @@ public class ProductoCrudView extends HorizontalLayout
     public ProductoCrudView(CategoriaProductoService iServiceCat, ProductoService iServiceProd) {
 
         viewLogic = new ProductoCrudLogic(iServiceProd, iServiceCat, this);
-//        if(viewLogic.access()) {
         setSizeFull();
         HorizontalLayout topLayout = createTopBar();
 
@@ -83,12 +82,8 @@ public class ProductoCrudView extends HorizontalLayout
         barAndGridLayout.expand(grid);
 
         add(barAndGridLayout);
-        add(form);
 
         viewLogic.init();
-//        }else{
-//            UI.getCurrent().navigate(MainLayout.class);
-//        }
     }
 
     public HorizontalLayout createTopBar() {
@@ -136,13 +131,11 @@ public class ProductoCrudView extends HorizontalLayout
 
     public void showForm(boolean show) {
         if(show){
-            barAndGridLayout.setVisible(false);
-        } else{
-            barAndGridLayout.setVisible(true);
+            form.open();
+        }else{
             filter.focus();
+            form.close();
         }
-        form.setVisible(show);
-        form.setEnabled(show);
     }
 
     @Override

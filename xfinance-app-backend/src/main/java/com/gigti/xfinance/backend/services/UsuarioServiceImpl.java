@@ -5,17 +5,18 @@ import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.backend.others.ResponseBool;
-import com.gigti.xfinance.backend.repositories.RolRepository;
-import com.gigti.xfinance.backend.repositories.UsuarioRepository;
-import com.gigti.xfinance.backend.repositories.VistaRepository;
+import com.gigti.xfinance.backend.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -28,6 +29,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     private RolRepository rolRepository;
     @Autowired
     private VistaRepository vistaRepository;
+
+    @Autowired
+    private EmpresaRepository empresaRepository;
+    @Autowired
+    private PersonaRepository personaRepository;
+
 //    @Autowired
 //    private PasswordEncoder passwordEncoder;
 //
@@ -63,13 +70,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Usuario findByNombreUsuario(String nombreUsuario) {
+    public List<Usuario> findByNombreUsuario(String nombreUsuario, Empresa empresa, int page, int pageSize) {
+
         return null;
     }
 
     @Override
-    public List<Rol> findAllRol(Empresa empresa, boolean activo) {
-        return rolRepository.findAllByEmpresaAndEliminado(empresa, activo);
+    public List<Rol> findAllRol(Empresa empresa, boolean eliminado) {
+        return rolRepository.findAllByEmpresaAndEliminado(empresa, eliminado);
     }
 
     @Override
@@ -118,5 +126,53 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public List<Vista> findAllVistas() {
         return vistaRepository.findAll();
+    }
+
+    @Override
+    public Usuario findUsuarioById(String id) {
+        return usuarioRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Usuario saveUsuario(Usuario usuario) {
+        try{
+            Optional<Empresa> empresa = empresaRepository.findById(usuario.getEmpresa().getId());
+            if(empresa.isPresent()){
+                usuario.setEmpresa(empresa.get());
+            }else{
+                return null;
+            }
+
+            if(usuario.getPersona() != null) {
+                usuario.setPersona(personaRepository.save(usuario.getPersona()));
+                return usuarioRepository.save(usuario);
+            } else {
+                return null;
+            }
+        }catch(Exception e){
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Override
+    public boolean deleteUsuario(String id) {
+        try {
+            Usuario usuario = usuarioRepository.findById(id).orElse(null);
+            if (usuario != null) {
+                usuario.setEliminado(true);
+                usuario = usuarioRepository.save(usuario);
+                return usuario != null;
+            }
+        } catch(Exception e) {
+            logger.debug("Error: "+e.getMessage(),e);
+        }
+        return false;
+    }
+
+    @Override
+    public List<Usuario> findAll(Empresa empresa, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
     }
 }

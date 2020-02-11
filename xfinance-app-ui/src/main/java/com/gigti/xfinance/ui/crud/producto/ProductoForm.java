@@ -14,6 +14,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
@@ -40,7 +41,8 @@ import java.util.Locale;
 /**
  * A form for editing a single product.
  */
-public class ProductoForm extends FormLayout {
+public class ProductoForm extends Dialog {
+    private FormLayout content;
 
     Logger logger = LoggerFactory.getLogger(ProductoForm.class);
     private NumberField tfProdStock;
@@ -97,14 +99,15 @@ public class ProductoForm extends FormLayout {
     }
 
     public ProductoForm(ProductoCrudLogic productoCrudLogic, List<CategoriaProducto> listCategoria, List<TipoMedidaEnum> listaTipoMedida) {
-        this.setClassName("formLayout");
-        this.setResponsiveSteps(
-                new ResponsiveStep("25em", 1),
-                new ResponsiveStep("32em", 2),
-                new ResponsiveStep("40em", 3));
+        content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("25em", 1),
+                new FormLayout.ResponsiveStep("32em", 2),
+                new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Producto");
-        this.add(title,3);
+        content.add(title,3);
 
         viewLogic = productoCrudLogic;
 
@@ -229,8 +232,12 @@ public class ProductoForm extends FormLayout {
         //HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete,btnCancel);
 
-        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,cbTipoMedida,cbCategorias,tfProdStock,tfPrecioCosto,tfPrecioVenta,chkActivo,actionsLayout);
-        this.setColspan(actionsLayout,2);
+        content.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,cbTipoMedida,cbCategorias,tfProdStock,tfPrecioCosto,tfPrecioVenta,chkActivo,actionsLayout);
+        content.setColspan(actionsLayout,2);
+
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
     public void setCategories(List<CategoriaProducto> categories) {
@@ -238,7 +245,6 @@ public class ProductoForm extends FormLayout {
     }
 
     public void editProducto(Producto producto) {
-        logger.info("Producto: "+producto);
         if (producto == null) {
             producto = new Producto();
             producto.setActivo(true);

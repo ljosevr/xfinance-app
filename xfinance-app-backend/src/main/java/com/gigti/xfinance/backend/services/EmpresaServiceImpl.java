@@ -4,8 +4,6 @@ import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.mapper.ConvertEmpresa;
 import com.gigti.xfinance.backend.repositories.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,12 +11,15 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 @Service
 public class EmpresaServiceImpl implements EmpresaService {
 
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    //Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(EmpresaServiceImpl.class.getName());
     @Autowired
     private EmpresaRepository empresaRepository;
 
@@ -129,7 +130,7 @@ public class EmpresaServiceImpl implements EmpresaService {
                 return empresa != null;
             }
         } catch(Exception e) {
-            logger.error("deleteEmpresa: "+e.getMessage(),e);
+            logger.log(Level.SEVERE, "deleteEmpresa: "+e.getMessage(),e);
         }
         return false;
     }
@@ -181,7 +182,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             persona.setId(empresa.getPersonaId());
             persona = personaRepository.save(persona);
 
-            List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndEliminado(null,true, false);
+            List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(null,true, "ROOT");
 
             List<Rol> listaRolesDestino = new ArrayList<>();
             for(Rol r : listaRolesOrigen){
@@ -226,7 +227,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             return empresa;
 
         }catch(Exception e){
-            logger.error("saveEmpresa: "+e.getMessage(), e);
+            logger.log(Level.SEVERE,"saveEmpresa: "+e.getMessage(), e);
             return null;
         }
     }

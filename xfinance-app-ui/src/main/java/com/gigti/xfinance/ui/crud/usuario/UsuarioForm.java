@@ -6,214 +6,195 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.Persona;
+import com.gigti.xfinance.backend.data.Rol;
+import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
-import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.value.ValueChangeMode;
-import org.apache.commons.lang3.StringUtils;
+import com.vaadin.flow.data.validator.EmailValidator;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A form for editing a single Usuario Admin.
  */
-public class UsuarioForm extends FormLayout {
+public class UsuarioForm extends Dialog {
 
-/*    private final NumberField tfProdStock;
-    private final TextField tfPrecioVenta;
-    private final TextField tfPrecioCosto;
-    private ComboBox<CategoriaProducto>  cbCategorias;
+    private FormLayout content;
+
     private Button btnSave;
     private Button btnDiscard;
     private Button btnDelete;
 
     private UsuarioCrudLogic viewLogic;
-    private Binder<Usuario> binder;
-    private Producto currentProduct;
+    private Binder<Usuario> binderUsuario;
+    private Binder<Persona> binderPersona;
+    private Usuario currentUsuario;
+    private Persona currentPersona;
+    private List<Rol> listRoles;
+    private final ComboBox<Rol> cbRoles;
 
-    private static class PriceConverter extends StringToBigDecimalConverter {
-
-        public PriceConverter() {
-            super(BigDecimal.ZERO, "No se puede convertir el valor a Número.");
-        }
-
-        @Override
-        protected NumberFormat getFormat(Locale locale) {
-            // Always display currency with two decimals
-            NumberFormat format = super.getFormat(locale);
-            if (format instanceof DecimalFormat) {
-                format.setMaximumFractionDigits(2);
-                format.setMinimumFractionDigits(2);
-            }
-            return format;
-        }
-    }
-
-    private static class StockCountConverter extends StringToIntegerConverter {
-
-        public StockCountConverter() {
-            super(0, "No se puede convertir el valor a " + Integer.class.getName()
-                    + ".");
-        }
-
-        @Override
-        protected NumberFormat getFormat(Locale locale) {
-            // Do not use a thousands separator, as HTML5 input type
-            // number expects a fixed wire/DOM number format regardless
-            // of how the browser presents it to the user (which could
-            // depend on the browser locale).
-            DecimalFormat format = new DecimalFormat();
-            format.setMaximumFractionDigits(0);
-            format.setDecimalSeparatorAlwaysShown(true);
-            format.setParseIntegerOnly(false);
-            format.setGroupingUsed(false);
-            return format;
-        }
-    }
-
-    public UsuarioForm(UsuarioCrudLogic usuarioCrudLogic, List<CategoriaProducto> listCategoria) {
-        this.setClassName("formLayout");
-        this.setResponsiveSteps(
-                new ResponsiveStep("25em", 1),
-                new ResponsiveStep("32em", 2),
-                new ResponsiveStep("40em", 3));
+    public UsuarioForm(UsuarioCrudLogic usuarioCrudLogic, List<Rol> listRoles) {
+        content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("25em", 1),
+                new FormLayout.ResponsiveStep("32em", 2),
+                new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Producto");
-        this.add(title,3);
+        content.add(title,3);
 
         viewLogic = usuarioCrudLogic;
 
-        TextField tfProdNombre = new TextField("Nombre Producto");
-        tfProdNombre.setRequired(true);
-        tfProdNombre.focus();
+        TextField tfUsuario = new TextField("Nombre Usuario");
+        tfUsuario.setRequired(true);
+        tfUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfProdCodigoB = new TextField("Codigo de barras");
-        tfProdCodigoB.setRequired(false);
+        cbRoles = new ComboBox<>();
+        cbRoles.setLabel("Rol Usuario");
+        cbRoles.setItems(listRoles);
+        this.listRoles = listRoles;
+        cbRoles.setRequired(true);
+        cbRoles.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
-        TextField tfProdDescripcion = new TextField("Descripción");
+        ComboBox<TipoIde> cbTipoIdePersona = new ComboBox<>();
+        cbTipoIdePersona.setLabel("Tipo Identificación");
+        cbTipoIdePersona.setItems(TipoIde.getListTipos());
+        cbTipoIdePersona.setRequired(true);
+        cbTipoIdePersona.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
+
+        TextField tfIdentificacionPersona = new TextField("N° Identificación");
+        tfIdentificacionPersona.setRequired(true);
+        tfIdentificacionPersona.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        TextField tfprimerNombreUsuario = new TextField("Primer Nombre");
+        tfprimerNombreUsuario.setRequired(true);
+        tfprimerNombreUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        TextField tfSegundoNombreUsuario = new TextField("Segundo Nombre");
+        tfSegundoNombreUsuario.setRequired(false);
+        tfSegundoNombreUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        TextField tfPrimerApellidoUsuario = new TextField("Primer Apellido");
+        tfPrimerApellidoUsuario.setRequired(true);
+        tfPrimerApellidoUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        TextField tfSegundoApellidoUsuario = new TextField("Segundo Apellido");
+        tfSegundoApellidoUsuario.setRequired(false);
+        tfSegundoApellidoUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        TextField tfDireccion = new TextField("Dirección Residencia");
+        tfDireccion.setRequired(false);
+        tfDireccion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        TextField tfTelefono = new TextField("Telefono");
+        tfTelefono.setRequired(false);
+        tfTelefono.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        EmailField tfEmail = new EmailField("Email");
+        tfEmail.setClearButtonVisible(true);
+        tfEmail.setErrorMessage("Agregue un Email Valido");
+        tfEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         Checkbox chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
+        chkActivo.setRequiredIndicatorVisible(true);
 
-        cbCategorias = new ComboBox<>();
-        cbCategorias.setLabel("Categoria");
-        cbCategorias.setItems(listCategoria);
-        cbCategorias.setRequired(true);
+        binderUsuario = new BeanValidationBinder<>(Usuario.class);
+        binderUsuario.forField(tfUsuario).asRequired("Digite el Nombre del Usuario").bind(Usuario::getNombreUsuario, Usuario::setNombreUsuario);
+        binderUsuario.forField(chkActivo).bind(Usuario::isActivo, Usuario::setActivo);
+        binderUsuario.forField(cbRoles).asRequired("Selecciona Un Rol").bind(Usuario::getRol, Usuario::setRol);
+        binderUsuario.bindInstanceFields(this);
 
-        tfPrecioCosto = new TextField("Precio Costo");
-        tfPrecioCosto.setPrefixComponent(new Span("$"));
-        tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfPrecioCosto.setValueChangeMode(ValueChangeMode.EAGER);
-        tfPrecioCosto.setRequired(true);
-        tfPrecioCosto.addFocusListener(focus -> {
-            if(focus.isFromClient()){
-                if(tfPrecioCosto.isEmpty() || tfPrecioCosto.getValue().equals("0,00")) {
-                    tfPrecioCosto.clear();
-                } else if(tfPrecioCosto.isEmpty()) {
-                    tfPrecioCosto.setValue("0");
-                }
-            }
-        });
 
-        tfPrecioVenta = new TextField("Precio Venta");
-        tfPrecioVenta.setPrefixComponent(new Span("$"));
-        tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfPrecioVenta.setValueChangeMode(ValueChangeMode.EAGER);
-        tfPrecioVenta.setRequired(true);
-        tfPrecioVenta.addFocusListener(focus -> {
-            if(focus.isFromClient()){
-                if(tfPrecioVenta.isEmpty() || tfPrecioVenta.getValue().equals("0,00")){
-                    tfPrecioVenta.clear();
-                } else if(tfPrecioVenta.isEmpty()) {
-                    tfPrecioVenta.setValue("0");
-                }
-            }
-        });
-
-        tfProdStock = new NumberField("Cantidad Inicial");
-        tfProdStock.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfProdStock.setValueChangeMode(ValueChangeMode.EAGER);
-        tfProdStock.setRequiredIndicatorVisible(true);
-        tfProdStock.addFocusListener(focus -> {
-            if(focus.isFromClient()){
-                if(tfProdStock.isEmpty() || tfProdStock.getValue() <= 0d){
-                    tfProdStock.clear();
-                }
-            }
-        });
-
-        binder = new BeanValidationBinder<>(Usuario.class);
-        /*binder.forField(tfPrecioCosto).asRequired("Digite el Precio de Costo").withConverter(new PriceConverter()).bind(Producto::getPrecioCostoActual, Producto::setPrecioCostoActual);
-        binder.forField(tfPrecioVenta).asRequired("Digite el Precio de Venta").withConverter(new PriceConverter()).bind(Producto::getPrecioVentaActual, Producto::setPrecioVentaActual);
-        binder.forField(tfProdStock).asRequired("Digite Cantidad").bind(Producto::getStockActual, Producto::setStockActual);
-        binder.forField(tfProdNombre).asRequired("Digite Nombre").bind(Producto::getNombreProducto, Producto::setNombreProducto);
-        binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
-        binder.forField(tfProdCodigoB).asRequired("Digite el Codigo de Barras").bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
-        binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
-        binder.forField(cbCategorias).asRequired("Seleccione una Categoria").bind(Producto::getCategoria, Producto::setCategoria);
-        *
-        binder.bindInstanceFields(this);
+        binderPersona = new BeanValidationBinder<>(Persona.class);
+        binderPersona.forField(cbTipoIdePersona).asRequired("Seleccione el Tipo de Identificación").bind(Persona::getTipoIde, Persona::setTipoIde);
+        binderPersona.forField(tfIdentificacionPersona).asRequired("Digite Identificación").bind(Persona::getIdentificacion, Persona::setIdentificacion);
+        binderPersona.forField(tfprimerNombreUsuario).asRequired("Digite Nombre").bind(Persona::getPrimerNombre, Persona::setPrimerNombre);
+        binderPersona.bind(tfSegundoNombreUsuario, Persona::getSegundoNombre, Persona::setSegundoNombre);
+        binderPersona.forField(tfPrimerApellidoUsuario).asRequired("Digite el Primer Apellido").bind(Persona::getPrimerApellido, Persona::setPrimerApellido);
+        binderPersona.bind(tfSegundoApellidoUsuario, Persona::getSegundoApellido, Persona::setSegundoApellido);
+        binderPersona.bind(tfDireccion, Persona::getDireccion, Persona::setDireccion);
+        binderPersona.bind(tfTelefono, Persona::getTelefono, Persona::setTelefono);
+        binderPersona.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Dirección").bind(Persona::getEmail, Persona::setEmail);
+        binderPersona.bindInstanceFields(this);
 
         // enable/disable btnSave button while editing
-        binder.addStatusChangeListener(event -> {
+        binderUsuario.addStatusChangeListener(event -> {
             boolean isValid = !event.hasValidationErrors();
-            boolean hasChanges = binder.hasChanges();
+            boolean hasChanges = binderUsuario.hasChanges();
             btnSave.setEnabled(hasChanges && isValid);
             btnDiscard.setEnabled(hasChanges);
+//            if(hasChanges && isValid)
+//                binderUsuario.writeBeanIfValid(currentUsuario);
         });
+
+        binderPersona.addStatusChangeListener(event -> {
+            boolean isValid = !event.hasValidationErrors();
+            boolean hasChanges = binderPersona.hasChanges();
+            btnSave.setEnabled(hasChanges && isValid);
+            btnDiscard.setEnabled(hasChanges);
+            //if(hasChanges && isValid)
+            //    binderPersona.writeBeanIfValid(currentPersona);
+        });
+
 
         btnSave = new Button("Guardar");
         btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-/*        btnSave.addClickListener(event -> {
-            if (currentProduct != null
-                    && binder.writeBeanIfValid(currentProduct)) {
-                viewLogic.saveProducto(currentProduct);
+        btnSave.addClickListener(event -> {
+//            if()
+//                binderPersona.readBean(currentPersona);
+//            if()
+//                binderPersona.readBean(currentPersona);
+            if (binderUsuario.validate().isOk() && binderUsuario.writeBeanIfValid(binderUsuario.getBean())){
+                if(binderPersona.validate().isOk() && binderPersona.writeBeanIfValid(binderPersona.getBean())) {
+                    currentUsuario = binderUsuario.getBean();
+                    currentUsuario.setPersona(binderPersona.getBean());
+                    viewLogic.guardar(currentUsuario);
+                }else {
+                    Notification.show("Validar Persona: "+binderPersona.validate().getValidationErrors(),3000, Notification.Position.TOP_CENTER);
+                }
             } else {
-                Notification.show("Validar Datos del formulario",3000, Notification.Position.MIDDLE);
+                Notification.show("Validar Usuario: "+binderUsuario.validate().getValidationErrors(),3000, Notification.Position.TOP_CENTER);
             }
-        });*
+        });
         btnSave.addClickShortcut(Key.ENTER);
 
         btnDiscard = new Button("Descartar Cambios");
         btnDiscard.setWidth("100%");
         btnDiscard.addClickListener(
-                event -> viewLogic.editProducto(currentProduct));
+                event -> viewLogic.editar(currentUsuario));
 
         Button btnCancel = new Button("Cancelar");
         btnCancel.setWidth("100%");
-        //btnCancel.addClickListener(event -> viewLogic.cancelProducto());
+        btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
-                .addEventListener("keydown", event -> viewLogic.cancelProducto())
+                .addEventListener("keydown", event -> viewLogic.cancelar())
                 .setFilter("event.key == 'Escape'");
 
         btnDelete = new Button("Eliminar");
         btnDelete.setWidth("100%");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> {
-            if (currentProduct != null) {
-                viewLogic.deleteProducto(currentProduct);
+            if (currentUsuario != null) {
+                viewLogic.eliminar(currentUsuario);
             }
         });
 
@@ -222,31 +203,46 @@ public class UsuarioForm extends FormLayout {
         HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete,btnCancel);
 
-        this.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,tfProdStock,tfPrecioCosto,tfPrecioVenta,cbCategorias,chkActivo,actionsLayout,actionsLayout2);
-        this.setColspan(chkActivo,2);
+        content.add(tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
+                tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout, actionsLayout2);
+
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
-    public void setCategories(List<CategoriaProducto> categories) {
-        cbCategorias.setItems(categories);
+    public void setListRoles(List<Rol> listRoles) {
+        this.listRoles = listRoles;
     }
 
-    public void editProducto(Producto producto) {
-        if (producto == null) {
-            producto = new Producto();
-            producto.setActivo(true);
+    public void editUsuario(Usuario usuario) {
+        if (usuario == null) {
+            currentUsuario = new Usuario();
+            currentUsuario.setActivo(true);
+            currentUsuario.setPersona(new Persona());
             btnDelete.setEnabled(false);
-            tfProdStock.setEnabled(true);
-        } else if(StringUtils.isBlank(producto.getId())){
-            producto.setActivo(true);
+            cbRoles.setEnabled(true);
+            cbRoles.setValue(null);
+            currentPersona = new Persona();
+        } else /*if(StringUtils.isBlank(usuario.getId())){
+            usuario.setActivo(true);
             btnDelete.setEnabled(false);
-            tfProdStock.setEnabled(true);
-        } else {
+            cbRoles.setEnabled(true);
+            cbRoles.setValue(null);
+            currentUsuario = usuario;
+            currentUsuario.setPersona(new Persona());
+        } else*/ {
             btnDelete.setEnabled(true);
-            tfProdStock.setEnabled(false);
-
+            if (usuario.isAdminDefecto()) {
+                cbRoles.setEnabled(false);
+            } else {
+                cbRoles.setEnabled(true);
+            }
+            currentUsuario = usuario;
+            currentPersona = usuario.getPersona();
+            cbRoles.setValue(usuario.getRol());
         }
-        currentProduct = producto;
-        //binder.readBean(producto);
-        cbCategorias.setValue(producto.getCategoria());
-    }*/
+        binderUsuario.readBean(currentUsuario);
+        binderPersona.readBean(currentPersona);
+    }
 }

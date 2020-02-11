@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
@@ -16,12 +17,12 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
 
         addColumn(CategoriaProducto::getNombre)
                 .setHeader("Nombre")
-                .setFlexGrow(20)
+                //.setFlexGrow(20)
                 .setSortable(true);
 
         addColumn(CategoriaProducto::getDescripcion)
                 .setHeader("Descripción")
-                .setFlexGrow(30)
+                //.setFlexGrow(30)
                 .setSortable(true);
 
         final String activoTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
@@ -29,8 +30,13 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
                 .withProperty("activoS", CategoriaProducto::getActivoS))
                 .setHeader("Activo")
                 .setComparator(Comparator.comparing(CategoriaProducto::getActivoS))
-                .setSortable(true)
-                .setFlexGrow(5);
+                .setSortable(true);
+                //.setFlexGrow(5);
+
+        addColumn(categoria -> {
+            Empresa empresa = categoria.getEmpresa();
+            return empresa == null ? "-" : empresa.getNombreEmpresa();
+        }).setHeader("Empresa");
 
         setPageSize(Constantes.PAGE_SIZE);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);

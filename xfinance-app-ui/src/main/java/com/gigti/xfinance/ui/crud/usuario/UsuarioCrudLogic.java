@@ -6,7 +6,19 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Rol;
+import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.services.UsuarioService;
+import com.gigti.xfinance.ui.authentication.AccessControlFactory;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.util.ICrudLogic;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class provides an interface for the logical operations between the CRUD
@@ -17,135 +29,160 @@ import java.io.Serializable;
  * the system separately, and to e.g. provide alternative views for the same
  * data.
  */
-public class UsuarioCrudLogic implements Serializable {
+public class UsuarioCrudLogic implements Serializable, ICrudLogic {
 
-    /*private UsuarioCrudView view;
-    private IusuarioService iusuarioService;
-    //private static Usuario usuario;
+    private UsuarioCrudView view;
+    private UsuarioService usuarioService;
     private static Empresa empresa;
     private String filterText = "";
 
-    public UsuarioCrudLogic(IusuarioService iusuarioService, UsuarioCrudView simpleCrudView) {
-        this.iusuarioService = iusuarioService;
+    public UsuarioCrudLogic(UsuarioService usuarioService, UsuarioCrudView simpleCrudView) {
+        this.usuarioService = usuarioService;
         view = simpleCrudView;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
 
+    @Override
     public void init() {
-        editProducto(null);
+        view.getFilter().focus();
+        //view.getForm().close();
     }
 
-    public boolean access() {
-        // Hide and disable if not admin
+    @Override
+    public boolean acceder() {
         return empresa != null;
     }
 
-    void cancelUsuario() {
-        setFragmentParameter("");
-        view.clearSelection();
-        view.showForm(false);
+    @Override
+    public void cancelar() {
+        clearSelection();
+        showForm(false);
     }
 
-    **
-     * Update the fragment without causing navigator to change view
-     *
-    private void setFragmentParameter(String usuarioId) {
-        String fragmentParameter;
-        if (productId == null || productId.isEmpty()) {
-            fragmentParameter = "";
-        } else {
-            fragmentParameter = productId;
-        }
-    }
-
-    public void enter(String productId) {
-        if (productId != null && !productId.isEmpty()) {
-            if (productId.equals("new")) {
-                newProducto();
+    @Override
+    public void enter(String id) {
+        if (id != null && !id.isEmpty()) {
+            if (id.equals("new")) {
+                nuevo();
             } else {
-                Producto producto = findProducto(productId);
-                view.selectRow(producto);
+                Usuario usuario = find(id);
+                view.selectRow(usuario);
             }
         } else {
-            view.showForm(false);
+            showForm(false);
         }
     }
 
-    private Producto findProducto(String productId) {
-        return iProductoService.findById(productId);
+    @Override
+    public Usuario find(String id) {
+        return usuarioService.findUsuarioById(id);
     }
 
-    void saveProducto(Producto producto) {
-        String typOperation = StringUtils.isBlank(producto.getId()) ? " Creado" : " Actualizada";
-        producto.setEmpresa(empresa);
-        producto = iProductoService.saveProduct(producto, CurrentUser.get());
-        if (producto != null) {
-            view.refresh(producto);
-            view.clearSelection();
-            view.showSaveNotification(producto.getNombreProducto() + " " + typOperation);
-            view.showForm(false);
-            setFragmentParameter("");
+    @Override
+    public void guardar(Object object) {
+        Usuario usuario = (Usuario) object;
+        String typOperation = StringUtils.isBlank(usuario.getId()) ? " Creado" : " Actualizado";
+        usuario.setEmpresa(empresa);
+        usuario = usuarioService.saveUsuario(usuario);
+        if(usuario != null){
+            refresh(usuario);
+            clearSelection();
+            view.showSaveNotification(usuario.getNombreUsuario() +" "+typOperation);
+            showForm(false);
         } else {
-            Notification.show("Error al Guardar Producto " + producto.getNombreProducto());
+            view.showError("Error al Guardar Usuario: "+usuario.getNombreUsuario());
         }
     }
 
-    void deleteProducto(Producto producto) {
-        view.clearSelection();
-        if (iProductoService.delete(producto.getId())) {
-            view.refresh();
-            view.showSaveNotification("Producto: " + producto.getNombreProducto() + " Eliminado");
-            List<Producto> lista = (List<Producto>) view.getGrid().getDataProvider();
-            if(lista.remove(producto)){
-                setFragmentParameter("");
+    @Override
+    public void eliminar(Object object) {
+        Usuario usuario = (Usuario) object;
+        clearSelection();
+        if(usuarioService.deleteUsuario(usuario.getId())){
+            view.showSaveNotification("Usuario: "+usuario.getNombreUsuario() + " Eliminado");
+            if(view.getItemsGrid().remove(usuario)){
+                view.getGrid().setItems(view.getItemsGrid());
             } else{
-                view.showError("Error al Eliminar Producto "+producto.getNombreProducto()+ " De la tabla");
-                view.refresh();
+                view.showError("Error al Eliminar Usuario "+usuario.getNombreUsuario()+ " De la tabla");
+                refresh();
             }
         } else {
-            view.showError("Error al Eliminar Producto " + producto.getNombreProducto());
+            view.showError("Error al Eliminar Usuario "+usuario.getNombreUsuario());
         }
     }
 
-    void editProducto(Producto producto) {
-        if (producto == null) {
-            setFragmentParameter("");
-        } else {
-            setFragmentParameter(producto.getId() + "");
-        }
-        view.editProducto(producto);
+    @Override
+    public void editar(Object object) {
+        view.getForm().editUsuario(object != null ? (Usuario) object : null);
+        showForm(true);
     }
 
-
-    void newProducto() {
-        view.clearSelection();
-        setFragmentParameter("new");
-        view.editProducto(new Producto());
+    @Override
+    public void nuevo() {
+        clearSelection();
+        editar(null);
     }
 
-    void rowSelected(Producto producto) {
+    @Override
+    public void rowSelected(Object object) {
+        Usuario usuario = (Usuario) object;
         if (AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(CurrentUser.get())) {
-            editProducto(producto);
+            editar(usuario);
         }
     }
 
-    public List<Producto> findAll() {
-        return iProductoService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
-    }
-
-    public List<CategoriaProducto> findAllCategoria() {
+    @Override
+    public List<Usuario> findAll() {
         //TODO aplicar al Filtro si es Activo O INACTIVO
-        return icategoriaProductoService.findActivoOrInactivo(true, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+        return usuarioService.findAll(empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
     }
 
-    public List<Producto> setFilter(String filterText) {
+    public List<Rol> findAllRoles() {
+        //TODO aplicar al Filtro si es Activo O INACTIVO
+        return usuarioService.findAllRol(empresa, false);
+    }
+
+    @Override
+    public List<Usuario> setFilter(String filterText) {
         Objects.requireNonNull(filterText, "Filtro No puede estar vacio.");
         if (Objects.equals(this.filterText, filterText.trim())) {
-            view.refresh();
+            refresh();
             return null;
         }
         this.filterText = filterText.trim();
-        return iProductoService.findByNombreProducto(empresa, filterText);
-    }*/
+        return usuarioService.findByNombreUsuario(filterText, empresa, view.getGrid().getPage(), view.getGrid().getPageSize());
+    }
+
+    public void showForm(boolean show) {
+        if(show){
+            view.getForm().open();
+        }else{
+            view.getFilter().focus();
+            view.getForm().close();
+        }
+    }
+
+    public void clearSelection() {
+        view.getGrid().getSelectionModel().deselectAll();
+    }
+
+    public void refresh() {
+        //view.setListaUsuarios(findAll());
+        view.getGrid().setItems(findAll());
+    }
+
+    public void refresh(Usuario usuario) {
+        for(Iterator<Usuario> it = view.getListaUsuarios().iterator(); it.hasNext();){
+            Usuario p = it.next();
+            if(p.getId().equals(usuario.getId())) {
+                it.remove();
+                view.getListaUsuarios().remove(p);
+                break;
+            }
+        }
+        view.getListaUsuarios().add(usuario);
+        view.getGrid().setItems(view.getListaUsuarios());
+        view.getGrid().refresh(usuario);
+    }
 }
