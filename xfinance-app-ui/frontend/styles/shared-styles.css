@@ -67,7 +67,8 @@
 
     .formLayout{
         margin: 20px 20px 20px 30px;
-        padding: 10px;
+        /*padding: 10px;*/
+        padding: var(--lumo-space-m);
         flex: 1;
     }
 
