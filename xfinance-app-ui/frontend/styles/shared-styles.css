@@ -70,6 +70,10 @@
         padding: 10px;
         flex: 1;
     }
+
+    .formLayoutDialog{
+        padding: 10px;
+    }
 }
 
 /* MOBILE*/
@@ -120,6 +124,10 @@
 
     .formLayout{
         padding: 10px;
+    }
+
+    .formLayoutDialog{
+        padding: 5px;
     }
 }
 

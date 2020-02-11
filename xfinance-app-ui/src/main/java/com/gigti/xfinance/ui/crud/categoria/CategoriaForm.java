@@ -11,12 +11,14 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
 public class CategoriaForm extends Dialog {
+    private TextField tfCatNombre;
     private FormLayout content;
 
     private Button btnSave;
@@ -29,25 +31,29 @@ public class CategoriaForm extends Dialog {
 
     public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
         content = new FormLayout();
-        content.setClassName("formLayout");
+        content.setClassName("formLayoutDialog");
         content.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 2),
-                new FormLayout.ResponsiveStep("40em", 3));
+                new FormLayout.ResponsiveStep("32em", 2));
 
         H4 title = new H4("Crear o Editar Categoria");
         content.add(title, 3);
 
         viewLogic = categoriaCrudLogic;
 
-        TextField tfCatNombre = new TextField("Nombre Categoria");
+        tfCatNombre = new TextField("Nombre Categoria");
         tfCatNombre.setRequired(true);
         tfCatNombre.setValueChangeMode(ValueChangeMode.EAGER);
+        tfCatNombre.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
+        tfCatNombre.setClearButtonVisible(true);
+        //tfCatNombre.setWidth("70%");
         tfCatNombre.focus();
 
         TextField tfCatDescripcion = new TextField("Descripción Categoria");
         tfCatDescripcion.setRequired(false);
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
+        tfCatDescripcion.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
+        tfCatDescripcion.setClearButtonVisible(true);
 
         content.add(tfCatNombre, tfCatDescripcion);
 
@@ -73,8 +79,7 @@ public class CategoriaForm extends Dialog {
         });
 
         btnSave = new Button("Guardar");
-        //btnSave.setWidth("100%");
-        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> {
             if (currentCategoria != null
                     && binder.writeBeanIfValid(currentCategoria)) {
@@ -84,12 +89,12 @@ public class CategoriaForm extends Dialog {
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
 
         btnDiscard = new Button("Descartar Cambios");
-        //btnDiscard.setWidth("100%");
+        btnDiscard.addThemeVariants(ButtonVariant.LUMO_SMALL);
         btnDiscard.addClickListener(
                 event -> viewLogic.editar(currentCategoria));
 
         Button btnCancel = new Button("Cancelar");
-        //btnCancel.setWidth("100%");
+        btnCancel.addThemeVariants(ButtonVariant.LUMO_SMALL);
         btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
@@ -98,7 +103,7 @@ public class CategoriaForm extends Dialog {
 
         btnDelete = new Button("Eliminar");
         //btnDelete.setWidth("100%");
-        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
         btnDelete.addClickListener(event -> {
             if (currentCategoria != null) {
                 viewLogic.eliminar(currentCategoria);
@@ -130,5 +135,9 @@ public class CategoriaForm extends Dialog {
         }
         currentCategoria = categoria;
         binder.readBean(categoria);
+    }
+
+    public TextField getTfCatNombre() {
+        return tfCatNombre;
     }
 }

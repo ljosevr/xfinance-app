@@ -8,7 +8,6 @@ package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.services.UsuarioService;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -66,6 +65,6 @@ public class BasicAccessControl implements AccessControl {
     public void signOut() {
         CurrentUser.set(null);
         VaadinSession.getCurrent().close();
-        UI.getCurrent().navigate(LoginScreen.class);
+        //UI.getCurrent().navigate(MainLayout.class);
     }
 }
