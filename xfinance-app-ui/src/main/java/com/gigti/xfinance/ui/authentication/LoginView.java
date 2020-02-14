@@ -25,9 +25,9 @@ import com.vaadin.flow.router.Route;
  * UI content when the user is not logged in yet.
  */
 @Route(value = Constantes.VIEW_R_LOGIN)
-@PageTitle(value = Constantes.VIEW_MAIN)
+@PageTitle(value = Constantes.VIEW_LOGIN +" | "+ Constantes.VIEW_MAIN)
 @CssImport("./styles/shared-styles.css")
-public class LoginScreen extends FlexLayout {
+public class LoginView extends FlexLayout {
 
     public static final String VIEW_NAME = "Login";
 
@@ -35,8 +35,7 @@ public class LoginScreen extends FlexLayout {
     private InitBackService initBackService;
     private UsuarioService usuarioService;
 
-    //@Autowired
-    public LoginScreen(InitBackService init, UsuarioService iusuario) {
+    public LoginView(InitBackService init, UsuarioService iusuario) {
         this.initBackService = init;
         this.usuarioService = iusuario;
         initBackService.initBackTipos();
@@ -60,6 +59,7 @@ public class LoginScreen extends FlexLayout {
         LoginForm loginForm = new LoginForm();
         loginForm.getElement().setAttribute("border"," 1px solid black");
         loginForm.getElement().setAttribute("border-radius","7px");
+        //loginForm.setAction("login");
         loginForm.addLoginListener(this::login);
         loginForm.addForgotPasswordListener(
                 event -> Notification.show("Tip: Contacta al Admin del App"));

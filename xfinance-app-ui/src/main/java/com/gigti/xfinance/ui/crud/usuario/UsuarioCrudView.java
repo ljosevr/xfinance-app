@@ -24,7 +24,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -36,8 +35,8 @@ import java.util.List;
  */
 @Route(value = Constantes.VIEW_R_USUARIOS, layout = MainLayout.class)
 @RouteAlias(value = "usuario", layout = MainLayout.class)
-@PageTitle(value = Constantes.VIEW_MAIN)
-public class UsuarioCrudView extends HorizontalLayout
+@PageTitle(value = Constantes.VIEW_USUARIO +" | "+ Constantes.VIEW_MAIN)
+public class UsuarioCrudView extends VerticalLayout
         /*implements HasUrlParameter<String> */{
 
     private UsuarioGrid grid;
@@ -48,11 +47,12 @@ public class UsuarioCrudView extends HorizontalLayout
     private List<Usuario> listaUsuarios;
     private VerticalLayout barAndGridLayout;
 
-    @Autowired
     public UsuarioCrudView(UsuarioService iService) {
+        addClassName("UsuarioCrudView");
+        setSizeFull();
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         viewLogic = new UsuarioCrudLogic(iService, this);
-        setSizeFull();
         HorizontalLayout topLayout = createTopBar();
 
         grid = new UsuarioGrid();

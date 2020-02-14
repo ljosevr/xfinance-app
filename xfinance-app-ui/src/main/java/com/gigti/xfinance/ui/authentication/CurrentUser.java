@@ -24,7 +24,7 @@ public final class CurrentUser {
     /**
      * The attribute key used to store the username in the session.
      */
-    public static final String CURRENT_USER_SESSION_ATTRIBUTE_KEY = LoginScreen.class
+    public static final String CURRENT_USER_SESSION_ATTRIBUTE_KEY = LoginView.class
             .getCanonicalName();
 
 //    public static final String CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY = Rol.class

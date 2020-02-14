@@ -22,8 +22,8 @@ spring:
   # JPA properties
   jpa:
     hibernate:
-     #ddl-auto: update
-      ddl-auto: create-drop
+     ddl-auto: update
+      #ddl-auto: create-drop
     show-sql: false
     generate-ddl: false
     properties:

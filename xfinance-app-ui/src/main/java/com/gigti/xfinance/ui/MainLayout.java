@@ -13,7 +13,7 @@ import com.gigti.xfinance.backend.services.InitBackServiceImpl;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.authentication.LoginScreen;
+import com.gigti.xfinance.ui.authentication.LoginView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
@@ -26,12 +26,14 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
@@ -81,17 +83,33 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         };
 
         this.setDrawerOpened(true);
-
-        //Title
-        H4 title = new H4("X Finance App");
-        title.setClassName("titleBar");
+        createHeader();
 
         VerticalLayout vDetail = new VerticalLayout();
         vDetail.add(new Span("Nombre: "+personname));
         vDetail.add(new Span("Empresa: "+empresaname));
 
-        this.addToNavbar(true, new DrawerToggle(), title);
+
         this.setPrimarySection(Section.DRAWER);
+    }
+
+    private void createHeader(){
+        H1 logo = new H1("X Finance App");
+        logo.addClassName("logo");
+
+        menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
+        menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
+        menu_salir.addClickListener(listener -> signOut());
+        menu_salir.setClassName("menubutton");
+
+        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, menu_salir); //
+
+        header.setDefaultVerticalComponentAlignment(
+                FlexComponent.Alignment.CENTER); //
+        header.setWidth("100%");
+        header.addClassName("header");
+        header.expand(logo);
+        addToNavbar(header);
     }
 
     private void createDrawer(){
@@ -164,12 +182,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             layoutMenu.add(menus_varios);
         }
 
-        menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
-        menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
-        menu_salir.addClickListener(listener -> signOut());
-        menu_salir.setClassName("menubutton");
-
-        layoutMenu.add(menu_salir);
         return layoutMenu;
     }
 
@@ -192,7 +204,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         if (!accessControl.isUserSignedIn()) {
-            beforeEnterEvent.forwardTo(LoginScreen.class);
+            beforeEnterEvent.forwardTo(LoginView.class);
         }
     }
 

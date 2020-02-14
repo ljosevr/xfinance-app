@@ -33,6 +33,7 @@ public class Constantes {
 
     //VIEW-NAME
     public static final String VIEW_MAIN = "X Finance App";
+    public static final String VIEW_LOGIN = "Login";
     public static final String VIEW_PVENTA = "Punto de Venta";
     public static final String VIEW_REGISTRAR = "Registrar";
     public static final String VIEW_PRODUCTO = "Productos";
@@ -58,5 +59,6 @@ public class Constantes {
     //Paginador
     public static final int PAGE_SIZE = 10;
     public static final int PAGINATOR_SIZE = 3;
+
 
 }
