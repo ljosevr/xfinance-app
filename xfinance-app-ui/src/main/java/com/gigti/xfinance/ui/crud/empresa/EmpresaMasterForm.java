@@ -51,6 +51,10 @@ public class EmpresaMasterForm extends Dialog {
         tfNombreEmpresa.focus();
         tfNombreEmpresa.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
+        TextField tfCodigoEmpresa = new TextField("Código");
+        tfCodigoEmpresa.setRequired(true);
+        tfCodigoEmpresa.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
         ComboBox<TipoIde> cbTipoIde = new ComboBox<>();
         cbTipoIde.setLabel("Tipo Ide");
         cbTipoIde.setItems(TipoIde.getListTipos());
@@ -68,9 +72,9 @@ public class EmpresaMasterForm extends Dialog {
         tfTelefono.setRequired(false);
         tfTelefono.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        Checkbox cbActivo = new Checkbox("Activo");
-        cbActivo.setValue(true);
-        cbActivo.setRequiredIndicatorVisible(true);
+        Checkbox chkActivo = new Checkbox("Activo");
+        chkActivo.setValue(true);
+        chkActivo.setRequiredIndicatorVisible(true);
 
         TextField tfUsuarioAdmin = new TextField("Usuario Admin");
         tfUsuarioAdmin.setRequired(true);
@@ -117,11 +121,12 @@ public class EmpresaMasterForm extends Dialog {
 
         binder = new BeanValidationBinder<>(EmpresaDTO.class);
         binder.forField(tfNombreEmpresa).bind(EmpresaDTO::getNombreEmpresa, EmpresaDTO::setNombreEmpresa);
+        binder.forField(tfCodigoEmpresa).bind(EmpresaDTO::getCodigoEmpresa, EmpresaDTO::setCodigoEmpresa);
         binder.forField(cbTipoIde).bind(EmpresaDTO::getTipoIde, EmpresaDTO::setTipoIde);
         binder.forField(tfIdentificacion).bind(EmpresaDTO::getIdentificacion, EmpresaDTO::setIdentificacion);
         binder.forField(tfDireccion).bind(EmpresaDTO::getDireccion, EmpresaDTO::setDireccion);
         binder.forField(tfTelefono).bind(EmpresaDTO::getTelefono, EmpresaDTO::setTelefono);
-        binder.forField(cbActivo).bind(EmpresaDTO::isActivo, EmpresaDTO::setActivo);
+        binder.forField(chkActivo).bind(EmpresaDTO::isActivo, EmpresaDTO::setActivo);
         binder.forField(tfUsuarioAdmin).bind(EmpresaDTO::getUsuarioNombre, EmpresaDTO::setUsuarioNombre);
         binder.forField(tfprimerNombreUsuario).bind(EmpresaDTO::getPrimerNombrePersona, EmpresaDTO::setPrimerNombrePersona);
         binder.forField(tfSegundoNombreUsuario).bind(EmpresaDTO::getSegundoNombrePersona, EmpresaDTO::setSegundoNombrePersona);
@@ -145,6 +150,7 @@ public class EmpresaMasterForm extends Dialog {
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> {
             if (currentEmpresa != null && binder.writeBeanIfValid(currentEmpresa)) {
+                currentEmpresa.setActivoUsuario(currentEmpresa.isActivo());
                 viewLogic.guardar(currentEmpresa);
             }
         });
@@ -173,7 +179,7 @@ public class EmpresaMasterForm extends Dialog {
         actionsLayout.add(btnSave,btnDiscard);
         HorizontalLayout actionsLayout2 = new HorizontalLayout();
         actionsLayout.add(btnDelete,btnCancel);
-        content.add(tfNombreEmpresa,cbTipoIde,tfIdentificacion,tfDireccion, tfTelefono,cbActivo,
+        content.add(tfNombreEmpresa, tfCodigoEmpresa,cbTipoIde,tfIdentificacion,tfDireccion, tfTelefono,chkActivo,
                 tfUsuarioAdmin,cbTipoIdePersona, tfIdentificacionPersona,tfprimerNombreUsuario,
                 tfSegundoNombreUsuario,tfPrimerApellidoUsuario,
                 tfSegundoApellidoUsuario,tfUserDireccion,tfUserPhone,tfUserEmail

@@ -1,16 +1,13 @@
 package com.gigti.xfinance.ui.crud.empresa;
 
-import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-import java.net.http.HttpRequest;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Comparator;
 
 public class EmpresaMasterGrid extends PaginatedGrid<EmpresaDTO> {
@@ -21,34 +18,27 @@ public class EmpresaMasterGrid extends PaginatedGrid<EmpresaDTO> {
 
         addColumn(EmpresaDTO::getNombreEmpresa)
                 .setHeader("Nombre")
-                .setFlexGrow(20)
                 .setSortable(true);
 
-        addColumn(EmpresaDTO::getTipoIde)
-                .setHeader("Tipo Iden")
-                .setFlexGrow(5)
-                .setSortable(true);
+        addColumn(EmpresaDTO::getCodigoEmpresa)
+                .setHeader("Código");
 
-        addColumn(EmpresaDTO::getIdentificacion)
-                .setHeader("Identificación")
-                .setFlexGrow(10);
+        addColumn(empresa -> {
+            return empresa.getTipoIde() + " "+empresa.getIdentificacion();
+        }).setHeader("Identificación");
 
         addColumn(EmpresaDTO::getDireccion)
-                .setHeader("Dirección")
-                .setFlexGrow(5);
+                .setHeader("Dirección");
 
         addColumn(EmpresaDTO::getTelefono)
-                .setHeader("Telefono")
-                .setFlexGrow(5);
+                .setHeader("Telefono");
 
         addColumn(this::formatDateActivation)
                 .setHeader("Fecha Activo")
-                .setFlexGrow(8)
                 .setSortable(true);
 
         addColumn(this::formatDateDesactivation)
                 .setHeader("Fecha Inactivo")
-                .setFlexGrow(8)
                 .setSortable(true);
 
         String activoTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
@@ -56,8 +46,7 @@ public class EmpresaMasterGrid extends PaginatedGrid<EmpresaDTO> {
                 .withProperty("activoS", EmpresaDTO::getActivoS))
                 .setHeader("Activo")
                 .setComparator(Comparator.comparing(EmpresaDTO::getActivoS))
-                .setSortable(true)
-                .setFlexGrow(5);
+                .setSortable(true);
 
         setPageSize(Constantes.PAGE_SIZE);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);

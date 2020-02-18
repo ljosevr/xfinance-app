@@ -139,10 +139,6 @@ public class EmpresaServiceImpl implements EmpresaService {
         try{
             Empresa empresaEnt = ConvertEmpresa.convertDtoToEntity(empresa);
 
-            if(empresaEnt.getIdInterno() == null){
-                empresaEnt.setIdInterno(empresaRepository.count());
-            }
-
             if(empresaEnt.getFechaActivacion() == null) {
                 empresaEnt.setFechaActivacion(new Date());
             }

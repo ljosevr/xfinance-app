@@ -6,8 +6,6 @@ import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.backend.others.ResponseBool;
 import com.gigti.xfinance.backend.repositories.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +15,13 @@ import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(UsuarioServiceImpl.class.getName());
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -47,24 +47,30 @@ public class UsuarioServiceImpl implements UsuarioService {
 //    }
 
     @Override
-    public Usuario login(String nombreUsuario, String password) {
+    public Usuario login(String codigoEmpresa, String nombreUsuario, String password) {
+        logger.log(Level.INFO,"login: "+codigoEmpresa+ " - "+nombreUsuario);
         try{
-            Usuario usuario = usuarioRepository.findByNombreUsuario(nombreUsuario);
-            if(usuario != null) {
-
-                //if(passwordEncoder.encode(password).equals(passwordEncoder.encode(usuario.getPasswordUsuario()))){
-                if(password.equals(usuario.getPasswordUsuario())){
-                    //TODO
-                    //Ejecutar parches de initBackend - De Compañia
-                    logger.debug("Iniciando App Backend");
-                    logger.debug("Finalizando App Backend");
-                    return usuario;
-                }else{
-                    return null;
+            Empresa empresa = empresaRepository.findByCodigoEmpresa(codigoEmpresa);
+            if(empresa != null) {
+                logger.log(Level.INFO,"Empresa existe: "+empresa.getNombreEmpresa());
+                Usuario usuario = usuarioRepository.findByNombreUsuarioAndEmpresa(nombreUsuario, empresa);
+                if (usuario != null) {
+                    logger.log(Level.INFO,"Usuario existe: "+usuario.getNombreUsuario());
+                    //if(passwordEncoder.encode(password).equals(passwordEncoder.encode(usuario.getPasswordUsuario()))){
+                    if (password.equals(usuario.getPasswordUsuario())) {
+                        logger.log(Level.INFO,"Concuerda Password");
+                        //TODO
+                        //Ejecutar parches de initBackend - De Compañia
+                        //logger.debug("Iniciando App Backend");
+                        //logger.debug("Finalizando App Backend");
+                        return usuario;
+                    } else {
+                        return null;
+                    }
                 }
             }
         } catch(Exception e){
-            logger.error("Error al hacer Login: "+e.getMessage(), e);
+            logger.log(Level.SEVERE, "Error al hacer Login: "+e.getMessage(), e);
         }
         return null;
     }
@@ -93,7 +99,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             rol.getVistas().addAll(vistasRol);
             return rolRepository.save(rol);
         }catch(Exception e){
-            logger.error("Error al Guardar Rol: "+e.getMessage(), e);
+            logger.log(Level.SEVERE,"Error al Guardar Rol: "+e.getMessage(), e);
             return null;
         }
     }
@@ -115,7 +121,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 response.setMsg("Error al Guardar Rol");
             }
         }catch(Exception e){
-            logger.error("Error al Eliminar Rol: "+e.getMessage(), e);
+            logger.log(Level.SEVERE,"Error al Eliminar Rol: "+e.getMessage(), e);
             response.setCode("0");
             response.setMsg("Error al Guardar Rol");
         }
@@ -150,7 +156,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 return null;
             }
         }catch(Exception e){
-            logger.error(e.getMessage(), e);
+            logger.log(Level.SEVERE, e.getMessage(), e);
             return null;
         }
     }
@@ -165,7 +171,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 return usuario != null;
             }
         } catch(Exception e) {
-            logger.debug("Error: "+e.getMessage(),e);
+            logger.log(Level.SEVERE,"Error: "+e.getMessage(),e);
         }
         return false;
     }
@@ -174,5 +180,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     public List<Usuario> findAll(Empresa empresa, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         return usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+    }
+
+    @Override
+    public List<Usuario> findAll(String filter, Empresa empresa, int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        if(filter == null || filter.isEmpty()) {
+            return usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+        } else  {
+            return  usuarioRepository.search(filter, empresa, pageable);
+        }
     }
 }

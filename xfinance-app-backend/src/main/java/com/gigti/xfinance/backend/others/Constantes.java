@@ -24,7 +24,7 @@ public class Constantes {
     public static final String VIEW_R_EMPRESA = "empresa";
     public static final String VIEW_R_USUARIOADMIN = "usuarioAdmin";
 
-
+    public static final String VIEW_R_FORGOT = "forgotPassword";
     public static final String VIEW_R_INVENTARIO = "inventario";
 
     public static final String VIEW_R_ROL = "roles";
@@ -32,7 +32,7 @@ public class Constantes {
     public static final String VIEW_R_GANANCIAS_Y_PERDIDAS = "balance";
 
     //VIEW-NAME
-    public static final String VIEW_MAIN = "X Finance App";
+    public static final String VIEW_MAIN = "Tu Punto de Venta";
     public static final String VIEW_LOGIN = "Login";
     public static final String VIEW_PVENTA = "Punto de Venta";
     public static final String VIEW_REGISTRAR = "Registrar";
@@ -55,6 +55,8 @@ public class Constantes {
     public static final String VIEW_REPORTS = "Reportes";
     public static final String VIEW_INVENTARIO = "Inventarios";
     public static final String VIEW_GANANCIAS_Y_PERDIDAS = "Ganancias y Perdidas";
+
+    public static final String VIEW_RECOVER_PASS = "Recuperar Password";
 
     //Paginador
     public static final int PAGE_SIZE = 10;

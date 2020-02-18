@@ -8,6 +8,7 @@ package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.services.UsuarioService;
+import com.gigti.xfinance.ui.util.Response;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,24 +22,37 @@ public class BasicAccessControl implements AccessControl {
     private UsuarioService usuarioService;
 
     @Override
-    public boolean signIn(String username, String password, @Autowired UsuarioService iusu) {
+    public Response signIn(String codigoEmpresa, String username, String password, @Autowired UsuarioService iusu) {
 
+        Response response = new Response();
         this.usuarioService = iusu;
 
-        if (username == null || username.isEmpty())
-            return false;
-
-        if (password == null || password.isEmpty())
-            return false;
-
-        Usuario usuario = usuarioService.login(username,password);
-
-        if(usuario != null){
-            CurrentUser.set(usuario);
-            return true;
+        if (username == null || username.isEmpty()){
+            response.setSuccess(false);
+            response.setMessage("Usuario Incorrecto");
         }
 
-        return false;
+        if (password == null || password.isEmpty()){
+            response.setSuccess(false);
+            response.setMessage("Password incorrecto");
+        }
+
+        Usuario usuario = usuarioService.login(codigoEmpresa, username, password);
+
+        if(usuario != null){
+            if(usuario.isActivo()){
+                response.setSuccess(true);
+                CurrentUser.set(usuario);
+            } else {
+                response.setSuccess(false);
+                response.setMessage("Usuario "+ usuario.getNombreUsuario() +" NO ACTIVO");
+            }
+        } else {
+            response.setSuccess(false);
+            response.setMessage("Validar Datos Ingresados");
+        }
+
+        return response;
     }
 
     @Override

@@ -6,7 +6,6 @@
 
 package com.gigti.xfinance.backend.repositories;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.TipoEmpresa;
 import org.springframework.data.domain.Pageable;
@@ -37,4 +36,5 @@ public interface EmpresaRepository extends JpaRepository<Empresa, String> {
     public Empresa findByNombreEmpresa(String companyName);
     public List<Empresa> findByNombreEmpresaContaining(String companyName);
 
+    public Empresa findByCodigoEmpresa(String codigoEmpresa);
 }

@@ -35,17 +35,12 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Primary;
 
 import java.util.Comparator;
 import java.util.List;
@@ -55,17 +50,28 @@ import java.util.stream.Collectors;
 /**
  * The main layout. Contains the navigation menu.
  */
-@SpringComponent
-@UIScope
-@Primary
-@Route("")
+//@SpringComponent
+//@UIScope
+//@Primary
+//
 //@PreserveOnRefresh
-@Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
-@PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
+//@Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
+//@PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
+
+@Route("")
+@PWA(
+        name = "Tu Punto De Venta",
+        shortName = "TPV",
+        offlineResources = {
+                "./styles/offline.css",
+                "./images/offline.png"
+        },
+        enableInstallPrompt = false
+)
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
-@Push
+//@Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
     private Accordion menus_varios;

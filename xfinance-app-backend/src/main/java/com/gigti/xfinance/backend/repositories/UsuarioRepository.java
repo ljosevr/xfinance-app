@@ -21,8 +21,8 @@ import java.util.List;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
-    @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario)")
-    public Usuario findByNombreUsuario(String nombreUsuario);
+    @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario) AND u.empresa =:empresa")
+    public Usuario findByNombreUsuarioAndEmpresa(String nombreUsuario, Empresa empresa);
 
     public List<Usuario> findByNombreUsuarioContaining(String nombreUsuario);
 
@@ -41,4 +41,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     public List<Usuario> findAllByActivoIsTrue();
 
     public List<Usuario> findAllByActivoIsFalse();
+
+    @Query("SELECT u FROM Usuario  u " +
+            "WHERE u.empresa =:empresa AND " +
+            "lower(u.nombreUsuario) like lower(concat('%', :filter, '%')) AND " +
+            "u.eliminado = false")
+    List<Usuario> search(@Param("filter") String filter, Empresa empresa, Pageable pageable);
 }

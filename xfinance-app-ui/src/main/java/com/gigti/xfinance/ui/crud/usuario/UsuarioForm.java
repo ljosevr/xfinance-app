@@ -10,6 +10,8 @@ import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.Usuario;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -26,6 +28,7 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
+import com.vaadin.flow.shared.Registration;
 
 import java.util.List;
 
@@ -34,22 +37,19 @@ import java.util.List;
  */
 public class UsuarioForm extends Dialog {
 
-    private FormLayout content;
-
     private Button btnSave;
-    private Button btnDiscard;
-    private Button btnDelete;
 
-    private UsuarioCrudLogic viewLogic;
     private Binder<Usuario> binderUsuario;
     private Binder<Persona> binderPersona;
     private Usuario currentUsuario;
-    private Persona currentPersona;
-    private List<Rol> listRoles;
-    private final ComboBox<Rol> cbRoles;
 
-    public UsuarioForm(UsuarioCrudLogic usuarioCrudLogic, List<Rol> listRoles) {
-        content = new FormLayout();
+    public UsuarioForm(List<Rol> listRoles) {
+        binderUsuario = new BeanValidationBinder<>(Usuario.class);
+        //binderUsuario.bindInstanceFields(content);
+        binderPersona = new BeanValidationBinder<>(Persona.class);
+        //binderPersona.bindInstanceFields(content);
+
+        FormLayout content = new FormLayout();
         content.setClassName("formLayout");
         content.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
@@ -59,16 +59,14 @@ public class UsuarioForm extends Dialog {
         H4 title = new H4("Crear o Editar Producto");
         content.add(title,3);
 
-        viewLogic = usuarioCrudLogic;
-
         TextField tfUsuario = new TextField("Nombre Usuario");
         tfUsuario.setRequired(true);
         tfUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        cbRoles = new ComboBox<>();
+        ComboBox<Rol> cbRoles = new ComboBox<>();
         cbRoles.setLabel("Rol Usuario");
         cbRoles.setItems(listRoles);
-        this.listRoles = listRoles;
+        cbRoles.setItemLabelGenerator(Rol::getNombre);
         cbRoles.setRequired(true);
         cbRoles.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
@@ -115,14 +113,14 @@ public class UsuarioForm extends Dialog {
         chkActivo.setValue(true);
         chkActivo.setRequiredIndicatorVisible(true);
 
-        binderUsuario = new BeanValidationBinder<>(Usuario.class);
+
         binderUsuario.forField(tfUsuario).asRequired("Digite el Nombre del Usuario").bind(Usuario::getNombreUsuario, Usuario::setNombreUsuario);
         binderUsuario.forField(chkActivo).bind(Usuario::isActivo, Usuario::setActivo);
         binderUsuario.forField(cbRoles).asRequired("Selecciona Un Rol").bind(Usuario::getRol, Usuario::setRol);
         binderUsuario.bindInstanceFields(this);
 
 
-        binderPersona = new BeanValidationBinder<>(Persona.class);
+
         binderPersona.forField(cbTipoIdePersona).asRequired("Seleccione el Tipo de Identificación").bind(Persona::getTipoIde, Persona::setTipoIde);
         binderPersona.forField(tfIdentificacionPersona).asRequired("Digite Identificación").bind(Persona::getIdentificacion, Persona::setIdentificacion);
         binderPersona.forField(tfprimerNombreUsuario).asRequired("Digite Nombre").bind(Persona::getPrimerNombre, Persona::setPrimerNombre);
@@ -134,115 +132,97 @@ public class UsuarioForm extends Dialog {
         binderPersona.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Dirección").bind(Persona::getEmail, Persona::setEmail);
         binderPersona.bindInstanceFields(this);
 
-        // enable/disable btnSave button while editing
-        binderUsuario.addStatusChangeListener(event -> {
-            boolean isValid = !event.hasValidationErrors();
-            boolean hasChanges = binderUsuario.hasChanges();
-            btnSave.setEnabled(hasChanges && isValid);
-            btnDiscard.setEnabled(hasChanges);
-//            if(hasChanges && isValid)
-//                binderUsuario.writeBeanIfValid(currentUsuario);
+         binderUsuario.addStatusChangeListener(event -> {
+             btnSave.setEnabled(binderUsuario.isValid() && binderPersona.isValid());
         });
 
         binderPersona.addStatusChangeListener(event -> {
-            boolean isValid = !event.hasValidationErrors();
-            boolean hasChanges = binderPersona.hasChanges();
-            btnSave.setEnabled(hasChanges && isValid);
-            btnDiscard.setEnabled(hasChanges);
-            //if(hasChanges && isValid)
-            //    binderPersona.writeBeanIfValid(currentPersona);
+            btnSave.setEnabled(binderUsuario.isValid() && binderPersona.isValid());
         });
-
 
         btnSave = new Button("Guardar");
         btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnSave.addClickListener(event -> {
-//            if()
-//                binderPersona.readBean(currentPersona);
-//            if()
-//                binderPersona.readBean(currentPersona);
-            if (binderUsuario.validate().isOk() && binderUsuario.writeBeanIfValid(binderUsuario.getBean())){
-                if(binderPersona.validate().isOk() && binderPersona.writeBeanIfValid(binderPersona.getBean())) {
-                    currentUsuario = binderUsuario.getBean();
-                    currentUsuario.setPersona(binderPersona.getBean());
-                    viewLogic.guardar(currentUsuario);
-                }else {
-                    Notification.show("Validar Persona: "+binderPersona.validate().getValidationErrors(),3000, Notification.Position.TOP_CENTER);
-                }
-            } else {
-                Notification.show("Validar Usuario: "+binderUsuario.validate().getValidationErrors(),3000, Notification.Position.TOP_CENTER);
-            }
-        });
+        btnSave.addClickListener(event -> validateAndSave());
         btnSave.addClickShortcut(Key.ENTER);
 
-        btnDiscard = new Button("Descartar Cambios");
-        btnDiscard.setWidth("100%");
-        btnDiscard.addClickListener(
-                event -> viewLogic.editar(currentUsuario));
+        Button btnClose = new Button("Cerrar");
+        btnClose.setWidth("100%");
+        btnClose.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        btnClose.addClickShortcut(Key.ESCAPE);
 
-        Button btnCancel = new Button("Cancelar");
-        btnCancel.setWidth("100%");
-        btnCancel.addClickListener(event -> viewLogic.cancelar());
-        btnCancel.addClickShortcut(Key.ESCAPE);
-        getElement()
-                .addEventListener("keydown", event -> viewLogic.cancelar())
-                .setFilter("event.key == 'Escape'");
-
-        btnDelete = new Button("Eliminar");
+        Button btnDelete = new Button("Eliminar");
         btnDelete.setWidth("100%");
-        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
-        btnDelete.addClickListener(event -> {
-            if (currentUsuario != null) {
-                viewLogic.eliminar(currentUsuario);
-            }
-        });
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binderUsuario.getBean(), null)));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
-        actionsLayout.add(btnSave,btnDiscard);
-        HorizontalLayout actionsLayout2 = new HorizontalLayout();
-        actionsLayout.add(btnDelete,btnCancel);
+        actionsLayout.add(btnSave, btnDelete, btnClose);
 
         content.add(tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
-                tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout, actionsLayout2);
+                tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
 
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);
         this.add(content);
     }
 
-    public void setListRoles(List<Rol> listRoles) {
-        this.listRoles = listRoles;
+    public void setUser(Usuario usuario) {
+        binderUsuario.setBean(usuario);
+        if(usuario != null){
+            binderPersona.setBean(usuario.getPersona());
+        }
     }
 
-    public void editUsuario(Usuario usuario) {
-        if (usuario == null) {
-            currentUsuario = new Usuario();
-            currentUsuario.setActivo(true);
-            currentUsuario.setPersona(new Persona());
-            btnDelete.setEnabled(false);
-            cbRoles.setEnabled(true);
-            cbRoles.setValue(null);
-            currentPersona = new Persona();
-        } else /*if(StringUtils.isBlank(usuario.getId())){
-            usuario.setActivo(true);
-            btnDelete.setEnabled(false);
-            cbRoles.setEnabled(true);
-            cbRoles.setValue(null);
-            currentUsuario = usuario;
-            currentUsuario.setPersona(new Persona());
-        } else*/ {
-            btnDelete.setEnabled(true);
-            if (usuario.isAdminDefecto()) {
-                cbRoles.setEnabled(false);
-            } else {
-                cbRoles.setEnabled(true);
-            }
-            currentUsuario = usuario;
-            currentPersona = usuario.getPersona();
-            cbRoles.setValue(usuario.getRol());
+    private void validateAndSave() {
+        if (binderUsuario.isValid() && binderPersona.isValid()) {
+            binderUsuario.getBean().setPersona(binderPersona.getBean());
+            fireEvent(new SaveEvent(this, binderUsuario.getBean(), binderPersona.getBean()));
+        } else {
+            Notification.show("Validar Usuario: "+binderUsuario.validate().getValidationErrors(),3000, Notification.Position.TOP_CENTER);
         }
-        binderUsuario.readBean(currentUsuario);
-        binderPersona.readBean(currentPersona);
     }
+
+    // Events
+    public static abstract class UsuarioFormEvent extends ComponentEvent<UsuarioForm> {
+        private Usuario usuario;
+        private Persona persona;
+
+        protected UsuarioFormEvent(UsuarioForm source, Usuario usuario, Persona persona) {
+            super(source, false);
+            this.usuario = usuario;
+            this.persona = persona;
+        }
+
+        public Usuario getUsuario() {
+            return usuario;
+        }
+        public Persona getPersona() { return persona; }
+    }
+
+    public static class SaveEvent extends UsuarioFormEvent {
+        SaveEvent(UsuarioForm source, Usuario usuario, Persona persona) {
+            super(source, usuario, persona);
+        }
+    }
+
+    public static class DeleteEvent extends UsuarioFormEvent {
+        DeleteEvent(UsuarioForm source, Usuario usuario, Persona persona) {
+            super(source, usuario, persona);
+        }
+
+    }
+
+    public static class CloseEvent extends UsuarioFormEvent {
+        CloseEvent(UsuarioForm source) {
+            super(source, null, null);
+        }
+    }
+
+    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
+                                                                  ComponentEventListener<T> listener) {
+        return getEventBus().addListener(eventType, listener);
+    }
+
 }

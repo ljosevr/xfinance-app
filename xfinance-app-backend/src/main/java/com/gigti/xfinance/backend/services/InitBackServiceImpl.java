@@ -177,7 +177,7 @@ public class InitBackServiceImpl implements InitBackService {
                         true,
                         java.sql.Date.valueOf(LocalDate.now()),
                         null,
-                        TipoEmpresa.ROOT, 0L);
+                        TipoEmpresa.ROOT, "GIG");
 
                 emp = empresaRepository.save(emp);
                 logger.info("Empresa Root Creado");

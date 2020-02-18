@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UsuarioService {
 
-    public Usuario login(String nombreUsuario, String Password);
+    public Usuario login(String codigoEmpresa, String nombreUsuario, String Password);
 
     public List<Usuario> findByNombreUsuario(String nombreUsuario, Empresa empresa, int page, int pageSize);
 
@@ -31,4 +31,6 @@ public interface UsuarioService {
     boolean deleteUsuario(String id);
 
     List<Usuario> findAll(Empresa empresa, int page, int pageSize);
+
+    List<Usuario> findAll(String filter, Empresa empresa, int page, int pageSize);
 }

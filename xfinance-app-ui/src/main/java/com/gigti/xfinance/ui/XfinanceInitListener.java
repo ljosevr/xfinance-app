@@ -25,8 +25,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class XfinanceInitListener implements VaadinServiceInitListener {
 
-
-
     @Override
     public void serviceInit(ServiceInitEvent event) {
 

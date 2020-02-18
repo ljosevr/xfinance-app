@@ -16,6 +16,7 @@ public class TopBarComponent extends HorizontalLayout {
 
     public TopBarComponent(TextField filter, Button btn) {
         super();
+        this.addClassName("toolbar");
         this.filter = filter;
         this.btn = btn;
         setWidth("100%");

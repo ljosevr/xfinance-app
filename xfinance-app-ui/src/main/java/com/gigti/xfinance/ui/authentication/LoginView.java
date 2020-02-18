@@ -6,20 +6,28 @@
 
 package com.gigti.xfinance.ui.authentication;
 
+import com.gigti.xfinance.backend.data.dto.LoginDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.InitBackService;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.util.Response;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.login.LoginForm;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLink;
 
 /**
  * UI content when the user is not logged in yet.
@@ -27,53 +35,73 @@ import com.vaadin.flow.router.Route;
 @Route(value = Constantes.VIEW_R_LOGIN)
 @PageTitle(value = Constantes.VIEW_LOGIN +" | "+ Constantes.VIEW_MAIN)
 @CssImport("./styles/shared-styles.css")
-public class LoginView extends FlexLayout {
-
-    public static final String VIEW_NAME = "Login";
+//public class LoginView extends FlexLayout {
+public class LoginView extends VerticalLayout {
 
     private AccessControl accessControl;
-    private InitBackService initBackService;
     private UsuarioService usuarioService;
+    private Binder<LoginDTO> binder;
 
     public LoginView(InitBackService init, UsuarioService iusuario) {
-        this.initBackService = init;
         this.usuarioService = iusuario;
-        initBackService.initBackTipos();
-        initBackService.initBackObjetos();
+        init.initBackTipos();
+        init.initBackObjetos();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();
-        UI.getCurrent().getPage().executeJavaScript("document.getElementById(\"vaadinLoginUsername\").focus();");
     }
 
     private void buildUI() {
-        setClassName("login-screen-flex");
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        setAlignItems(Alignment.CENTER);
 
         VerticalLayout loginLayout = new VerticalLayout();
-        loginLayout.setClassName("login-screen");
+        loginLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        H1 loginInfoHeader = new H1("X Finance App");
+        H1 loginInfoHeader = new H1(Constantes.VIEW_MAIN);
         loginInfoHeader.setClassName("h1-login");
-        loginLayout.add(loginInfoHeader);
 
-        LoginForm loginForm = new LoginForm();
-        loginForm.getElement().setAttribute("border"," 1px solid black");
-        loginForm.getElement().setAttribute("border-radius","7px");
-        //loginForm.setAction("login");
-        loginForm.addLoginListener(this::login);
-        loginForm.addForgotPasswordListener(
-                event -> Notification.show("Tip: Contacta al Admin del App"));
-        loginForm.setI18n(createSpanishI18n());
-        loginLayout.add(loginForm);
+        H2 titleLogin = new H2("INICIAR SESIÓN");
 
-        add(loginLayout);
+        TextField tfCodigoEmpresa = new TextField("Código Empresa");
+        TextField tfUsername = new TextField("Usuario");
+        PasswordField tfPassword = new PasswordField("Password");
+
+        Button btnIngresar = new Button("Ingresar");
+        btnIngresar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnIngresar.addClickListener(click ->
+                login2(tfCodigoEmpresa.getValue(), tfUsername.getValue(), tfPassword.getValue()));
+        btnIngresar.addClickShortcut(Key.ENTER);
+
+
+        binder = new Binder<>();
+        binder.forField(tfCodigoEmpresa).asRequired("Digite Código de la Empresa").bind(LoginDTO::getCodigoEmpresa, LoginDTO::setCodigoEmpresa);
+        binder.forField(tfUsername).asRequired("Digite un Nombre de Usuario").bind(LoginDTO::getUserName, LoginDTO::setUserName);
+        binder.forField(tfPassword).asRequired("Digite un Password").bind(LoginDTO::getPassword, LoginDTO::setPassword);
+        //binder.bindInstanceFields(this);
+
+        binder.addStatusChangeListener(event -> {
+            btnIngresar.setEnabled(binder.isValid());
+        });
+
+        RouterLink forgot = new RouterLink("Olvide el Password", ForgotPasswordView.class);
+        //content.add(tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar);
+
+        //loginLayout.add();
+        add(loginInfoHeader, titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
+        tfCodigoEmpresa.focus();
     }
 
-    private void login(LoginForm.LoginEvent event) {
-        if (accessControl.signIn(event.getUsername(), event.getPassword(), usuarioService)) {
-            UI.getCurrent().navigate(MainLayout.class);
+    private void login2(String codigoEmpresa, String userName, String password) {
+        if(binder.isValid()) {
+            Response response = accessControl.signIn(codigoEmpresa, userName, password, usuarioService);
+            if (response.isSuccess()) {
+                UI.getCurrent().navigate(MainLayout.class);
+            } else {
+                Notification.show(response.getMessage(),5000, Notification.Position.MIDDLE);
+            }
         } else {
-            event.getSource().setError(true);
+            binder.validate();
         }
     }
 

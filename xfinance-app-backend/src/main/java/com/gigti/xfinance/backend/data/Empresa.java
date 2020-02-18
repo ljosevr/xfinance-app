@@ -36,13 +36,14 @@ public class Empresa extends AbstractEntity {
     @Column(unique = true)
     private String identificacion;
 
-    @Column(name = "id_interno", unique = true, updatable = false, nullable = false)
-    private Long idInterno;
+    @Size(min= 3, max = 6)
+    @Column(name = "codigo_empresa", unique = true, nullable = false)
+    private String codigoEmpresa;
 
     @NotNull
     @NotEmpty()
     @Size(min= 4)
-    @Column(name = "nombre_empresa",unique = true)
+    @Column(name = "nombre_empresa", unique = true)
     private String nombreEmpresa;
 
     private String direccion;
@@ -62,7 +63,6 @@ public class Empresa extends AbstractEntity {
     private Date fechaDesactivacion;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn
     @JoinColumn(name = "tipo_empresa_id")
     private TipoEmpresa tipoEmpresa;
 
@@ -90,7 +90,7 @@ public class Empresa extends AbstractEntity {
         this.tipoEmpresa = tipo;
     }
 
-    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Boolean activo, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo, Long idInterno) {
+    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Boolean activo, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo, String codigoEmpresa) {
         this.tipoIde = tipoIde;
         this.identificacion = identificacion;
         this.nombreEmpresa = nombreEmpresa;
@@ -100,7 +100,7 @@ public class Empresa extends AbstractEntity {
         this.fechaDesactivacion = fechaDesactivacion;
         this.eliminado = false;
         this.tipoEmpresa = tipo;
-        this.idInterno = idInterno;
+        this.codigoEmpresa = codigoEmpresa;
     }
 
     @Override
