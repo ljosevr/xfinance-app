@@ -31,7 +31,6 @@ public class EmpresaMasterForm extends Dialog {
     private Binder<EmpresaDTO> binder;
     private Binder<Usuario> binderUser;
     private EmpresaDTO currentEmpresa;
-    private Usuario usuarioAdmin;
 
     public EmpresaMasterForm(EmpresaMasterCrudLogic empresaMasterCrudLogic) {
         content = new FormLayout();

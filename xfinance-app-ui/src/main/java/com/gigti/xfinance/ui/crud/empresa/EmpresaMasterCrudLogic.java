@@ -30,14 +30,7 @@ public class EmpresaMasterCrudLogic implements Serializable, ICrudLogic {
     }
 
     public boolean acceder(){
-        // Hide and disable if not admin
         return empresa != null;
-        //TODO permisos
-//        if (!AccessControlFactory.getInstance().createAccessControl()
-//                .isUserInRole(CurrentUser.get())) {
-//            view.setNewProductEnabled(false);
-//        }
-        //return true;
     }
 
     public void cancelar() {

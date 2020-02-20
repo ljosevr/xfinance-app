@@ -2,8 +2,6 @@ package com.gigti.xfinance.ui.crud.usuario.rol;
 
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.ProductoService;
-import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -23,7 +21,6 @@ public class RolView extends HorizontalLayout {
     private RolForm form;
     private TextField filter;
 
-    private RolCrudLogic viewLogic;
     private List<Rol> listaRoles;
     private VerticalLayout barAndGridLayout;
 

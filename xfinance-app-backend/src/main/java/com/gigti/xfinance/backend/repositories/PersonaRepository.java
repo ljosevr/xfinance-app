@@ -20,5 +20,5 @@ public interface PersonaRepository extends JpaRepository<Persona, String> {
 
     public List<Persona> findByPrimerNombreContaining(String lastName);
 
-    public List<Persona> findByIdentificacion(String identification);
+    public Persona findByIdentificacion(String identification);
 }

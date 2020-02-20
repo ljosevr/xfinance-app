@@ -6,10 +6,9 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.TipoIde;
-import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -31,23 +30,19 @@ import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.shared.Registration;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * A form for editing a single Usuario Admin.
  */
 public class UsuarioForm extends Dialog {
 
+    private static final Logger logger = Logger.getLogger(UsuarioForm.class.getName());
     private Button btnSave;
-
-    private Binder<Usuario> binderUsuario;
-    private Binder<Persona> binderPersona;
-    private Usuario currentUsuario;
+    private Binder<UsuarioDTO> binderUsuario;
 
     public UsuarioForm(List<Rol> listRoles) {
-        binderUsuario = new BeanValidationBinder<>(Usuario.class);
-        //binderUsuario.bindInstanceFields(content);
-        binderPersona = new BeanValidationBinder<>(Persona.class);
-        //binderPersona.bindInstanceFields(content);
+        binderUsuario = new BeanValidationBinder<>(UsuarioDTO.class);
 
         FormLayout content = new FormLayout();
         content.setClassName("formLayout");
@@ -114,30 +109,23 @@ public class UsuarioForm extends Dialog {
         chkActivo.setRequiredIndicatorVisible(true);
 
 
-        binderUsuario.forField(tfUsuario).asRequired("Digite el Nombre del Usuario").bind(Usuario::getNombreUsuario, Usuario::setNombreUsuario);
-        binderUsuario.forField(chkActivo).bind(Usuario::isActivo, Usuario::setActivo);
-        binderUsuario.forField(cbRoles).asRequired("Selecciona Un Rol").bind(Usuario::getRol, Usuario::setRol);
-        binderUsuario.bindInstanceFields(this);
+        binderUsuario.forField(tfUsuario).asRequired("Digite el Nombre del Usuario").bind(UsuarioDTO::getNombreUsuario, UsuarioDTO::setNombreUsuario);
+        binderUsuario.forField(chkActivo).bind(UsuarioDTO::isActivo, UsuarioDTO::setActivo);
+        binderUsuario.forField(cbRoles).asRequired("Selecciona Un Rol").bind(UsuarioDTO::getRol, UsuarioDTO::setRol);
 
-
-
-        binderPersona.forField(cbTipoIdePersona).asRequired("Seleccione el Tipo de Identificación").bind(Persona::getTipoIde, Persona::setTipoIde);
-        binderPersona.forField(tfIdentificacionPersona).asRequired("Digite Identificación").bind(Persona::getIdentificacion, Persona::setIdentificacion);
-        binderPersona.forField(tfprimerNombreUsuario).asRequired("Digite Nombre").bind(Persona::getPrimerNombre, Persona::setPrimerNombre);
-        binderPersona.bind(tfSegundoNombreUsuario, Persona::getSegundoNombre, Persona::setSegundoNombre);
-        binderPersona.forField(tfPrimerApellidoUsuario).asRequired("Digite el Primer Apellido").bind(Persona::getPrimerApellido, Persona::setPrimerApellido);
-        binderPersona.bind(tfSegundoApellidoUsuario, Persona::getSegundoApellido, Persona::setSegundoApellido);
-        binderPersona.bind(tfDireccion, Persona::getDireccion, Persona::setDireccion);
-        binderPersona.bind(tfTelefono, Persona::getTelefono, Persona::setTelefono);
-        binderPersona.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Dirección").bind(Persona::getEmail, Persona::setEmail);
-        binderPersona.bindInstanceFields(this);
+        binderUsuario.forField(cbTipoIdePersona).asRequired("Seleccione el Tipo de Identificación").bind(UsuarioDTO::getTipoIde, UsuarioDTO::setTipoIde);
+        binderUsuario.forField(tfIdentificacionPersona).asRequired("Digite Identificación").bind(UsuarioDTO::getIdentificacion, UsuarioDTO::setIdentificacion);
+        binderUsuario.forField(tfprimerNombreUsuario).asRequired("Digite Nombre").bind(UsuarioDTO::getPrimerNombre, UsuarioDTO::setPrimerNombre);
+        binderUsuario.bind(tfSegundoNombreUsuario, UsuarioDTO::getSegundoNombre, UsuarioDTO::setSegundoNombre);
+        binderUsuario.forField(tfPrimerApellidoUsuario).asRequired("Digite el Primer Apellido").bind(UsuarioDTO::getPrimerApellido, UsuarioDTO::setPrimerApellido);
+        binderUsuario.bind(tfSegundoApellidoUsuario, UsuarioDTO::getSegundoApellido, UsuarioDTO::setSegundoApellido);
+        binderUsuario.bind(tfDireccion, UsuarioDTO::getDireccion, UsuarioDTO::setDireccion);
+        binderUsuario.bind(tfTelefono, UsuarioDTO::getTelefono, UsuarioDTO::setTelefono);
+        binderUsuario.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Dirección").bind(UsuarioDTO::getEmail, UsuarioDTO::setEmail);
+        //binderPersona.bindInstanceFields(this);
 
          binderUsuario.addStatusChangeListener(event -> {
-             btnSave.setEnabled(binderUsuario.isValid() && binderPersona.isValid());
-        });
-
-        binderPersona.addStatusChangeListener(event -> {
-            btnSave.setEnabled(binderUsuario.isValid() && binderPersona.isValid());
+             btnSave.setEnabled(binderUsuario.isValid());
         });
 
         btnSave = new Button("Guardar");
@@ -155,7 +143,7 @@ public class UsuarioForm extends Dialog {
         Button btnDelete = new Button("Eliminar");
         btnDelete.setWidth("100%");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binderUsuario.getBean(), null)));
+        btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binderUsuario.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
@@ -168,17 +156,16 @@ public class UsuarioForm extends Dialog {
         this.add(content);
     }
 
-    public void setUser(Usuario usuario) {
+    public void setUser(UsuarioDTO usuario) {
         binderUsuario.setBean(usuario);
-        if(usuario != null){
-            binderPersona.setBean(usuario.getPersona());
-        }
     }
 
     private void validateAndSave() {
-        if (binderUsuario.isValid() && binderPersona.isValid()) {
-            binderUsuario.getBean().setPersona(binderPersona.getBean());
-            fireEvent(new SaveEvent(this, binderUsuario.getBean(), binderPersona.getBean()));
+        logger.info("validateAndSave");
+        if (binderUsuario.isValid()) {
+            //binderUsuario.getBean().setPersona(binderPersona.getBean());
+            logger.info("usuario: "+binderUsuario.isValid() + " - "+binderUsuario.getBean());
+            fireEvent(new SaveEvent(this, binderUsuario.getBean()));
         } else {
             Notification.show("Validar Usuario: "+binderUsuario.validate().getValidationErrors(),3000, Notification.Position.TOP_CENTER);
         }
@@ -186,37 +173,34 @@ public class UsuarioForm extends Dialog {
 
     // Events
     public static abstract class UsuarioFormEvent extends ComponentEvent<UsuarioForm> {
-        private Usuario usuario;
-        private Persona persona;
+        private UsuarioDTO usuario;
 
-        protected UsuarioFormEvent(UsuarioForm source, Usuario usuario, Persona persona) {
+        protected UsuarioFormEvent(UsuarioForm source, UsuarioDTO usuario) {
             super(source, false);
             this.usuario = usuario;
-            this.persona = persona;
         }
 
-        public Usuario getUsuario() {
+        public UsuarioDTO getUsuario() {
             return usuario;
         }
-        public Persona getPersona() { return persona; }
     }
 
     public static class SaveEvent extends UsuarioFormEvent {
-        SaveEvent(UsuarioForm source, Usuario usuario, Persona persona) {
-            super(source, usuario, persona);
+        SaveEvent(UsuarioForm source, UsuarioDTO usuario) {
+            super(source, usuario);
         }
     }
 
     public static class DeleteEvent extends UsuarioFormEvent {
-        DeleteEvent(UsuarioForm source, Usuario usuario, Persona persona) {
-            super(source, usuario, persona);
+        DeleteEvent(UsuarioForm source, UsuarioDTO usuario) {
+            super(source, usuario);
         }
 
     }
 
     public static class CloseEvent extends UsuarioFormEvent {
         CloseEvent(UsuarioForm source) {
-            super(source, null, null);
+            super(source, null);
         }
     }
 

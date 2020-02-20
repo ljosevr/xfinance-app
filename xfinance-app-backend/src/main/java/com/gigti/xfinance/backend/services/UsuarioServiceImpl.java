@@ -1,18 +1,18 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.data.Vista;
-import com.gigti.xfinance.backend.others.ResponseBool;
+import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
+import com.gigti.xfinance.backend.mapper.ConvertUsuario;
 import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -56,10 +56,10 @@ public class UsuarioServiceImpl implements UsuarioService {
                 Usuario usuario = usuarioRepository.findByNombreUsuarioAndEmpresa(nombreUsuario, empresa);
                 if (usuario != null) {
                     logger.log(Level.INFO,"Usuario existe: "+usuario.getNombreUsuario());
+                    //TODO
                     //if(passwordEncoder.encode(password).equals(passwordEncoder.encode(usuario.getPasswordUsuario()))){
                     if (password.equals(usuario.getPasswordUsuario())) {
                         logger.log(Level.INFO,"Concuerda Password");
-                        //TODO
                         //Ejecutar parches de initBackend - De Compañia
                         //logger.debug("Iniciando App Backend");
                         //logger.debug("Finalizando App Backend");
@@ -76,85 +76,32 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<Usuario> findByNombreUsuario(String nombreUsuario, Empresa empresa, int page, int pageSize) {
-
-        return null;
-    }
-
-    @Override
     public List<Rol> findAllRol(Empresa empresa, boolean eliminado) {
         return rolRepository.findAllByEmpresaAndEliminado(empresa, eliminado);
     }
 
     @Override
-    public Rol findRolById(String id, Empresa empresa, boolean activo) {
-        return rolRepository.findAllByIdAndEmpresaAndEliminado(id, empresa, activo);
-    }
-
-    @Override
-    @Transactional
-    public Rol saveRol(Rol rol, List<Vista> vistasRol) {
+    public UsuarioDTO saveUsuario(UsuarioDTO usuarioDTO) {
+        logger.log(Level.INFO, "saveUsuario");
         try{
-            rol.setVistas(new HashSet<>());
-            rol.getVistas().addAll(vistasRol);
-            return rolRepository.save(rol);
-        }catch(Exception e){
-            logger.log(Level.SEVERE,"Error al Guardar Rol: "+e.getMessage(), e);
-            return null;
-        }
-    }
-
-    @Override
-    @Transactional
-    public ResponseBool deleteRol(Rol rol) {
-        ResponseBool response = new ResponseBool(false,"","");
-        try{
-            //TODO rol Asociado a un Usuario
-
-            rol.setEliminado(true);
-            rol = rolRepository.save(rol);
-            if(rol != null) {
-                response.setMsg("Rol Eliminado");
-                response.setCode("OK");
-            }else{
-                response.setCode("0");
-                response.setMsg("Error al Guardar Rol");
-            }
-        }catch(Exception e){
-            logger.log(Level.SEVERE,"Error al Eliminar Rol: "+e.getMessage(), e);
-            response.setCode("0");
-            response.setMsg("Error al Guardar Rol");
-        }
-
-        return response;
-    }
-
-    @Override
-    public List<Vista> findAllVistas() {
-        return vistaRepository.findAll();
-    }
-
-    @Override
-    public Usuario findUsuarioById(String id) {
-        return usuarioRepository.findById(id).orElse(null);
-    }
-
-    @Override
-    public Usuario saveUsuario(Usuario usuario) {
-        try{
-            Optional<Empresa> empresa = empresaRepository.findById(usuario.getEmpresa().getId());
+            Optional<Empresa> empresa = empresaRepository.findById(usuarioDTO.getEmpresa().getId());
             if(empresa.isPresent()){
-                usuario.setEmpresa(empresa.get());
+                logger.log(Level.INFO, "isPresent Empresa");
+                usuarioDTO.setEmpresa(empresa.get());
             }else{
+                logger.log(Level.INFO, "NOT Present Empresa");
                 return null;
             }
+            Usuario usuario = ConvertUsuario.convertDtoToEntity(usuarioDTO);
+            Persona persona = personaRepository.findByIdentificacion(usuario.getPersona().getIdentificacion());
 
-            if(usuario.getPersona() != null) {
-                usuario.setPersona(personaRepository.save(usuario.getPersona()));
-                return usuarioRepository.save(usuario);
-            } else {
-                return null;
+            if(persona != null) {
+                logger.log(Level.INFO, "persona Not found");
+                usuario.getPersona().setId(persona.getId());
             }
+            usuario.setPersona(personaRepository.save(usuario.getPersona()));
+            usuario = usuarioRepository.save(usuario);
+            return ConvertUsuario.convertEntityToDTO(usuario);
         }catch(Exception e){
             logger.log(Level.SEVERE, e.getMessage(), e);
             return null;
@@ -177,18 +124,26 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public List<Usuario> findAll(Empresa empresa, int page, int pageSize) {
+    public List<UsuarioDTO> findAll(Empresa empresa, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+        List<UsuarioDTO> result = new ArrayList<>();
+        List<Usuario> usuarios = usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+        usuarios.forEach(e -> result.add(ConvertUsuario.convertEntityToDTO(e)));
+        return result;
     }
 
     @Override
-    public List<Usuario> findAll(String filter, Empresa empresa, int page, int pageSize) {
+    public List<UsuarioDTO> findAll(String filter, Empresa empresa, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
+        List<UsuarioDTO> result = new ArrayList<>();
         if(filter == null || filter.isEmpty()) {
-            return usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+            List<Usuario> usuarios = usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
+            usuarios.forEach(e -> result.add(ConvertUsuario.convertEntityToDTO(e)));
+            return result;
         } else  {
-            return  usuarioRepository.search(filter, empresa, pageable);
+            List<Usuario> usuarios = usuarioRepository.search(filter, empresa, pageable);
+            usuarios.forEach(e -> result.add(ConvertUsuario.convertEntityToDTO(e)));
+            return  result;
         }
     }
 }

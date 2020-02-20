@@ -6,8 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.Persona;
-import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
@@ -15,73 +14,60 @@ import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.util.Comparator;
 
-public class UsuarioGrid extends PaginatedGrid<Usuario> {
+public class UsuarioGrid extends PaginatedGrid<UsuarioDTO> {
 
     public UsuarioGrid() {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
-        addColumn(Usuario::getNombreUsuario)
+        addColumn(UsuarioDTO::getNombreUsuario)
                 .setHeader("Usuario")
                 .setFlexGrow(20)
                 .setSortable(true);
 
-        addColumn(usuario -> {
-            Persona persona = usuario.getPersona();
-            return persona == null ? "-" : persona.getTipoIde().getNombre();
-        }).setHeader("Tipo Ide").setSortable(true);
+        addColumn(UsuarioDTO::getTipoIde)
+                .setHeader("Tipo Ide")
+                .setSortable(true);
 
-        addColumn(usuario -> {
-            Persona persona = usuario.getPersona();
-            return persona == null ? "-" : persona.getIdentificacion();
-        }).setHeader("Identificación").setSortable(true);
+        addColumn(UsuarioDTO::getIdentificacion)
+                .setHeader("Identificación")
+                .setSortable(true);
 
-        addColumn(usuario -> {
-            Persona persona = usuario.getPersona();
-            return persona == null ? "-" : persona.getPrimerNombre();
-        }).setHeader("Primer Nombre").setSortable(true);
+        addColumn(UsuarioDTO::getPrimerNombre)
+                .setHeader("Primer Nombre")
+                .setSortable(true);
 
-        addColumn(usuario -> {
-            Persona persona = usuario.getPersona();
-            return persona == null ? "-" : persona.getPrimerApellido();
-        }).setHeader("Primer Apellido").setSortable(true);
+        addColumn(UsuarioDTO::getPrimerApellido)
+                .setHeader("Primer Apellido")
+                .setSortable(true);
 
         final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
-        addColumn(TemplateRenderer.<Usuario>of(availabilityTemplate)
-                .withProperty("activoS", Usuario::getActivoS))
+        addColumn(TemplateRenderer.<UsuarioDTO>of(availabilityTemplate)
+                .withProperty("activoS", UsuarioDTO::getActivoS))
                 .setHeader("Activo")
-                .setComparator(Comparator.comparing(Usuario::getActivoS))
+                .setComparator(Comparator.comparing(UsuarioDTO::getActivoS))
                 .setSortable(true);
 
-        addColumn(usuario -> {
-            Persona persona = usuario.getPersona();
-            return persona == null ? "-" : persona.getTelefono();
-        }).setHeader("Telefono").setSortable(false);
+        addColumn(UsuarioDTO::getTelefono)
+                .setHeader("Telefono")
+                .setSortable(false);
 
-        addColumn(usuario -> {
-            Persona persona = usuario.getPersona();
-            return persona == null ? "-" : persona.getEmail();
-        }).setHeader("Email").setSortable(true);
+        addColumn(UsuarioDTO::getEmail)
+                .setHeader("Email")
+                .setSortable(false);
 
         // Show all categories the product is in, separated by commas
-        addColumn(this::formatRol)
-                .setHeader("Rol")
-                .setSortable(true);
+        addColumn(usuario ->
+            usuario.getRol().getNombre()
+        ).setHeader("Rol").setSortable(true);
 
         setPageSize(Constantes.PAGE_SIZE);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(Usuario usuario) {
+    public void refresh(UsuarioDTO usuario) {
         getDataCommunicator().refresh(usuario);
-    }
-
-    private String formatRol(Usuario usuario) {
-        if (usuario.getRol() == null || usuario.getRol().getNombre().isEmpty()) {
-            return "";
-        }
-        return usuario.getRol().getNombre();
     }
 
     @Override

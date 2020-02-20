@@ -17,7 +17,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +34,7 @@ public class CategoriaView extends HorizontalLayout
     private List<CategoriaProducto> lista;
     private VerticalLayout barAndGridLayout;
 
-    @Autowired
+    //@Autowired
     public CategoriaView(CategoriaProductoService iService) {
             viewLogic = new CategoriaCrudLogic(iService,this);
 //        if(viewLogic.access()) {

@@ -7,7 +7,6 @@
 package com.gigti.xfinance.backend.data;
 
 import lombok.Data;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -55,10 +54,5 @@ public class Factura extends AbstractEntity {
         this.descripcion = descripcion;
         this.fechaCreacion = fechaCreacion;
         this.usuario = usuario;
-    }
-
-    //TODO
-    public String createFacturaNueva(){
-        return "0001";
     }
 }

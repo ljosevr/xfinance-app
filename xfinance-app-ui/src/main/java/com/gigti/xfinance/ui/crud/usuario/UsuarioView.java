@@ -7,7 +7,7 @@
 package com.gigti.xfinance.ui.crud.usuario;
 
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
@@ -27,9 +27,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 //@Component
 @Route(value = Constantes.VIEW_R_USUARIOS, layout = MainLayout.class)
@@ -41,10 +38,9 @@ public class UsuarioView extends VerticalLayout {
     private UsuarioForm form;
     private TextField filter;
     private UsuarioService usuarioService;
-    private List<Usuario> listaUsuarios;
     private Empresa empresa;
 
-    @Autowired
+    //@Autowired
     public UsuarioView(UsuarioService iService) {
         this.usuarioService = iService;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
@@ -82,7 +78,7 @@ public class UsuarioView extends VerticalLayout {
 
     private void addUser() {
         grid.asSingleSelect().clear();
-        editUser(new Usuario());
+        editUser(new UsuarioDTO());
     }
 
     private void configureGrid() {
@@ -91,7 +87,7 @@ public class UsuarioView extends VerticalLayout {
         grid.asSingleSelect().addValueChangeListener(evt -> editUser(evt.getValue()));
     }
 
-    private void editUser(Usuario usuario) {
+    private void editUser(UsuarioDTO usuario) {
         if (usuario == null) {
             closeEditor();
         } else {
@@ -111,8 +107,7 @@ public class UsuarioView extends VerticalLayout {
     }
 
     private void updateList() {
-        listaUsuarios = usuarioService.findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
-        grid.setItems(listaUsuarios);
+        grid.setItems(usuarioService.findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize()));
     }
 
     public HorizontalLayout createTopBar() {
@@ -134,8 +129,7 @@ public class UsuarioView extends VerticalLayout {
     }
 
     private void saveUser(UsuarioForm.SaveEvent evt) {
-        Usuario usuario = evt.getUsuario();
-        usuario.setPersona(evt.getPersona());
+        UsuarioDTO usuario = evt.getUsuario();
         usuario.setEmpresa(empresa);
         usuarioService.saveUsuario(usuario);
         updateList();
@@ -143,8 +137,8 @@ public class UsuarioView extends VerticalLayout {
     }
 
     private void deleteContact(UsuarioForm.DeleteEvent evt) {
-        Usuario usuario = evt.getUsuario();
-        if(usuarioService.deleteUsuario(usuario.getId())){
+        UsuarioDTO usuario = evt.getUsuario();
+        if(usuarioService.deleteUsuario(usuario.getUsuarioid())){
             showSaveNotification("Usuario: "+usuario.getNombreUsuario() + " Eliminado");
             updateList();
             closeEditor();
