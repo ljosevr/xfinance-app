@@ -3,6 +3,7 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.mapper.ConvertEmpresa;
+import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -179,7 +180,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(null,true, "ROOT");
 
             List<Rol> listaRolesDestino = new ArrayList<>();
-            for(Rol r : listaRolesOrigen){
+            for(Rol r : listaRolesOrigen) {
                 Rol rol = new Rol();
                 rol.setFechaActivacion(new Date());
 
@@ -203,9 +204,10 @@ public class EmpresaServiceImpl implements EmpresaService {
             usuarioAdmin.setRol(rolAdmin);
             usuarioAdmin.setTipoUsuario(TipoUsuario.ADMIN);
             //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
-            usuarioAdmin.setPasswordUsuario("1234");
-
+            usuarioAdmin.setPasswordUsuario(Utils.encrytPass("123456"));
+            usuarioAdmin.setAdminDefecto(true);
             usuarioAdmin = usuarioRepository.save(usuarioAdmin);
+
             empresa.setUsuarioId(usuarioAdmin.getId());
 
             //Categoria de Productos

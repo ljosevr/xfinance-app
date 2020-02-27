@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseBool {
+public class Response {
 
-    private boolean sucess;
+    private boolean success;
     private String code;
-    private String msg;
+    private String message;
+    private Object object;
 
 }

@@ -24,12 +24,10 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.contextmenu.ContextMenu;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -39,12 +37,11 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -79,42 +76,41 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     public MainLayout() {
-        String username = "";
-        String personname = "";
-        String empresaname = "";
-        if(CurrentUser.get() != null){
-            username = CurrentUser.get().getNombreUsuario();
-            personname = CurrentUser.get().getPersona().getCompleteName();
-            empresaname = CurrentUser.get().getEmpresa().getNombreEmpresa();
-        };
 
         this.setDrawerOpened(true);
         createHeader();
-
-        VerticalLayout vDetail = new VerticalLayout();
-        vDetail.add(new Span("Nombre: "+personname));
-        vDetail.add(new Span("Empresa: "+empresaname));
-
 
         this.setPrimarySection(Section.DRAWER);
     }
 
     private void createHeader(){
-        H1 logo = new H1("X Finance App");
-        logo.addClassName("logo");
+        H1 appTitle = new H1("X Finance App");
+        appTitle.addClassName("logo");
 
         menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
         menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
         menu_salir.addClickListener(listener -> signOut());
         menu_salir.setClassName("menubutton");
 
-        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo, menu_salir); //
+        String username = "";
+        String personname = "";
+        String empresaname = "";
+        if(CurrentUser.get() != null){
+            username = CurrentUser.get().getNombreUsuario();
+            personname = CurrentUser.get().getPersona().getPrimerNombre();
+            empresaname = CurrentUser.get().getEmpresa().getNombreEmpresa();
+        }
+
+        H1 bienvenida = new H1("Bienvenido: "+personname);
+        bienvenida.addClassName("logo");
+
+        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);
 
         header.setDefaultVerticalComponentAlignment(
                 FlexComponent.Alignment.CENTER); //
         header.setWidth("100%");
         header.addClassName("header");
-        header.expand(logo);
+        header.expand(appTitle);
         addToNavbar(header);
     }
 
@@ -127,22 +123,10 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             logo.setHeight("45px");
             logo.setWidth("45px");
 
-
-            Image imgUser = new Image("/frontend/images/IconoUser.png", "Perfil");
-            imgUser.setHeight("70px");
-            imgUser.setWidth("70px");
-            imgUser.getStyle().set("border","1px solid mediumseagreen");
-            imgUser.getStyle().set("border-radius","50px");
-
-            ContextMenu contextMenu = new ContextMenu();
-            contextMenu.setTarget(imgUser);
-            contextMenu.addItem("Perfil", null);
-
             H2 titleMenu = new H2("MENU");
             titleMenu.setClassName("titleMenu");
 
             layoutDrawer.add(logo);
-            layoutDrawer.add(imgUser);
             layoutDrawer.add(titleMenu);
             layoutDrawer.add(createMenu());
             this.addToDrawer(layoutDrawer);
@@ -153,37 +137,78 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         VerticalLayout layoutMenu = new VerticalLayout();
         layoutMenu.setClassName("menuLayout");
         Usuario user = CurrentUser.get();
-        List<Vista> listVista =  user.getRol().getVistas().stream().sorted(Comparator.comparing(Vista::getOrderVista))
+        List<Vista> listVista =  user.getRol().getVistas().stream()
+                .sorted(Comparator.comparing(Vista::getOrderVista))
                 .collect(Collectors.toList());
-        for(Vista view : listVista){
+
+        Map<Vista, List<Vista>> mapMenu = new HashMap<>();
+        for(Vista view : listVista) {
+
             if(view.getVistaPadre() == null) {
-                if(view.getSubVistas().isEmpty()){
+                if (view.getSubVistas().isEmpty()) {
                     //SOLO MENU
                     Button menu = new Button(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
                     menu.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
                     menu.addClickListener(l -> UI.getCurrent().navigate(view.getRouteVista()));
                     menu.setClassName("menubutton");
                     layoutMenu.add(menu);
-                } else {
-                  //SubMenu
-                    VerticalLayout  layout_menu_sub = new VerticalLayout();
-                    if(menus_varios == null) {
-                        menus_varios = new Accordion();
-                    }
+                }
+            }
 
-                    for(Vista sub : view.getSubVistas()){
-                        if(sub.getVistaPadre().getId().equals(view.getId())) {
-                            Button menu_sub = new Button(sub.getNombreVista(), new Icon(VaadinIcon.valueOf(sub.getIconMenu())));
-                            menu_sub.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-                            menu_sub.addClickListener(l -> UI.getCurrent().navigate(sub.getRouteVista()));
-                            menu_sub.setClassName("subMenu-Layout");
-                            layout_menu_sub.add(menu_sub);
-                        }
-                    }
-                    menus_varios.add(view.getNombreVista(), layout_menu_sub);
+            if (view.getVistaPadre() != null) {
+                List<Vista> list = mapMenu.get(view.getVistaPadre());
+                if (CollectionUtils.isEmpty(list)) {
+                    list = new ArrayList<>();
+                    list.add(view);
+                    mapMenu.put(view.getVistaPadre(), list);
+                } else {
+                    list.add(view);
+                    mapMenu.putIfAbsent(view.getVistaPadre(), list);
                 }
             }
         }
+
+        Map<Vista, List<Vista>> result2 = new LinkedHashMap<>();
+        mapMenu.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Vista::getOrderVista)))
+                .forEachOrdered(x -> result2.put(x.getKey(), x.getValue()));
+
+        for(Map.Entry<Vista, List<Vista>> entry : result2.entrySet()){
+            Vista vista = entry.getKey();
+            List<Vista> vistas = entry.getValue();
+
+            VerticalLayout  layout_menu_sub = new VerticalLayout();
+            if(menus_varios == null) {
+                menus_varios = new Accordion();
+            }
+
+            for(Vista sub : vistas){
+                Button menu_sub = new Button(sub.getNombreVista(), new Icon(VaadinIcon.valueOf(sub.getIconMenu())));
+                menu_sub.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+                menu_sub.addClickListener(l -> UI.getCurrent().navigate(sub.getRouteVista()));
+                menu_sub.setClassName("subMenu-Layout");
+                layout_menu_sub.add(menu_sub);
+            }
+            menus_varios.add(vista.getNombreVista(), layout_menu_sub);
+        }
+
+//        mapMenu.forEach((vista, vistas) -> {
+//            VerticalLayout  layout_menu_sub = new VerticalLayout();
+//            if(menus_varios == null) {
+//                menus_varios = new Accordion();
+//            }
+//
+//            for(Vista sub : vistas){
+//                    Button menu_sub = new Button(sub.getNombreVista(), new Icon(VaadinIcon.valueOf(sub.getIconMenu())));
+//                    menu_sub.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+//                    menu_sub.addClickListener(l -> UI.getCurrent().navigate(sub.getRouteVista()));
+//                    menu_sub.setClassName("subMenu-Layout");
+//                    layout_menu_sub.add(menu_sub);
+//            }
+//            menus_varios.add(vista.getNombreVista(), layout_menu_sub);
+//
+//        });
+
         if(menus_varios != null){
             layoutMenu.add(menus_varios);
         }

@@ -39,8 +39,8 @@ public class UsuarioForm extends Dialog {
 
     private static final Logger logger = Logger.getLogger(UsuarioForm.class.getName());
     private Button btnSave;
-    private Binder<UsuarioDTO> binderUsuario;
 
+    private Binder<UsuarioDTO> binderUsuario;
     public UsuarioForm(List<Rol> listRoles) {
         binderUsuario = new BeanValidationBinder<>(UsuarioDTO.class);
 

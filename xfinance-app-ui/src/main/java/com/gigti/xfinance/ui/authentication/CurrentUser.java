@@ -63,15 +63,10 @@ public final class CurrentUser {
             getCurrentRequest().getWrappedSession().removeAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY);
             current = null;
-//            getCurrentRequest().getWrappedSession().removeAttribute(
-//                    CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY);
-
         } else {
             getCurrentRequest().getWrappedSession().setAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
             current = currentUser;
-//            getCurrentRequest().getWrappedSession().setAttribute(
-//                    CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY, rolUsuario);
         }
     }
 

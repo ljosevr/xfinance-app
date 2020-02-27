@@ -213,8 +213,8 @@ a[highlight] {
 .subMenu-Layout {
     margin: 1px;
     padding: 1px;
-    border: 1px solid blue;
-    border-radius: 7px;
+    /*border: 1px solid blue;*/
+    /*border-radius: 7px;*/
 }
 
 .drawerLayout {

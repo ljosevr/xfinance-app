@@ -7,8 +7,8 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.UsuarioService;
-import com.gigti.xfinance.ui.util.Response;
 
 import java.io.Serializable;
 

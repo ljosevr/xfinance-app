@@ -30,6 +30,9 @@ public class Constantes {
     public static final String VIEW_R_ROL = "roles";
     public static final String VIEW_R_REPORTS = "reports";
     public static final String VIEW_R_GANANCIAS_Y_PERDIDAS = "balance";
+    public static final String VIEW_R_CONFIG_PERFIL = "perfil";
+    public static final String VIEW_R_CONFIG_EMPRESA = "dataEmpresa";
+    public static final String VIEW_R_CONFIG_PASSWORD = "changePass";
 
     //VIEW-NAME
     public static final String VIEW_MAIN = "Tu Punto de Venta";
@@ -55,6 +58,11 @@ public class Constantes {
     public static final String VIEW_REPORTS = "Reportes";
     public static final String VIEW_INVENTARIO = "Inventarios";
     public static final String VIEW_GANANCIAS_Y_PERDIDAS = "Ganancias y Perdidas";
+    public static final String VIEW_CONFIG_PERFIL = "Perfil";
+    public static final String VIEW_CONFIG_EMPRESA = "Datos Empresa";
+    public static final String VIEW_CONFIG_PASSWORD = "Cambiar Mi Clave";
+
+    public static final String VIEW_CONFIG = "Configuración";
 
     public static final String VIEW_RECOVER_PASS = "Recuperar Password";
 

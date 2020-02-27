@@ -8,10 +8,10 @@ package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.dto.LoginDTO;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InitBackService;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.util.Response;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -70,7 +70,7 @@ public class LoginView extends VerticalLayout {
         Button btnIngresar = new Button("Ingresar");
         btnIngresar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnIngresar.addClickListener(click ->
-                login2(tfCodigoEmpresa.getValue(), tfUsername.getValue(), tfPassword.getValue()));
+                login(tfCodigoEmpresa.getValue(), tfUsername.getValue(), tfPassword.getValue()));
         btnIngresar.addClickShortcut(Key.ENTER);
 
 
@@ -80,9 +80,9 @@ public class LoginView extends VerticalLayout {
         binder.forField(tfPassword).asRequired("Digite un Password").bind(LoginDTO::getPassword, LoginDTO::setPassword);
         //binder.bindInstanceFields(this);
 
-        binder.addStatusChangeListener(event -> {
-            btnIngresar.setEnabled(binder.isValid());
-        });
+//        binder.addStatusChangeListener(event -> {
+//            btnIngresar.setEnabled(binder.isValid());
+//        });
 
         RouterLink forgot = new RouterLink("Olvide el Password", ForgotPasswordView.class);
         //content.add(tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar);
@@ -92,7 +92,7 @@ public class LoginView extends VerticalLayout {
         tfCodigoEmpresa.focus();
     }
 
-    private void login2(String codigoEmpresa, String userName, String password) {
+    private void login(String codigoEmpresa, String userName, String password) {
         if(binder.isValid()) {
             Response response = accessControl.signIn(codigoEmpresa, userName, password, usuarioService);
             if (response.isSuccess()) {

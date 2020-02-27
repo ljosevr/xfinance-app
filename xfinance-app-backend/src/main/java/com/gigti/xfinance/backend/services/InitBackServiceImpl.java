@@ -2,6 +2,7 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -73,11 +74,14 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
                 Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 2, null));
                 Vista vista_usuarios = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO,null,null,3,null));
+
                 //PERFIL
                 Vista vista_empresa = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA,Constantes.VIEW_R_EMPRESA, null, 4, "OFFICE"));
 
                 Vista vista_empresaMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESAS,null, null, 5, null));
                 Vista vista_reportes = vistaRepository.save(new Vista(Constantes.VIEW_REPORTS,null, null, 6, null));
+
+                Vista vista_config = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG,null, null, 7, null));
 
                 //1.Punto de Venta
                 Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_R_VENTA, vista_venta, 11, "CASH"));//CASH
@@ -100,6 +104,11 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_invHoy = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO,Constantes.VIEW_R_INVENTARIO,vista_reportes, 61, "STORAGE"));
                 Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_R_GANANCIAS_Y_PERDIDAS,vista_reportes, 62,"CHART_LINE"));
 
+                //7. Config
+                Vista vista_config_perfil = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PERFIL,Constantes.VIEW_R_CONFIG_PERFIL,vista_config, 63, "COG"));
+                Vista vista_config_empresa = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_EMPRESA,Constantes.VIEW_R_CONFIG_EMPRESA,vista_config, 64,"COGS"));
+                Vista vista_config_password = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PASSWORD,Constantes.VIEW_R_CONFIG_PASSWORD,vista_config, 65, "PASSWORD"));
+
                 logger.info("Vistas");
 
                 //Roles
@@ -108,6 +117,9 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ROOT.getVistas().add(vista_empresaMaster);
                 Rol.ROOT.getVistas().add(vista_admin_empMaster);
                 Rol.ROOT.getVistas().add(vista_usuario_emp);
+                Rol.ROOT.getVistas().add(vista_config);
+                Rol.ROOT.getVistas().add(vista_config_perfil);
+                Rol.ROOT.getVistas().add(vista_config_password);
                 Rol.ROOT.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ROOT);
 
@@ -128,6 +140,10 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ADMIN.getVistas().add(vista_reportes);
                 Rol.ADMIN.getVistas().add(vista_invHoy);
                 Rol.ADMIN.getVistas().add(vista_balance);
+                Rol.ADMIN.getVistas().add(vista_config);
+                Rol.ADMIN.getVistas().add(vista_config_perfil);
+                Rol.ADMIN.getVistas().add(vista_config_empresa);
+                Rol.ADMIN.getVistas().add(vista_config_password);
                 Rol.ADMIN.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ADMIN);
                 logger.info("Rol Admin");
@@ -136,16 +152,24 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.VENDEDOR.setVistas(new HashSet<>());
                 Rol.VENDEDOR.getVistas().add(vista_venta);
                 Rol.VENDEDOR.getVistas().add(vista_vender);
+                Rol.VENDEDOR.getVistas().add(vista_config);
+                Rol.VENDEDOR.getVistas().add(vista_config_perfil);
+                Rol.VENDEDOR.getVistas().add(vista_config_password);
                 Rol.VENDEDOR.setFechaActivacion(new Date());
                 rolRepository.save(Rol.VENDEDOR);
                 logger.info("Rol Vendedor");
 
                 //4.AUXILIAR
                 Rol.AUXILIAR.setVistas(new HashSet<>());
+                Rol.AUXILIAR.getVistas().add(vista_venta);
+                Rol.AUXILIAR.getVistas().add(vista_vender);
                 Rol.AUXILIAR.getVistas().add(vista_producto);
                 Rol.AUXILIAR.getVistas().add(vista_admin_prod);
                 Rol.AUXILIAR.getVistas().add(vista_categoria);
-                Rol.AUXILIAR.getVistas().add(vista_compras);
+                Rol.AUXILIAR.getVistas().add(vista_config);
+                Rol.AUXILIAR.getVistas().add(vista_config_perfil);
+                Rol.AUXILIAR.getVistas().add(vista_config_password);
+                //Rol.AUXILIAR.getVistas().add(vista_compras);
                 Rol.AUXILIAR.setFechaActivacion(new Date());
                 rolRepository.save(Rol.AUXILIAR);
                 logger.info("Rol Auxiliar");
@@ -200,10 +224,11 @@ public class InitBackServiceImpl implements InitBackService {
 
                 //Usuario Root
                 Rol rolRoot = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ROOT.getNombre(), null, false);
+
+                String pass = Utils.encrytPass("jose410Angel");
                 Usuario userRoot = new Usuario(
                         "Root",
-                        //passwordEncoder.encode("1234"),
-                        "1234",
+                        pass,
                         true,
                         persona,
                         emp,

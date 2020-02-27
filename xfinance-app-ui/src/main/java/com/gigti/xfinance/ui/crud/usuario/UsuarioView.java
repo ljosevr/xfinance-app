@@ -9,6 +9,7 @@ package com.gigti.xfinance.ui.crud.usuario;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -138,21 +139,14 @@ public class UsuarioView extends VerticalLayout {
 
     private void deleteContact(UsuarioForm.DeleteEvent evt) {
         UsuarioDTO usuario = evt.getUsuario();
-        if(usuarioService.deleteUsuario(usuario.getUsuarioid())){
-            showSaveNotification("Usuario: "+usuario.getNombreUsuario() + " Eliminado");
+        Response response = usuarioService.deleteUsuario(usuario.getUsuarioid());
+        if(response.isSuccess()){
+            Notification.show(response.getMessage(), 3000, Notification.Position.MIDDLE);
             updateList();
             closeEditor();
         } else {
-            showError("Error al Eliminar Usuario "+usuario.getNombreUsuario());
+            Notification.show(response.getMessage(), 5000, Notification.Position.MIDDLE);
         }
-    }
-
-    public void showError(String msg) {
-        Notification.show(msg);
-    }
-
-    public void showSaveNotification(String msg) {
-        Notification.show(msg);
     }
 
     public void showForm(boolean show) {
