@@ -119,14 +119,29 @@ public class EmpresaMasterForm extends Dialog {
         tfUserEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         binder = new BeanValidationBinder<>(EmpresaDTO.class);
-        binder.forField(tfNombreEmpresa).bind(EmpresaDTO::getNombreEmpresa, EmpresaDTO::setNombreEmpresa);
-        binder.forField(tfCodigoEmpresa).bind(EmpresaDTO::getCodigoEmpresa, EmpresaDTO::setCodigoEmpresa);
+        binder.forField(tfNombreEmpresa)
+                .withValidator(name -> name.length() >= 4,
+                        "El Nombre de la Empresa debe contener Minimo 4 caracteres")
+                .bind(EmpresaDTO::getNombreEmpresa, EmpresaDTO::setNombreEmpresa);
+
+        binder.forField(tfCodigoEmpresa)
+                .withValidator(codigo -> codigo.length() >= 3 && codigo.length() <= 6,
+                        "El Codigo de la Empresa debe tener entre 3 y 6 caracteres")
+                .bind(EmpresaDTO::getCodigoEmpresa, EmpresaDTO::setCodigoEmpresa);
+
         binder.forField(cbTipoIde).bind(EmpresaDTO::getTipoIde, EmpresaDTO::setTipoIde);
-        binder.forField(tfIdentificacion).bind(EmpresaDTO::getIdentificacion, EmpresaDTO::setIdentificacion);
+        binder.forField(tfIdentificacion)
+                .withValidator(ide -> ide.length() >= 4,
+                        "El numero de Identificación de la Empresa debe contener Minimo 4 caracteres")
+                .bind(EmpresaDTO::getIdentificacion, EmpresaDTO::setIdentificacion);
+
         binder.forField(tfDireccion).bind(EmpresaDTO::getDireccion, EmpresaDTO::setDireccion);
         binder.forField(tfTelefono).bind(EmpresaDTO::getTelefono, EmpresaDTO::setTelefono);
         binder.forField(chkActivo).bind(EmpresaDTO::isActivo, EmpresaDTO::setActivo);
-        binder.forField(tfUsuarioAdmin).bind(EmpresaDTO::getUsuarioNombre, EmpresaDTO::setUsuarioNombre);
+        binder.forField(tfUsuarioAdmin)
+                .withValidator(name -> name.length() >= 4,
+                        "El Nombre de usuario debe contener Minimo 4 caracteres")
+                .bind(EmpresaDTO::getUsuarioNombre, EmpresaDTO::setUsuarioNombre);
         binder.forField(tfprimerNombreUsuario).bind(EmpresaDTO::getPrimerNombrePersona, EmpresaDTO::setPrimerNombrePersona);
         binder.forField(tfSegundoNombreUsuario).bind(EmpresaDTO::getSegundoNombrePersona, EmpresaDTO::setSegundoNombrePersona);
         binder.forField(tfPrimerApellidoUsuario).bind(EmpresaDTO::getPrimerApellidoPersona, EmpresaDTO::setPrimerApellidoPersona);

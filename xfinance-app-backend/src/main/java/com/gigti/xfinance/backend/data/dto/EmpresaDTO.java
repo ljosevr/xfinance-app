@@ -6,6 +6,7 @@ import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.Vista;
 import lombok.Data;
 
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +30,7 @@ public class EmpresaDTO implements Serializable {
     private String activoS;
 
     private String usuarioId;
+    @Size(min = 4, max = 25)
     private String usuarioNombre;
     private Rol rol;
     private List<Vista> vistas;

@@ -101,7 +101,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             empresaname = CurrentUser.get().getEmpresa().getNombreEmpresa();
         }
 
-        H1 bienvenida = new H1("Bienvenido: "+personname);
+        H1 bienvenida = new H1(empresaname.toUpperCase() + " - Bienvenido: "+personname);
         bienvenida.addClassName("logo");
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);

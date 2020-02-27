@@ -67,15 +67,28 @@ public class UserChangePasswordView extends VerticalLayout {
         formLayout.add(pfOldPassword,pfNewPassword1,pfNewPassword2);
 
         binder = new BeanValidationBinder<>(UsuarioChangePasswordDTO.class);
-        binder.forField(pfOldPassword).asRequired("Digite el Password Actual").bind(UsuarioChangePasswordDTO::getOldPassword, UsuarioChangePasswordDTO::setOldPassword);
-        binder.forField(pfNewPassword1).asRequired("Digite el Nuevo Password").bind(UsuarioChangePasswordDTO::getNewPassword1, UsuarioChangePasswordDTO::setNewPassword1);
-        binder.forField(pfNewPassword2).asRequired("Confirme el Nuevo Password").bind(UsuarioChangePasswordDTO::getNewPassword2, UsuarioChangePasswordDTO::setNewPassword2);
+        binder.forField(pfOldPassword).asRequired("Digite el Password Actual")
+                .bind(UsuarioChangePasswordDTO::getOldPassword, UsuarioChangePasswordDTO::setOldPassword);
+
+        binder.forField(pfNewPassword1).asRequired("Digite el Nuevo Password")
+                .withValidator(newPass -> newPass.length() >= 4,"Nueva Contraseña debe contener al menos 4 caracteres")
+                .withValidator(pass1 -> pfNewPassword2.isEmpty() || pass1.equals(pfNewPassword2.getValue()),
+                            "La Nueva Contraseña NO coincide, Verifica")
+                .bind(UsuarioChangePasswordDTO::getNewPassword1, UsuarioChangePasswordDTO::setNewPassword1);
+
+        binder.forField(pfNewPassword2).asRequired("Confirme el Nuevo Password")
+                .withValidator(newPass -> newPass.length() >= 4,"Nueva Contraseña debe contener al menos 4 caracteres")
+                .withValidator(pass2 -> pfNewPassword1.isEmpty() || pass2.equals(pfNewPassword1.getValue()),
+                            "La Nueva Contraseña NO coincide, Verifica")
+                .bind(UsuarioChangePasswordDTO::getNewPassword2, UsuarioChangePasswordDTO::setNewPassword2);
 
         Button btnSave = new Button("Guardar");
         btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> validateAndSave());
         btnSave.addClickShortcut(Key.ENTER);
+
+        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         Button btnClean = new Button("Limpiar");
         btnClean.setWidth("100%");
@@ -107,8 +120,6 @@ public class UserChangePasswordView extends VerticalLayout {
                 } else {
                     Notification.show(response.getMessage(), 3000, Notification.Position.MIDDLE);
                 }
-            } else {
-                Notification.show("Nuevo Password no coincide ", 7000, Notification.Position.MIDDLE);
             }
         }
     }

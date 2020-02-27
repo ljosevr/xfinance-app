@@ -15,10 +15,10 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios", uniqueConstraints={@UniqueConstraint(columnNames={"nombre_usuario","empresa_id"})})
 public class Usuario extends AbstractEntity {
 
-    @Column(name="nombre_usuario", unique = true)
+    @Column(name="nombre_usuario")
     @Size(min = 4, max = 25)
     @NotNull
     private String nombreUsuario;
