@@ -41,7 +41,6 @@ public class UsuarioView extends VerticalLayout {
     private UsuarioService usuarioService;
     private Empresa empresa;
 
-    //@Autowired
     public UsuarioView(UsuarioService iService) {
         this.usuarioService = iService;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;

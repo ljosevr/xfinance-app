@@ -4,8 +4,7 @@ import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.repositories.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,13 +12,16 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 public class VentaServiceImpl implements VentaService {
 
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    private static final Logger logger = Logger.getLogger(UsuarioServiceImpl.class.getName());
 
     @Autowired
     private FacturaRepository facturaRepository;
@@ -39,16 +41,22 @@ public class VentaServiceImpl implements VentaService {
     @Autowired
     private ProductoInvInicioRepository productoInvInicioRepository;
 
+//    @Override
+//    public List<PventaDTO> find100MostImportant(Empresa empresa) {
+//        Pageable pageable = PageRequest.of(0, 100);
+//        return getListPventaDTO(empresa, pageable);
+//    }
+
     @Override
-    public List<PventaDTO> find100MostImportant(Empresa empresa) {
-        Pageable pageable = PageRequest.of(0, 100);
-        return getListPventaDTO(empresa, pageable);
+    public ListDataProvider<PventaDTO> findAll(String filter, Empresa empresa, int page, int size) {
+        logger.info("--> findAll");
+        Pageable pageable = PageRequest.of(page, size);
+        return getListPventaDTO(filter, empresa, pageable);
     }
 
     @Override
-    public List<PventaDTO> findAll(Empresa empresa, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return getListPventaDTO(empresa, pageable);
+    public int count(Empresa empresa) {
+        return productoRepository.countByEmpresa(empresa);
     }
 
     @Override
@@ -108,16 +116,23 @@ public class VentaServiceImpl implements VentaService {
             itemFacturaRepository.saveAll(listItems);
             return factura;
         }catch(Exception e){
-            logger.error("Error: al generar Factura: "+e.getMessage(), e);
+            logger.log(Level.SEVERE, "Error: al generar Factura: "+e.getMessage(), e);
             return null;
         }
     }
 
-    private List<PventaDTO> getListPventaDTO(Empresa empresa,Pageable pageable){
-        List<Producto> list = productoRepository.findByEmpresa(empresa, pageable);
-        List<PventaDTO> listDTO = new ArrayList<>();
+    private ListDataProvider<PventaDTO> getListPventaDTO(String filter, Empresa empresa, Pageable pageable){
+        String methodName = "getListPventaDTO";
+        logger.info("--> "+methodName);
+        List<Producto> result = new ArrayList<>();
+        if(filter == null || filter.isEmpty()) {
+            result = productoRepository.findByEmpresa(empresa, pageable);
+        } else {
+            result = productoRepository.search(filter, empresa, pageable);
+        }
+        Collection<PventaDTO> listDTO = new ArrayList<>();
 
-        for(Producto p : list){
+        for(Producto p : result) {
             double inStock = 0;
             ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(p);
             if(pid == null) {
@@ -137,8 +152,8 @@ public class VentaServiceImpl implements VentaService {
                 }
             }
         }
-
-        return listDTO;
+        logger.info("<-- "+methodName);
+        return new ListDataProvider<>(listDTO);
     }
 
     private PventaDTO convertProductoToPventaDTO(Producto p, ProductoValores pvalores, double inStock){

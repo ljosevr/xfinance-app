@@ -42,6 +42,7 @@ import java.util.Locale;
  * A form for editing a single product.
  */
 public class ProductoForm extends Dialog {
+    private TextField tfProdNombre;
     private FormLayout content;
 
     Logger logger = LoggerFactory.getLogger(ProductoForm.class);
@@ -111,7 +112,7 @@ public class ProductoForm extends Dialog {
 
         viewLogic = productoCrudLogic;
 
-        TextField tfProdNombre = new TextField("Nombre Producto");
+        tfProdNombre = new TextField("Nombre Producto");
         tfProdNombre.setRequired(true);
         tfProdNombre.focus();
 
@@ -238,6 +239,7 @@ public class ProductoForm extends Dialog {
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);
         this.add(content);
+        tfProdNombre.focus();
     }
 
     public void setCategories(List<CategoriaProducto> categories) {

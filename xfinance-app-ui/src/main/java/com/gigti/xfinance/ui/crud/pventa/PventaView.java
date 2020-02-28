@@ -1,9 +1,12 @@
 package com.gigti.xfinance.ui.crud.pventa;
 
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Factura;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -33,28 +36,34 @@ public class PventaView extends HorizontalLayout {
 
     private boolean isModified;
     private PventaGrid grid;
-    private ComboBox<PventaDTO> filter;
+    private ComboBox<PventaDTO> cbFilter;
     private NumberField nfCantidad;
     private NumberField nfSubTotal;
     private H2 lblTotal;
-    private PventaLogic viewLogic;
+    //private PventaLogic viewLogic;
     private List<PventaDTO> lista;
 
     private Map<String,PventaDTO> mapItemsventa;
     private PventaDTO pventaDTO;
     private BigDecimal totalFactura;
     private FormLayout formActions;
+    private static Empresa empresa;
+    private VentaService ventaService;
+    private String filterText;
 
-    //@Autowired
     public PventaView(VentaService ventaService) {
+        this.ventaService =  ventaService;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+
         formActions = new FormLayout();
         formActions.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
                 new FormLayout.ResponsiveStep("32em", 2),
                 new FormLayout.ResponsiveStep("40em", 4));
 
-        viewLogic = new PventaLogic(ventaService,this);
-        lista = viewLogic.findAll();
+        //viewLogic = new PventaLogic(ventaService,this);
+        //lista = viewLogic.findAll();
+
         createTopBar();
 
         grid = new PventaGrid();
@@ -62,7 +71,6 @@ public class PventaView extends HorizontalLayout {
         H3 title = new H3(Constantes.VIEW_PVENTA);
         title.setClassName("titleView");
 
-        //private Set<PventaDTO> listaItemsVenta;
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);
 
@@ -74,8 +82,8 @@ public class PventaView extends HorizontalLayout {
         barAndGridLayout.expand(grid);
 
         grid.addItemClickListener(event ->{
-            filter.setValue(event.getItem());
-            filter.setEnabled(false);
+            cbFilter.setValue(event.getItem());
+            cbFilter.setEnabled(false);
             nfCantidad.setValue(event.getItem().getCantidadVenta());
             nfSubTotal.setValue(event.getItem().getCantidadVenta() * event.getItem().getPrecioVentaActual().doubleValue());
             pventaDTO = event.getItem();
@@ -84,43 +92,51 @@ public class PventaView extends HorizontalLayout {
         });
 
         add(barAndGridLayout);
+        filterText = "";
+//        updateList("");
     }
 
-    private void createTopBar() {
+//    private void updateList(String filter) {
+//        cbFilter.setItems(ventaService.findAll(filter, empresa, 0, 10));
+//    }
 
-        // TODO Precargar list de 50 0 100 Productos ?
-        filter = new ComboBox<>("Producto");
-        filter.setPlaceholder("Buscar por Nombre o Codigo Barras");
-        filter.setItemLabelGenerator(PventaDTO::getNombreProducto);
-        filter.setAllowCustomValue(true);
-        filter.setPageSize(10);
+    private void createTopBar() {
+        cbFilter = new ComboBox<>("Producto");
         ComboBox.ItemFilter<PventaDTO> filter2 = (pventa, filterString) ->
                 pventa.getNombreProducto().toLowerCase()
                         .contains(filterString.toLowerCase())
                         || pventa.getCodigoBarra().toLowerCase()
                         .contains(filterString.toLowerCase());
-
-        filter.setItems(filter2, lista);
-        //filter.addValueChangeMode(ValueChangeMode.ON_CHANGE);
-        filter.addCustomValueSetListener(custom -> {
-            if (!custom.getDetail().isBlank()) {
-                //TODO Buscar resultados a BD
-                NotificacionesUtil.openProgressBar("Buscando por Favor Espere", true, false);
-            }
-        });
-        filter.addValueChangeListener(event -> {
-                pventaDTO = event.getValue();
-                if (pventaDTO != null) {
-                    if(mapItemsventa == null) mapItemsventa = new HashMap<>();
-                    nfCantidad.setEnabled(true);
-                    nfCantidad.setValue(1.0);
-                    nfSubTotal.setValue(pventaDTO.getPrecioVentaActual().doubleValue());
-                    nfCantidad.focus();
+        //cbFilter.setItems(filter2, lista);
+        cbFilter.setPlaceholder("Codigo Barras ó Nombre");
+        cbFilter.setAllowCustomValue(true);
+        cbFilter.setItemLabelGenerator(PventaDTO::getNombreProducto);
+        cbFilter.addValueChangeListener(event -> {
+                    pventaDTO = event.getValue();
+                    if (pventaDTO != null) {
+                        if(mapItemsventa == null) mapItemsventa = new HashMap<>();
+                        nfCantidad.setEnabled(true);
+                        nfCantidad.setValue(1.0);
+                        nfSubTotal.setValue(pventaDTO.getPrecioVentaActual().doubleValue());
+                        nfCantidad.focus();
+                    }
                 }
-            }
         );
-        filter.addFocusShortcut(Key.F10);
-        filter.focus();
+
+        cbFilter.addCustomValueSetListener(event -> filterText = event.getDetail());
+        cbFilter.addFocusShortcut(Key.F10);
+        cbFilter.setDataProvider(ventaService.findAll(filterText, empresa, 0, 10));
+        cbFilter.focus();
+
+
+        //cbFilter.addValueChangeMode(ValueChangeMode.LAZY);
+//        cbFilter.addCustomValueSetListener(custom -> {
+//            if (!custom.getDetail().isBlank()) {
+//                //TODO Buscar resultados a BD
+//                NotificacionesUtil.openProgressBar("Buscando por Favor Espere", true, false);
+//            }
+//        });
+
 
         nfCantidad = new NumberField("Cantidad");
         nfCantidad.setValue(0.0);
@@ -143,7 +159,7 @@ public class PventaView extends HorizontalLayout {
 
         Button btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-        btnSave.addClickListener(listener -> viewLogic.save(mapItemsventa.values()));
+        btnSave.addClickListener(listener -> saveSell(mapItemsventa.values()));
 
         Button btnDelete = new Button("Borrar Item");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
@@ -154,7 +170,17 @@ public class PventaView extends HorizontalLayout {
         btnCancel.addClickListener(listener -> clearAll());
 
         isModified = false;
-        formActions.add(filter, nfCantidad, nfSubTotal, lblTotal, btnSave, btnDelete, btnCancel);
+        formActions.add(cbFilter, nfCantidad, nfSubTotal, lblTotal, btnSave, btnDelete, btnCancel);
+    }
+
+    private void saveSell(Collection<PventaDTO> items) {
+            Factura factura = ventaService.registrarFactura(CurrentUser.get(), new ArrayList<>(items));
+            if(factura == null){
+                Notification.show("Error al generar factura");
+            } else {
+                Notification.show("Factura Generada: "+factura.getNumeroFactura());
+                clearAll();
+            }
     }
 
     private void deleteItemFromGrid() {
@@ -167,7 +193,7 @@ public class PventaView extends HorizontalLayout {
             mapItemsventa.remove(pventaDTO.getIdProducto());
             putInGrid(mapItemsventa);
             calculteTotalFactura();
-            filter.focus();
+            cbFilter.focus();
         }
     }
 
@@ -204,12 +230,12 @@ public class PventaView extends HorizontalLayout {
                     }
                     calculteTotalFactura();
 
-                    filter.setValue(null);
+                    cbFilter.setValue(null);
                     nfCantidad.setValue(0.0);
                     nfCantidad.setEnabled(false);
                     nfSubTotal.setValue(0.0);
-                    filter.setEnabled(true);
-                    filter.focus();
+                    cbFilter.setEnabled(true);
+                    cbFilter.focus();
                     pventaDTO = null;
                 } else {
                     double temp = pventaDTO.getInStock() - quantityAccumalted(pventaDTO);
@@ -218,7 +244,7 @@ public class PventaView extends HorizontalLayout {
                                 "¿Deseas Agregar " + temp + " a la Compra actual?", true, false);
 
                         Objects.requireNonNull(NotificacionesUtil.getDialogConfirmation()).addDialogCloseActionListener(
-                                listener -> filter.focus());
+                                listener -> cbFilter.focus());
 
                         getConfirmButton().focus();
 
@@ -235,17 +261,19 @@ public class PventaView extends HorizontalLayout {
                     }else {
                         Notification.show("No existen inventario para este producto, No se puede vender. \nSi tiene 1 o más en " +
                                 "mano contacta al administrador", 6000, Notification.Position.MIDDLE);
-                        filter.setValue(null);
+                        cbFilter.setValue(null);
                         nfCantidad.setValue(0d);
-                        filter.focus();
+                        cbFilter.focus();
                     }
                 }
             } else {
                 nfCantidad.focus();
             }
         } else {
-            filter.focus();
+            cbFilter.focus();
         }
+        //updateList("");
+        filterText = "";
     }
 
     /**
@@ -276,49 +304,25 @@ public class PventaView extends HorizontalLayout {
         lblTotal.setText("TOTAL: "+subtotal);
     }
 
-    public void showError(String msg) {
-        Notification.show(msg);
-    }
-
-    public void showSaveNotification(String msg) {
-        Notification.show(msg);
-    }
-
-    public void clearSelection() {
-        grid.getSelectionModel().deselectAll();
-    }
-
-    public void selectRow(PventaDTO row) {
-        grid.getSelectionModel().select(row);
-    }
-
-    public void refresh(){
-        lista = viewLogic.findAll();
-        filter.setItems(lista);
-        filter.focus();
-    }
-
     public void refresh(PventaDTO pventaDTO){
         lista.add(pventaDTO);
-        filter.setItems(lista);
+        cbFilter.setItems(lista);
     }
 
     public PventaGrid getGrid() {
         return grid;
     }
 
-    public List<PventaDTO> getItemsGrid(){
-        return lista;
-    }
-
     public void clearAll() {
         grid.setItems(new ArrayList<>());
-        filter.setValue(null);
+        cbFilter.setValue(null);
+        //updateList("");
+        filterText = "";
         nfCantidad.setValue(0.0);
         nfSubTotal.setValue(0.0);
         mapItemsventa = null;
         totalFactura = BigDecimal.ZERO;
         lblTotal.setText("TOTAL: "+totalFactura);
-        filter.focus();
+        cbFilter.focus();
     }
 }

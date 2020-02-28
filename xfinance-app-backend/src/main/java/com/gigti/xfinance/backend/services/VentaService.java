@@ -4,14 +4,17 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Factura;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
+import com.vaadin.flow.data.provider.ListDataProvider;
 
 import java.util.List;
 
 public interface VentaService {
 
-    public List<PventaDTO> find100MostImportant(Empresa empresa);
+//    public List<PventaDTO> find100MostImportant(Empresa empresa);
 
-    public List<PventaDTO> findAll(Empresa empresa, int page, int size);
+    public ListDataProvider<PventaDTO> findAll(String filter, Empresa empresa, int page, int size);
+
+    public int count(Empresa empresa);
 
     public Factura registrarFactura(Usuario usuario, List<PventaDTO> listVenta);
 
