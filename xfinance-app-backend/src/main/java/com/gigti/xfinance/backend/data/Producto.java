@@ -7,14 +7,10 @@
 package com.gigti.xfinance.backend.data;
 
 import com.gigti.xfinance.backend.TipoMedidaEnum;
-import lombok.Builder;
 import lombok.Data;
-import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
@@ -41,14 +37,17 @@ public class Producto extends AbstractEntity {
     @Transient
     private String activoS;
 
-    @Transient
-    private BigDecimal precioCostoActual = BigDecimal.ZERO;
-
-    @Transient
-    private BigDecimal precioVentaActual = BigDecimal.ZERO;
-
-    @Transient
-    private double stockActual;
+//    @Transient
+////    private BigDecimal precioCostoActual = BigDecimal.ZERO;
+////
+////    @Transient
+////    private BigDecimal precioVentaActual = BigDecimal.ZERO;
+////
+////    @Transient
+////    private BigDecimal stockActual;
+////
+////    @Transient
+////    private String inventarioId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
@@ -59,13 +58,13 @@ public class Producto extends AbstractEntity {
     private CategoriaProducto categoria;
 
     @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoValores> productoValores;
+    private List<ProductoInventario> inventarios;
 
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoInventarioInicio> productoInventarioInicio;
-
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoInventarioDia> productsStockDay;
+//    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<ProductoInventarioInicio> productoInventarioInicio;
+//
+//    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
+//    private List<ProductoInventarioDia> productsStockDay;
 
     public Producto(){}
 
@@ -93,10 +92,7 @@ public class Producto extends AbstractEntity {
                 ", eliminado=" + eliminado +
                 ", tipoMedida=" + tipoMedida +
                 ", activoS='" + activoS + '\'' +
-                ", precioCostoActual=" + precioCostoActual +
-                ", precioVentaActual=" + precioVentaActual +
-                ", stockActual=" + stockActual +
-                ", empresa=" + empresa +
+                  ", empresa=" + empresa +
                 ", categoria=" + categoria +
                  '}';
     }

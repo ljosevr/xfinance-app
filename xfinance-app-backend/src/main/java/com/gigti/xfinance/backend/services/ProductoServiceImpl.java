@@ -7,11 +7,12 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.TipoMedidaEnum;
-import com.gigti.xfinance.backend.data.*;
-import com.gigti.xfinance.backend.repositories.ProductoInvDiaRepository;
-import com.gigti.xfinance.backend.repositories.ProductoInvInicioRepository;
-import com.gigti.xfinance.backend.repositories.ProductoRepository;
-import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.ProductoInventario;
+import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.repositories.*;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -43,51 +42,37 @@ public class ProductoServiceImpl implements ProductoService {
     @Autowired
     private ProductoValoresRepository productoValoresRepository;
 
+    @Autowired
+    private InventarioRepository inventarioRepository;
+
     @Transactional
     public Producto saveProduct(Producto producto, Usuario usuario) {
         //TODO Guardar Valores de Costos y Venta - así como la Cantidad del producto
         boolean isNew = StringUtils.isBlank(producto.getId());
         Producto result = productoRepository.save(producto);
-        if (result != null) {
-            if (isNew) {
-                //Guarda el Inventario Inicial al Crear el Producto
-                ProductoInventarioInicio pid = new ProductoInventarioInicio(result, producto.getStockActual(), new Date(), usuario);
-                pid = productoInvInicioRepository.save(pid);
-                result.setStockActual(pid.getQuantity());
-            }
-            // Se guarda Valores de Costo y Venta
-            ProductoValores pval = productoValoresRepository.findByProductoAndActivoIsTrue(result);
-            boolean pvalExists = true;
-            if (pval == null) {
-                pval = new ProductoValores(result, producto.getPrecioCostoActual(), producto.getPrecioVentaActual(),
-                        new Date(), true, Float.parseFloat("0.0"));
-                pvalExists = false;
-            }
-            //validar que no se igual a lo que esta activo
-            if (pval.getPrecioCosto().compareTo(producto.getPrecioCostoActual()) != 0 ||
-                    pval.getPrecioVenta().compareTo(producto.getPrecioVentaActual()) != 0) {
-                if(pvalExists){
-                    pval.setActivo(false);
-                    productoValoresRepository.save(pval);
-                    ProductoValores pvalNew = new ProductoValores(result, producto.getPrecioCostoActual(), producto.getPrecioVentaActual(), new Date(), true, Float.valueOf("0"));
-                    productoValoresRepository.save(pvalNew);
-                    result.setPrecioVentaActual(pvalNew.getPrecioVenta());
-                    result.setPrecioCostoActual(pvalNew.getPrecioCosto());
-                } else {
-                    pval.setActivo(true);
-                    productoValoresRepository.save(pval);
-                    result.setPrecioVentaActual(pval.getPrecioVenta());
-                    result.setPrecioCostoActual(pval.getPrecioCosto());
-                }
-            } else {
-                if(!pvalExists){
-                    pval.setActivo(true);
-                    productoValoresRepository.save(pval);
-                    result.setPrecioVentaActual(pval.getPrecioVenta());
-                    result.setPrecioCostoActual(pval.getPrecioCosto());
-                }
-            }
-        }
+//        if (result != null) {
+//            if (isNew && producto.getStockActual().compareTo(BigDecimal.ZERO) > 0) {
+//                //Guarda el Inventario al Crear el Producto
+//
+//                ProductoInventario pInventario = new ProductoInventario();
+//                pInventario.setProducto(result);
+//                pInventario.setActivo(true);
+//                pInventario.setDescripcion("INICIAL");
+//                pInventario.setPrecioCosto(producto.getPrecioCostoActual());
+//                pInventario.setPrecioVenta(producto.getPrecioVentaActual());
+//                pInventario.setQuantity(producto.getStockActual());
+//                pInventario.setTrackingDate(new Date());
+//                pInventario.setUsuario(usuario);
+//
+//                ProductoInventario resultProdInv = productoInventarioRepository.save(pInventario);
+//
+//                if(resultProdInv != null) {
+//                    result.setPrecioCostoActual(pInventario.getPrecioCosto());
+//                    result.setPrecioVentaActual(pInventario.getPrecioVenta());
+//                    result.setStockActual(pInventario.getQuantity());
+//                }
+//            }
+//        }
 
         return result;
     }
@@ -116,27 +101,11 @@ public class ProductoServiceImpl implements ProductoService {
         List<Producto> result = new ArrayList<>();
         //Calcula la Cantidad Actual
         for (Producto p : productoRepository.findByEmpresa(empresa, pageable)) {
-            ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(p);
-            if (pid != null) {
-                p.setStockActual(pid.getQuantity());
-            } else {
-                ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(p);
-                if (pii != null) {
-                    p.setStockActual(pii.getQuantity());
-                } else {
-                    p.setStockActual(0);
-                }
+            List<ProductoInventario> productosInventario = new ArrayList<>(inventarioRepository.findByProductoAndActivoIsTrue(p));
+            if (CollectionUtils.isNotEmpty(productosInventario) ) {
+                p.setInventarios(productosInventario);
             }
 
-            //Obtiene Costo y Venta del producto actual
-            ProductoValores pval = productoValoresRepository.findByProductoAndActivoIsTrue(p);
-            if (pval != null) {
-                p.setPrecioCostoActual(pval.getPrecioCosto());
-                p.setPrecioVentaActual(pval.getPrecioVenta());
-            } else {
-                p.setPrecioCostoActual(BigDecimal.ZERO);
-                p.setPrecioVentaActual(BigDecimal.ZERO);
-            }
             result.add(p);
         }
 

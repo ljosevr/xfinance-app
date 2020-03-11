@@ -12,7 +12,6 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-import java.text.DecimalFormat;
 import java.util.Comparator;
 
 public class ProductoGrid extends PaginatedGrid<Producto> {
@@ -60,18 +59,18 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setSortable(true)
                 .setFlexGrow(5);
 
-        addColumn(this::formatStock)
-                .setHeader("Cantidad")
-                .setSortable(true)
-                .setFlexGrow(3);
-
-        addColumn(this::formatCostPrice)
-                .setHeader("P. Costo")
-                .setFlexGrow(5);
-
-        addColumn(this::formatSellPrice)
-                .setHeader("P. Venta")
-                .setFlexGrow(5);
+//        addColumn(this::formatStock)
+//                .setHeader("Cantidad")
+//                .setSortable(true)
+//                .setFlexGrow(3);
+//
+//        addColumn(this::formatCostPrice)
+//                .setHeader("P. Costo")
+//                .setFlexGrow(5);
+//
+//        addColumn(this::formatSellPrice)
+//                .setHeader("P. Venta")
+//                .setFlexGrow(5);
 
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories)
@@ -79,7 +78,7 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setSortable(true)
                 .setFlexGrow(12);
 
-        setPageSize(Constantes.PAGE_SIZE);
+        setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
@@ -96,29 +95,29 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
         return producto.getCategoria().getNombre();
     }
 
-    private String formatCostPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioCostoActual());
-    }
-
-    private String formatSellPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioVentaActual());
-    }
-
-    private String formatStock(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return decimalFormat.format(producto.getStockActual());
-    }
+//    private String formatCostPrice(Producto producto){
+//        final DecimalFormat decimalFormat = new DecimalFormat();
+//        decimalFormat.setMaximumFractionDigits(2);
+//        decimalFormat.setMinimumFractionDigits(2);
+//
+//        return "$ "+decimalFormat.format(producto.getPrecioCostoActual());
+//    }
+//
+//    private String formatSellPrice(Producto producto){
+//        final DecimalFormat decimalFormat = new DecimalFormat();
+//        decimalFormat.setMaximumFractionDigits(2);
+//        decimalFormat.setMinimumFractionDigits(2);
+//
+//        return "$ "+decimalFormat.format(producto.getPrecioVentaActual());
+//    }
+//
+//    private String formatStock(Producto producto){
+//        final DecimalFormat decimalFormat = new DecimalFormat();
+//        decimalFormat.setMaximumFractionDigits(2);
+//        decimalFormat.setMinimumFractionDigits(2);
+//
+//        return decimalFormat.format(producto.getStockActual());
+//    }
 
     @Override
     public int getPage() {

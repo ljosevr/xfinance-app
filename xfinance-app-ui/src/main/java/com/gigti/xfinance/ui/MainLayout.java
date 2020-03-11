@@ -241,16 +241,16 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
 
     private void signOut(){
         NotificacionesUtil.openConfirmationDialog("¿Está Seguro de Salir?", true, false);
-        Objects.requireNonNull(NotificacionesUtil.getDialogConfirmation()).addDialogCloseActionListener(event -> menu_salir.setEnabled(true));
-        NotificacionesUtil.getConfirmButton().addClickListener(event -> {
+        Objects.requireNonNull(NotificacionesUtil.getDialog()).addDialogCloseActionListener(event -> menu_salir.setEnabled(true));
+        NotificacionesUtil.getSiButton().addClickListener(event -> {
             menu_salir.setEnabled(false);
-            if(NotificacionesUtil.getDialogConfirmation().isOpened())
-                NotificacionesUtil.getDialogConfirmation().close();
+            if(NotificacionesUtil.getDialog().isOpened())
+                NotificacionesUtil.getDialog().close();
             AccessControlFactory.getInstance().createAccessControl().signOut();
         });
-        NotificacionesUtil.getCancelButton().addClickListener(event -> {
-            if(NotificacionesUtil.getDialogConfirmation().isOpened())
-                NotificacionesUtil.getDialogConfirmation().close();
+        NotificacionesUtil.getNoButton().addClickListener(event -> {
+            if(NotificacionesUtil.getDialog().isOpened())
+                NotificacionesUtil.getDialog().close();
             menu_salir.setEnabled(true);
         });
     }

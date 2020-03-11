@@ -67,7 +67,8 @@ public class Constantes {
     public static final String VIEW_RECOVER_PASS = "Recuperar Password";
 
     //Paginador
-    public static final int PAGE_SIZE = 10;
+    public static final int PAGE_SIZE_10 = 10;
+    public static final int PAGE_SIZE_20 = 20;
     public static final int PAGINATOR_SIZE = 3;
 
 

@@ -28,7 +28,7 @@ import com.vaadin.flow.router.RouteAlias;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.gigti.xfinance.ui.util.NotificacionesUtil.getConfirmButton;
+import static com.gigti.xfinance.ui.util.NotificacionesUtil.getSiButton;
 
 @Route(value = Constantes.VIEW_R_VENTA,layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_VENTA,layout = MainLayout.class)
@@ -243,20 +243,20 @@ public class PventaView extends HorizontalLayout {
                         NotificacionesUtil.openConfirmationDialog("Solo existen " + pventaDTO.getInStock() + " en Stock, No puedes vender más de esa cantidad.\n" +
                                 "¿Deseas Agregar " + temp + " a la Compra actual?", true, false);
 
-                        Objects.requireNonNull(NotificacionesUtil.getDialogConfirmation()).addDialogCloseActionListener(
+                        Objects.requireNonNull(NotificacionesUtil.getDialog()).addDialogCloseActionListener(
                                 listener -> cbFilter.focus());
 
-                        getConfirmButton().focus();
+                        getSiButton().focus();
 
-                        getConfirmButton().addClickListener(event -> {
-                            if(NotificacionesUtil.getDialogConfirmation().isOpened())
-                                NotificacionesUtil.getDialogConfirmation().close();
+                        getSiButton().addClickListener(event -> {
+                            if(NotificacionesUtil.getDialog().isOpened())
+                                NotificacionesUtil.getDialog().close();
                             valueHigherThanZero(temp);
                         });
 
-                        NotificacionesUtil.getCancelButton().addClickListener(event -> {
-                            if(NotificacionesUtil.getDialogConfirmation().isOpened())
-                                NotificacionesUtil.getDialogConfirmation().close();
+                        NotificacionesUtil.getNoButton().addClickListener(event -> {
+                            if(NotificacionesUtil.getDialog().isOpened())
+                                NotificacionesUtil.getDialog().close();
                         });
                     }else {
                         Notification.show("No existen inventario para este producto, No se puede vender. \nSi tiene 1 o más en " +

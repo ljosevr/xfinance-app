@@ -61,7 +61,7 @@ public class UsuarioGrid extends PaginatedGrid<UsuarioDTO> {
             usuario.getRol().getNombre()
         ).setHeader("Rol").setSortable(true);
 
-        setPageSize(Constantes.PAGE_SIZE);
+        setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }

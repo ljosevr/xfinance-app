@@ -17,17 +17,13 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,13 +42,12 @@ public class ProductoForm extends Dialog {
     private FormLayout content;
 
     Logger logger = LoggerFactory.getLogger(ProductoForm.class);
-    private NumberField tfProdStock;
-    private TextField tfPrecioVenta;
-    private TextField tfPrecioCosto;
+//    private NumberField tfProdStock;
+//    private TextField tfPrecioVenta;
+//    private TextField tfPrecioCosto;
     private ComboBox<TipoMedidaEnum> cbTipoMedida;
     private ComboBox<CategoriaProducto>  cbCategorias;
     private Button btnSave;
-    private Button btnDiscard;
     private Button btnDelete;
 
     private ProductoCrudLogic viewLogic;
@@ -134,52 +129,52 @@ public class ProductoForm extends Dialog {
         cbCategorias.setItems(listCategoria);
         cbCategorias.setRequired(true);
 
-        tfPrecioCosto = new TextField("Precio Costo");
-        tfPrecioCosto.setPrefixComponent(new Span("$"));
-        tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfPrecioCosto.setValueChangeMode(ValueChangeMode.EAGER);
-        tfPrecioCosto.setRequired(true);
-        tfPrecioCosto.addFocusListener(focus -> {
-            if(focus.isFromClient()){
-                if(tfPrecioCosto.isEmpty() || tfPrecioCosto.getValue().equals("0,00")) {
-                    tfPrecioCosto.clear();
-                } else if(tfPrecioCosto.isEmpty()) {
-                    tfPrecioCosto.setValue("0");
-                }
-            }
-        });
-
-        tfPrecioVenta = new TextField("Precio Venta");
-        tfPrecioVenta.setPrefixComponent(new Span("$"));
-        tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfPrecioVenta.setValueChangeMode(ValueChangeMode.EAGER);
-        tfPrecioVenta.setRequired(true);
-        tfPrecioVenta.addFocusListener(focus -> {
-            if(focus.isFromClient()){
-                if(tfPrecioVenta.isEmpty() || tfPrecioVenta.getValue().equals("0,00")){
-                    tfPrecioVenta.clear();
-                } else if(tfPrecioVenta.isEmpty()) {
-                    tfPrecioVenta.setValue("0");
-                }
-            }
-        });
-
-        tfProdStock = new NumberField("Cantidad Inicial");
-        tfProdStock.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
-        tfProdStock.setValueChangeMode(ValueChangeMode.EAGER);
-        tfProdStock.setRequiredIndicatorVisible(true);
-        tfProdStock.addFocusListener(focus -> {
-            if(focus.isFromClient()){
-                if(tfProdStock.isEmpty() || tfProdStock.getValue() <= 0d){
-                    tfProdStock.clear();
-                }
-            }
-        });
+//        tfPrecioCosto = new TextField("Precio Costo");
+//        tfPrecioCosto.setPrefixComponent(new Span("$"));
+//        tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+//        tfPrecioCosto.setValueChangeMode(ValueChangeMode.EAGER);
+//        tfPrecioCosto.setRequired(true);
+//        tfPrecioCosto.addFocusListener(focus -> {
+//            if(focus.isFromClient()){
+//                if(tfPrecioCosto.isEmpty() || tfPrecioCosto.getValue().equals("0,00")) {
+//                    tfPrecioCosto.clear();
+//                } else if(tfPrecioCosto.isEmpty()) {
+//                    tfPrecioCosto.setValue("0");
+//                }
+//            }
+//        });
+//
+//        tfPrecioVenta = new TextField("Precio Venta");
+//        tfPrecioVenta.setPrefixComponent(new Span("$"));
+//        tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+//        tfPrecioVenta.setValueChangeMode(ValueChangeMode.EAGER);
+//        tfPrecioVenta.setRequired(true);
+//        tfPrecioVenta.addFocusListener(focus -> {
+//            if(focus.isFromClient()){
+//                if(tfPrecioVenta.isEmpty() || tfPrecioVenta.getValue().equals("0,00")){
+//                    tfPrecioVenta.clear();
+//                } else if(tfPrecioVenta.isEmpty()) {
+//                    tfPrecioVenta.setValue("0");
+//                }
+//            }
+//        });
+//
+//        tfProdStock = new NumberField("Cantidad Inicial");
+//        tfProdStock.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT);
+//        tfProdStock.setValueChangeMode(ValueChangeMode.EAGER);
+//        tfProdStock.setRequiredIndicatorVisible(true);
+//        tfProdStock.addFocusListener(focus -> {
+//            if(focus.isFromClient()){
+//                if(tfProdStock.isEmpty() || tfProdStock.getValue() <= 0d){
+//                    tfProdStock.clear();
+//                }
+//            }
+//        });
 
         binder = new BeanValidationBinder<>(Producto.class);
-        binder.forField(tfPrecioCosto).asRequired("Digite el Precio de Costo").withConverter(new PriceConverter()).bind(Producto::getPrecioCostoActual, Producto::setPrecioCostoActual);
-        binder.forField(tfPrecioVenta).asRequired("Digite el Precio de Venta").withConverter(new PriceConverter()).bind(Producto::getPrecioVentaActual, Producto::setPrecioVentaActual);
-        binder.forField(tfProdStock).asRequired("Digite Cantidad").bind(Producto::getStockActual, Producto::setStockActual);
+//        binder.forField(tfPrecioCosto).asRequired("Digite el Precio de Costo").withConverter(new PriceConverter()).bind(Producto::getPrecioCostoActual, Producto::setPrecioCostoActual);
+//        binder.forField(tfPrecioVenta).asRequired("Digite el Precio de Venta").withConverter(new PriceConverter()).bind(Producto::getPrecioVentaActual, Producto::setPrecioVentaActual);
+//        binder.forField(tfProdStock).asRequired("Digite Cantidad").bind(Producto::getStockActual, Producto::setStockActual);
         binder.forField(tfProdNombre).asRequired("Digite Nombre").bind(Producto::getNombreProducto, Producto::setNombreProducto);
         binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
         binder.forField(tfProdCodigoB).asRequired("Digite el Codigo de Barras").bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
@@ -194,7 +189,6 @@ public class ProductoForm extends Dialog {
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
             btnSave.setEnabled(hasChanges && isValid);
-            btnDiscard.setEnabled(hasChanges);
         });
 
         btnSave = new Button("Guardar");
@@ -208,10 +202,6 @@ public class ProductoForm extends Dialog {
             }
         });
         btnSave.addClickShortcut(Key.ENTER);
-
-        btnDiscard = new Button("Descartar");
-        btnDiscard.addClickListener(
-                event -> viewLogic.editProducto(currentProduct));
 
         Button btnCancel = new Button("Cancelar");
         btnCancel.addClickListener(event -> viewLogic.cancelProducto());
@@ -229,11 +219,12 @@ public class ProductoForm extends Dialog {
         });
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
-        actionsLayout.add(btnSave,btnDiscard);
+        actionsLayout.add(btnSave,btnDelete,btnCancel);
         //HorizontalLayout actionsLayout2 = new HorizontalLayout();
-        actionsLayout.add(btnDelete,btnCancel);
 
-        content.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,cbTipoMedida,cbCategorias,tfProdStock,tfPrecioCosto,tfPrecioVenta,chkActivo,actionsLayout);
+        content.add(tfProdNombre,tfProdCodigoB,tfProdDescripcion,cbTipoMedida,cbCategorias,
+                //tfProdStock,tfPrecioCosto,tfPrecioVenta,
+                chkActivo,actionsLayout);
         content.setColspan(actionsLayout,2);
 
         this.setCloseOnEsc(true);
@@ -251,14 +242,14 @@ public class ProductoForm extends Dialog {
             producto = new Producto();
             producto.setActivo(true);
             btnDelete.setEnabled(false);
-            tfProdStock.setEnabled(true);
+            //tfProdStock.setEnabled(true);
         } else if(StringUtils.isBlank(producto.getId())){
             producto.setActivo(true);
             btnDelete.setEnabled(false);
-            tfProdStock.setEnabled(true);
+            //tfProdStock.setEnabled(true);
         } else {
             btnDelete.setEnabled(true);
-            tfProdStock.setEnabled(false);
+            //tfProdStock.setEnabled(false);
         }
         currentProduct = producto;
         binder.readBean(producto);

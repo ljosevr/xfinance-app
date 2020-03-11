@@ -1,6 +1,5 @@
 package com.gigti.xfinance.ui.util;
 
-import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -55,15 +54,15 @@ public class NotificacionesUtil {
         dialogConfirmation.open();
     }
 
-    public static Button getConfirmButton() {
+    public static Button getSiButton() {
         return confirmButton;
     }
 
-    public static Button getCancelButton() {
+    public static Button getNoButton() {
         return cancelButton;
     }
 
-    public static Dialog getDialogConfirmation() {
+    public static Dialog getDialog() {
         if (dialogConfirmation.isOpened()){
             return dialogConfirmation;
         }else {

@@ -38,7 +38,7 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
             return empresa == null ? "-" : empresa.getNombreEmpresa();
         }).setHeader("Empresa");
 
-        setPageSize(Constantes.PAGE_SIZE);
+        setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
 
         getColumns().forEach(column -> column.setAutoWidth(true));

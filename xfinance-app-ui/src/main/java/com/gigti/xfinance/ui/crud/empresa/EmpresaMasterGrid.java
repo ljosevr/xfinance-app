@@ -48,7 +48,7 @@ public class EmpresaMasterGrid extends PaginatedGrid<EmpresaDTO> {
                 .setComparator(Comparator.comparing(EmpresaDTO::getActivoS))
                 .setSortable(true);
 
-        setPageSize(Constantes.PAGE_SIZE);
+        setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
 
         getColumns().forEach(column -> column.setAutoWidth(true));

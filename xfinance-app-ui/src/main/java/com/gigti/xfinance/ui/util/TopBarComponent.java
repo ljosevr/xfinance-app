@@ -26,6 +26,16 @@ public class TopBarComponent extends HorizontalLayout {
         expand(filter);
     }
 
+    public TopBarComponent(TextField filter) {
+        super();
+        this.addClassName("toolbar");
+        this.filter = filter;
+        setWidth("100%");
+        add(filter);
+        setVerticalComponentAlignment(Alignment.START, filter);
+        expand(filter);
+    }
+
     public TopBarComponent(ComboBox<PventaDTO> filter) {
         super();
         this.filter1 = filter;
