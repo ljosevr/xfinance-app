@@ -1,10 +1,10 @@
 package com.gigti.xfinance.ui.crud.empresa;
 
 import com.gigti.xfinance.backend.data.TipoIde;
-import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -12,28 +12,25 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
-import org.apache.commons.lang3.StringUtils;
+import com.vaadin.flow.shared.Registration;
 
 public class EmpresaMasterForm extends Dialog {
-    private FormLayout content;
 
     private Button btnSave;
-    private Button btnDiscard;
-    private Button btnDelete;
-
-    private EmpresaMasterCrudLogic viewLogic;
     private Binder<EmpresaDTO> binder;
-    private Binder<Usuario> binderUser;
-    private EmpresaDTO currentEmpresa;
 
-    public EmpresaMasterForm(EmpresaMasterCrudLogic empresaMasterCrudLogic) {
-        content = new FormLayout();
+    public EmpresaMasterForm() {
+
+        binder = new BeanValidationBinder<>(EmpresaDTO.class);
+
+        FormLayout content = new FormLayout();
         content.setClassName("formLayout");
         content.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
@@ -41,9 +38,7 @@ public class EmpresaMasterForm extends Dialog {
                 new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Empresa");
-        content.add(title,3);
-
-        viewLogic = empresaMasterCrudLogic;
+        content.add(title, 3);
 
         TextField tfNombreEmpresa = new TextField("Nombre Empresa");
         tfNombreEmpresa.setRequired(true);
@@ -118,7 +113,6 @@ public class EmpresaMasterForm extends Dialog {
         tfUserEmail.setErrorMessage("Agregue un Email Valido");
         tfUserEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        binder = new BeanValidationBinder<>(EmpresaDTO.class);
         binder.forField(tfNombreEmpresa)
                 .withValidator(name -> name.length() >= 4,
                         "El Nombre de la Empresa debe contener Minimo 4 caracteres")
@@ -154,70 +148,86 @@ public class EmpresaMasterForm extends Dialog {
         binder.bindInstanceFields(this);
 
         binder.addStatusChangeListener(event -> {
-            boolean isValid = !event.hasValidationErrors();
-            boolean hasChanges = binder.hasChanges();
-            btnSave.setEnabled(hasChanges && isValid);
-            btnDiscard.setEnabled(hasChanges);
+            btnSave.setEnabled(binder.isValid());
         });
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnSave.addClickListener(event -> {
-            if (currentEmpresa != null && binder.writeBeanIfValid(currentEmpresa)) {
-                currentEmpresa.setActivoUsuario(currentEmpresa.isActivo());
-                viewLogic.guardar(currentEmpresa);
-            }
-        });
-        btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
+        btnSave.addClickShortcut(Key.ENTER);
 
-        btnDiscard = new Button("Descartar Cambios");
-        btnDiscard.addClickListener(
-                event -> viewLogic.editar(currentEmpresa));
+        btnSave.addClickListener(event -> validateAndSave());
 
-        Button btnCancel = new Button("Cancelar");
-        btnCancel.addClickListener(event -> viewLogic.cancelar());
-        btnCancel.addClickShortcut(Key.ESCAPE);
-        getElement()
-                .addEventListener("keydown", event -> viewLogic.cancelar())
-                .setFilter("event.key == 'Escape'");
+        Button btnClose = new Button("Cerrar");
+        btnClose.setWidth("100%");
+        btnClose.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        btnClose.addClickShortcut(Key.ESCAPE);
 
-        btnDelete = new Button("Eliminar");
-        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
-        btnDelete.addClickListener(event -> {
-            if (currentEmpresa != null) {
-                viewLogic.eliminar(currentEmpresa);
-            }
-        });
+        Button btnDelete = new Button("Eliminar");
+        btnDelete.setWidth("100%");
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+        btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
-        actionsLayout.add(btnSave,btnDiscard);
-        HorizontalLayout actionsLayout2 = new HorizontalLayout();
-        actionsLayout.add(btnDelete,btnCancel);
-        content.add(tfNombreEmpresa, tfCodigoEmpresa,cbTipoIde,tfIdentificacion,tfDireccion, tfTelefono,chkActivo,
-                tfUsuarioAdmin,cbTipoIdePersona, tfIdentificacionPersona,tfprimerNombreUsuario,
-                tfSegundoNombreUsuario,tfPrimerApellidoUsuario,
-                tfSegundoApellidoUsuario,tfUserDireccion,tfUserPhone,tfUserEmail
-                ,actionsLayout,actionsLayout2);
-        content.setColspan(actionsLayout, 3);
-        content.setColspan(actionsLayout2,2);
+        actionsLayout.add(btnSave, btnDelete, btnClose);
+
+        content.add(tfNombreEmpresa, tfCodigoEmpresa, cbTipoIde, tfIdentificacion, tfDireccion, tfTelefono, chkActivo,
+                tfUsuarioAdmin, cbTipoIdePersona, tfIdentificacionPersona, tfprimerNombreUsuario,
+                tfSegundoNombreUsuario, tfPrimerApellidoUsuario,
+                tfSegundoApellidoUsuario, tfUserDireccion, tfUserPhone, tfUserEmail
+                , actionsLayout);
 
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);
         this.add(content);
     }
 
-    public void edit(EmpresaDTO empresa) {
-        if (empresa == null) {
-            empresa = new EmpresaDTO();
-            empresa.setActivo(true);
-            btnDelete.setEnabled(false);
-        } else if(StringUtils.isBlank(empresa.getEmpresaId())){
-            empresa.setActivo(true);
-            btnDelete.setEnabled(false);
+    public void setEmpresa(EmpresaDTO empresa) {
+        binder.setBean(empresa);
+    }
+
+    private void validateAndSave() {
+        if (binder.isValid()) {
+            fireEvent(new SaveEvent(this, binder.getBean()));
         } else {
-            btnDelete.setEnabled(true);
+            Notification.show("Validar Datos: " + binder.validate().getValidationErrors(), 3000, Notification.Position.TOP_CENTER);
         }
-        currentEmpresa = empresa;
-        binder.readBean(empresa);
+    }
+
+    // Events
+    public static abstract class EmpresaFormEvent extends ComponentEvent<EmpresaMasterForm> {
+        private EmpresaDTO empresaDTO;
+
+        protected EmpresaFormEvent(EmpresaMasterForm source, EmpresaDTO empresaDTO) {
+            super(source, false);
+            this.empresaDTO = empresaDTO;
+        }
+
+        public EmpresaDTO getEmpresaDTO() {
+            return empresaDTO;
+        }
+    }
+
+    public static class SaveEvent extends EmpresaFormEvent {
+        SaveEvent(EmpresaMasterForm source, EmpresaDTO empresaDTO) {
+            super(source, empresaDTO);
+        }
+    }
+
+    public static class DeleteEvent extends EmpresaFormEvent {
+        DeleteEvent(EmpresaMasterForm source, EmpresaDTO empresaDTO) {
+            super(source, empresaDTO);
+        }
+    }
+
+    public static class CloseEvent extends EmpresaFormEvent {
+        CloseEvent(EmpresaMasterForm source) {
+            super(source, null);
+        }
+    }
+
+    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType,
+                                                                  ComponentEventListener<T> listener) {
+        return getEventBus().addListener(eventType, listener);
     }
 }

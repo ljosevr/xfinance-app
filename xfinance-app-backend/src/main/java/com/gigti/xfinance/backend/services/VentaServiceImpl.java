@@ -3,7 +3,10 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.others.Utils;
-import com.gigti.xfinance.backend.repositories.*;
+import com.gigti.xfinance.backend.repositories.ProductoRepository;
+import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
+import com.gigti.xfinance.backend.repositories.VentaItemRepository;
+import com.gigti.xfinance.backend.repositories.VentaRepository;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -24,22 +27,16 @@ public class VentaServiceImpl implements VentaService {
     private static final Logger logger = Logger.getLogger(UsuarioServiceImpl.class.getName());
 
     @Autowired
-    private FacturaRepository facturaRepository;
+    private VentaRepository ventaRepository;
 
     @Autowired
-    private ItemFacturaRepository itemFacturaRepository;
+    private VentaItemRepository ventaItemRepository;
 
     @Autowired
     private ProductoRepository productoRepository;
 
     @Autowired
     private ProductoValoresRepository productoValoresRepository;
-
-    @Autowired
-    private ProductoInvDiaRepository productoInvDiaRepository;
-
-    @Autowired
-    private ProductoInvInicioRepository productoInvInicioRepository;
 
 //    @Override
 //    public List<PventaDTO> find100MostImportant(Empresa empresa) {
@@ -61,26 +58,26 @@ public class VentaServiceImpl implements VentaService {
 
     @Override
     @Transactional
-    public Factura registrarFactura(Usuario usuario, List<PventaDTO> listVenta) {
+    public Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta) {
         try {
-            Factura factura = new Factura();
-            factura.setUsuario(usuario);
-            factura.setFechaCreacion(new Date());
+            Venta venta = new Venta();
+            venta.setUsuario(usuario);
+            venta.setFechaCreacion(new Date());
             //TODO Luego cambiar por # Factura de Dian
             // TODO Agregar luego iniciar factura en Numero XXX definido por los usuarios
-            long cantidadFacturasxEmpresa = facturaRepository.countByUsuario_Empresa(usuario.getEmpresa());
+            long cantidadFacturasxEmpresa = ventaRepository.countByUsuario_Empresa(usuario.getEmpresa());
             cantidadFacturasxEmpresa++;
-            factura.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
-            factura.setNumeroFactura(Utils.generateNumberTicket(cantidadFacturasxEmpresa));
-            factura.setTotalFactura(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum());
-            facturaRepository.save(factura);
-            List<ItemFactura> listItems = new ArrayList<>();
+            venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
+            venta.setNumeroFactura(Utils.generateNumberTicket(cantidadFacturasxEmpresa));
+//            venta.setTotalVenta(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum());
+            ventaRepository.save(venta);
+            List<VentaItem> listItems = new ArrayList<>();
             //Items Factura
             for (PventaDTO pv : listVenta) {
                 Producto producto = productoRepository.findById(pv.getIdProducto()).orElse(null);
 
-                ItemFactura item = new ItemFactura();
-                item.setFactura(factura);
+                VentaItem item = new VentaItem();
+                item.setVenta(venta);
                 item.setProducto(producto);
                 item.setCantidad(pv.getCantidadVenta());
                 item.setPrecioCosto(pv.getPrecioCostoActual());
@@ -88,33 +85,33 @@ public class VentaServiceImpl implements VentaService {
                 item.setItem(pv.getItem());
                 listItems.add(item);
 
-                //descontar cantidad del Inventario
-                double inStock = 0;
-                ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(producto);
-                if(pid == null) {
-                    ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(producto);
-                    if(pii == null){
-                        pid = new ProductoInventarioDia();
-                        pid.setQuantity(pv.getCantidadVenta() * -1);
-                        pid.setProducto(producto);
-                        pid.setTrackingDate(new Date());
-                        productoInvDiaRepository.save(pid);
-                    } else {
-                        pid = new ProductoInventarioDia();
-                        pid.setQuantity(pii.getQuantity() - pv.getCantidadVenta());
-                        pid.setProducto(producto);
-                        pid.setTrackingDate(new Date());
-                        productoInvDiaRepository.save(pid);
-                    }
-                } else {
-                    pid.setQuantity(pid.getQuantity() - pv.getCantidadVenta());
-                    pid.setProducto(producto);
-                    pid.setTrackingDate(new Date());
-                    productoInvDiaRepository.save(pid);
-                }
+//                //descontar cantidad del Inventario
+//                double inStock = 0;
+//                ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(producto);
+//                if(pid == null) {
+//                    ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(producto);
+//                    if(pii == null){
+//                        pid = new ProductoInventarioDia();
+//                        pid.setQuantity(pv.getCantidadVenta() * -1);
+//                        pid.setProducto(producto);
+//                        pid.setTrackingDate(new Date());
+//                        productoInvDiaRepository.save(pid);
+//                    } else {
+//                        pid = new ProductoInventarioDia();
+//                        pid.setQuantity(pii.getQuantity() - pv.getCantidadVenta());
+//                        pid.setProducto(producto);
+//                        pid.setTrackingDate(new Date());
+//                        productoInvDiaRepository.save(pid);
+//                    }
+//                } else {
+//                    pid.setQuantity(pid.getQuantity() - pv.getCantidadVenta());
+//                    pid.setProducto(producto);
+//                    pid.setTrackingDate(new Date());
+//                    productoInvDiaRepository.save(pid);
+//                }
             }
-            itemFacturaRepository.saveAll(listItems);
-            return factura;
+            ventaItemRepository.saveAll(listItems);
+            return venta;
         }catch(Exception e){
             logger.log(Level.SEVERE, "Error: al generar Factura: "+e.getMessage(), e);
             return null;
@@ -134,19 +131,19 @@ public class VentaServiceImpl implements VentaService {
 
         for(Producto p : result) {
             double inStock = 0;
-            ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(p);
-            if(pid == null) {
-                ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(p);
-                if(pii == null){
-                    continue;
-                } else {
-                    inStock = pii.getQuantity() > 0 ? pii.getQuantity() : 0;
-                }
-            } else {
-                inStock = pid.getQuantity() > 0 ? pid.getQuantity() : 0;
-            }
+//            ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(p);
+//            if(pid == null) {
+//                ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(p);
+//                if(pii == null){
+//                    continue;
+//                } else {
+//                    inStock = pii.getQuantity() > 0 ? pii.getQuantity() : 0;
+//                }
+//            } else {
+//                inStock = pid.getQuantity() > 0 ? pid.getQuantity() : 0;
+//            }
             if(inStock > 0) {
-                ProductoValores pvalores = productoValoresRepository.findByProductoAndActivoIsTrue(p);
+                ProductoValor pvalores = productoValoresRepository.findByProductoAndActivoIsTrue(p);
                 if (pvalores != null) {
                     listDTO.add(convertProductoToPventaDTO(p, pvalores, inStock));
                 }
@@ -156,13 +153,13 @@ public class VentaServiceImpl implements VentaService {
         return new ListDataProvider<>(listDTO);
     }
 
-    private PventaDTO convertProductoToPventaDTO(Producto p, ProductoValores pvalores, double inStock){
+    private PventaDTO convertProductoToPventaDTO(Producto p, ProductoValor pvalores, double inStock){
         PventaDTO pv = new PventaDTO();
         pv.setIdProducto(p.getId());
         pv.setCodigoBarra(p.getCodigoBarra());
         pv.setNombreProducto(p.getNombreProducto());
         pv.setCantidadVenta(0);
-        pv.setPrecioCostoActual(pvalores.getPrecioCosto());
+//        pv.setPrecioCostoActual(pvalores.getPrecioCosto());
         pv.setPrecioVentaActual(pvalores.getPrecioVenta());
         pv.setInStock(inStock);
         pv.setUnidadMedida(p.getTipoMedida() == null ? "NE" : p.getTipoMedida().toString());

@@ -1,7 +1,7 @@
 package com.gigti.xfinance.ui.crud.pventa;
 
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Factura;
+import com.gigti.xfinance.backend.data.Venta;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.VentaService;
@@ -174,11 +174,11 @@ public class PventaView extends HorizontalLayout {
     }
 
     private void saveSell(Collection<PventaDTO> items) {
-            Factura factura = ventaService.registrarFactura(CurrentUser.get(), new ArrayList<>(items));
-            if(factura == null){
+            Venta venta = ventaService.registrarVenta(CurrentUser.get(), new ArrayList<>(items));
+            if(venta == null){
                 Notification.show("Error al generar factura");
             } else {
-                Notification.show("Factura Generada: "+factura.getNumeroFactura());
+                Notification.show("Factura Generada: "+ venta.getNumeroFactura());
                 clearAll();
             }
     }

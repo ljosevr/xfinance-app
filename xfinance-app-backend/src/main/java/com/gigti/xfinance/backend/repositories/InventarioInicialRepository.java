@@ -7,8 +7,8 @@
 package com.gigti.xfinance.backend.repositories;
 
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.ProductoInventario;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,22 +18,18 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface InventarioRepository extends JpaRepository<ProductoInventario, String> {
+public interface InventarioInicialRepository extends JpaRepository<InventarioInicial, String> {
 
-    @Query("SELECT p FROM ProductoInventario p " +
-            "WHERE p.producto.empresa =:empresa AND " +
-            "p.inicial = true")
-    List<ProductoInventario> findByEmpresaAndInicialIsTrue(@Param("empresa") Empresa empresa, Pageable pageable);
+    @Query("SELECT p FROM InventarioInicial p " +
+            "WHERE p.producto.empresa =:empresa")
+    List<InventarioInicial> findByEmpresaAndInicialIsTrue(@Param("empresa") Empresa empresa, Pageable pageable);
 
-    @Query("SELECT p FROM ProductoInventario p " +
+    @Query("SELECT p FROM InventarioInicial p " +
             "WHERE p.producto.empresa =:empresa AND " +
             "lower(p.producto.nombreProducto" +
-            ") like lower(concat('%', :filter, '%')) AND " +
-            "p.inicial = true")
-    List<ProductoInventario> search(@Param("filter") String filter, Empresa empresa, Pageable pageable);
+            ") like lower(concat('%', :filter, '%')) ")
+    List<InventarioInicial> search(@Param("filter") String filter, Empresa empresa, Pageable pageable);
 
-    List<ProductoInventario> findByProductoAndActivoIsTrue(Producto p);
-
-    List<ProductoInventario> findByProducto(Producto p);
+    InventarioInicial findByProducto(Producto p);
 
 }

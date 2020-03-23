@@ -40,10 +40,11 @@ public class InitBackServiceImpl implements InitBackService {
     private TipoEmpresaRepository tipoEmpresaRepository;
     @Autowired
     private VistaRepository vistaRepository;
-    //private PasswordEncoder passwordEncoder;
+    @Autowired
+    private TipoMovimientoRepository tipoMovimientoRepository;
+    @Autowired
+    private TipoDescuentoRepository tipoDescuentoRepository;
 
-
-    // Metodo para crear Init del Backend
     // Tipos de Datos
     @Transactional
     @Override
@@ -70,6 +71,20 @@ public class InitBackServiceImpl implements InitBackService {
                 tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
                 logger.info("Tipos Empresas");
 
+                //Tipo Movimiento
+                tipoMovimientoRepository.save(TipoMovimiento.COMPRA);
+                tipoMovimientoRepository.save(TipoMovimiento.VENTA);
+                tipoMovimientoRepository.save(TipoMovimiento.INICIAL);
+                tipoMovimientoRepository.save(TipoMovimiento.TRASLADO);
+                logger.info("Tipos Movimientos");
+
+                //Tipo Descuentos
+                tipoDescuentoRepository.save(TipoDescuento.VALOR_UNIDAD);
+                tipoDescuentoRepository.save(TipoDescuento.VALOR_TOTAL);
+                tipoDescuentoRepository.save(TipoDescuento.PORCENTAJE_UNIDAD);
+                tipoDescuentoRepository.save(TipoDescuento.PORCENTAJE_TOTAL);
+                logger.info("Tipos Descuentos");
+
                 //Vistas
                 Vista vista_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
                 Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 2, null));
@@ -91,6 +106,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_categoria = vistaRepository.save(new Vista(Constantes.VIEW_CATEGORIA,Constantes.VIEW_R_CATEGORIA, vista_producto, 22,"CUBES"));
                 Vista vista_compras = vistaRepository.save(new Vista(Constantes.VIEW_COMPRAS,Constantes.VIEW_R_COMPRAS,vista_producto, 23, "CART_O"));
                 Vista vista_invInicial = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_INICIAL,Constantes.VIEW_R_INVENTARIO_INICIAL,vista_producto,24, "STOCK"));
+                Vista vista_invActual = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_ACTUAL,Constantes.VIEW_R_INVENTARIO_ACTUAL,vista_producto,25, "STORAGE"));
 
                 //3.Usuarios
                 Vista vista_admin_usu = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO_ADMIN,Constantes.VIEW_R_USUARIOS,vista_usuarios,31, "GROUP"));
@@ -134,6 +150,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ADMIN.getVistas().add(vista_categoria);
                 Rol.ADMIN.getVistas().add(vista_compras);
                 Rol.ADMIN.getVistas().add(vista_invInicial);
+                Rol.ADMIN.getVistas().add(vista_invActual);
                 Rol.ADMIN.getVistas().add(vista_usuarios);
                 Rol.ADMIN.getVistas().add(vista_admin_usu);
                 Rol.ADMIN.getVistas().add(vista_rol);
@@ -152,6 +169,8 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.VENDEDOR.setVistas(new HashSet<>());
                 Rol.VENDEDOR.getVistas().add(vista_venta);
                 Rol.VENDEDOR.getVistas().add(vista_vender);
+                Rol.VENDEDOR.getVistas().add(vista_producto);
+                Rol.VENDEDOR.getVistas().add(vista_invActual);
                 Rol.VENDEDOR.getVistas().add(vista_config);
                 Rol.VENDEDOR.getVistas().add(vista_config_perfil);
                 Rol.VENDEDOR.getVistas().add(vista_config_password);
@@ -166,6 +185,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.AUXILIAR.getVistas().add(vista_producto);
                 Rol.AUXILIAR.getVistas().add(vista_admin_prod);
                 Rol.AUXILIAR.getVistas().add(vista_categoria);
+                Rol.AUXILIAR.getVistas().add(vista_invActual);
                 Rol.AUXILIAR.getVistas().add(vista_config);
                 Rol.AUXILIAR.getVistas().add(vista_config_perfil);
                 Rol.AUXILIAR.getVistas().add(vista_config_password);

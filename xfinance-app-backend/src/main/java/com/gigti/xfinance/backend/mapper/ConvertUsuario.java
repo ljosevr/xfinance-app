@@ -42,8 +42,6 @@ public class ConvertUsuario {
         if(usuarioDTO != null) {
             if(usuarioDTO.getUsuarioid() != null && !usuarioDTO.getUsuarioid().isEmpty()){
                 usuario.setId(usuarioDTO.getUsuarioid());
-            } else {
-                usuario.setPasswordUsuario("1234");
             }
 
             usuario.setRol(usuarioDTO.getRol());

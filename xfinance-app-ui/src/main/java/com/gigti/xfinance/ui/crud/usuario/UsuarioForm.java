@@ -32,9 +32,6 @@ import com.vaadin.flow.shared.Registration;
 import java.util.List;
 import java.util.logging.Logger;
 
-/**
- * A form for editing a single Usuario Admin.
- */
 public class UsuarioForm extends Dialog {
 
     private static final Logger logger = Logger.getLogger(UsuarioForm.class.getName());
@@ -108,7 +105,6 @@ public class UsuarioForm extends Dialog {
         chkActivo.setValue(true);
         chkActivo.setRequiredIndicatorVisible(true);
 
-
         binderUsuario.forField(tfUsuario).asRequired("Digite el Nombre del Usuario").bind(UsuarioDTO::getNombreUsuario, UsuarioDTO::setNombreUsuario);
         binderUsuario.forField(chkActivo).bind(UsuarioDTO::isActivo, UsuarioDTO::setActivo);
         binderUsuario.forField(cbRoles).asRequired("Selecciona Un Rol").bind(UsuarioDTO::getRol, UsuarioDTO::setRol);
@@ -124,7 +120,7 @@ public class UsuarioForm extends Dialog {
         binderUsuario.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Dirección").bind(UsuarioDTO::getEmail, UsuarioDTO::setEmail);
         //binderPersona.bindInstanceFields(this);
 
-         binderUsuario.addStatusChangeListener(event -> {
+        binderUsuario.addStatusChangeListener(event -> {
              btnSave.setEnabled(binderUsuario.isValid());
         });
 
@@ -163,7 +159,6 @@ public class UsuarioForm extends Dialog {
     private void validateAndSave() {
         logger.info("validateAndSave");
         if (binderUsuario.isValid()) {
-            //binderUsuario.getBean().setPersona(binderPersona.getBean());
             logger.info("usuario: "+binderUsuario.isValid() + " - "+binderUsuario.getBean());
             fireEvent(new SaveEvent(this, binderUsuario.getBean()));
         } else {

@@ -8,6 +8,7 @@ drop table items_factura cascade;
 drop table parches cascade;
 drop table producto_inventario_dia cascade;
 drop table producto_inventario_inicio cascade;
+drop table productos_inventario cascade;
 drop table producto_valores cascade;
 drop table rolesvistas cascade;
 drop table roles cascade;

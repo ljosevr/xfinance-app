@@ -64,12 +64,12 @@ public class EmpresaMasterGrid extends PaginatedGrid<EmpresaDTO> {
     }
 
     private String formatDateActivation(EmpresaDTO empresa){
-        DateFormat df = new SimpleDateFormat("dd-mm-yyyy");
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         return empresa.getFechaActivacion() != null ? df.format(empresa.getFechaActivacion()) : "";
     }
 
     private String formatDateDesactivation(EmpresaDTO empresa){
-        DateFormat df = new SimpleDateFormat("dd-mm-yyyy");
+        DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         return empresa.getFechaDesactivacion() != null ? df.format(empresa.getFechaDesactivacion()) : "";
     }
 }

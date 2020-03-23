@@ -9,10 +9,10 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.ProductoInventario;
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.repositories.*;
-import org.apache.commons.collections.CollectionUtils;
+import com.gigti.xfinance.backend.repositories.InventarioInicialRepository;
+import com.gigti.xfinance.backend.repositories.ProductoRepository;
+import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,17 +33,17 @@ public class ProductoServiceImpl implements ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    @Autowired
-    private ProductoInvDiaRepository productoInvDiaRepository;
-
-    @Autowired
-    private ProductoInvInicioRepository productoInvInicioRepository;
+//    @Autowired
+//    private ProductoInvDiaRepository productoInvDiaRepository;
+//
+//    @Autowired
+//    private ProductoInvInicioRepository productoInvInicioRepository;
 
     @Autowired
     private ProductoValoresRepository productoValoresRepository;
 
     @Autowired
-    private InventarioRepository inventarioRepository;
+    private InventarioInicialRepository inventarioInicialRepository;
 
     @Transactional
     public Producto saveProduct(Producto producto, Usuario usuario) {
@@ -101,10 +101,10 @@ public class ProductoServiceImpl implements ProductoService {
         List<Producto> result = new ArrayList<>();
         //Calcula la Cantidad Actual
         for (Producto p : productoRepository.findByEmpresa(empresa, pageable)) {
-            List<ProductoInventario> productosInventario = new ArrayList<>(inventarioRepository.findByProductoAndActivoIsTrue(p));
-            if (CollectionUtils.isNotEmpty(productosInventario) ) {
-                p.setInventarios(productosInventario);
-            }
+//            List<ProductoInventario> productosInventario = new ArrayList<>(inventarioRepository.findByProductoAndActivoIsTrue(p));
+//            if (CollectionUtils.isNotEmpty(productosInventario) ) {
+//                p.setInventarios(productosInventario);
+//            }
 
             result.add(p);
         }

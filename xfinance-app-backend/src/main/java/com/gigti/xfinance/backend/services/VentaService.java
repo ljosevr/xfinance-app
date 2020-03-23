@@ -1,8 +1,8 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Factura;
 import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.Venta;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.vaadin.flow.data.provider.ListDataProvider;
 
@@ -16,6 +16,6 @@ public interface VentaService {
 
     public int count(Empresa empresa);
 
-    public Factura registrarFactura(Usuario usuario, List<PventaDTO> listVenta);
+    public Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta);
 
 }

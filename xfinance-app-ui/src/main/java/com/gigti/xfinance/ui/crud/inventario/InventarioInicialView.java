@@ -7,7 +7,7 @@
 package com.gigti.xfinance.ui.crud.inventario;
 
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.ProductoInventario;
+import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InventarioService;
@@ -133,7 +133,7 @@ public class InventarioInicialView extends VerticalLayout {
 
     }
 
-    private void editInventario(ProductoInventario inventario) {
+    private void editInventario(InventarioInicial inventario) {
         if (inventario == null) {
             closeEditor();
         } else {
@@ -165,7 +165,7 @@ public class InventarioInicialView extends VerticalLayout {
     }
 
     private void saveInventario(InventarioInicialForm.SaveEvent evt) {
-        ProductoInventario inventario = evt.getInventario();
+        InventarioInicial inventario = evt.getInventario();
 
         Response response = inventarioService.saveInventarioInicial(inventario, CurrentUser.get());
         Notification.show(response.getMessage());

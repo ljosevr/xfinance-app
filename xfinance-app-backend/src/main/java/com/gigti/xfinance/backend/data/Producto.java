@@ -11,7 +11,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
@@ -57,8 +56,9 @@ public class Producto extends AbstractEntity {
     @JoinColumn
     private CategoriaProducto categoria;
 
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoInventario> inventarios;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private InventarioActual inventario;
 
 //    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
 //    private List<ProductoInventarioInicio> productoInventarioInicio;

@@ -6,38 +6,44 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
 @Entity
 @ToString
-@Table(name = "producto_inventario_inicio")
-public class ProductoInventarioInicio extends AbstractEntity {
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "inventario_inicial")
+public class InventarioInicial extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(unique = true)
     private Producto producto;
 
-    private double quantity;
+    private BigDecimal cantidad;
 
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+    private boolean infinite;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaActualizacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Usuario usuario;
 
-    public ProductoInventarioInicio(Producto producto, double quantity, Date startDate, Usuario usuario) {
-        this.producto = producto;
-        this.quantity = quantity;
-        this.startDate = startDate;
-        this.usuario = usuario;
-    }
+    @Transient
+    private BigDecimal precioCosto;
 
-    public ProductoInventarioInicio() {
-    }
+    @Transient
+    private BigDecimal precioVenta;
+
+    @Transient
+    private Impuesto impuesto;
 }

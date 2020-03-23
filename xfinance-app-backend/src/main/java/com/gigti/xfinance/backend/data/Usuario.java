@@ -55,7 +55,7 @@ public class Usuario extends AbstractEntity {
     private TipoUsuario tipoUsuario;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Factura> facturas;
+    private List<Venta> ventas;
 
     public Usuario(){
         super();

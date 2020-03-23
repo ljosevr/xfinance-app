@@ -6,18 +6,23 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 @Data
 @Entity
-@Table(name="facturas")
-public class Factura extends AbstractEntity {
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name="ventas")
+public class Venta extends AbstractEntity {
 
     @NotEmpty
     @Column(name="numero_factura",unique = true)
@@ -39,16 +44,15 @@ public class Factura extends AbstractEntity {
     @JoinColumn
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "factura",fetch = FetchType.LAZY)
-    private List<ItemFactura> items;
+    @OneToMany(mappedBy = "venta",fetch = FetchType.LAZY)
+    private List<VentaItem> items;
 
     @Transient
-    private Double totalFactura;
+    private BigDecimal totalVenta;
 
-    public Factura() {
-    }
+    private BigDecimal descuentoFactura;
 
-    public Factura(String numeroFactura, long numeroFacturaInterno, String descripcion, Date fechaCreacion, Usuario usuario) {
+    public Venta(String numeroFactura, long numeroFacturaInterno, String descripcion, Date fechaCreacion, Usuario usuario) {
         this.numeroFactura = numeroFactura;
         this.numeroFacturaInterno = numeroFacturaInterno;
         this.descripcion = descripcion;

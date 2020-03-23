@@ -17,6 +17,7 @@ public class Constantes {
     public static final String VIEW_R_CATEGORIA = "categorias";
     public static final String VIEW_R_COMPRAS = "compras";
     public static final String VIEW_R_INVENTARIO_INICIAL = "invInicial";
+    public static final String VIEW_R_INVENTARIO_ACTUAL = "invActual";
 
     public static final String VIEW_R_USUARIOS = "usuarios";
 
@@ -45,6 +46,7 @@ public class Constantes {
     public static final String VIEW_PRODUCTO_ADMIN = "Administrar Productos";
     public static final String VIEW_COMPRAS = "Compras";
     public static final String VIEW_INVENTARIO_INICIAL = "Inventario Inicial";
+    public static final String VIEW_INVENTARIO_ACTUAL = "Inventario Actual";
 
     public static final String VIEW_USUARIO = "Usuarios";
     public static final String VIEW_USUARIO_ADMIN = "Administrar Usuarios";

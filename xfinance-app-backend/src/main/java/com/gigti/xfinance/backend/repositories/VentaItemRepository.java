@@ -6,14 +6,10 @@
 
 package com.gigti.xfinance.backend.repositories;
 
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Factura;
+import com.gigti.xfinance.backend.data.VentaItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface FacturaRepository  extends JpaRepository<Factura, String> {
-
-    //public long countFacturaByUsuarioEmpresa(Empresa empresa);
-    public long countByUsuario_Empresa(Empresa empresa);
+public interface VentaItemRepository extends JpaRepository<VentaItem, String> {
 }

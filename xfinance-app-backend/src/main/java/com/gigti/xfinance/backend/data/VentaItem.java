@@ -6,19 +6,24 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Data
 @Entity
-@Table(name = "items_factura")
-public class ItemFactura extends AbstractEntity {
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "ventas_items")
+public class VentaItem extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
-    private Factura factura;
+    private Venta venta;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
@@ -30,6 +35,10 @@ public class ItemFactura extends AbstractEntity {
 
     private BigDecimal precioCosto;
 
+    private BigDecimal descuentoArticulo;
+
+    private BigDecimal impuestoArticulo;
+
     @Min(value = 1)
     private int item;
 
@@ -39,11 +48,8 @@ public class ItemFactura extends AbstractEntity {
     @Transient
     private BigDecimal precioTotalVenta;
 
-    public ItemFactura() {
-    }
-
-    public ItemFactura(Factura factura, Producto producto, double cantidad, BigDecimal precioVenta, BigDecimal precioCosto, int item) {
-        this.factura = factura;
+    public VentaItem(Venta venta, Producto producto, double cantidad, BigDecimal precioVenta, BigDecimal precioCosto, int item) {
+        this.venta = venta;
         this.producto = producto;
         this.cantidad = cantidad;
         this.precioVenta = precioVenta;

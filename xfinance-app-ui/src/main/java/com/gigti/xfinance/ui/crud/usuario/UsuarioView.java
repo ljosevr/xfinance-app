@@ -29,7 +29,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
-//@Component
 @Route(value = Constantes.VIEW_R_USUARIOS, layout = MainLayout.class)
 @RouteAlias(value = "usuario", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_USUARIO +" | "+ Constantes.VIEW_MAIN)

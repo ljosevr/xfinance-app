@@ -6,7 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.inventario;
 
-import com.gigti.xfinance.backend.data.ProductoInventario;
+import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -38,9 +38,9 @@ public class InventarioInicialForm extends Dialog {
     private static final Logger logger = Logger.getLogger(InventarioInicialForm.class.getName());
     private Button btnSave;
 
-    private Binder<ProductoInventario> binder;
+    private Binder<InventarioInicial> binder;
     public InventarioInicialForm() {
-        binder = new BeanValidationBinder<>(ProductoInventario.class);
+        binder = new BeanValidationBinder<>(InventarioInicial.class);
 
         FormLayout content = new FormLayout();
         content.setClassName("formLayout");
@@ -94,8 +94,8 @@ public class InventarioInicialForm extends Dialog {
                 }, (inv, data) -> inv.setProducto(binder.getBean().getProducto()));
         binder.forField(tfCantidad).asRequired("Digite Cantidad")
                 .bind(inv -> {
-                    return inv.getQuantity().doubleValue();
-                }, (inv, data) -> inv.setQuantity(BigDecimal.valueOf(data)));
+                    return inv.getCantidad().doubleValue();
+                }, (inv, data) -> inv.setCantidad(BigDecimal.valueOf(data)));
         binder.forField(tfPrecioCosto).asRequired("Digite Precio de Costo")
                 .bind(inv -> {
                     return inv.getPrecioCosto().doubleValue();
@@ -139,8 +139,8 @@ public class InventarioInicialForm extends Dialog {
         this.add(content);
     }
 
-    public void setInventario(ProductoInventario productoInventario) {
-        binder.setBean(productoInventario);
+    public void setInventario(InventarioInicial inventarioInicial) {
+        binder.setBean(inventarioInicial);
     }
 
     private void validateAndSave() {
@@ -168,20 +168,20 @@ public class InventarioInicialForm extends Dialog {
 
     // Events
     public static abstract class InventarioFormEvent extends ComponentEvent<InventarioInicialForm> {
-        private ProductoInventario inventario;
+        private InventarioInicial inventario;
 
-        protected InventarioFormEvent(InventarioInicialForm source, ProductoInventario inventario) {
+        protected InventarioFormEvent(InventarioInicialForm source, InventarioInicial inventario) {
             super(source, false);
             this.inventario = inventario;
         }
 
-        public ProductoInventario getInventario() {
+        public InventarioInicial getInventario() {
             return inventario;
         }
     }
 
     public static class SaveEvent extends InventarioFormEvent {
-        SaveEvent(InventarioInicialForm source, ProductoInventario inventario) {
+        SaveEvent(InventarioInicialForm source, InventarioInicial inventario) {
             super(source, inventario);
         }
     }

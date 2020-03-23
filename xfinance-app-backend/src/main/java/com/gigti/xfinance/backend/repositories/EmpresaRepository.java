@@ -25,7 +25,7 @@ public interface EmpresaRepository extends JpaRepository<Empresa, String> {
             "WHERE UPPER(e.nombreEmpresa) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
             "e.eliminado = FALSE AND "+
             "e.tipoEmpresa =:tipoEmpresa")
-    public List<Empresa> findByNombreOrDescripcionAndTipoEmpresa(@Param("filter") String filter, TipoEmpresa tipoEmpresa, Pageable pageable);
+    public List<Empresa> search(@Param("filter") String filter, TipoEmpresa tipoEmpresa, Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE e.activo =:activo AND " +

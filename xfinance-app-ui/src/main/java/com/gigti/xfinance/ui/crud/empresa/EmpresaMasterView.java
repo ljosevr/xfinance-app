@@ -1,9 +1,12 @@
 package com.gigti.xfinance.ui.crud.empresa;
 
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.EmpresaService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.TopBarComponent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -16,142 +19,130 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.router.BeforeEvent;
-import com.vaadin.flow.router.HasUrlParameter;
-import com.vaadin.flow.router.OptionalParameter;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Iterator;
-import java.util.List;
 
 @Route(value = Constantes.VIEW_R_EMPRESA_MASTER, layout = MainLayout.class)
-public class EmpresaMasterView extends HorizontalLayout
-        implements HasUrlParameter<String> {
+@PageTitle(value = Constantes.VIEW_EMPRESA_ADMIN + " | " + Constantes.VIEW_MAIN)
+public class EmpresaMasterView extends VerticalLayout {
 
     private EmpresaMasterGrid grid;
     private EmpresaMasterForm form;
     private TextField filter;
-    private EmpresaMasterCrudLogic viewLogic;
-    private Button btnNewEmpresa;
-    private List<EmpresaDTO> lista;
-    private VerticalLayout barAndGridLayout;
+    private EmpresaService empresaService;
+    private Empresa empresa;
 
-    @Autowired
     public EmpresaMasterView(EmpresaService iService) {
-            viewLogic = new EmpresaMasterCrudLogic(iService,this);
-//        if(viewLogic.access()) {
-            setSizeFull();
-            HorizontalLayout topLayout = createTopBar();
+        this.empresaService = iService;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
 
-            grid = new EmpresaMasterGrid();
-            lista = viewLogic.findAll();
-            grid.setItems(lista);
-            grid.asSingleSelect().addValueChangeListener(
-                    event -> viewLogic.rowSelected(event.getValue()));
+        setSizeFull();
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-            form = new EmpresaMasterForm(viewLogic);
+        HorizontalLayout topLayout = createTopBar();
+        configureGrid();
 
-            H3 title = new H3(Constantes.VIEW_EMPRESAS);
-            title.setClassName("titleView");
+        form = new EmpresaMasterForm();
+        form.addListener(EmpresaMasterForm.SaveEvent.class, this::saveEmpresa);
+        form.addListener(EmpresaMasterForm.DeleteEvent.class, this::deleteEmpresa);
+        form.addListener(EmpresaMasterForm.CloseEvent.class, e -> closeEditor());
 
-            barAndGridLayout = new VerticalLayout();
-            barAndGridLayout.add(title);
+        H3 title = new H3(Constantes.VIEW_EMPRESAS);
+        title.setClassName("titleView");
 
-            barAndGridLayout.add(topLayout);
-            barAndGridLayout.add(grid);
-            barAndGridLayout.setFlexGrow(1, grid);
-            barAndGridLayout.setFlexGrow(0, topLayout);
-            barAndGridLayout.setSizeFull();
-            barAndGridLayout.expand(grid);
+        VerticalLayout barAndGridLayout = new VerticalLayout();
+        barAndGridLayout.add(title);
 
-            add(barAndGridLayout);
+        barAndGridLayout.add(topLayout);
+        barAndGridLayout.add(grid);
+        barAndGridLayout.setFlexGrow(1, grid);
+        barAndGridLayout.setFlexGrow(0, topLayout);
+        barAndGridLayout.setSizeFull();
+        barAndGridLayout.expand(grid);
 
-            viewLogic.init();
+        add(barAndGridLayout);
+
+        updateList();
+        closeEditor();
+    }
+
+    private void configureGrid() {
+        grid = new EmpresaMasterGrid();
+        grid.setSizeFull();
+        grid.asSingleSelect().addValueChangeListener(evt -> editEmpresa(evt.getValue()));
+    }
+
+    private void addEmpresa() {
+        grid.asSingleSelect().clear();
+        editEmpresa(new EmpresaDTO());
+    }
+
+    private void editEmpresa(EmpresaDTO empresaDTO) {
+        if (empresaDTO == null) {
+            closeEditor();
+        } else {
+            form.setEmpresa(empresaDTO);
+            form.setVisible(true);
+            showForm(true);
+            addClassName("editing");
+        }
+    }
+
+    private void closeEditor() {
+        form.setEmpresa(null);
+        //form.setVisible(false);
+        grid.deselectAll();
+        showForm(false);
+        removeClassName("editing");
+    }
+
+    private void updateList() {
+        grid.setItems(empresaService.findAll(filter.getValue(), grid.getPage(), grid.getPageSize()));
     }
 
     public HorizontalLayout createTopBar() {
         filter = new TextField();
         filter.setPlaceholder("Buscar Empresa por Nombre ó NIT");
         filter.setValueChangeMode(ValueChangeMode.LAZY);
-        filter.addValueChangeListener(event -> {
-            lista = viewLogic.setFilter(event.getValue());
-            if(lista != null)
-                grid.setItems(lista);
-            }
-        );
+        filter.addValueChangeListener(event -> updateList());
         filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
+        filter.focus();
 
-        btnNewEmpresa = new Button("Nueva");
+        Button btnNewEmpresa = new Button("Nueva");
         btnNewEmpresa.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnNewEmpresa.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewEmpresa.addClickListener(click -> viewLogic.nuevo());
-        // CTRL+N will create a new window which is unavoidable
-        btnNewEmpresa.addClickShortcut(Key.F4);
+        btnNewEmpresa.addClickListener(click -> addEmpresa());
+        btnNewEmpresa.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
 
         return new TopBarComponent(filter, btnNewEmpresa);
     }
 
-    public void showError(String msg) {
-        Notification.show(msg);
+    private void saveEmpresa(EmpresaMasterForm.SaveEvent evt) {
+        EmpresaDTO empresaDTO = evt.getEmpresaDTO();
+
+        empresaService.saveEmpresa(empresaDTO);
+        updateList();
+        closeEditor();
     }
 
-    public void showSaveNotification(String msg) {
-        Notification.show(msg);
-    }
-
-    public void clearSelection() {
-        grid.getSelectionModel().deselectAll();
-    }
-
-    public void selectRow(EmpresaDTO row) {
-        grid.getSelectionModel().select(row);
-    }
-
-    public void edit(EmpresaDTO empresa) {
-        form.edit(empresa);
-        showForm(empresa != null);
+    private void deleteEmpresa(EmpresaMasterForm.DeleteEvent evt) {
+        EmpresaDTO empresaDTO = evt.getEmpresaDTO();
+        Response response = empresaService.deleteEmpresa(empresaDTO.getEmpresaId());
+        if(response.isSuccess()){
+            Notification.show(response.getMessage(), 3000, Notification.Position.MIDDLE);
+            updateList();
+            closeEditor();
+        } else {
+            Notification.show(response.getMessage(), 5000, Notification.Position.MIDDLE);
+        }
     }
 
     public void showForm(boolean show) {
         if(show){
             form.open();
         }else{
-            filter.focus();
             form.close();
+            filter.focus();
         }
-    }
-
-    @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
-        viewLogic.enter(parameter);
-    }
-
-    public void refresh(){
-        lista = viewLogic.findAll();
-        grid.setItems(lista);
-    }
-
-    public void refresh(EmpresaDTO empresa){
-        for(Iterator<EmpresaDTO> it = lista.iterator(); it.hasNext();){
-            EmpresaDTO e = it.next();
-            if(e.getEmpresaId().equals(empresa.getEmpresaId())) {
-                it.remove();
-                lista.remove(e);
-                break;
-            }
-        }
-
-        lista.add(empresa);
-        grid.setItems(lista);
-        grid.refresh(empresa);
-    }
-
-    public EmpresaMasterGrid getGrid() {
-        return grid;
-    }
-
-    public List<EmpresaDTO> getItemsGrid(){
-        return lista;
     }
 }

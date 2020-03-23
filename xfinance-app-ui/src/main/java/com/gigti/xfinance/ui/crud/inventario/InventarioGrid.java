@@ -6,7 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.inventario;
 
-import com.gigti.xfinance.backend.data.ProductoInventario;
+import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +16,7 @@ import java.text.DecimalFormat;
 import java.util.Currency;
 import java.util.Locale;
 
-public class InventarioGrid extends PaginatedGrid<ProductoInventario> {
+public class InventarioGrid extends PaginatedGrid<InventarioInicial> {
 
     public InventarioGrid() {
         setSizeFull();
@@ -26,7 +26,7 @@ public class InventarioGrid extends PaginatedGrid<ProductoInventario> {
                 .setHeader("Nombre Producto")
                 .setSortable(true);
 
-        addColumn(inventario -> inventario.getQuantity())
+        addColumn(InventarioInicial::getCantidad)
                 .setHeader("Cantidad")
                 .setKey("cantidad");
 
@@ -64,7 +64,7 @@ public class InventarioGrid extends PaginatedGrid<ProductoInventario> {
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(ProductoInventario product) {
+    public void refresh(InventarioInicial product) {
         getDataCommunicator().refresh(product);
     }
 
