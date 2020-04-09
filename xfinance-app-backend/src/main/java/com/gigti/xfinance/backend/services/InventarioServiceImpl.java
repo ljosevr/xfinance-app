@@ -187,12 +187,18 @@ public class InventarioServiceImpl implements InventarioService {
             //Inventario Actual
             InventarioActual invActual = inventarioActualRepository.findByProducto(producto);
             if(invActual == null) {
-                invActual = new InventarioActual(producto, cantidad, infinite, fecha);
-            } else {
-                if(aumentarStock) {
-                    invActual.setCantidad(invActual.getCantidad().add(cantidad));
+                if(infinite) {
+                    invActual = new InventarioActual(producto, BigDecimal.ZERO, infinite, fecha);
                 } else {
-                    invActual.setCantidad(invActual.getCantidad().subtract(cantidad));
+                    invActual = new InventarioActual(producto, cantidad, infinite, fecha);
+                }
+            } else {
+                if(!infinite) {
+                    if (aumentarStock) {
+                        invActual.setCantidad(invActual.getCantidad().add(cantidad));
+                    } else {
+                        invActual.setCantidad(invActual.getCantidad().subtract(cantidad));
+                    }
                 }
                 invActual.setInfinite(infinite);
                 invActual.setFechaActualizacion(fecha);
