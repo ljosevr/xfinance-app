@@ -1,8 +1,8 @@
 /* WEB */
 @media (min-width: 600px) {
-    * {
-        box-sizing: border-box;
-    }
+    /** {*/
+    /*    box-sizing: border-box;*/
+    /*}*/
 
     .login-screen-flex{
         width: 60%;
@@ -75,7 +75,32 @@
     .formLayoutDialog{
         padding: 10px;
     }
+
+    /* Pventa view */
+    .PventaView .content {
+        display: flex;
+    }
+
+    .PventaView .grid {
+        flex: 3;
+    }
+
+    .PventaView .rightLayout {
+        flex: 1;
+        padding: var(--lumo-space-m);
+        padding-top: 0;
+    }
+
+    .InventarioInicialView.form {
+        max-width: 350px;
+    }
+
+    .ProductoView.form {
+        max-width: 450px;
+    }
 }
+
+
 
 /* MOBILE*/
 @media (max-width: 550px) {
@@ -129,6 +154,16 @@
 
     .formLayoutDialog{
         padding: 5px;
+    }
+
+    .InventarioInicialView.editing .searchBar,
+    .InventarioInicialView.editing .grid {
+        display: none;
+    }
+
+    .ProductoView.editing .searchBar,
+    .ProductoView.editing .grid {
+        display: none;
     }
 }
 

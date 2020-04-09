@@ -6,23 +6,23 @@
 
 package com.gigti.xfinance.backend.services;
 
-import com.gigti.xfinance.backend.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.Usuario;
-import org.springframework.stereotype.Component;
+import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
+import com.gigti.xfinance.backend.others.Response;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductoService {
 
-    public Producto saveProduct(Producto producto, Usuario usuario);
-    public boolean delete(String id);
-    public List<Producto> findByNombreProducto(Empresa empresa, String productName);
-    public List<Producto> findAll(Empresa empresa, int page, int size);
-    public Producto findByBarCode(Empresa empresa, String barCode);
-    public List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
-    public Producto findById(String id);
-    public List<TipoMedidaEnum> getAllTipoMedidaEnum();
+    Producto saveProduct(Producto producto, Usuario usuario);
+    Response delete(String id);
+    List<Producto> findByNombreProducto(Empresa empresa, String productName);
+    List<Producto> findAll(String filterText, Empresa empresa, int page, int size);
+    Producto findByBarCode(Empresa empresa, String barCode);
+    List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
+    Producto findById(String id);
+    List<TipoMedidaEnum> getAllTipoMedidaEnum();
+    int count(String filterText, Empresa empresa);
 }

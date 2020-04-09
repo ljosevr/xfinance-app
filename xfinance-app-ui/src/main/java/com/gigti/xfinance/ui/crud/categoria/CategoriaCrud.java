@@ -5,28 +5,27 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.util.ICrudLogic;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-public class CategoriaCrudLogic implements Serializable, ICrudLogic {
+public class CategoriaCrud implements Serializable {
 
     private CategoriaView view;
     private CategoriaProductoService categoriaProductoService;
     private static Empresa empresa;
     private String filterText = "";
 
-    public CategoriaCrudLogic(CategoriaProductoService iService, CategoriaView simpleCrudView) {
+    public CategoriaCrud(CategoriaProductoService iService, CategoriaView simpleCrudView) {
         categoriaProductoService = iService;
         view = simpleCrudView;
         empresa  = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
     }
 
     public void init() {
-        editar(null);
+        edit(null);
     }
 
     public boolean acceder(){
@@ -54,7 +53,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
     public void enter(String categoriaId) {
         if (categoriaId != null && !categoriaId.isEmpty()) {
             if (categoriaId.equals("new")) {
-                nuevo();
+                newItem();
             } else {
                 CategoriaProducto categoria = find(categoriaId);
                 view.selectRow(categoria);
@@ -68,7 +67,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
         return categoriaProductoService.findById(id);
     }
 
-    public void guardar(Object object) {
+    public void save(Object object) {
         CategoriaProducto categoria = (CategoriaProducto) object;
         String typOperation = StringUtils.isBlank(categoria.getId()) ? " Creada" : " Actualizada";
         categoria.setEmpresa(empresa);
@@ -85,7 +84,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
         }
     }
 
-    public void eliminar(Object object) {
+    public void delete(Object object) {
         CategoriaProducto categoria = (CategoriaProducto) object;
         view.clearSelection();
         if(categoriaProductoService.deleteCategoria(categoria.getId())){
@@ -102,7 +101,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
         }
     }
 
-    public void editar(Object object) {
+    public void edit(Object object) {
         CategoriaProducto categoria = (CategoriaProducto) object;
         if (categoria == null) {
             setFragmentParameter("");
@@ -112,7 +111,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
         view.editCategoria(categoria);
     }
 
-    public void nuevo() {
+    public void newItem() {
         view.clearSelection();
         setFragmentParameter("new");
         view.editCategoria(new CategoriaProducto());
@@ -122,7 +121,7 @@ public class CategoriaCrudLogic implements Serializable, ICrudLogic {
         CategoriaProducto categoria = (CategoriaProducto) object;
         if (AccessControlFactory.getInstance().createAccessControl()
                 .isUserInRole(CurrentUser.get())) {
-            editar(categoria);
+            edit(categoria);
         }
     }
 

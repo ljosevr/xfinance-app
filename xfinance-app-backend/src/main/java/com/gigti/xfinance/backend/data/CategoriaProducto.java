@@ -17,8 +17,10 @@ public class CategoriaProducto extends AbstractEntity{
     @NotNull
     private String nombre;
     private String descripcion;
+
     @NotNull
     private boolean activo;
+
     @NotNull
     private boolean eliminado;
 

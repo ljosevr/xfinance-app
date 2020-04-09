@@ -1,6 +1,8 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
+import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.repositories.*;
@@ -21,15 +23,10 @@ public class InitBackServiceImpl implements InitBackService {
 
     @Autowired
     private EmpresaRepository empresaRepository;
-
     @Autowired
     private PersonaRepository personaRepository;
-
     @Autowired
     private TipoIdeRepository tipoIdeRepository;
-
-    @Autowired
-    private TipoUsuarioRepository tipoUsuarioRepository;
     @Autowired
     private RolRepository rolRepository;
     @Autowired
@@ -37,13 +34,7 @@ public class InitBackServiceImpl implements InitBackService {
     @Autowired
     private ParcheRepository parcheRepository;
     @Autowired
-    private TipoEmpresaRepository tipoEmpresaRepository;
-    @Autowired
     private VistaRepository vistaRepository;
-    @Autowired
-    private TipoMovimientoRepository tipoMovimientoRepository;
-    @Autowired
-    private TipoDescuentoRepository tipoDescuentoRepository;
 
     // Tipos de Datos
     @Transactional
@@ -59,31 +50,6 @@ public class InitBackServiceImpl implements InitBackService {
                 tipoIdeRepository.save(TipoIde.NIT);
                 tipoIdeRepository.save(TipoIde.TIDENTIDAD);
                 logger.info("Tipos IDE");
-
-                //Tipo Usuarios
-                tipoUsuarioRepository.save(TipoUsuario.ADMIN);
-                tipoUsuarioRepository.save(TipoUsuario.NORMAL);
-                tipoUsuarioRepository.save(TipoUsuario.ROOT);
-                tipoUsuarioRepository.save(TipoUsuario.SELLER);
-                logger.info("Tipos Usuarios");
-                //Tipo Empresa
-                tipoEmpresaRepository.save(TipoEmpresa.ROOT);
-                tipoEmpresaRepository.save(TipoEmpresa.NORMAL);
-                logger.info("Tipos Empresas");
-
-                //Tipo Movimiento
-                tipoMovimientoRepository.save(TipoMovimiento.COMPRA);
-                tipoMovimientoRepository.save(TipoMovimiento.VENTA);
-                tipoMovimientoRepository.save(TipoMovimiento.INICIAL);
-                tipoMovimientoRepository.save(TipoMovimiento.TRASLADO);
-                logger.info("Tipos Movimientos");
-
-                //Tipo Descuentos
-                tipoDescuentoRepository.save(TipoDescuento.VALOR_UNIDAD);
-                tipoDescuentoRepository.save(TipoDescuento.VALOR_TOTAL);
-                tipoDescuentoRepository.save(TipoDescuento.PORCENTAJE_UNIDAD);
-                tipoDescuentoRepository.save(TipoDescuento.PORCENTAJE_TOTAL);
-                logger.info("Tipos Descuentos");
 
                 //Vistas
                 Vista vista_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
@@ -221,7 +187,7 @@ public class InitBackServiceImpl implements InitBackService {
                         true,
                         java.sql.Date.valueOf(LocalDate.now()),
                         null,
-                        TipoEmpresa.ROOT, "GIG");
+                        TipoEmpresaEnum.ROOT, "GIG");
 
                 emp = empresaRepository.save(emp);
                 logger.info("Empresa Root Creado");
@@ -253,7 +219,7 @@ public class InitBackServiceImpl implements InitBackService {
                         persona,
                         emp,
                         rolRoot,
-                        TipoUsuario.ROOT
+                        TipoUsuarioEnum.ROOT
                 );
 
                 usuarioRepository.save(userRoot);

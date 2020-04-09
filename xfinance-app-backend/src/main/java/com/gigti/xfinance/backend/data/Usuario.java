@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.backend.data;
 
+import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -50,9 +51,9 @@ public class Usuario extends AbstractEntity {
 
     private boolean adminDefecto;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
-    private TipoUsuario tipoUsuario;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TipoUsuarioEnum tipoUsuario;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Venta> ventas;
@@ -61,7 +62,7 @@ public class Usuario extends AbstractEntity {
         super();
     }
 
-    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuario tipoUsuario) {
+    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuarioEnum tipoUsuario) {
         this.nombreUsuario = nombreUsuario;
         this.passwordUsuario = passwordUsuario;
         this.activo = activo;

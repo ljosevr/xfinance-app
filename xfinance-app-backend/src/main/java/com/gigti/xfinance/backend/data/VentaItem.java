@@ -8,6 +8,7 @@ package com.gigti.xfinance.backend.data;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "ventas_items")
 public class VentaItem extends AbstractEntity {
 
@@ -29,7 +31,7 @@ public class VentaItem extends AbstractEntity {
     @JoinColumn
     private Producto producto;
 
-    private double cantidad;
+    private BigDecimal cantidad;
 
     private BigDecimal precioVenta;
 
@@ -38,6 +40,8 @@ public class VentaItem extends AbstractEntity {
     private BigDecimal descuentoArticulo;
 
     private BigDecimal impuestoArticulo;
+
+    private String impuestoNombre;
 
     @Min(value = 1)
     private int item;
@@ -48,12 +52,4 @@ public class VentaItem extends AbstractEntity {
     @Transient
     private BigDecimal precioTotalVenta;
 
-    public VentaItem(Venta venta, Producto producto, double cantidad, BigDecimal precioVenta, BigDecimal precioCosto, int item) {
-        this.venta = venta;
-        this.producto = producto;
-        this.cantidad = cantidad;
-        this.precioVenta = precioVenta;
-        this.precioCosto = precioCosto;
-        this.item = item;
-    }
 }

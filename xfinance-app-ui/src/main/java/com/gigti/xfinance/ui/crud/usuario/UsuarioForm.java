@@ -190,7 +190,6 @@ public class UsuarioForm extends Dialog {
         DeleteEvent(UsuarioForm source, UsuarioDTO usuario) {
             super(source, usuario);
         }
-
     }
 
     public static class CloseEvent extends UsuarioFormEvent {

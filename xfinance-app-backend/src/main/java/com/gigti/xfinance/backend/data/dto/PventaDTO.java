@@ -2,7 +2,6 @@ package com.gigti.xfinance.backend.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -19,12 +18,18 @@ public class PventaDTO implements Serializable {
     private String codigoBarra;
     private BigDecimal precioCostoActual;
     private BigDecimal precioVentaActual;
-    private double cantidadVenta;
-    private double inStock;
+    private BigDecimal cantidadVenta;
+    private BigDecimal inStock;
     private String unidadMedida;
+    private String impuestoId;
+    private BigDecimal impuestoValor;
+    private String impuestoNombre;
+    private boolean infinite;
+    private BigDecimal descuento;
+    private BigDecimal descuentoTotal;
 
     public BigDecimal getSubTotal(){
-        return  precioVentaActual.multiply(BigDecimal.valueOf(cantidadVenta));
+        return  precioVentaActual.multiply(cantidadVenta);
     }
 
 }

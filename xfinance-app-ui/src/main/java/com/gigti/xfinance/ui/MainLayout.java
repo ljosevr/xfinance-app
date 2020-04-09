@@ -9,7 +9,6 @@ package com.gigti.xfinance.ui;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.services.InitBackServiceImpl;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -38,8 +37,6 @@ import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,14 +44,7 @@ import java.util.stream.Collectors;
 /**
  * The main layout. Contains the navigation menu.
  */
-//@SpringComponent
-//@UIScope
-//@Primary
-//
 //@PreserveOnRefresh
-//@Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
-//@PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
-
 @Route("")
 @PWA(
         name = "Tu Punto De Venta",
@@ -73,7 +63,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
     private Accordion menus_varios;
     private Button menu_salir;
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     public MainLayout() {
 
@@ -103,6 +92,14 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
 
         H1 bienvenida = new H1(empresaname.toUpperCase() + " - Bienvenido: "+personname);
         bienvenida.addClassName("logo");
+
+        UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
+            if(details.getWindowInnerWidth() < 600) {
+                bienvenida.setVisible(false);
+            } else {
+                bienvenida.setVisible(true);
+            }
+        });
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);
 
@@ -191,23 +188,6 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             }
             menus_varios.add(vista.getNombreVista(), layout_menu_sub);
         }
-
-//        mapMenu.forEach((vista, vistas) -> {
-//            VerticalLayout  layout_menu_sub = new VerticalLayout();
-//            if(menus_varios == null) {
-//                menus_varios = new Accordion();
-//            }
-//
-//            for(Vista sub : vistas){
-//                    Button menu_sub = new Button(sub.getNombreVista(), new Icon(VaadinIcon.valueOf(sub.getIconMenu())));
-//                    menu_sub.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-//                    menu_sub.addClickListener(l -> UI.getCurrent().navigate(sub.getRouteVista()));
-//                    menu_sub.setClassName("subMenu-Layout");
-//                    layout_menu_sub.add(menu_sub);
-//            }
-//            menus_varios.add(vista.getNombreVista(), layout_menu_sub);
-//
-//        });
 
         if(menus_varios != null){
             layoutMenu.add(menus_varios);

@@ -1,9 +1,9 @@
 package com.gigti.xfinance.backend.data.dto;
 
 import com.gigti.xfinance.backend.data.Rol;
-import com.gigti.xfinance.backend.data.TipoEmpresa;
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.Vista;
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import lombok.Data;
 
 import javax.validation.constraints.Size;
@@ -24,7 +24,7 @@ public class EmpresaDTO implements Serializable {
     private boolean eliminado;
     private Date fechaActivacion;
     private Date fechaDesactivacion;
-    private TipoEmpresa tipoEmpresa;
+    private TipoEmpresaEnum tipoEmpresa;
     private String codigoEmpresa;
 
     private String activoS;

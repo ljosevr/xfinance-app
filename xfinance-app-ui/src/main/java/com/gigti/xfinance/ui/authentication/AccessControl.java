@@ -23,7 +23,5 @@ public interface AccessControl extends Serializable {
 
     boolean isUserInRole(Usuario currentUser);
 
-    String getTipoUsuario();
-
     void signOut();
 }

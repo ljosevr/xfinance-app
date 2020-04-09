@@ -34,10 +34,6 @@ public class ProductoValor extends AbstractEntity {
     @NotNull
     private BigDecimal precioVenta;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
-    private Impuesto impuesto;
-
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActualizacion;
 

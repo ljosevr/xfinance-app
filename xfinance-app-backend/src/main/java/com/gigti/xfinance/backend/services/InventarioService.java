@@ -1,6 +1,7 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.Response;
 
 import java.math.BigDecimal;
@@ -9,7 +10,19 @@ import java.util.List;
 public interface InventarioService {
 
     List<InventarioInicial> findAll(String filterText, Empresa empresa, int page, int size);
+    int getCount(String filterText, Empresa empresa);
     Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
+
+    /**
+     * Metodo para buscar todo el Inventario Actual de los productos
+     * @param filterText
+     * @param empresa
+     * @param page
+     * @param size
+     * @return
+     */
+    List<InventarioActual> findInvActual(String filterText, Empresa empresa, int page, int size);
+    int countInvActual(String filterText, Empresa empresa);
 
     /**
      * Metodo para actualizar Inventario Actual, Movimientos, y ProductoValores
@@ -19,9 +32,12 @@ public interface InventarioService {
      * @param cantidad -> Cantidad a guardar o mover
      * @param precioVenta -> Precio Venta aplicado
      * @param precioCosto -> precio de Costo Aplicado
-     * @param impuestoId -> Id del Impuesto a aplicar
      * @param tipoMovimiento -> Fuente de Modificación
+     * @param updatePrices -> Sirve para saber si actualiza Precios o no
+     * @param infinite -> Si el producto tiene inventario infinite
+     * @param impuestoValor -> Valor del impuesto a aplicar
+     * @param impuestoNombre -> Nombre del Impuesto a aplicar
      * @return -> Retorna Verdadero o Falso
      */
-    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, String impuestoId, TipoMovimiento tipoMovimiento);
+    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre);
 }

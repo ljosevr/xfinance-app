@@ -1,24 +1,15 @@
 package com.gigti.xfinance.ui.crud.empresa;
 
-import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.EmpresaService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.util.TopBarComponent;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -30,16 +21,14 @@ public class EmpresaMasterView extends VerticalLayout {
     private EmpresaMasterForm form;
     private TextField filter;
     private EmpresaService empresaService;
-    private Empresa empresa;
+    private SearchFilterComponent component;
 
     public EmpresaMasterView(EmpresaService iService) {
         this.empresaService = iService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
 
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        HorizontalLayout topLayout = createTopBar();
         configureGrid();
 
         form = new EmpresaMasterForm();
@@ -53,10 +42,13 @@ public class EmpresaMasterView extends VerticalLayout {
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);
 
-        barAndGridLayout.add(topLayout);
+        configureTopBar();
+        filter = component.getFilter();
+
+        barAndGridLayout.add(component);
         barAndGridLayout.add(grid);
         barAndGridLayout.setFlexGrow(1, grid);
-        barAndGridLayout.setFlexGrow(0, topLayout);
+        barAndGridLayout.setFlexGrow(0, component);
         barAndGridLayout.setSizeFull();
         barAndGridLayout.expand(grid);
 
@@ -90,7 +82,6 @@ public class EmpresaMasterView extends VerticalLayout {
 
     private void closeEditor() {
         form.setEmpresa(null);
-        //form.setVisible(false);
         grid.deselectAll();
         showForm(false);
         removeClassName("editing");
@@ -100,21 +91,13 @@ public class EmpresaMasterView extends VerticalLayout {
         grid.setItems(empresaService.findAll(filter.getValue(), grid.getPage(), grid.getPageSize()));
     }
 
-    public HorizontalLayout createTopBar() {
-        filter = new TextField();
-        filter.setPlaceholder("Buscar Empresa por Nombre ó NIT");
-        filter.setValueChangeMode(ValueChangeMode.LAZY);
-        filter.addValueChangeListener(event -> updateList());
-        filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
-        filter.focus();
+    public void configureTopBar() {
 
-        Button btnNewEmpresa = new Button("Nueva");
-        btnNewEmpresa.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNewEmpresa.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewEmpresa.addClickListener(click -> addEmpresa());
-        btnNewEmpresa.addClickShortcut(Key.KEY_N, KeyModifier.ALT);
+        component = new SearchFilterComponent("Nueva", "", "Buscar Empresa por Nombre ó NIT", false, true);
+        component.getFilter().addValueChangeListener(event -> updateList());
+        component.getFilter().focus();
+        component.getBtnAdd().addClickListener(click -> addEmpresa());
 
-        return new TopBarComponent(filter, btnNewEmpresa);
     }
 
     private void saveEmpresa(EmpresaMasterForm.SaveEvent evt) {

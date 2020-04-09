@@ -22,14 +22,13 @@ public class CategoriaForm extends Dialog {
     private FormLayout content;
 
     private Button btnSave;
-    private Button btnDiscard;
     private Button btnDelete;
 
-    private CategoriaCrudLogic viewLogic;
+    private CategoriaCrud viewLogic;
     private Binder<CategoriaProducto> binder;
     private CategoriaProducto currentCategoria;
 
-    public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
+    public CategoriaForm(CategoriaCrud categoriaCrudLogic) {
         content = new FormLayout();
         content.setClassName("formLayoutDialog");
         content.setResponsiveSteps(
@@ -75,7 +74,6 @@ public class CategoriaForm extends Dialog {
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
             btnSave.setEnabled(hasChanges && isValid);
-            btnDiscard.setEnabled(hasChanges);
         });
 
         btnSave = new Button("Guardar");
@@ -83,15 +81,10 @@ public class CategoriaForm extends Dialog {
         btnSave.addClickListener(event -> {
             if (currentCategoria != null
                     && binder.writeBeanIfValid(currentCategoria)) {
-                viewLogic.guardar(currentCategoria);
+                viewLogic.save(currentCategoria);
             }
         });
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
-
-        btnDiscard = new Button("Descartar Cambios");
-        btnDiscard.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        btnDiscard.addClickListener(
-                event -> viewLogic.editar(currentCategoria));
 
         Button btnCancel = new Button("Cancelar");
         btnCancel.addThemeVariants(ButtonVariant.LUMO_SMALL);
@@ -106,16 +99,13 @@ public class CategoriaForm extends Dialog {
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
         btnDelete.addClickListener(event -> {
             if (currentCategoria != null) {
-                viewLogic.eliminar(currentCategoria);
+                viewLogic.delete(currentCategoria);
             }
         });
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
-        actionsLayout.add(btnSave, btnDiscard);
-        HorizontalLayout actionsLayout2 = new HorizontalLayout();
-        actionsLayout.add(btnDelete, btnCancel);
+        actionsLayout.add(btnSave, btnDelete, btnCancel);
         content.add(actionsLayout,3);
-        content.add(actionsLayout2,3);
 
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);

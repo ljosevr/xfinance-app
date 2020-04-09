@@ -35,7 +35,6 @@ import com.vaadin.flow.router.RouterLink;
 @Route(value = Constantes.VIEW_R_LOGIN)
 @PageTitle(value = Constantes.VIEW_LOGIN +" | "+ Constantes.VIEW_MAIN)
 @CssImport("./styles/shared-styles.css")
-//public class LoginView extends FlexLayout {
 public class LoginView extends VerticalLayout {
 
     private AccessControl accessControl;

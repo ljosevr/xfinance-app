@@ -2,6 +2,8 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
+import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.mapper.ConvertEmpresa;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.Utils;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,15 +39,18 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Autowired
     private CategoriaProductoRepository categoriaProductoRepository;
 
+    @Autowired
+    private ImpuestoRepository impuestoRepository;
+
     @Override
     public List<EmpresaDTO> findAll(String filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         List<Empresa> empresas;
         List<EmpresaDTO> result = new ArrayList<>();
         if(filter == null || filter.isEmpty()) {
-            empresas = empresaRepository.findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresa.NORMAL, pageable);
+            empresas = empresaRepository.findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresaEnum.NORMAL, pageable);
         } else  {
-            empresas = empresaRepository.search(filter, TipoEmpresa.NORMAL, pageable);
+            empresas = empresaRepository.search(filter, TipoEmpresaEnum.NORMAL, pageable);
         }
         empresas.forEach(emp -> result.add(getData(emp)));
 
@@ -56,7 +62,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             Usuario user = null;
             if (emp.getUsuarios() != null) {
                 for(Usuario user1 : emp.getUsuarios()){
-                    if(user1.getTipoUsuario().equals(TipoUsuario.ADMIN)){
+                    if(user1.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN)){
                         user = user1;
                         break;
                     }
@@ -79,7 +85,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             if(empresa != null){
                 Usuario user = null;
                 for(Usuario user1 : empresa.getUsuarios()) {
-                    if (user1.getTipoUsuario().equals(TipoUsuario.ADMIN)) {
+                    if (user1.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN)) {
                         user = user1;
                         break;
                     }
@@ -96,13 +102,10 @@ public class EmpresaServiceImpl implements EmpresaService {
         EmpresaDTO empresaDTO = new EmpresaDTO();
         Empresa empresa = empresaRepository.findById(id).orElse(null);
         if(empresa != null){
-            Usuario user = null;
-            for(Usuario user1 : empresa.getUsuarios()){
-                if(user1.getTipoUsuario().equals(TipoUsuario.ADMIN)){
-                    user = user1;
-                    break;
-                }
-            }
+            Usuario user = empresa.getUsuarios().stream()
+                    .filter(usu -> usu.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN))
+                    .findFirst()
+                    .orElse(null);
             empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
         }
         return empresaDTO;
@@ -110,21 +113,17 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     public List<EmpresaDTO> findByNombreOrDescripcion(String filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        List<Empresa> listTemp = empresaRepository.search(filter, TipoEmpresa.NORMAL, pageable);
+        List<Empresa> listTemp = empresaRepository.search(filter, TipoEmpresaEnum.NORMAL, pageable);
         List<EmpresaDTO> listResult = new ArrayList<>();
-        for(Empresa empresa : listTemp){
-            if(empresa != null){
-                Usuario user = null;
-                for(Usuario user1 : empresa.getUsuarios()){
-                    if(user1.getTipoUsuario().equals(TipoUsuario.ADMIN)){
-                        user = user1;
-                        break;
-                    }
-                }
-                EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
-                listResult.add(empresaDTO);
-            }
-        }
+
+        listTemp.forEach(empresa -> {
+            Usuario user = empresa.getUsuarios().stream()
+                    .filter(usu -> usu.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN))
+                    .findFirst().orElse(null);
+            EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
+            listResult.add(empresaDTO);
+        });
+
         return listResult;
     }
 
@@ -163,6 +162,8 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Transactional
     @Override
     public EmpresaDTO saveEmpresa(EmpresaDTO empresa) {
+        final String methodName = "saveEmpresa";
+        logger.log(Level.INFO, "--> "+methodName);
         try{
             Empresa empresaEnt;
             boolean isNew = false;
@@ -181,21 +182,45 @@ public class EmpresaServiceImpl implements EmpresaService {
             }
 
             if(isNew) {
+                empresaEnt = ConvertEmpresa.convertDtoToEntity(empresa);
                 if (empresaEnt.getFechaActivacion() == null) {
                     empresaEnt.setFechaActivacion(new Date());
                 }
                 if (empresaEnt.getTipoEmpresa() == null) {
-                    empresaEnt.setTipoEmpresa(TipoEmpresa.NORMAL);
+                    empresaEnt.setTipoEmpresa(TipoEmpresaEnum.NORMAL);
                 }
                 if (empresaEnt.getTipoIde() == null) {
                     empresaEnt.setTipoIde(TipoIde.NIT);
                 }
             }
-
+            logger.log(Level.INFO, empresaEnt.toString());
             empresaEnt = empresaRepository.save(empresaEnt);
 
             empresa.setEmpresaId(empresaEnt.getId());
             empresa.setFechaActivacion(empresaEnt.getFechaActivacion());
+
+            //Copiar Roles a Empresa
+            if(isNew) {
+                List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(null,true, "ROOT");
+
+                List<Rol> listaRolesDestino = new ArrayList<>();
+                Empresa finalEmpresaEnt = empresaEnt;
+                listaRolesOrigen.forEach(r -> {
+                    Rol rol = new Rol();
+                    rol.setFechaActivacion(new Date());
+                    rol.setEmpresa(finalEmpresaEnt);
+                    rol.setPorDefecto(r.isPorDefecto());
+                    rol.setEliminado(r.isEliminado());
+                    rol.setDescripcion(r.getDescripcion());
+                    rol.setNombre(r.getNombre());
+                    Set<Vista> newVistas = new HashSet<>(r.getVistas());
+                    rol.setVistas(newVistas);
+
+                    listaRolesDestino.add(rol);
+                });
+
+                rolRepository.saveAll(listaRolesDestino);
+            }
 
             Usuario usuarioAdmin;
             if(StringUtils.isNotBlank(empresa.getUsuarioId())){
@@ -211,13 +236,13 @@ public class EmpresaServiceImpl implements EmpresaService {
                 usuarioAdmin = new Usuario();
             }
             if(isNew) {
-                usuarioAdmin.setEmpresa(empresaEnt);
-                Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
-                usuarioAdmin.setRol(rolAdmin);
-                usuarioAdmin.setTipoUsuario(TipoUsuario.ADMIN);
                 //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
                 usuarioAdmin.setPasswordUsuario(Utils.encrytPass("123456"));
                 usuarioAdmin.setAdminDefecto(true);
+                usuarioAdmin.setEmpresa(empresaEnt);
+                Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
+                usuarioAdmin.setRol(rolAdmin);
+                usuarioAdmin.setTipoUsuario(TipoUsuarioEnum.ADMIN);
             }
 
             usuarioAdmin.setActivo(empresa.isActivo());
@@ -236,29 +261,6 @@ public class EmpresaServiceImpl implements EmpresaService {
             } else {
                 isNew = true;
                 persona = new Persona();
-            }
-
-            if(isNew) {
-                List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(null,true, "ROOT");
-
-                List<Rol> listaRolesDestino = new ArrayList<>();
-                for(Rol r : listaRolesOrigen) {
-                    Rol rol = new Rol();
-                    rol.setFechaActivacion(new Date());
-
-                    rol.setEmpresa(empresaEnt);
-                    rol.setPorDefecto(r.isPorDefecto());
-                    rol.setEliminado(r.isEliminado());
-                    rol.setDescripcion(r.getDescripcion());
-                    rol.setNombre(r.getNombre());
-                    Set<Vista> newVistas = new HashSet<>();
-                    newVistas.addAll(r.getVistas());
-                    rol.setVistas(newVistas);
-
-                    listaRolesDestino.add(rol);
-                }
-
-                rolRepository.saveAll(listaRolesDestino);
             }
 
             persona.setTipoIde(empresa.getTipoIdePersona());
@@ -289,7 +291,19 @@ public class EmpresaServiceImpl implements EmpresaService {
                 categoria.setNombre("Normal");
 
                 categoriaProductoRepository.save(categoria);
+
+                //Impuestos
+                List<Impuesto> listImpuestos = new ArrayList<>();
+                listImpuestos.add(new Impuesto("No Aplica", BigDecimal.valueOf(0),"No Aplica Impuesto", true, false,empresaEnt, "SI"));
+                listImpuestos.add(new Impuesto("5%", BigDecimal.valueOf(5),"Impuesto del 5%", true, false,empresaEnt, "SI"));
+                listImpuestos.add(new Impuesto("19%", BigDecimal.valueOf(19),"Impuesto del 19%", true, false,empresaEnt, "SI"));
+                listImpuestos.add(new Impuesto("Excluido", BigDecimal.ZERO,"Excluido de impuesto", true, false,empresaEnt, "SI"));
+                listImpuestos.add(new Impuesto("Exento", BigDecimal.ZERO,"Exento de impuesto", true, false,empresaEnt, "SI"));
+
+                impuestoRepository.saveAll(listImpuestos);
+
             }
+            logger.log(Level.INFO, "<-- "+methodName);
             return empresa;
 
         }catch(Exception e){

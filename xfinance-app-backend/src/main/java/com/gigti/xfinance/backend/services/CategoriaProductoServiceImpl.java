@@ -28,6 +28,11 @@ public class CategoriaProductoServiceImpl implements CategoriaProductoService {
     private EmpresaRepository empresaRepository;
 
     @Override
+    public List<CategoriaProducto> findAll(Empresa empresa) {
+        return categoriaProductoRepository.findAllByEmpresaAndEliminadoIsFalse(empresa);
+    }
+
+    @Override
     public List<CategoriaProducto> findAll(Empresa empresa, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);

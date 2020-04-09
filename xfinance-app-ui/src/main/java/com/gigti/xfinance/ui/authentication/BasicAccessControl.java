@@ -7,6 +7,7 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.services.UsuarioService;
@@ -73,16 +74,10 @@ public class BasicAccessControl implements AccessControl {
     @Override
     public boolean isUserInRole(Usuario currentUser) {
         if ("Default".equals(currentUser.getRol().getNombre())) {
-            return getTipoUsuario().equalsIgnoreCase("ADMIN") || getTipoUsuario().equalsIgnoreCase("ROOT");
+            return currentUser.getTipoUsuario() == TipoUsuarioEnum.ADMIN || currentUser.getTipoUsuario() == TipoUsuarioEnum.ROOT;
         }
 
-        // All users are in all non-admin roles
         return true;
-    }
-
-    @Override
-    public String getTipoUsuario() {
-        return CurrentUser.get().getTipoUsuario().getName();
     }
 
     @Override

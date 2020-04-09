@@ -6,7 +6,7 @@
 
 package com.gigti.xfinance.backend.data;
 
-import com.gigti.xfinance.backend.TipoMedidaEnum;
+import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -29,24 +29,11 @@ public class Producto extends AbstractEntity {
     private boolean eliminado;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private TipoMedidaEnum tipoMedida = TipoMedidaEnum.UNIDAD;
-//    @NotNull
-//    private Integer cantidadMedida = 1;
 
     @Transient
     private String activoS;
-
-//    @Transient
-////    private BigDecimal precioCostoActual = BigDecimal.ZERO;
-////
-////    @Transient
-////    private BigDecimal precioVentaActual = BigDecimal.ZERO;
-////
-////    @Transient
-////    private BigDecimal stockActual;
-////
-////    @Transient
-////    private String inventarioId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
@@ -60,11 +47,9 @@ public class Producto extends AbstractEntity {
     @JoinColumn
     private InventarioActual inventario;
 
-//    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<ProductoInventarioInicio> productoInventarioInicio;
-//
-//    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<ProductoInventarioDia> productsStockDay;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Impuesto impuesto;
 
     public Producto(){}
 

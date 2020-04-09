@@ -2,20 +2,17 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
+import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.Utils;
-import com.gigti.xfinance.backend.repositories.ProductoRepository;
-import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
-import com.gigti.xfinance.backend.repositories.VentaItemRepository;
-import com.gigti.xfinance.backend.repositories.VentaRepository;
-import com.vaadin.flow.data.provider.ListDataProvider;
+import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,14 +35,14 @@ public class VentaServiceImpl implements VentaService {
     @Autowired
     private ProductoValoresRepository productoValoresRepository;
 
-//    @Override
-//    public List<PventaDTO> find100MostImportant(Empresa empresa) {
-//        Pageable pageable = PageRequest.of(0, 100);
-//        return getListPventaDTO(empresa, pageable);
-//    }
+    @Autowired
+    private InventarioActualRepository inventarioActualRepository;
+
+    @Autowired
+    private InventarioService inventarioService;
 
     @Override
-    public ListDataProvider<PventaDTO> findAll(String filter, Empresa empresa, int page, int size) {
+    public List<PventaDTO> findAll(String filter, Empresa empresa, int page, int size) {
         logger.info("--> findAll");
         Pageable pageable = PageRequest.of(page, size);
         return getListPventaDTO(filter, empresa, pageable);
@@ -69,11 +66,13 @@ public class VentaServiceImpl implements VentaService {
             cantidadFacturasxEmpresa++;
             venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
             venta.setNumeroFactura(Utils.generateNumberTicket(cantidadFacturasxEmpresa));
-//            venta.setTotalVenta(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum());
+            venta.setTotalVenta(BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
+            //venta.setD
             ventaRepository.save(venta);
             List<VentaItem> listItems = new ArrayList<>();
+
             //Items Factura
-            for (PventaDTO pv : listVenta) {
+            listVenta.forEach(pv -> {
                 Producto producto = productoRepository.findById(pv.getIdProducto()).orElse(null);
 
                 VentaItem item = new VentaItem();
@@ -83,33 +82,24 @@ public class VentaServiceImpl implements VentaService {
                 item.setPrecioCosto(pv.getPrecioCostoActual());
                 item.setPrecioVenta(pv.getPrecioVentaActual());
                 item.setItem(pv.getItem());
+                //item.setDescuentoArticulo(pv.getDescuento());
+                item.setImpuestoArticulo(pv.getImpuestoValor());
+                item.setImpuestoNombre(pv.getImpuestoNombre());
+
                 listItems.add(item);
 
-//                //descontar cantidad del Inventario
-//                double inStock = 0;
-//                ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(producto);
-//                if(pid == null) {
-//                    ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(producto);
-//                    if(pii == null){
-//                        pid = new ProductoInventarioDia();
-//                        pid.setQuantity(pv.getCantidadVenta() * -1);
-//                        pid.setProducto(producto);
-//                        pid.setTrackingDate(new Date());
-//                        productoInvDiaRepository.save(pid);
-//                    } else {
-//                        pid = new ProductoInventarioDia();
-//                        pid.setQuantity(pii.getQuantity() - pv.getCantidadVenta());
-//                        pid.setProducto(producto);
-//                        pid.setTrackingDate(new Date());
-//                        productoInvDiaRepository.save(pid);
-//                    }
-//                } else {
-//                    pid.setQuantity(pid.getQuantity() - pv.getCantidadVenta());
-//                    pid.setProducto(producto);
-//                    pid.setTrackingDate(new Date());
-//                    productoInvDiaRepository.save(pid);
-//                }
-            }
+                inventarioService.saveProcessInventarioActualAndPrecios(producto,
+                        false,
+                        pv.getCantidadVenta(),
+                        pv.getPrecioVentaActual(),
+                        pv.getPrecioCostoActual(),
+                        TipoMovimientoEnum.VENTA,
+                        false,
+                        pv.isInfinite(),
+                        pv.getImpuestoValor(),
+                        pv.getImpuestoNombre());
+            });
+
             ventaItemRepository.saveAll(listItems);
             return venta;
         }catch(Exception e){
@@ -118,51 +108,50 @@ public class VentaServiceImpl implements VentaService {
         }
     }
 
-    private ListDataProvider<PventaDTO> getListPventaDTO(String filter, Empresa empresa, Pageable pageable){
+    private List<PventaDTO> getListPventaDTO(String filter, Empresa empresa, Pageable pageable){
         String methodName = "getListPventaDTO";
         logger.info("--> "+methodName);
-        List<Producto> result = new ArrayList<>();
+        List<Producto> listProductos = new ArrayList<>();
         if(filter == null || filter.isEmpty()) {
-            result = productoRepository.findByEmpresa(empresa, pageable);
+            listProductos = productoRepository.findByEmpresa(empresa, pageable);
         } else {
-            result = productoRepository.search(filter, empresa, pageable);
+            listProductos = productoRepository.search(filter, empresa, pageable);
         }
-        Collection<PventaDTO> listDTO = new ArrayList<>();
+        List<PventaDTO> result = new ArrayList<>();
 
-        for(Producto p : result) {
-            double inStock = 0;
-//            ProductoInventarioDia pid = productoInvDiaRepository.findByProducto(p);
-//            if(pid == null) {
-//                ProductoInventarioInicio pii = productoInvInicioRepository.findByProducto(p);
-//                if(pii == null){
-//                    continue;
-//                } else {
-//                    inStock = pii.getQuantity() > 0 ? pii.getQuantity() : 0;
-//                }
-//            } else {
-//                inStock = pid.getQuantity() > 0 ? pid.getQuantity() : 0;
-//            }
-            if(inStock > 0) {
+        for(Producto p : listProductos) {
+            BigDecimal inStock = BigDecimal.ZERO;
+            boolean infinite = false;
+            InventarioActual actual = inventarioActualRepository.findByProducto(p);
+            if(actual != null) {
+                inStock = actual.getCantidad().compareTo(BigDecimal.ZERO) > 0 ? actual.getCantidad() : BigDecimal.ZERO;
+                infinite = actual.isInfinite();
+            }
+            if(inStock.compareTo(BigDecimal.ZERO) > 0 || infinite) {
                 ProductoValor pvalores = productoValoresRepository.findByProductoAndActivoIsTrue(p);
                 if (pvalores != null) {
-                    listDTO.add(convertProductoToPventaDTO(p, pvalores, inStock));
+                    result.add(convertProductoToPventaDTO(p, pvalores, inStock, infinite));
                 }
             }
         }
         logger.info("<-- "+methodName);
-        return new ListDataProvider<>(listDTO);
+        return result;
     }
 
-    private PventaDTO convertProductoToPventaDTO(Producto p, ProductoValor pvalores, double inStock){
+    private PventaDTO convertProductoToPventaDTO(Producto p, ProductoValor pvalores, BigDecimal inStock, boolean infinite){
         PventaDTO pv = new PventaDTO();
         pv.setIdProducto(p.getId());
         pv.setCodigoBarra(p.getCodigoBarra());
         pv.setNombreProducto(p.getNombreProducto());
-        pv.setCantidadVenta(0);
-//        pv.setPrecioCostoActual(pvalores.getPrecioCosto());
+        pv.setCantidadVenta(BigDecimal.ZERO);
+        pv.setPrecioCostoActual(pvalores.getPrecioCosto());
         pv.setPrecioVentaActual(pvalores.getPrecioVenta());
         pv.setInStock(inStock);
         pv.setUnidadMedida(p.getTipoMedida() == null ? "NE" : p.getTipoMedida().toString());
+        pv.setImpuestoId(p.getImpuesto().getId());
+        pv.setImpuestoValor(p.getImpuesto().getValor());
+        pv.setImpuestoNombre(p.getImpuesto().getNombre());
+        pv.setInfinite(infinite);
 
         return pv;
     }

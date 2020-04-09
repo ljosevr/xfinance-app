@@ -4,25 +4,19 @@ import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.util.TopBarComponent;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 
 import java.util.Iterator;
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_CATEGORIA,layout = MainLayout.class)
-@RouteAlias(value = "categoria",layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_CATEGORIA, layout = MainLayout.class)
+@RouteAlias(value = "categoria", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
 public class CategoriaView extends HorizontalLayout
         implements HasUrlParameter<String> {
@@ -30,38 +24,37 @@ public class CategoriaView extends HorizontalLayout
     private CategoriaGrid grid;
     private CategoriaForm form;
     private TextField filter;
-    private CategoriaCrudLogic viewLogic;
+    private CategoriaCrud viewLogic;
     private List<CategoriaProducto> lista;
-    private VerticalLayout barAndGridLayout;
+    private SearchFilterComponent component;
 
-    //@Autowired
     public CategoriaView(CategoriaProductoService iService) {
-            viewLogic = new CategoriaCrudLogic(iService,this);
-//        if(viewLogic.access()) {
-            setSizeFull();
-            HorizontalLayout topLayout = createTopBar();
+        viewLogic = new CategoriaCrud(iService, this);
+        setSizeFull();
+        configureTopBar();
+        filter = component.getFilter();
 
-            configureGrid();
+        configureGrid();
 
-            form = new CategoriaForm(viewLogic);
+        form = new CategoriaForm(viewLogic);
 
-            H3 title = new H3(Constantes.VIEW_CATEGORIA);
-            title.setClassName("titleView");
+        H3 title = new H3(Constantes.VIEW_CATEGORIA);
+        title.setClassName("titleView");
 
-            barAndGridLayout = new VerticalLayout();
-            barAndGridLayout.add(title);
+        VerticalLayout barAndGridLayout = new VerticalLayout();
+        barAndGridLayout.add(title);
 
-            barAndGridLayout.add(topLayout);
-            barAndGridLayout.add(grid);
-            barAndGridLayout.setFlexGrow(1, grid);
-            barAndGridLayout.setFlexGrow(0, topLayout);
-            barAndGridLayout.setSizeFull();
-            barAndGridLayout.expand(grid);
+        barAndGridLayout.add(component);
+        barAndGridLayout.add(grid);
+        barAndGridLayout.setFlexGrow(1, grid);
+        barAndGridLayout.setFlexGrow(0, component);
+        barAndGridLayout.setSizeFull();
+        barAndGridLayout.expand(grid);
 
-            add(barAndGridLayout);
-            //add(form);
+        add(barAndGridLayout);
+        //add(form);
 
-            viewLogic.init();
+        viewLogic.init();
 //        }else{
 //            UI.getCurrent().navigate(MainLayout.class);
 //        }
@@ -77,27 +70,16 @@ public class CategoriaView extends HorizontalLayout
         grid.getColumns().forEach(col -> col.setAutoWidth(true)); //
     }
 
-    private HorizontalLayout createTopBar() {
-        filter = new TextField();
-        filter.setPlaceholder("Filtro por Nombre");
-        filter.setValueChangeMode(ValueChangeMode.LAZY);
-        filter.addValueChangeListener(event -> {
+    public void configureTopBar() {
+
+        component = new SearchFilterComponent("Nueva", "", "Filtro por Nombre", false, true);
+        component.getFilter().addValueChangeListener(event -> {
             lista = viewLogic.setFilter(event.getValue());
-            if(lista != null)
+            if (lista != null)
                 grid.setItems(lista);
-            }
-        );
-        filter.addFocusShortcut(Key.KEY_F, KeyModifier.CONTROL);
-        filter.focus();
-
-        Button btnNewCategoria = new Button("Nueva");
-        btnNewCategoria.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNewCategoria.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnNewCategoria.addClickListener(click -> viewLogic.nuevo());
-        // CTRL+N will create a new window which is unavoidable
-        btnNewCategoria.addClickShortcut(Key.F4);
-
-        return new TopBarComponent(filter, btnNewCategoria);
+        });
+        component.getFilter().focus();
+        component.getBtnAdd().addClickListener(click -> viewLogic.newItem());
     }
 
     public void showError(String msg) {
@@ -122,9 +104,9 @@ public class CategoriaView extends HorizontalLayout
     }
 
     public void showForm(boolean show) {
-        if(show){
+        if (show) {
             form.open();
-        }else{
+        } else {
             filter.focus();
             form.close();
         }
@@ -135,15 +117,15 @@ public class CategoriaView extends HorizontalLayout
         viewLogic.enter(parameter);
     }
 
-    public void refresh(){
+    public void refresh() {
         lista = viewLogic.findAll();
         grid.setItems(lista);
     }
 
-    public void refresh(CategoriaProducto categoria){
-        for(Iterator<CategoriaProducto> it = lista.iterator(); it.hasNext();){
+    public void refresh(CategoriaProducto categoria) {
+        for (Iterator<CategoriaProducto> it = lista.iterator(); it.hasNext(); ) {
             CategoriaProducto p = it.next();
-            if(p.getId().equals(categoria.getId())) {
+            if (p.getId().equals(categoria.getId())) {
                 it.remove();
                 lista.remove(p);
                 break;
@@ -158,7 +140,7 @@ public class CategoriaView extends HorizontalLayout
         return grid;
     }
 
-    public List<CategoriaProducto> getItemsGrid(){
+    public List<CategoriaProducto> getItemsGrid() {
         return lista;
     }
 

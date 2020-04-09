@@ -1,10 +1,12 @@
 package com.gigti.xfinance.backend.data;
 
+import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -29,7 +31,9 @@ public class Movimiento extends AbstractEntity {
 
     private BigDecimal impuestoValor;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
-    private TipoMovimiento tipoMovimiento;
+    private String impuestoNombre;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TipoMovimientoEnum tipoMovimiento;
 }

@@ -1,10 +1,13 @@
 package com.gigti.xfinance.ui.util;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.progressbar.ProgressBar;
@@ -37,12 +40,14 @@ public class NotificacionesUtil {
 
         confirmButton = new Button("SI");
         confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        confirmButton.addClickShortcut(Key.ENTER);
         confirmButton.focus();
 
         cancelButton = new Button("NO");
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+        cancelButton.addClickShortcut(Key.ESCAPE);
         VerticalLayout layout = new VerticalLayout();
-        layout.add(new Label(mensaje));
+        layout.add(new Span(mensaje));
         HorizontalLayout hlayout = new HorizontalLayout();
         hlayout.add(confirmButton, cancelButton);
         layout.add(hlayout);
@@ -69,5 +74,20 @@ public class NotificacionesUtil {
             Notification.show("Debes Abrir primero una Notificación, Error de Sistema");
             return null;
         }
+    }
+
+    public static void showSuccess(String msg){
+        Notification notification = Notification.show(msg, 4000, Notification.Position.MIDDLE);
+        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+    }
+
+    public static void showError(String msg){
+        Notification notification = Notification.show(msg, 4000, Notification.Position.MIDDLE);
+        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+    }
+
+    public static void showWarn(String msg){
+        Notification notification = Notification.show(msg, 4000, Notification.Position.MIDDLE);
+        notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
     }
 }

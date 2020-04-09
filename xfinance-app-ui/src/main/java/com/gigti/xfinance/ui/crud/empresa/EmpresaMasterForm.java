@@ -187,7 +187,7 @@ public class EmpresaMasterForm extends Dialog {
     }
 
     private void validateAndSave() {
-        if (binder.isValid()) {
+        if (binder.validate().isOk()) {
             fireEvent(new SaveEvent(this, binder.getBean()));
         } else {
             Notification.show("Validar Datos: " + binder.validate().getValidationErrors(), 3000, Notification.Position.TOP_CENTER);
