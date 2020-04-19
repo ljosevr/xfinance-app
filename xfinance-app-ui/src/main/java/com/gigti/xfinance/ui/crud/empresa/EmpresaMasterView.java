@@ -37,7 +37,7 @@ public class EmpresaMasterView extends VerticalLayout {
         form.addListener(EmpresaMasterForm.CloseEvent.class, e -> closeEditor());
 
         H3 title = new H3(Constantes.VIEW_EMPRESAS);
-        title.setClassName("titleView");
+        title.addClassName("titleView2");
 
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);

@@ -51,7 +51,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         H3 title = new H3(Constantes.VIEW_INVENTARIO_INICIAL);
-        title.setClassName("titleView");
+        title.addClassName("titleView2");
 
         configureSearchLayout();
         filter = searchLayout.getFilter();

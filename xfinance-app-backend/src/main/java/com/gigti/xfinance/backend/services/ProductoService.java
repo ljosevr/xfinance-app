@@ -20,6 +20,7 @@ public interface ProductoService {
     Response delete(String id);
     List<Producto> findByNombreProducto(Empresa empresa, String productName);
     List<Producto> findAll(String filterText, Empresa empresa, int page, int size);
+    List<Producto> findAll(Empresa empresa);
     Producto findByBarCode(Empresa empresa, String barCode);
     List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
     Producto findById(String id);

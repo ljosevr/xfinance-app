@@ -68,7 +68,7 @@ public class PventaView extends VerticalLayout {
         dataLayout.addClassName("rightLayout");
 
         H3 title = new H3(Constantes.VIEW_PVENTA);
-        title.setClassName("titleView");
+        title.addClassName("titleView2");
         this.add(title);
 
         configureTopBar();

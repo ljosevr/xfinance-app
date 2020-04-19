@@ -52,7 +52,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         H3 title = new H3(Constantes.VIEW_PRODUCTO);
-        title.setClassName("titleView");
+        title.addClassName("titleView2");
 
         configureProvider();
 

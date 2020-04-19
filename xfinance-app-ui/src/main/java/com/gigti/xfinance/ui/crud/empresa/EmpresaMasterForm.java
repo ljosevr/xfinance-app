@@ -38,6 +38,7 @@ public class EmpresaMasterForm extends Dialog {
                 new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Empresa");
+        title.addClassName("subTitleView");
         content.add(title, 3);
 
         TextField tfNombreEmpresa = new TextField("Nombre Empresa");
@@ -53,6 +54,7 @@ public class EmpresaMasterForm extends Dialog {
         cbTipoIde.setLabel("Tipo Ide");
         cbTipoIde.setItems(TipoIde.getListTipos());
         cbTipoIde.setRequired(true);
+        cbTipoIde.getElement().setAttribute("theme", "small");
 
         TextField tfIdentificacion = new TextField("N° Identificación");
         tfIdentificacion.setRequired(true);
@@ -69,6 +71,7 @@ public class EmpresaMasterForm extends Dialog {
         Checkbox chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
         chkActivo.setRequiredIndicatorVisible(true);
+        cbTipoIde.getElement().setAttribute("theme", "small");
 
         TextField tfUsuarioAdmin = new TextField("Usuario Admin");
         tfUsuarioAdmin.setRequired(true);
@@ -78,7 +81,8 @@ public class EmpresaMasterForm extends Dialog {
         cbTipoIdePersona.setLabel("Tipo Ide Usuario");
         cbTipoIdePersona.setItems(TipoIde.getListTipos());
         cbTipoIdePersona.setRequired(true);
-        cbTipoIdePersona.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
+        //cbTipoIdePersona.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
+        cbTipoIdePersona.getElement().setAttribute("theme", "small");
 
         TextField tfIdentificacionPersona = new TextField("N° Identificación Usuario");
         tfIdentificacionPersona.setRequired(true);

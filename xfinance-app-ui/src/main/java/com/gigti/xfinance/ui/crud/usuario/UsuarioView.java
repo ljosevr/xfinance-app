@@ -53,7 +53,8 @@ public class UsuarioView extends VerticalLayout {
         form.addListener(UsuarioForm.CloseEvent.class, e -> closeEditor());
 
         H3 title = new H3(Constantes.VIEW_USUARIO);
-        title.setClassName("titleView");
+        title.addClassName("titleView2");
+        title.setClassName("Date");
 
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);

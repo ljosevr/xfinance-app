@@ -12,7 +12,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -36,18 +36,18 @@ public class UserChangePasswordView extends VerticalLayout {
 
     public UserChangePasswordView(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-
         setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.START);
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+
+        H3 title = new H3("Cambiar Password");
+        title.addClassName("titleView2");
 
         FormLayout formLayout = new FormLayout();
-        //formLayout.setClassName("formLayout");
+        formLayout.setClassName("formLayout");
         formLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
                 new FormLayout.ResponsiveStep("32em", 2),
                 new FormLayout.ResponsiveStep("40em", 3));
-
-        H4 title = new H4("Cambiar Password");
 
         pfOldPassword = new PasswordField("Password Actual");
         pfOldPassword.setRequired(true);
@@ -83,7 +83,6 @@ public class UserChangePasswordView extends VerticalLayout {
                 .bind(UsuarioChangePasswordDTO::getNewPassword2, UsuarioChangePasswordDTO::setNewPassword2);
 
         Button btnSave = new Button("Guardar");
-        btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> validateAndSave());
         btnSave.addClickShortcut(Key.ENTER);
@@ -91,7 +90,6 @@ public class UserChangePasswordView extends VerticalLayout {
         binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         Button btnClean = new Button("Limpiar");
-        btnClean.setWidth("100%");
         btnClean.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnClean.addClickListener(event -> cleanForm());
         btnClean.addClickShortcut(Key.ESCAPE);

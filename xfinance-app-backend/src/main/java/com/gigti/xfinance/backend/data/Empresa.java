@@ -10,7 +10,6 @@ import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,7 +19,6 @@ import java.util.List;
 
 @Data
 @Entity
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "empresas")

@@ -28,8 +28,12 @@
         /*border: 1px solid mediumseagreen;*/
         border-radius: 7px;
         padding: 0;
-        margin: 50px 5px 5px 5px;
-        /*visibility: visible;*/
+        margin: 5px 5px 5px 5px;
+    }
+
+    .login-panel {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        border-radius: 7px;
     }
 
     .main-layout {
@@ -66,17 +70,14 @@
     }
 
     .formLayout{
-        margin: 20px 20px 20px 30px;
-        /*padding: 10px;*/
+        margin: 10px;
         padding: var(--lumo-space-m);
         flex: 1;
+        border: 2px solid black;
+        border-radius: 7px;
+        box-sizing: content-box;
     }
 
-    .formLayoutDialog{
-        padding: 10px;
-    }
-
-    /* Pventa view */
     .PventaView .content {
         display: flex;
     }
@@ -99,8 +100,6 @@
         max-width: 450px;
     }
 }
-
-
 
 /* MOBILE*/
 @media (max-width: 550px) {
@@ -137,6 +136,12 @@
         text-align: center;
         /*visibility: hidden;*/
     }
+
+    .login-panel {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        border-radius: 7px;
+    }
+
     .titleBar {
         height: 15em;
         margin: 14px 0px 14px;
@@ -150,10 +155,7 @@
 
     .formLayout{
         padding: 10px;
-    }
-
-    .formLayoutDialog{
-        padding: 5px;
+        box-sizing: content-box;
     }
 
     .InventarioInicialView.editing .searchBar,
@@ -214,9 +216,22 @@ a[highlight] {
 .titleView {
     height: 20px;
     border-spacing: 0.5px;
-    margin: auto;
+    /*margin: auto;*/
     text-align: left;
     color: #2dd013;
+}
+
+.titleView2 {
+    text-align: center;
+    color: #2dd013;
+}
+
+.subTitleView {
+    /*height: 20px;*/
+    border-spacing: 0.5px;
+    text-align: left;
+    color: #555555;
+    text-decoration-line: underline;
 }
 
 .userNavBar {
@@ -255,4 +270,8 @@ a[highlight] {
 .drawerLayout {
     margin: 2px;
     padding: 2px;
+}
+
+.panel-principal-login{
+    margin: 150px 0px;
 }

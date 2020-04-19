@@ -1,18 +1,25 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
+import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Utils;
 import com.gigti.xfinance.backend.repositories.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,6 +42,21 @@ public class InitBackServiceImpl implements InitBackService {
     private ParcheRepository parcheRepository;
     @Autowired
     private VistaRepository vistaRepository;
+
+    @Autowired
+    private EmpresaService empresaService;
+
+    @Autowired
+    private ProductoRepository productoRepository;
+
+    @Autowired
+    private InventarioActualRepository inventarioActualRepository;
+
+    @Autowired
+    private CategoriaProductoService categoriaProductoService;
+
+    @Autowired
+    private ImpuestoRepository impuestoRepository;
 
     // Tipos de Datos
     @Transactional
@@ -228,6 +250,93 @@ public class InitBackServiceImpl implements InitBackService {
                 parche = new Parche(Constantes.INIT2,java.sql.Date.valueOf(LocalDate.now()),true, null);
                 logger.info("Parche Creado");
                 parcheRepository.save(parche);
+            }
+            logger.info("<-- initBackObjetos");
+        }catch(Exception e){
+            logger.log(Level.SEVERE, "Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
+            e.printStackTrace();
+        }
+    }
+
+    @Transactional
+    @Override
+    public void initBackDemo() {
+        logger.info("--> initBackDemo");
+        try{
+            Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT5, null);
+            if (parche == null) {
+
+                EmpresaDTO empresa = new EmpresaDTO();
+                empresa.setCodigoEmpresa("DEMO");
+                empresa.setEmailPersona("ljosevr3@gmail.com");
+                empresa.setTelefonoPersona("3006600000");
+                empresa.setDireccionPersona("Calle Espectacular");
+                empresa.setSegundoApellidoPersona("Rogers");
+                empresa.setPrimerApellidoPersona("Stark");
+                empresa.setPrimerNombrePersona("Tony");
+                empresa.setSegundoNombrePersona("Steve");
+                empresa.setIdentificacionPersona("0011223344");
+                empresa.setTipoIdePersona(TipoIde.CEDULA);
+                empresa.setActivoUsuario(true);
+                empresa.setUsuarioNombre("demo");
+                empresa.setNombreEmpresa("Demo S.A.S");
+                empresa.setEliminado(false);
+                empresa.setTipoEmpresa(TipoEmpresaEnum.NORMAL);
+                empresa.setDireccion("Wakanda");
+                empresa.setIdentificacion("800900700600");
+                empresa = empresaService.saveEmpresa(empresa);
+
+                if(empresa != null){
+                    logger.info("Empresa DEMO Creada");
+
+                    //Crear Productos
+                    //Consultar Empresa byId
+                    Empresa emp = empresaRepository.findById(empresa.getEmpresaId()).orElse(null);
+                    //Consultar Impuestos
+                    Pageable pageable = PageRequest.of(0, 5);
+                    List<Impuesto> impuestos = impuestoRepository.findByEmpresaAndEliminadoIsFalse(emp, pageable);
+
+                    //Consultar Categorias
+                    CategoriaProducto categoria = categoriaProductoService.findByNombreOrDescripcion("Normal", emp, 0, 10).get(0);
+                    //Tipos de Medidas
+                    TipoMedidaEnum[] tipos =  TipoMedidaEnum.values();
+                    if(emp != null) {
+                        for(int i = 0; i < 50 ; i++) {
+                            Producto producto = new Producto();
+                            producto.setActivo(true);
+                            producto.setCategoria(categoria);
+                            producto.setCodigoBarra(StringUtils.leftPad((i + 1) + "", 10, "0"));
+                            producto.setDescripcion("Producto Demo " + (i + 1));
+                            producto.setEmpresa(emp);
+                            Double aleatorio = Math.floor(Math.random()*5);
+                            producto.setImpuesto(impuestos.get(aleatorio.intValue()));
+                            producto.setNombreProducto("Producto # " + (i + 1));
+                            aleatorio = Math.floor(Math.random()*8);
+                            producto.setTipoMedida(tipos[aleatorio.intValue()]);
+
+                            producto = productoRepository.save(producto);
+
+                            //Inventario Actual
+                            InventarioActual actual = new InventarioActual();
+                            actual.setInfinite(false);
+                            actual.setFechaActualizacion(new Date());
+                            actual.setCantidad(BigDecimal.valueOf((i + 1) * 2));
+                            actual.setProducto(producto);
+
+                            inventarioActualRepository.save(actual);
+                        }
+
+                        parche = new Parche(Constantes.INIT5,java.sql.Date.valueOf(LocalDate.now()),true, null);
+                        logger.info("Parche Demo Creado");
+                        parcheRepository.save(parche);
+
+                    } else {
+                        logger.info("Error al Buscar Empresa");
+                    }
+                } else {
+                    logger.info("Error al crear Empresa DEMO");
+                }
+
             }
             logger.info("<-- initBackObjetos");
         }catch(Exception e){

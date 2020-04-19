@@ -18,7 +18,7 @@ public class CompraItem extends AbstractEntity {
     @JoinColumn
     private Compra compra;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Producto producto;
 

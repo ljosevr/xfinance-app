@@ -39,7 +39,7 @@ public class CategoriaView extends HorizontalLayout
         form = new CategoriaForm(viewLogic);
 
         H3 title = new H3(Constantes.VIEW_CATEGORIA);
-        title.setClassName("titleView");
+        title.addClassName("titleView2");
 
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);

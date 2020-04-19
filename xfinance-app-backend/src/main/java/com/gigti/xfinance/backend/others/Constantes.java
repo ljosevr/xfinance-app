@@ -7,6 +7,7 @@ public class Constantes {
     public static final String INIT2 = "PI Back - 2 - Objetos";
     public static final String INIT3 = "PI Back - 3 - TipoEmpresa";
     public static final String INIT4 = "PI Back - 4 - Roles";
+    public static final String INIT5 = "PI Back - 5 - DEMO";
 
     //VIEWS-ROUTE
     public static final String VIEW_R_LOGIN = "Login";

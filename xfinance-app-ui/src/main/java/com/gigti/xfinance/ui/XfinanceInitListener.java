@@ -11,9 +11,10 @@ import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.LoginView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.server.ServiceInitEvent;
-import com.vaadin.flow.server.VaadinServiceInitListener;
+import com.vaadin.flow.server.*;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
 
 /**
  * This class is used to listen to BeforeEnter event of all UIs in order to
@@ -23,7 +24,7 @@ import org.springframework.stereotype.Component;
  */
 
 @Component
-public class XfinanceInitListener implements VaadinServiceInitListener {
+public class XfinanceInitListener implements VaadinServiceInitListener, SessionInitListener {
 
     @Override
     public void serviceInit(ServiceInitEvent event) {
@@ -32,6 +33,8 @@ public class XfinanceInitListener implements VaadinServiceInitListener {
             final UI ui = uiEvent.getUI();
             ui.addBeforeEnterListener(this::authenticateNavigation);
         });
+
+        event.getSource().addSessionInitListener(this);
     }
 
     private void authenticateNavigation(BeforeEnterEvent event) {
@@ -40,5 +43,10 @@ public class XfinanceInitListener implements VaadinServiceInitListener {
                 && !accessControl.isUserSignedIn()) { //
             event.rerouteTo(LoginView.class);
         }
+    }
+
+    @Override
+    public void sessionInit(SessionInitEvent event) throws ServiceException {
+        event.getSession().setLocale(new Locale("es", "CO"));
     }
 }

@@ -77,8 +77,8 @@ public class Producto extends AbstractEntity {
                 ", eliminado=" + eliminado +
                 ", tipoMedida=" + tipoMedida +
                 ", activoS='" + activoS + '\'' +
-                  ", empresa=" + empresa +
-                ", categoria=" + categoria +
+                  ", empresa=" + empresa.getNombreEmpresa() +
+                ", categoria=" + categoria.getNombre() +
                  '}';
     }
 }

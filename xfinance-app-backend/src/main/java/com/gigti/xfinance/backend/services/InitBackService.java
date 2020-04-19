@@ -4,4 +4,5 @@ public interface InitBackService {
 
     void initBackTipos();
     void initBackObjetos();
+    void initBackDemo();
 }

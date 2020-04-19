@@ -19,8 +19,11 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.BoxSizing;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -45,26 +48,41 @@ public class LoginView extends VerticalLayout {
         this.usuarioService = iusuario;
         init.initBackTipos();
         init.initBackObjetos();
+        init.initBackDemo();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();
     }
 
     private void buildUI() {
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        setAlignItems(Alignment.CENTER);
-
+        this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        this.setSizeUndefined();
+        this.setJustifyContentMode(JustifyContentMode.CENTER);
+        this.addClassName("panel-principal-login");
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        loginLayout.setBoxSizing(BoxSizing.CONTENT_BOX);
+        loginLayout.addClassName("login-panel");
+        loginLayout.setSizeUndefined();
 
-        H1 loginInfoHeader = new H1(Constantes.VIEW_MAIN);
+
+
+        H1 loginInfoHeader = new H1(Constantes.VIEW_MAIN.toUpperCase());
         loginInfoHeader.setClassName("h1-login");
 
         H2 titleLogin = new H2("INICIAR SESIÓN");
 
-        TextField tfCodigoEmpresa = new TextField("Código Empresa");
-        TextField tfUsername = new TextField("Usuario");
-        PasswordField tfPassword = new PasswordField("Password");
+        TextField tfCodigoEmpresa = new TextField();
+        tfCodigoEmpresa.setPrefixComponent(new Icon(VaadinIcon.FACTORY));
+        tfCodigoEmpresa.setPlaceholder("Código Empresa");
+
+        TextField tfUsername = new TextField();
+        tfUsername.setPrefixComponent(new Icon(VaadinIcon.USER));
+        tfUsername.setPlaceholder("Usuario");
+
+        PasswordField tfPassword = new PasswordField();
+        tfPassword.setPrefixComponent(new Icon(VaadinIcon.PASSWORD));
+        tfPassword.setPlaceholder("Password");
 
         Button btnIngresar = new Button("Ingresar");
         btnIngresar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -72,22 +90,15 @@ public class LoginView extends VerticalLayout {
                 login(tfCodigoEmpresa.getValue(), tfUsername.getValue(), tfPassword.getValue()));
         btnIngresar.addClickShortcut(Key.ENTER);
 
-
         binder = new Binder<>();
         binder.forField(tfCodigoEmpresa).asRequired("Digite Código de la Empresa").bind(LoginDTO::getCodigoEmpresa, LoginDTO::setCodigoEmpresa);
         binder.forField(tfUsername).asRequired("Digite un Nombre de Usuario").bind(LoginDTO::getUserName, LoginDTO::setUserName);
         binder.forField(tfPassword).asRequired("Digite un Password").bind(LoginDTO::getPassword, LoginDTO::setPassword);
-        //binder.bindInstanceFields(this);
-
-//        binder.addStatusChangeListener(event -> {
-//            btnIngresar.setEnabled(binder.isValid());
-//        });
 
         RouterLink forgot = new RouterLink("Olvide el Password", ForgotPasswordView.class);
-        //content.add(tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar);
 
-        //loginLayout.add();
-        add(loginInfoHeader, titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
+        loginLayout.add(loginInfoHeader, titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
+        this.add(loginLayout);
         tfCodigoEmpresa.focus();
     }
 

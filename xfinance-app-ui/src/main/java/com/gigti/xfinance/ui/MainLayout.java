@@ -24,6 +24,7 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -57,7 +58,9 @@ import java.util.stream.Collectors;
 )
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
+//@Theme(value = Material.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
+@JsModule("@vaadin/vaadin-lumo-styles/presets/compact.js")
 //@Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();

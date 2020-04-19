@@ -49,6 +49,7 @@ public class UsuarioForm extends Dialog {
                 new FormLayout.ResponsiveStep("40em", 3));
 
         H4 title = new H4("Crear o Editar Producto");
+        title.addClassName("subTitleView");
         content.add(title,3);
 
         TextField tfUsuario = new TextField("Nombre Usuario");

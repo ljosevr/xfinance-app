@@ -8,6 +8,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
@@ -33,12 +35,21 @@ public class Compra extends AbstractEntity {
     private Date fechaCreacion;
 
     @NotNull
+    @Column(name = "fecha_compra")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaCompra;
+
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Usuario usuario;
 
     @OneToMany(mappedBy = "compra",fetch = FetchType.EAGER)
     private List<CompraItem> items;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Empresa empresa;
 
     @Transient
     private BigDecimal totalFactura;
@@ -49,5 +60,30 @@ public class Compra extends AbstractEntity {
 
     private String telefonoProveedor;
 
-    private boolean inicial = false;
+    private String direccionProveedor;
+
+
+    public LocalDate getFechaCompraLD(){
+        return fechaCompra != null ? fechaCompra.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate() : null;
+    }
+
+    public void setFechaCompraLD(LocalDate fechaCom) {
+        this.fechaCompra = java.util.Date.from(fechaCom.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
+
+    public LocalDate getFechaCreacionLD(){
+        return fechaCreacion != null ? fechaCreacion.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate() : null;
+    }
+
+    public void setFechaCreacionLD(LocalDate fechaCre) {
+        this.fechaCreacion = java.util.Date.from(fechaCre.atStartOfDay()
+                .atZone(ZoneId.systemDefault())
+                .toInstant());
+    }
 }

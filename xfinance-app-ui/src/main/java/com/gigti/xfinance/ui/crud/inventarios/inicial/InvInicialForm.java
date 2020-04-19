@@ -41,6 +41,7 @@ public class InvInicialForm extends FormLayout {
         this.addClassName("form-inv");
 
         H4 title = new H4("Crear Inventario Inicial");
+        title.addClassName("subTitleView");
         this.add(title,3);
 
         TextField tfProducto = new TextField("Producto");

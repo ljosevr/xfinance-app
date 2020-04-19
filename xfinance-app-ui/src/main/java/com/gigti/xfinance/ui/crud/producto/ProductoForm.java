@@ -44,6 +44,7 @@ public class ProductoForm extends FormLayout {
                 new FormLayout.ResponsiveStep("32em", 2));
 
         H4 title = new H4("Crear o Editar Producto");
+        title.addClassName("subTitleView");
         this.add(title,3);
 
         tfProdNombre = new TextField("Nombre Producto");

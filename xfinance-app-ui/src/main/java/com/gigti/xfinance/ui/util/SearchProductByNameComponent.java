@@ -1,7 +1,9 @@
 package com.gigti.xfinance.ui.util;
 
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
+import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.vaadin.flow.component.Key;
@@ -23,9 +25,12 @@ public class SearchProductByNameComponent extends VerticalLayout {
     private Button btnClose;
     private TextField filter;
     private Grid<PventaDTO> grid;
+    private Grid<Producto> gridPro;
     private VentaService ventaService;
     private Empresa empresa;
     private List<PventaDTO> listData;
+    private List<Producto> listDataPro;
+    private ProductoService productoService;
 
     public SearchProductByNameComponent(VentaService ventaService, String labelFilter, String placeHolderFilter) {
         this.ventaService = ventaService;
@@ -51,6 +56,31 @@ public class SearchProductByNameComponent extends VerticalLayout {
         this.add(new HorizontalLayout(filter, btnClose), grid);
     }
 
+    public SearchProductByNameComponent(ProductoService productoService, String labelFilter, String placeHolderFilter) {
+        this.productoService = productoService;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+
+        filter = new TextField(labelFilter);
+        filter.setPlaceholder(placeHolderFilter);
+        filter.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        filter.setValueChangeMode(ValueChangeMode.LAZY);
+        filter.setClearButtonVisible(true);
+        filter.setAutoselect(true);
+        filter.addFocusShortcut(Key.F3);
+        filter.addValueChangeListener(event -> updateGridPro());
+        filter.addKeyPressListener(Key.ENTER, listener ->  gridPro.focus());
+        filter.focus();
+
+        btnClose = new Button("Cerrar");
+        btnClose.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+
+        gridPro = new Grid<>(Producto.class);
+        gridPro.setColumns("nombreProducto");
+
+        this.add(new HorizontalLayout(filter, btnClose), gridPro);
+    }
+
+
     private void updateGrid() {
         if(StringUtils.isNotBlank(filter.getValue())) {
             listData = ventaService.findAll(filter.getValue(), empresa, 0, 20);
@@ -58,8 +88,19 @@ public class SearchProductByNameComponent extends VerticalLayout {
         }
     }
 
+    private void updateGridPro() {
+        if(StringUtils.isNotBlank(filter.getValue())) {
+            listDataPro = productoService.findAll(filter.getValue(), empresa, 0, 20);
+            gridPro.setItems(listDataPro);
+        }
+    }
+
     public Grid<PventaDTO> getGrid() {
         return grid;
+    }
+
+    public Grid<Producto> getGridPro() {
+        return gridPro;
     }
 
     public TextField getFilter() {
@@ -68,6 +109,10 @@ public class SearchProductByNameComponent extends VerticalLayout {
 
     public List<PventaDTO> getListData() {
         return listData;
+    }
+
+    public List<Producto> getListDataPro() {
+        return listDataPro;
     }
 
     public Button getBtnClose(){

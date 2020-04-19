@@ -36,6 +36,7 @@ public class CategoriaForm extends Dialog {
                 new FormLayout.ResponsiveStep("32em", 2));
 
         H4 title = new H4("Crear o Editar Categoria");
+        title.addClassName("subTitleView");
         content.add(title, 3);
 
         viewLogic = categoriaCrudLogic;

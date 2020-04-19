@@ -71,6 +71,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public List<Producto> findAll(String filterText, Empresa empresa, int page, int size) {
+        logger.info("--> findAll Productos: "+page + " - "+size);
         Pageable pageable = PageRequest.of(page, size);
         List<Producto> listResult;
         if(filterText == null || filterText.isEmpty()) {
@@ -79,6 +80,10 @@ public class ProductoServiceImpl implements ProductoService {
             listResult = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
         }
         return listResult;
+    }
+
+    public List<Producto> findAll(Empresa empresa) {
+        return productoRepository.findByEmpresa(empresa);
     }
 
     public Producto findByBarCode(Empresa empresa, String barCode) {
