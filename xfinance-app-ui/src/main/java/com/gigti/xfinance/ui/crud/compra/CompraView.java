@@ -180,9 +180,14 @@ public class CompraView extends VerticalLayout implements ICrudView {
     public void save(ComponentEvent evt) {
         Compra compra = ((CompraDetailForm.SaveEvent) evt).getCompra();
         compra.setEmpresa(empresa);
-        compraService.saveCompra(compra, empresa, CurrentUser.get());
-        updateList();
-        closeEditor();
+        Response response = compraService.saveCompra(compra, empresa, CurrentUser.get());
+        if(response.isSuccess()) {
+            NotificacionesUtil.showSuccess(response.getMessage());
+            updateList();
+            closeEditor();
+        } else {
+            NotificacionesUtil.showError(response.getMessage());
+        }
     }
 
     public void delete(ComponentEvent evt) {

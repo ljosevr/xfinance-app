@@ -79,6 +79,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         H1 appTitle = new H1("X Finance App");
         appTitle.addClassName("logo");
 
+
         menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
         menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
         menu_salir.addClickListener(listener -> signOut());

@@ -1,9 +1,7 @@
 package com.gigti.xfinance.ui.crud.compra;
 
-import com.gigti.xfinance.backend.data.Compra;
-import com.gigti.xfinance.backend.data.CompraItem;
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
@@ -56,6 +54,8 @@ public class CompraDetailForm extends FormLayout {
     private TextField tfProducto;
     private BigDecimalField tfCosto;
     private ComboBox<Producto> cbProductos;
+    private ProductoValor productoValor;
+    private Button btnUpdate;
 
     public CompraDetailForm(ProductoService productoService) {
         this.productoService = productoService;
@@ -157,12 +157,18 @@ public class CompraDetailForm extends FormLayout {
         cbProductos.addValueChangeListener(evt -> {
             selectedProd = evt.getValue();
             if(selectedProd != null) {
-                tfProducto.setValue(selectedProd.getNombreProducto());
-                tfCantidad.setValue(BigDecimal.valueOf(0));
-                tfCosto.setValue(BigDecimal.valueOf(0));
-                tfVenta.setValue(BigDecimal.valueOf(0));
-                btnAgregar.setEnabled(true);
-                tfCantidad.focus();
+                Response result = productoService.getPriceVenta(selectedProd);
+                if(result.isSuccess()) {
+                    productoValor = (ProductoValor) result.getObject();
+                    tfProducto.setValue(selectedProd.getNombreProducto());
+                    tfCantidad.setValue(BigDecimal.valueOf(0));
+                    tfCosto.setValue(BigDecimal.valueOf(0));
+                    tfVenta.setValue(productoValor.getPrecioVenta());
+                    btnAgregar.setEnabled(true);
+                    tfCantidad.focus();
+                } else {
+                    NotificacionesUtil.showError(result.getMessage());
+                }
             } else {
                 clearData();
             }
@@ -207,7 +213,7 @@ public class CompraDetailForm extends FormLayout {
         tfVenta.setAutoselect(true);
 
         btnAgregar = new Button(new Icon(VaadinIcon.PLUS_CIRCLE));
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        btnAgregar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnAgregar.setEnabled(false);
         btnAgregar.addClickListener(evt -> {
             if(selectedProd != null) {
@@ -230,9 +236,31 @@ public class CompraDetailForm extends FormLayout {
             itemsGrid.setItems(listaItems);
             btnQuitar.setEnabled(false);
         });
+
+        btnUpdate = new Button(new Icon(VaadinIcon.CHECK_CIRCLE));
+        btnUpdate.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        btnUpdate.setEnabled(false);
+        btnUpdate.addClickListener(evt -> {
+            if(selectedProd != null) {
+                CompraItem item = new CompraItem();
+                item.setProducto(selectedProd);
+                item.setCantidad(tfCantidad.getValue());
+                item.setPrecioTotalCosto(tfCosto.getValue());
+                item.setPrecioVenta(tfVenta.getValue());
+                if(listaItems.removeIf(i -> i.getProducto().getId().equals(selectedProd.getId()))) {
+                    listaItems.add(item);
+                    itemsGrid.setItems(listaItems);
+                } else {
+                    NotificacionesUtil.showError("No fue posible actualizar Item en la tabla");
+                }
+
+                clearData();
+            }
+        });
+
         formItemLayout.add(cbProductos);
         formItemLayout.setColspan(cbProductos, 5);
-        formItemLayout.add(tfProducto, tfCantidad, tfCosto,tfVenta, new HorizontalLayout(btnAgregar, btnQuitar));
+        formItemLayout.add(tfProducto, tfCantidad, tfCosto,tfVenta, new HorizontalLayout(btnAgregar, btnQuitar, btnUpdate));
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");
@@ -272,6 +300,9 @@ public class CompraDetailForm extends FormLayout {
         tfCosto.setValue(BigDecimal.valueOf(0));
         tfVenta.setValue(BigDecimal.valueOf(0));
         btnAgregar.setEnabled(false);
+        btnQuitar.setEnabled(false);
+        btnUpdate.setEnabled(false);
+        productoValor = null;
         cbProductos.focus();
     }
 
@@ -280,7 +311,16 @@ public class CompraDetailForm extends FormLayout {
         itemsGrid.setItems(listaItems);
         itemsGrid.asSingleSelect().addValueChangeListener(evt -> {
             selectedItemGrid = evt.getValue();
-            btnQuitar.setEnabled(evt.getValue() != null);
+            if(selectedItemGrid != null) {
+                btnQuitar.setEnabled(evt.getValue() != null);
+                btnUpdate.setEnabled(evt.getValue() != null);
+                tfProducto.setValue(selectedItemGrid.getProducto().getNombreProducto());
+                tfCantidad.setValue(selectedItemGrid.getCantidad());
+                tfCosto.setValue(selectedItemGrid.getPrecioTotalCosto());
+                tfVenta.setValue(selectedItemGrid.getPrecioVenta());
+                selectedProd = selectedItemGrid.getProducto();
+                tfCantidad.focus();
+            }
         });
     }
 
@@ -297,9 +337,10 @@ public class CompraDetailForm extends FormLayout {
     }
 
     private void validateAndSave() {
-        if (binder.validate().isOk()) {
-            //if(itemsGrid.getI)
-            fireEvent(new SaveEvent(this, binder.getBean()));
+        if (binder.validate().isOk() && listaItems.size() > 0) {
+            Compra compra = binder.getBean();
+            compra.setItems(listaItems);
+            fireEvent(new SaveEvent(this, compra));
         } else {
             NotificacionesUtil.showError("Validar Compra: "+binder.validate().getValidationErrors());
         }

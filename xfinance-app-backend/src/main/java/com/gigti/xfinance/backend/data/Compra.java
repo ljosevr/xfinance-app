@@ -24,7 +24,7 @@ public class Compra extends AbstractEntity {
     private String numeroFactura;
 
     @Column(name="numero_factura_interno", unique = true, updatable = false, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long numeroFacturaInterno;
 
     private String descripcion;

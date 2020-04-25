@@ -26,4 +26,5 @@ public interface ProductoService {
     Producto findById(String id);
     List<TipoMedidaEnum> getAllTipoMedidaEnum();
     int count(String filterText, Empresa empresa);
+    Response getPriceVenta(Producto producto);
 }

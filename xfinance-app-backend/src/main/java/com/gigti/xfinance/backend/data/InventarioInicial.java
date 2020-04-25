@@ -21,6 +21,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "inventario_inicial")
+
 public class InventarioInicial extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)

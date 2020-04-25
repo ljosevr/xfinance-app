@@ -1,18 +1,23 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Compra;
+import com.gigti.xfinance.backend.data.CompraItem;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Response;
+import com.gigti.xfinance.backend.repositories.CompraItemRepository;
 import com.gigti.xfinance.backend.repositories.CompraRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Service
@@ -22,6 +27,9 @@ public class CompraServiceImpl implements CompraService {
 
     @Autowired
     private CompraRepository compraRepository;
+
+    @Autowired
+    private CompraItemRepository compraItemRepository;
 
     @Override
     public int count(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd) {
@@ -69,8 +77,33 @@ public class CompraServiceImpl implements CompraService {
         return listResult;
     }
 
+    @Transactional
     @Override
     public Response saveCompra(Compra compra, Empresa empresa, Usuario usuario) {
-        return null;
+        logger.info("--> saveCompra");
+        Response result = new Response();
+        List<CompraItem> listItems = compra.getItems();
+        try {
+            compra.setUsuario(usuario);
+            compra.setFechaCreacion(new Date());
+            compra = compraRepository.save(compra);
+            if (compra != null) {
+                Compra finalCompra = compra;
+                listItems.forEach(item -> item.setCompra(finalCompra));
+                compraItemRepository.saveAll(listItems);
+                
+                result.setSuccess(true);
+                result.setMessage("Compra "+compra.getNumeroFactura() + " Guardada Exitosamente");
+            } else {
+                result.setSuccess(false);
+                result.setMessage("No fue posible guardar la Compra");
+            }
+        }catch(Exception e) {
+            logger.log(Level.SEVERE, "[Exception]: "+e.getMessage(), e);
+            result.setSuccess(false);
+            result.setMessage("Error al guardar Compra");
+        }
+        logger.info("<-- saveCompra");
+        return result;
     }
 }

@@ -8,6 +8,7 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.ProductoValor;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import com.gigti.xfinance.backend.others.Response;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
     private InventarioInicialRepository inventarioInicialRepository;
+
 
     @Transactional
     public Producto saveProduct(Producto producto, Usuario usuario) {
@@ -119,5 +122,31 @@ public class ProductoServiceImpl implements ProductoService {
         }
 
         return count;
+    }
+
+    public Response getPriceVenta(Producto producto) {
+        logger.info("--> getPriceVenta");
+        Response result = new Response();
+        ProductoValor pv = null;
+        try{
+            pv = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
+            if(pv == null) {
+                pv = new ProductoValor();
+                pv.setActivo(true);
+                pv.setProducto(producto);
+                pv.setPrecioVenta(BigDecimal.ZERO);
+            }
+            result.setSuccess(true);
+            result.setMessage("OK");
+            result.setObject(pv);
+        } catch(Exception e){
+            logger.error("[Exception]: "+e.getMessage(), e);
+            pv = null;
+            result.setSuccess(false);
+            result.setMessage("Error al Obtener Precio de Venta del Producto");
+            result.setObject(null);
+        }
+        logger.info("<-- getPriceVenta");
+        return result;
     }
 }
