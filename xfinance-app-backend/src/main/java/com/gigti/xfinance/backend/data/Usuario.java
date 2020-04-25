@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.backend.data;
 
+import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -15,20 +16,23 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "usuarios")
+@Table(name = "usuarios", uniqueConstraints={@UniqueConstraint(columnNames={"nombre_usuario","empresa_id"})})
 public class Usuario extends AbstractEntity {
 
-    @Column(name="nombre_usuario", unique = true)
+    @Column(name="nombre_usuario")
     @Size(min = 4, max = 25)
     @NotNull
     private String nombreUsuario;
 
     @Column(name="password_usuario")
     @NotNull
-    @Size(min = 4, max = 255)
+    @Size(min = 4, max = 512)
     private String passwordUsuario;
 
     private boolean activo;
+
+    @NotNull
+    private boolean eliminado = false;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
@@ -45,16 +49,20 @@ public class Usuario extends AbstractEntity {
     @JoinColumn
     private Rol rol;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
-    private TipoUsuario tipoUsuario;
+    private boolean adminDefecto;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TipoUsuarioEnum tipoUsuario;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Factura> facturas;
+    private List<Venta> ventas;
 
-    public Usuario(){}
+    public Usuario(){
+        super();
+    }
 
-    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuario tipoUsuario) {
+    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuarioEnum tipoUsuario) {
         this.nombreUsuario = nombreUsuario;
         this.passwordUsuario = passwordUsuario;
         this.activo = activo;
@@ -62,6 +70,15 @@ public class Usuario extends AbstractEntity {
         this.empresa = empresa;
         this.rol = rol;
         this.tipoUsuario = tipoUsuario;
+        this.eliminado = false;
     }
 
+    public String getActivoS() {
+        return isActivo() ? "SI" : "NO";
+    }
+
+    @Override
+    public String toString() {
+        return nombreUsuario;
+    }
 }

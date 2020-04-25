@@ -7,12 +7,14 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.services.IusuarioService;
-import com.gigti.xfinance.ui.MainLayout;
-import com.vaadin.flow.component.UI;
+import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
+import com.gigti.xfinance.backend.others.Response;
+import com.gigti.xfinance.backend.others.Utils;
+import com.gigti.xfinance.backend.services.UsuarioService;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Default mock implementation of {@link AccessControl}. This implementation
@@ -21,27 +23,47 @@ import org.springframework.stereotype.Component;
  */
 public class BasicAccessControl implements AccessControl {
 
-    private IusuarioService iusuarioService;
+    private UsuarioService usuarioService;
 
     @Override
-    public boolean signIn(String username, String password, @Autowired IusuarioService iusu) {
+    public Response signIn(String codigoEmpresa, String username, String password, @Autowired UsuarioService iusu) {
 
-        this.iusuarioService = iusu;
+        Response response = new Response();
+        this.usuarioService = iusu;
 
-        if (username == null || username.isEmpty())
-            return false;
-
-        if (password == null || password.isEmpty())
-            return false;
-
-        Usuario usuario = iusuarioService.login(username,password);
-
-        if(usuario != null){
-            CurrentUser.set(usuario);
-            return true;
+        if (username == null || username.isEmpty()){
+            response.setSuccess(false);
+            response.setMessage("Usuario Incorrecto");
         }
 
-        return false;
+        if (password == null || password.isEmpty()){
+            response.setSuccess(false);
+            response.setMessage("Password incorrecto");
+        }
+        String pass = "";
+        try {
+            pass = Utils.encrytPass(password);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            response.setSuccess(false);
+            response.setMessage("Password incorrecto");
+        }
+        Usuario usuario = usuarioService.login(codigoEmpresa, username, pass);
+
+        if(usuario != null){
+            if(usuario.isActivo()){
+                response.setSuccess(true);
+                CurrentUser.set(usuario);
+            } else {
+                response.setSuccess(false);
+                response.setMessage("Usuario "+ usuario.getNombreUsuario() +" NO ACTIVO");
+            }
+        } else {
+            response.setSuccess(false);
+            response.setMessage("Validar Datos Ingresados");
+        }
+
+        return response;
     }
 
     @Override
@@ -52,22 +74,16 @@ public class BasicAccessControl implements AccessControl {
     @Override
     public boolean isUserInRole(Usuario currentUser) {
         if ("Default".equals(currentUser.getRol().getNombre())) {
-            return getTipoUsuario().equalsIgnoreCase("ADMIN") || getTipoUsuario().equalsIgnoreCase("ROOT");
+            return currentUser.getTipoUsuario() == TipoUsuarioEnum.ADMIN || currentUser.getTipoUsuario() == TipoUsuarioEnum.ROOT;
         }
 
-        // All users are in all non-admin roles
         return true;
-    }
-
-    @Override
-    public String getTipoUsuario() {
-        return CurrentUser.get().getTipoUsuario().getName();
     }
 
     @Override
     public void signOut() {
         CurrentUser.set(null);
         VaadinSession.getCurrent().close();
-        UI.getCurrent().navigate(LoginScreen.class);
+        //UI.getCurrent().navigate(MainLayout.class);
     }
 }

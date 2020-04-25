@@ -6,53 +6,59 @@ import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.apache.commons.lang3.StringUtils;
 
-public class CategoriaForm extends FormLayout {
-    //private VerticalLayout content;
+public class CategoriaForm extends Dialog {
+    private TextField tfCatNombre;
+    private FormLayout content;
 
     private Button btnSave;
-    private Button btnDiscard;
     private Button btnDelete;
 
-    private CategoriaCrudLogic viewLogic;
+    private CategoriaCrud viewLogic;
     private Binder<CategoriaProducto> binder;
     private CategoriaProducto currentCategoria;
 
-    public CategoriaForm(CategoriaCrudLogic categoriaCrudLogic) {
-        //this.setClassName("form-layout");
-        //this.setSizeFull();
-        this.setResponsiveSteps(
-                new ResponsiveStep("25em", 1),
-                new ResponsiveStep("32em", 2),
-                new ResponsiveStep("40em", 3));
+    public CategoriaForm(CategoriaCrud categoriaCrudLogic) {
+        content = new FormLayout();
+        content.setClassName("formLayoutDialog");
+        content.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("25em", 1),
+                new FormLayout.ResponsiveStep("32em", 2));
 
         H4 title = new H4("Crear o Editar Categoria");
-        this.add(title, 3);
+        content.add(title, 3);
 
         viewLogic = categoriaCrudLogic;
 
-        TextField tfCatNombre = new TextField("Nombre Categoria");
+        tfCatNombre = new TextField("Nombre Categoria");
         tfCatNombre.setRequired(true);
         tfCatNombre.setValueChangeMode(ValueChangeMode.EAGER);
+        tfCatNombre.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
+        tfCatNombre.setClearButtonVisible(true);
+        //tfCatNombre.setWidth("70%");
         tfCatNombre.focus();
 
         TextField tfCatDescripcion = new TextField("Descripción Categoria");
         tfCatDescripcion.setRequired(false);
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
+        tfCatDescripcion.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
+        tfCatDescripcion.setClearButtonVisible(true);
 
-        this.add(tfCatNombre, tfCatDescripcion);
+        content.add(tfCatNombre, tfCatDescripcion);
 
         Checkbox cbCatActivo = new Checkbox("Activo");
         cbCatActivo.setValue(true);
-        this.add(cbCatActivo, 3);
+        content.add(cbCatActivo, 3);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
         binder.forField(tfCatNombre).bind(CategoriaProducto::getNombre,
@@ -68,27 +74,20 @@ public class CategoriaForm extends FormLayout {
             boolean isValid = !event.hasValidationErrors();
             boolean hasChanges = binder.hasChanges();
             btnSave.setEnabled(hasChanges && isValid);
-            btnDiscard.setEnabled(hasChanges);
         });
 
         btnSave = new Button("Guardar");
-        //btnSave.setWidth("100%");
-        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> {
             if (currentCategoria != null
                     && binder.writeBeanIfValid(currentCategoria)) {
-                viewLogic.guardar(currentCategoria);
+                viewLogic.save(currentCategoria);
             }
         });
         btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
 
-        btnDiscard = new Button("Descartar Cambios");
-        //btnDiscard.setWidth("100%");
-        btnDiscard.addClickListener(
-                event -> viewLogic.editar(currentCategoria));
-
         Button btnCancel = new Button("Cancelar");
-        //btnCancel.setWidth("100%");
+        btnCancel.addThemeVariants(ButtonVariant.LUMO_SMALL);
         btnCancel.addClickListener(event -> viewLogic.cancelar());
         btnCancel.addClickShortcut(Key.ESCAPE);
         getElement()
@@ -97,19 +96,20 @@ public class CategoriaForm extends FormLayout {
 
         btnDelete = new Button("Eliminar");
         //btnDelete.setWidth("100%");
-        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
         btnDelete.addClickListener(event -> {
             if (currentCategoria != null) {
-                viewLogic.eliminar(currentCategoria);
+                viewLogic.delete(currentCategoria);
             }
         });
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
-        actionsLayout.add(btnSave, btnDiscard);
-        HorizontalLayout actionsLayout2 = new HorizontalLayout();
-        actionsLayout.add(btnDelete, btnCancel);
-        this.add(actionsLayout,3);
-        this.add(actionsLayout2,3);
+        actionsLayout.add(btnSave, btnDelete, btnCancel);
+        content.add(actionsLayout,3);
+
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
     public void editCategoria(CategoriaProducto categoria) {
@@ -125,5 +125,9 @@ public class CategoriaForm extends FormLayout {
         }
         currentCategoria = categoria;
         binder.readBean(categoria);
+    }
+
+    public TextField getTfCatNombre() {
+        return tfCatNombre;
     }
 }

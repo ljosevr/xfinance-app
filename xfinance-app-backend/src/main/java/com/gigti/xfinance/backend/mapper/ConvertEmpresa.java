@@ -18,6 +18,8 @@ public class ConvertEmpresa {
     public static Empresa convertDtoToEntity(EmpresaDTO empresaDTO){
         mapper = new DozerBeanMapper();
         Empresa empresa = mapper.map(empresaDTO, Empresa.class);
+        empresa.setId(empresaDTO.getEmpresaId());
+
         return empresa;
     }
 
@@ -31,6 +33,7 @@ public class ConvertEmpresa {
             empresaDTO.setUsuarioNombre(usuario.getNombreUsuario());
             empresaDTO.setActivoUsuario(usuario.isActivo());
             empresaDTO.setTipoIdePersona(usuario.getPersona().getTipoIde());
+            empresaDTO.setPersonaId(usuario.getPersona().getId());
             empresaDTO.setIdentificacionPersona(usuario.getPersona().getIdentificacion());
             empresaDTO.setPrimerNombrePersona(usuario.getPersona().getPrimerNombre());
             empresaDTO.setSegundoNombrePersona(usuario.getPersona().getSegundoNombre());
@@ -39,6 +42,7 @@ public class ConvertEmpresa {
             empresaDTO.setDireccionPersona(usuario.getPersona().getDireccion());
             empresaDTO.setTelefonoPersona(usuario.getPersona().getTelefono());
             empresaDTO.setEmailPersona(usuario.getPersona().getEmail());
+            empresaDTO.setRol(usuario.getRol());
         }
         return empresaDTO;
     }

@@ -6,14 +6,11 @@
 
 package com.gigti.xfinance.backend.data;
 
-import lombok.Builder;
+import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
@@ -31,17 +28,12 @@ public class Producto extends AbstractEntity {
     @NotNull
     private boolean eliminado;
 
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TipoMedidaEnum tipoMedida = TipoMedidaEnum.UNIDAD;
+
     @Transient
     private String activoS;
-
-    @Transient
-    private BigDecimal precioCostoActual = BigDecimal.ZERO;
-
-    @Transient
-    private BigDecimal precioVentaActual = BigDecimal.ZERO;
-
-    @Transient
-    private double stockActual;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
@@ -51,28 +43,42 @@ public class Producto extends AbstractEntity {
     @JoinColumn
     private CategoriaProducto categoria;
 
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoValores> productoValores;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private InventarioActual inventario;
 
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoInventarioInicio> productoInventarioInicio;
-
-    @OneToMany(mappedBy = "producto", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ProductoInventarioDia> productsStockDay;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Impuesto impuesto;
 
     public Producto(){}
 
-    public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa) {
+    public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa, TipoMedidaEnum tipoMedida) {
         this.nombreProducto = nombreProducto;
         this.codigoBarra = codigoBarra;
         this.descripcion = descripcion;
         this.activo = activo;
         this.eliminado = false;
         this.empresa = empresa;
+        this.tipoMedida = tipoMedida;
     }
 
     public String getActivoS() {
         return isActivo() ? "SI" : "NO";
     }
 
+    @Override
+    public String toString() {
+        return "Producto{" +
+                "nombreProducto='" + nombreProducto + '\'' +
+                ", codigoBarra='" + codigoBarra + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", activo=" + activo +
+                ", eliminado=" + eliminado +
+                ", tipoMedida=" + tipoMedida +
+                ", activoS='" + activoS + '\'' +
+                  ", empresa=" + empresa +
+                ", categoria=" + categoria +
+                 '}';
+    }
 }

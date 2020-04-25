@@ -9,7 +9,6 @@ package com.gigti.xfinance.backend.data;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -44,7 +43,6 @@ public class Persona extends AbstractEntity{
     private Date fechaNacimiento;
 
     @NotEmpty
-    @Email
     @Column(unique = true)
     private String email;
 
@@ -120,4 +118,7 @@ public class Persona extends AbstractEntity{
         return persona;
     }
 
+    public String getCompleteName(){
+        return String.format("%s %s %s %s", primerNombre, segundoNombre, primerApellido, segundoApellido);
+    }
 }

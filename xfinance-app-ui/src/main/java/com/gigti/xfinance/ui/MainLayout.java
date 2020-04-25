@@ -6,168 +6,196 @@
 
 package com.gigti.xfinance.ui;
 
-import com.gigti.xfinance.backend.data.TipoUsuario;
 import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.authentication.LoginScreen;
-import com.gigti.xfinance.ui.crud.categoria.CategoriaView;
-import com.gigti.xfinance.ui.crud.empresa.EmpresaView;
-import com.gigti.xfinance.ui.crud.producto.ProductoCrudView;
-import com.gigti.xfinance.ui.crud.pventa.PventaView;
+import com.gigti.xfinance.ui.authentication.LoginView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.contextmenu.MenuItem;
-import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.menubar.MenuBar;
-import com.vaadin.flow.component.menubar.MenuBarVariant;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.vaadin.flow.spring.annotation.UIScope;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-import org.springframework.context.annotation.Primary;
+import org.apache.commons.collections.CollectionUtils;
 
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The main layout. Contains the navigation menu.
  */
-@SpringComponent
-@UIScope
-@Primary
-@Route("")
 //@PreserveOnRefresh
-@Viewport("width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover")
-@PWA(name = "XFinance App", shortName = "XFinApp", backgroundColor = "#233348", themeColor = "#233348")
+@Route("")
+@PWA(
+        name = "Tu Punto De Venta",
+        shortName = "TPV",
+        offlineResources = {
+                "./styles/offline.css",
+                "./images/offline.png"
+        },
+        enableInstallPrompt = false
+)
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
-@Push
+//@Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-    private MenuBar menu;
-    private MenuItem m_ventas;
-    private MenuItem m_productos;
-    private MenuItem m_usuarios;
-    private MenuItem m_empresas;
-    private MenuItem m_salir;
+    private Accordion menus_varios;
+    private Button menu_salir;
 
     public MainLayout() {
-        //String username = CurrentUser.get() != null ? .getNombreUsuario();
 
-        //this.setDrawerOpened(true);
-        //createDrawer();
+        this.setDrawerOpened(true);
+        createHeader();
 
-        Image img = new Image("/frontend/images/logo.png", "Logo");
-        img.addClassName("hide-on-mobile");
-        img.setHeight("60px");
-        img.setWidth("60px");
-        //this.addToNavbar(false, img);
+        this.setPrimarySection(Section.DRAWER);
+    }
 
-        //Title
-        H4 title = new H4("X Finance App");
-        title.setClassName("titleBar");
-        //this.addToNavbar(false, title);
+    private void createHeader(){
+        H1 appTitle = new H1("X Finance App");
+        appTitle.addClassName("logo");
 
-        menu = createMenu();
-        this.addToNavbar(true, new DrawerToggle(), img, title, menu);
-        this.setPrimarySection(Section.NAVBAR);
+        menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
+        menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
+        menu_salir.addClickListener(listener -> signOut());
+        menu_salir.setClassName("menubutton");
+
+        String username = "";
+        String personname = "";
+        String empresaname = "";
+        if(CurrentUser.get() != null){
+            username = CurrentUser.get().getNombreUsuario();
+            personname = CurrentUser.get().getPersona().getPrimerNombre();
+            empresaname = CurrentUser.get().getEmpresa().getNombreEmpresa();
+        }
+
+        H1 bienvenida = new H1(empresaname.toUpperCase() + " - Bienvenido: "+personname);
+        bienvenida.addClassName("logo");
 
         UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
-            if(details.getWindowInnerWidth() < 600){
-                img.setVisible(false);
-                title.setVisible(false);
-                menu.addThemeVariants(MenuBarVariant.LUMO_SMALL);
+            if(details.getWindowInnerWidth() < 600) {
+                bienvenida.setVisible(false);
             } else {
-                img.setVisible(true);
-                title.setVisible(true);
-                menu.addThemeVariants(MenuBarVariant.LUMO_LARGE);
+                bienvenida.setVisible(true);
             }
         });
 
-        UI.getCurrent().getPage().addBrowserWindowResizeListener(event -> {
-            Notification.show(event.getWidth()+"",6000, Notification.Position.BOTTOM_CENTER);
-            if(event.getWidth() < 600){
-                img.setVisible(false);
-                title.setVisible(false);
-                menu.addThemeVariants(MenuBarVariant.LUMO_SMALL);
-            } else {
-                img.setVisible(true);
-                title.setVisible(true);
-                menu.addThemeVariants(MenuBarVariant.LUMO_LARGE);
+        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);
+
+        header.setDefaultVerticalComponentAlignment(
+                FlexComponent.Alignment.CENTER); //
+        header.setWidth("100%");
+        header.addClassName("header");
+        header.expand(appTitle);
+        addToNavbar(header);
+    }
+
+    private void createDrawer(){
+        if(CurrentUser.get() != null) {
+            VerticalLayout layoutDrawer = new VerticalLayout();
+
+            Image logo = new Image("/frontend/images/icon.png", "Logo");
+            //logo.addClassName("hide-on-mobile");
+            logo.setHeight("45px");
+            logo.setWidth("45px");
+
+            H2 titleMenu = new H2("MENU");
+            titleMenu.setClassName("titleMenu");
+
+            layoutDrawer.add(logo);
+            layoutDrawer.add(titleMenu);
+            layoutDrawer.add(createMenu());
+            this.addToDrawer(layoutDrawer);
+        }
+    }
+
+    private VerticalLayout createMenu() {
+        VerticalLayout layoutMenu = new VerticalLayout();
+        layoutMenu.setClassName("menuLayout");
+        Usuario user = CurrentUser.get();
+        List<Vista> listVista =  user.getRol().getVistas().stream()
+                .sorted(Comparator.comparing(Vista::getOrderVista))
+                .collect(Collectors.toList());
+
+        Map<Vista, List<Vista>> mapMenu = new HashMap<>();
+        for(Vista view : listVista) {
+
+            if(view.getVistaPadre() == null) {
+                if (view.getSubVistas().isEmpty()) {
+                    //SOLO MENU
+                    Button menu = new Button(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
+                    menu.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+                    menu.addClickListener(l -> UI.getCurrent().navigate(view.getRouteVista()));
+                    menu.setClassName("menubutton");
+                    layoutMenu.add(menu);
+                }
             }
-        });
 
+            if (view.getVistaPadre() != null) {
+                List<Vista> list = mapMenu.get(view.getVistaPadre());
+                if (CollectionUtils.isEmpty(list)) {
+                    list = new ArrayList<>();
+                    list.add(view);
+                    mapMenu.put(view.getVistaPadre(), list);
+                } else {
+                    list.add(view);
+                    mapMenu.putIfAbsent(view.getVistaPadre(), list);
+                }
+            }
+        }
+
+        Map<Vista, List<Vista>> result2 = new LinkedHashMap<>();
+        mapMenu.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Vista::getOrderVista)))
+                .forEachOrdered(x -> result2.put(x.getKey(), x.getValue()));
+
+        for(Map.Entry<Vista, List<Vista>> entry : result2.entrySet()){
+            Vista vista = entry.getKey();
+            List<Vista> vistas = entry.getValue();
+
+            VerticalLayout  layout_menu_sub = new VerticalLayout();
+            if(menus_varios == null) {
+                menus_varios = new Accordion();
+            }
+
+            for(Vista sub : vistas){
+                Button menu_sub = new Button(sub.getNombreVista(), new Icon(VaadinIcon.valueOf(sub.getIconMenu())));
+                menu_sub.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+                menu_sub.addClickListener(l -> UI.getCurrent().navigate(sub.getRouteVista()));
+                menu_sub.setClassName("subMenu-Layout");
+                layout_menu_sub.add(menu_sub);
+            }
+            menus_varios.add(vista.getNombreVista(), layout_menu_sub);
+        }
+
+        if(menus_varios != null){
+            layoutMenu.add(menus_varios);
+        }
+
+        return layoutMenu;
     }
 
-//    private void createDrawer(){
-//        VerticalLayout layout = new VerticalLayout();
-//
-//        Image img = new Image("/frontend/images/logo.png", "Logo");
-//        img.addClassName("hide-on-mobile");
-//        img.setHeight("60px");
-//        img.setWidth("60px");
-//
-//        H4 title = new H4("X Finance App");
-//        title.setClassName("titleBar");
-//
-//        Tab tab1 = new Tab("Prueba");
-//
-//        Tabs tabs = new Tabs(false, tab1, new Tab("Tab2"),new Tab("Tab3"),new Tab("Tab4"),new Tab("Prueba"), new Tab("Usuario Admin"));
-//        tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
-//        tabs.setAutoselect(true);
-//
-//        this.addToNavbar(true, new DrawerToggle(), tabs);
-//    }
-
-
-
-    private MenuBar createMenu() {
-        menu = new MenuBar();
-        //m_ventas = menu.addItem(new RouterLink("Ventas", PventaView.class));
-        m_ventas = menu.addItem("Ventas",event -> getUI().get().navigate(PventaView.class));
-
-        m_productos = menu.addItem("Productos");
-        m_usuarios = menu.addItem("Usuarios");
-        m_empresas = menu.addItem("Empresas");
-        m_salir = menu.addItem("Salir", event -> {
-            m_salir.setEnabled(false);
-            signOut();});
-        SubMenu sm_productos = m_productos.getSubMenu();
-        sm_productos.addItem(new RouterLink("Administrar", ProductoCrudView.class));//"Administrar", event -> getUI().get().navigate(ProductoCrudView.class));
-        sm_productos.addItem("Compras", event -> getUI().get().navigate("adminProd"));
-        sm_productos.addItem(new RouterLink("Categoria", CategoriaView.class));//event -> getUI().get().navigate(CategoriaView_CrudUI.class));
-        sm_productos.addItem("Inventario Hoy",event -> getUI().get().navigate("adminProd"));
-        sm_productos.addItem("Inv. Inicial",event -> getUI().get().navigate("adminProd"));
-
-        SubMenu sm_usuarios = m_usuarios.getSubMenu();
-        sm_usuarios.addItem("Administrar",event -> getUI().get().navigate("adminUserView"));
-        sm_usuarios.addItem("Roles",event -> getUI().get().navigate("rolView"));
-        sm_usuarios.addItem("Permisos",event -> getUI().get().navigate("permisoView"));
-
-        SubMenu sm_empresas = m_empresas.getSubMenu();
-        sm_empresas.addItem(new RouterLink("Administrar", EmpresaView.class));
-        //sm_empresas.addItem("Usuario Admin",event -> getUI().get().navigate("adminProd"));
-        sm_empresas.addItem("Usuarios Empresas",event -> getUI().get().navigate("adminProd"));
-
-        menu.addThemeVariants(MenuBarVariant.LUMO_PRIMARY);
-        return menu;
-    }
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
@@ -179,51 +207,31 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
                                 .createAccessControl().signOut(),
                         Key.KEY_L, KeyModifier.CONTROL);
 
-        if (!accessControl.isUserSignedIn()) {
-            UI.getCurrent().navigate(LoginScreen.class);
-        } else {
-            accessShowMenu();
+        if (accessControl.isUserSignedIn()) {
+            createDrawer();
         }
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         if (!accessControl.isUserSignedIn()) {
-            beforeEnterEvent.rerouteTo(LoginScreen.class);
-        }
-    }
-
-    private void accessShowMenu() {
-        if(CurrentUser.get() != null) {
-            Usuario user = CurrentUser.get();
-            m_salir.setEnabled(true);
-            if(user.getTipoUsuario().equals(TipoUsuario.ROOT)){
-                m_empresas.setVisible(true);
-                m_ventas.setVisible(false);
-                m_productos.setVisible(false);
-                m_usuarios.setVisible(false);
-            } else{
-                m_ventas.setVisible(true);
-                m_productos.setVisible(true);
-                m_usuarios.setVisible(true);
-                m_empresas.setVisible(false);
-            }
+            beforeEnterEvent.forwardTo(LoginView.class);
         }
     }
 
     private void signOut(){
-
         NotificacionesUtil.openConfirmationDialog("¿Está Seguro de Salir?", true, false);
-        Objects.requireNonNull(NotificacionesUtil.getDialogConfirmation()).addDialogCloseActionListener(event -> m_salir.setEnabled(true));
-        NotificacionesUtil.getConfirmButton().addClickListener(event -> {
-            if(NotificacionesUtil.getDialogConfirmation().isOpened())
-                NotificacionesUtil.getDialogConfirmation().close();
+        Objects.requireNonNull(NotificacionesUtil.getDialog()).addDialogCloseActionListener(event -> menu_salir.setEnabled(true));
+        NotificacionesUtil.getSiButton().addClickListener(event -> {
+            menu_salir.setEnabled(false);
+            if(NotificacionesUtil.getDialog().isOpened())
+                NotificacionesUtil.getDialog().close();
             AccessControlFactory.getInstance().createAccessControl().signOut();
         });
-        NotificacionesUtil.getCancelButton().addClickListener(event -> {
-            if(NotificacionesUtil.getDialogConfirmation().isOpened())
-                NotificacionesUtil.getDialogConfirmation().close();
-            m_salir.setEnabled(true);
+        NotificacionesUtil.getNoButton().addClickListener(event -> {
+            if(NotificacionesUtil.getDialog().isOpened())
+                NotificacionesUtil.getDialog().close();
+            menu_salir.setEnabled(true);
         });
     }
 }

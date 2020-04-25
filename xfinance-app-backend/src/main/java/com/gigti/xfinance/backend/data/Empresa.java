@@ -6,12 +6,13 @@
 
 package com.gigti.xfinance.backend.data;
 
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.List;
 
 @Data
 @Entity
-//@Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "empresas")
@@ -30,18 +31,17 @@ public class Empresa extends AbstractEntity {
     private TipoIde tipoIde;
 
     @NotNull
-    @NotEmpty
     @Size(min= 4)
     @Column(unique = true)
     private String identificacion;
 
-    @Column(name = "id_interno", unique = true, updatable = false, nullable = false)
-    private Long idInterno;
+    @Size(min= 3, max = 6)
+    @Column(name = "codigo_empresa", unique = true, nullable = false)
+    private String codigoEmpresa;
 
     @NotNull
-    @NotEmpty()
     @Size(min= 4)
-    @Column(name = "nombre_empresa",unique = true)
+    @Column(name = "nombre_empresa", unique = true)
     private String nombreEmpresa;
 
     private String direccion;
@@ -60,10 +60,9 @@ public class Empresa extends AbstractEntity {
     @Temporal(value = TemporalType.TIMESTAMP)
     private Date fechaDesactivacion;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    //@JoinColumn
-    @JoinColumn(name = "tipo_empresa_id")
-    private TipoEmpresa tipoEmpresa;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private TipoEmpresaEnum tipoEmpresa;
 
     @Transient
     private String activoS;
@@ -77,7 +76,7 @@ public class Empresa extends AbstractEntity {
     @OneToMany(mappedBy = "empresa", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CategoriaProducto> categoriaProductos;
 
-    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo) {
+    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresaEnum tipo) {
         this.tipoIde = tipoIde;
         this.identificacion = identificacion;
         this.nombreEmpresa = nombreEmpresa;
@@ -89,7 +88,7 @@ public class Empresa extends AbstractEntity {
         this.tipoEmpresa = tipo;
     }
 
-    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Boolean activo, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresa tipo, Long idInterno) {
+    public Empresa(TipoIde tipoIde, String identificacion, String nombreEmpresa, String direccion, Boolean activo, Date fechaActivacion, Date fechaDesactivacion, TipoEmpresaEnum tipo, String codigoEmpresa) {
         this.tipoIde = tipoIde;
         this.identificacion = identificacion;
         this.nombreEmpresa = nombreEmpresa;
@@ -99,12 +98,7 @@ public class Empresa extends AbstractEntity {
         this.fechaDesactivacion = fechaDesactivacion;
         this.eliminado = false;
         this.tipoEmpresa = tipo;
-        this.idInterno = idInterno;
-    }
-
-    @Override
-    public String toString() {
-        return nombreEmpresa;
+        this.codigoEmpresa = codigoEmpresa;
     }
 
 }

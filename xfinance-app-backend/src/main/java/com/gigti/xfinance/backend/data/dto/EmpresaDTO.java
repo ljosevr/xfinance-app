@@ -1,12 +1,15 @@
 package com.gigti.xfinance.backend.data.dto;
 
-import com.gigti.xfinance.backend.data.TipoEmpresa;
+import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.TipoIde;
+import com.gigti.xfinance.backend.data.Vista;
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import lombok.Data;
 
-import javax.persistence.Transient;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class EmpresaDTO implements Serializable {
@@ -21,13 +24,16 @@ public class EmpresaDTO implements Serializable {
     private boolean eliminado;
     private Date fechaActivacion;
     private Date fechaDesactivacion;
-    private TipoEmpresa tipoEmpresa;
+    private TipoEmpresaEnum tipoEmpresa;
+    private String codigoEmpresa;
 
     private String activoS;
 
     private String usuarioId;
+    @Size(min = 4, max = 25)
     private String usuarioNombre;
-
+    private Rol rol;
+    private List<Vista> vistas;
     private boolean activoUsuario;
 
     private boolean eliminadoUsuario;

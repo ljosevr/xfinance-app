@@ -6,102 +6,72 @@
 
 package com.gigti.xfinance.ui.crud.usuario;
 
-import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-import java.text.DecimalFormat;
 import java.util.Comparator;
 
-public class UsuarioGrid extends PaginatedGrid<Usuario> {
+public class UsuarioGrid extends PaginatedGrid<UsuarioDTO> {
 
-    /*public UsuarioGrid() {
+    public UsuarioGrid() {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
-        addColumn(Usuario::getNombreUsuario)
+        addColumn(UsuarioDTO::getNombreUsuario)
                 .setHeader("Usuario")
                 .setFlexGrow(20)
                 .setSortable(true);
 
-        addColumn(Usuario::getPer)
-                .setHeader("Codigo Barras")
-                .setFlexGrow(20)
+        addColumn(UsuarioDTO::getTipoIde)
+                .setHeader("Tipo Ide")
+                .setSortable(true);
+
+        addColumn(UsuarioDTO::getIdentificacion)
+                .setHeader("Identificación")
+                .setSortable(true);
+
+        addColumn(UsuarioDTO::getPrimerNombre)
+                .setHeader("Primer Nombre")
+                .setSortable(true);
+
+        addColumn(UsuarioDTO::getPrimerApellido)
+                .setHeader("Primer Apellido")
                 .setSortable(true);
 
         final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
-        addColumn(TemplateRenderer.<Producto>of(availabilityTemplate)
-                .withProperty("activoS", Producto::getActivoS))
+        addColumn(TemplateRenderer.<UsuarioDTO>of(availabilityTemplate)
+                .withProperty("activoS", UsuarioDTO::getActivoS))
                 .setHeader("Activo")
-                .setComparator(Comparator.comparing(Producto::getActivoS))
-                .setSortable(true)
-                .setFlexGrow(5);
+                .setComparator(Comparator.comparing(UsuarioDTO::getActivoS))
+                .setSortable(true);
 
-        addColumn(this::formatStock)
-                .setHeader("Cantidad")
-                .setSortable(true)
-                .setFlexGrow(3);
+        addColumn(UsuarioDTO::getTelefono)
+                .setHeader("Telefono")
+                .setSortable(false);
 
-        addColumn(this::formatCostPrice)
-                .setHeader("P. Costo")
-                .setFlexGrow(5);
-
-        addColumn(this::formatSellPrice)
-                .setHeader("P. Venta")
-                .setFlexGrow(5);
+        addColumn(UsuarioDTO::getEmail)
+                .setHeader("Email")
+                .setSortable(false);
 
         // Show all categories the product is in, separated by commas
-        addColumn(this::formatCategories)
-                .setHeader("Categoria")
-                .setSortable(true)
-                .setFlexGrow(12);
+        addColumn(usuario ->
+            usuario.getRol().getNombre()
+        ).setHeader("Rol").setSortable(true);
 
-        setPageSize(Constantes.PAGE_SIZE);
+        setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(Producto product) {
-        getDataCommunicator().refresh(product);
-    }
-
-    private String formatCategories(Producto producto) {
-        if (producto.getCategoria() == null || producto.getCategoria().getNombre().isEmpty()) {
-            return "";
-        }
-
-        return producto.getCategoria().getNombre();
-    }
-
-    private String formatCostPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioCostoActual());
-    }
-
-    private String formatSellPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioVentaActual());
-    }
-
-    private String formatStock(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return decimalFormat.format(producto.getStockActual());
+    public void refresh(UsuarioDTO usuario) {
+        getDataCommunicator().refresh(usuario);
     }
 
     @Override
     public int getPage() {
         return super.getPage()-1;
-    }*/
+    }
 }

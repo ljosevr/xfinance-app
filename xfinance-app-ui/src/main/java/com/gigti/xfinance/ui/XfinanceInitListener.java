@@ -8,11 +8,12 @@ package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
-import com.gigti.xfinance.ui.authentication.LoginScreen;
+import com.gigti.xfinance.ui.authentication.LoginView;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
-import com.vaadin.flow.spring.annotation.SpringComponent;
+import org.springframework.stereotype.Component;
 
 /**
  * This class is used to listen to BeforeEnter event of all UIs in order to
@@ -21,41 +22,23 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
  * com.vaadin.flow.server.VaadinServiceInitListener in META-INF/services.
  */
 
-@SpringComponent
+@Component
 public class XfinanceInitListener implements VaadinServiceInitListener {
 
     @Override
     public void serviceInit(ServiceInitEvent event) {
 
+        event.getSource().addUIInitListener(uiEvent -> { //
+            final UI ui = uiEvent.getUI();
+            ui.addBeforeEnterListener(this::authenticateNavigation);
+        });
+    }
+
+    private void authenticateNavigation(BeforeEnterEvent event) {
         final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-
-//        event.addBootstrapListener(response -> {
-//            response.getUI().addBeforeEnterListener(enterEvent -> {
-//                if (!accessControl.isUserSignedIn() && !LoginScreen.class
-//                        .equals(enterEvent.getNavigationTarget())) {
-//                    enterEvent.rerouteTo(LoginScreen.class);
-//                }
-//            });
-//        });
-
-        event.addDependencyFilter((dependencies, filterContext) -> {
-            // DependencyFilter to add/remove/change dependencies sent to
-            // the client
-            return dependencies;
-        });
-
-        event.addRequestHandler((session, request, response) -> {
-            // RequestHandler to change how responses are handled
-            return false;
-        });
-
-        event.getSource().addUIInitListener(uiInitEvent -> {
-            uiInitEvent.getUI().addBeforeEnterListener(enterEvent -> {
-                if (!accessControl.isUserSignedIn() && !LoginScreen.class
-                        .equals(enterEvent.getNavigationTarget())) {
-                    enterEvent.rerouteTo(LoginScreen.class);
-                }
-            });
-        });
+        if (!LoginView.class.equals(event.getNavigationTarget())
+                && !accessControl.isUserSignedIn()) { //
+            event.rerouteTo(LoginView.class);
+        }
     }
 }

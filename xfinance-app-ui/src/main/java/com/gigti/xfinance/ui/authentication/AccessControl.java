@@ -7,7 +7,8 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.services.IusuarioService;
+import com.gigti.xfinance.backend.others.Response;
+import com.gigti.xfinance.backend.services.UsuarioService;
 
 import java.io.Serializable;
 
@@ -16,16 +17,11 @@ import java.io.Serializable;
  */
 public interface AccessControl extends Serializable {
 
-    String ADMIN_ROLE_NAME = "admin";
-    String ADMIN_USERNAME = "admin";
-
-    boolean signIn(String username, String password, IusuarioService iusu);
+    Response signIn(String codigoEmpresa, String username, String password, UsuarioService iusu);
 
     boolean isUserSignedIn();
 
     boolean isUserInRole(Usuario currentUser);
-
-    String getTipoUsuario();
 
     void signOut();
 }

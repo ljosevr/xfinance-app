@@ -6,9 +6,8 @@
 
 package com.gigti.xfinance.backend.repositories;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.TipoEmpresa;
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,13 +19,13 @@ import java.util.List;
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, String> {
 
-    public List<Empresa> findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresa tipoEmpresa,Pageable pageable);
+    public List<Empresa> findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresaEnum tipoEmpresa, Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE UPPER(e.nombreEmpresa) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
             "e.eliminado = FALSE AND "+
             "e.tipoEmpresa =:tipoEmpresa")
-    public List<Empresa> findByNombreOrDescripcionAndTipoEmpresa(@Param("filter") String filter, TipoEmpresa tipoEmpresa, Pageable pageable);
+    public List<Empresa> search(@Param("filter") String filter, TipoEmpresaEnum tipoEmpresa, Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE e.activo =:activo AND " +
@@ -37,4 +36,5 @@ public interface EmpresaRepository extends JpaRepository<Empresa, String> {
     public Empresa findByNombreEmpresa(String companyName);
     public List<Empresa> findByNombreEmpresaContaining(String companyName);
 
+    public Empresa findByCodigoEmpresa(String codigoEmpresa);
 }

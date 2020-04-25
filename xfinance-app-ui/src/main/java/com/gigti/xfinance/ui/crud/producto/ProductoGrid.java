@@ -8,11 +8,11 @@ package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-import java.text.DecimalFormat;
 import java.util.Comparator;
 
 public class ProductoGrid extends PaginatedGrid<Producto> {
@@ -26,9 +26,14 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setFlexGrow(20)
                 .setSortable(true);
 
+        addColumn(producto -> AllUtils.formatUnidadMedida(producto.getTipoMedida().name()))
+                .setHeader("Medida")
+                .setSortable(true)
+                .setFlexGrow(5);
+
         addColumn(Producto::getCodigoBarra)
                 .setHeader("Codigo Barras")
-                .setFlexGrow(20)
+                .setFlexGrow(15)
                 .setSortable(true);
 
         final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
@@ -37,12 +42,11 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .setHeader("Activo")
                 .setComparator(Comparator.comparing(Producto::getActivoS))
                 .setSortable(true)
-                .setFlexGrow(5);
+                .setFlexGrow(3);
 
-        //TODO
-//        grid.addComponentColumn(item -> {
+//        addColumn(item -> {
 //            Icon icon;
-//            if(item.isAdult()){
+//            if(item.isActivo()){
 //                icon = VaadinIcon.CHECK_CIRCLE.create();
 //                icon.setColor("green");
 //            } else {
@@ -50,31 +54,22 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
 //                icon.setColor("red");
 //            }
 //            return icon;
-//        })
-//                .setKey("adult")
-//                .setHeader("Adult")
-//                .setComparator(Comparator.comparing(Person::isAdult));
-
-        addColumn(this::formatStock)
-                .setHeader("Cantidad")
-                .setSortable(true)
-                .setFlexGrow(3);
-
-        addColumn(this::formatCostPrice)
-                .setHeader("P. Costo")
-                .setFlexGrow(5);
-
-        addColumn(this::formatSellPrice)
-                .setHeader("P. Venta")
-                .setFlexGrow(5);
+//        })      .setHeader("Activo")
+//                .setComparator(Comparator.comparing(Producto::isActivo))
+//                .setSortable(true)
+//                .setFlexGrow(5);
 
         // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories)
                 .setHeader("Categoria")
                 .setSortable(true)
-                .setFlexGrow(12);
+                .setFlexGrow(8);
 
-        setPageSize(Constantes.PAGE_SIZE);
+        addColumn(producto -> producto.getImpuesto().getNombre())
+                .setHeader("Impuesto")
+                .setSortable(true);
+
+        setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
@@ -89,30 +84,6 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
         }
 
         return producto.getCategoria().getNombre();
-    }
-
-    private String formatCostPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioCostoActual());
-    }
-
-    private String formatSellPrice(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return "$ "+decimalFormat.format(producto.getPrecioVentaActual());
-    }
-
-    private String formatStock(Producto producto){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(2);
-
-        return decimalFormat.format(producto.getStockActual());
     }
 
     @Override

@@ -1,30 +1,15 @@
 package com.gigti.xfinance.ui.crud.pventa;
 
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
-import com.vaadin.flow.component.Key;
+import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.textfield.TextFieldVariant;
-import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.converter.StringToDoubleConverter;
-import com.vaadin.flow.data.value.ValueChangeMode;
-
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Currency;
-import java.util.Locale;
 
 public class PventaGrid extends Grid<PventaDTO> {
 
-    private BigDecimal total;
-    private BigDecimal subTotal;
-
     public PventaGrid() {
-        //setSizeFull();
+        setSizeFull();
         addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COLUMN_BORDERS);
 
         addColumn(PventaDTO::getItem)
@@ -33,16 +18,24 @@ public class PventaGrid extends Grid<PventaDTO> {
 
         addColumn(PventaDTO::getNombreProducto)
                 .setHeader("Producto")
-                .setFlexGrow(10)
+                .setFlexGrow(15)
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.START);
 
-        addColumn(PventaDTO::getCantidadVenta)
-                .setHeader("Cantidad")
-                .setFlexGrow(3)
+        addColumn(pv -> AllUtils.formatUnidadMedida(pv.getUnidadMedida()))
+                .setHeader("Medida")
+                .setFlexGrow(2)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
-        total = BigDecimal.ZERO;
+        addColumn(PventaDTO::getCantidadVenta)
+                .setHeader("Cantidad")
+                .setFlexGrow(2)
+                .setTextAlign(ColumnTextAlign.CENTER);
+
+        addColumn(this::formatImpuesto)
+                .setHeader("Impuesto")
+                .setFlexGrow(3)
+                .setTextAlign(ColumnTextAlign.END);
 
         addColumn(this::formatPrice)
                 .setHeader("SubTotal")
@@ -58,14 +51,12 @@ public class PventaGrid extends Grid<PventaDTO> {
     }
 
     private String formatPrice(PventaDTO pventaDTO){
-        final DecimalFormat decimalFormat = new DecimalFormat();
-        decimalFormat.setCurrency(Currency.getInstance(Locale.US));
-        decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(0);
+        return AllUtils.numberFormat(pventaDTO.getPrecioVentaActual().multiply(pventaDTO.getCantidadVenta()));
+    }
 
-        subTotal = pventaDTO.getPrecioVentaActual().multiply(BigDecimal.valueOf(pventaDTO.getCantidadVenta()));
+    private String formatImpuesto(PventaDTO pventaDTO) {
 
-        return "$ "+decimalFormat.format(subTotal);
+        return AllUtils.numberFormat(AllUtils.percentage(pventaDTO.getPrecioVentaActual(), pventaDTO.getImpuestoValor()));
     }
 
 }

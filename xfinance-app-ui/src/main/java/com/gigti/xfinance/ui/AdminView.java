@@ -7,7 +7,7 @@
 package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
-import com.gigti.xfinance.backend.services.IcategoriaProductoService;
+import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -42,7 +42,7 @@ public class AdminView extends VerticalLayout {
     //Cambiar View Admin por otra cosa. Esta View debe ser Exclusiva para el
     // menu Admin - Categorias - Usuarios - Roles - Permisos
     @Autowired
-    public AdminView(IcategoriaProductoService iService) {
+    public AdminView(CategoriaProductoService iService) {
         categoriesListing = new IronList<>();
 
         //dataProvider = CategoriaDataProvider.getInstance(iService);

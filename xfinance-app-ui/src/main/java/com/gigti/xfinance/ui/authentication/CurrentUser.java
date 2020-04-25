@@ -7,8 +7,6 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.ui.MainLayout;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
 
@@ -26,7 +24,7 @@ public final class CurrentUser {
     /**
      * The attribute key used to store the username in the session.
      */
-    public static final String CURRENT_USER_SESSION_ATTRIBUTE_KEY = CurrentUser.class
+    public static final String CURRENT_USER_SESSION_ATTRIBUTE_KEY = LoginView.class
             .getCanonicalName();
 
 //    public static final String CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY = Rol.class
@@ -64,16 +62,11 @@ public final class CurrentUser {
         if (currentUser == null) {
             getCurrentRequest().getWrappedSession().removeAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY);
-
-//            getCurrentRequest().getWrappedSession().removeAttribute(
-//                    CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY);
-
+            current = null;
         } else {
             getCurrentRequest().getWrappedSession().setAttribute(
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
             current = currentUser;
-//            getCurrentRequest().getWrappedSession().setAttribute(
-//                    CURRENT_USER_ROL_SESSION_ATTRIBUTE_KEY, rolUsuario);
         }
     }
 
