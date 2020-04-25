@@ -12,9 +12,9 @@ spring:
   # Uncomment if using PostgreSQL
   # Database
   datasource:
-    url: jdbc:postgresql://localhost:5432/xfinance_db
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://localhost:5432/tupuntodeventa
+    username: luisjose
+    password: jose410Angel
     driver-class-name: org.postgresql.Driver
   # JPA properties
   jpa:
