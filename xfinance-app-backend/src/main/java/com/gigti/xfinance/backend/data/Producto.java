@@ -12,7 +12,7 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-@Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+@Data
 @Entity
 @Table(name = "productos")
 public class Producto extends AbstractEntity {
@@ -45,7 +45,7 @@ public class Producto extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
-    private InventarioActual inventario;
+    private InventarioActualCosto inventario;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
@@ -81,4 +81,5 @@ public class Producto extends AbstractEntity {
                 ", categoria=" + categoria +
                  '}';
     }
+
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface InventarioActualRepository extends JpaRepository<InventarioActual, String> {
+public interface InventarioActualVentaRepository extends JpaRepository<InventarioActual, String> {
 
     InventarioActual findByProducto(Producto producto);
 
@@ -20,7 +20,7 @@ public interface InventarioActualRepository extends JpaRepository<InventarioActu
             "a.producto.eliminado = false")
     List<InventarioActual> findAllByEmpresa(Empresa empresa, Pageable pageable);
 
-    @Query("SELECT a FROM InventarioActual a " +
+    @Query("SELECT a FROM InventarioActualCosto a " +
             "WHERE UPPER(a.producto.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') AND " +
             "a.producto.empresa =:empresa AND " +
             "a.producto.eliminado = false")

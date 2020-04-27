@@ -7,7 +7,7 @@ import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.gigti.xfinance.backend.mapper.ConvertUsuario;
 import com.gigti.xfinance.backend.others.Response;
-import com.gigti.xfinance.backend.others.Utils;
+import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -90,7 +90,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 logger.log(Level.INFO, "persona found");
                 usuario.getPersona().setId(persona.getId());
             } else {
-                String pass = Utils.encrytPass("123456");
+                String pass = UtilsBackend.encrytPass("123456");
                 usuario.setPasswordUsuario(pass);
             }
             usuario.setPersona(personaRepository.save(usuario.getPersona()));
@@ -158,9 +158,9 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if(usuario != null) {
             try {
-                value = Utils.encrytPass(value);
-                value1 = Utils.encrytPass(value1);
-                value2 = Utils.encrytPass(value2);
+                value = UtilsBackend.encrytPass(value);
+                value1 = UtilsBackend.encrytPass(value1);
+                value2 = UtilsBackend.encrytPass(value2);
             } catch (NoSuchAlgorithmException e) {
                 logger.log(Level.SEVERE, "Error al Encriptar Password: "+e.getMessage(), e);
             }

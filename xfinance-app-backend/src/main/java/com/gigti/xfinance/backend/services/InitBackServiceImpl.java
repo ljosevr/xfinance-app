@@ -4,7 +4,7 @@ import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.others.Utils;
+import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -211,7 +211,7 @@ public class InitBackServiceImpl implements InitBackService {
                 //Usuario Root
                 Rol rolRoot = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ROOT.getNombre(), null, false);
 
-                String pass = Utils.encrytPass("jose410Angel");
+                String pass = UtilsBackend.encrytPass("jose410Angel");
                 Usuario userRoot = new Usuario(
                         "Root",
                         pass,

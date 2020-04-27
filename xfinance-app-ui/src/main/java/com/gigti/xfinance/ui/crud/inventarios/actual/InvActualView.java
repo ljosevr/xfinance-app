@@ -7,7 +7,7 @@
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.InventarioActual;
+import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.InventarioService;
 import com.gigti.xfinance.ui.MainLayout;
@@ -34,7 +34,7 @@ public class InvActualView extends VerticalLayout  implements ICrudView {
     private TextField filter;
     private InventarioService inventarioService;
     private SearchFilterComponent searchLayout;
-    private DataProvider<InventarioActual, Void> dataProvider;
+    private DataProvider<InventarioActualCosto, Void> dataProvider;
 
     public InvActualView(InventarioService inventarioService) {
         this.inventarioService = inventarioService;
@@ -87,7 +87,7 @@ public class InvActualView extends VerticalLayout  implements ICrudView {
         dataProvider = DataProvider.fromCallbacks(
                 // First callback fetches items based on a query
                 query -> {
-                    List<InventarioActual> listResult = inventarioService.
+                    List<InventarioActualCosto> listResult = inventarioService.
                             findInvActual(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
 
                     return listResult.stream();

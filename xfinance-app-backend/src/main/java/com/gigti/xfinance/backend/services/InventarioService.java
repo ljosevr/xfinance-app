@@ -21,7 +21,7 @@ public interface InventarioService {
      * @param size
      * @return
      */
-    List<InventarioActual> findInvActual(String filterText, Empresa empresa, int page, int size);
+    List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, int page, int size);
     int countInvActual(String filterText, Empresa empresa);
 
     /**

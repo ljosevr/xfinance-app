@@ -7,16 +7,16 @@
 package com.gigti.xfinance.backend.repositories;
 
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.ProductoValor;
+import com.gigti.xfinance.backend.data.ProductoValorVenta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProductoValoresRepository extends JpaRepository<ProductoValor, String> {
+public interface ProductoValoresRepository extends JpaRepository<ProductoValorVenta, String> {
 
-    public ProductoValor findByProductoAndActivoIsTrue(Producto producto);
+    public ProductoValorVenta findByProductoAndActivoIsTrue(Producto producto);
 
-    public List<ProductoValor> findByActivoIsFalse();
+    public List<ProductoValorVenta> findByActivoIsFalse();
 }

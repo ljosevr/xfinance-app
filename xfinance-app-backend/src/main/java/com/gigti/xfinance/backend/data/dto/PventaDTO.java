@@ -16,7 +16,6 @@ public class PventaDTO implements Serializable {
     private String idProducto;
     private String nombreProducto;
     private String codigoBarra;
-    private BigDecimal precioCostoActual;
     private BigDecimal precioVentaActual;
     private BigDecimal cantidadVenta;
     private BigDecimal inStock;

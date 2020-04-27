@@ -6,7 +6,7 @@ import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.mapper.ConvertEmpresa;
 import com.gigti.xfinance.backend.others.Response;
-import com.gigti.xfinance.backend.others.Utils;
+import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -237,7 +237,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             }
             if(isNew) {
                 //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
-                usuarioAdmin.setPasswordUsuario(Utils.encrytPass("123456"));
+                usuarioAdmin.setPasswordUsuario(UtilsBackend.encrytPass("123456"));
                 usuarioAdmin.setAdminDefecto(true);
                 usuarioAdmin.setEmpresa(empresaEnt);
                 Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
