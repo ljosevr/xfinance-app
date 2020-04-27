@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2019. Propiedad Exclusiva de GigTi.
- * Derechos reservados.
- * Toda copia o utilización de este codigo debe estar sustentado por escrito por GigTi, si no será considerado plagio y pirateria. Por consiguiente será llevado ante la justicia correspondiente.
- */
-
 package com.gigti.xfinance.backend.data;
 
 import lombok.AllArgsConstructor;
@@ -19,23 +13,29 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "producto_valores")
-public class ProductoValor extends AbstractEntity {
-
+@Table(name = "inventario_actual_costo")
+public class InventarioActualCosto extends AbstractEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Producto producto;
+
+    private BigDecimal cantidad;
 
     @Column(name="precio_costo")
     @NotNull
     private BigDecimal precioCosto;
 
-    @Column(name="precio_venta")
-    @NotNull
-    private BigDecimal precioVenta;
+    private boolean infinite;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaCreacion;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActualizacion;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Empresa empresa;
 
     private boolean activo;
 }

@@ -3,6 +3,7 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.Response;
+import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,7 +29,10 @@ public class InventarioServiceImpl implements InventarioService {
     private InventarioInicialRepository inventarioInicialRepository;
 
     @Autowired
-    private InventarioActualRepository inventarioActualRepository;
+    private InventarioActualCostoRepository inventarioActualCostoRepository;
+
+    @Autowired
+    private InventarioActualVentaRepository inventarioActualVentaRepository;
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -68,16 +71,15 @@ public class InventarioServiceImpl implements InventarioService {
                 inventarioInicial.setCantidad(BigDecimal.ZERO);
                 result.add(inventarioInicial);
             } else {
-                ProductoValor productoValor = productoValoresRepository.findByProductoAndActivoIsTrue(p);
+                ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(p);
                 invInicial.setImpuesto(p.getImpuesto());
-                invInicial.setPrecioCosto(productoValor.getPrecioCosto());
-                invInicial.setPrecioVenta(productoValor.getPrecioVenta());
+                invInicial.setPrecioVenta(productoValorVenta.getValorVenta());
                 result.add(invInicial);
 
             }
         });
-        Collections.sort(result, (InventarioInicial o1, InventarioInicial o2) ->
-                o1.getProducto().getNombreProducto().compareTo( o2.getProducto().getNombreProducto()));
+        result.sort((InventarioInicial o1, InventarioInicial o2) ->
+                o1.getProducto().getNombreProducto().compareTo(o2.getProducto().getNombreProducto()));
         logger.info("<-- "+methodName);
         return result;
     }
@@ -137,15 +139,15 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    public List<InventarioActual> findInvActual(String filterText, Empresa empresa, int page, int size) {
+    public List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, int page, int size) {
         String methodName = "findInvActual";
         logger.info("--> "+methodName);
         Pageable pageable = PageRequest.of(page, size);
-        List<InventarioActual> listResult;
+        List<InventarioActualCosto> listResult;
         if(filterText == null || filterText.isEmpty()) {
-            listResult = inventarioActualRepository.findAllByEmpresa(empresa, pageable);
+            listResult = inventarioActualCostoRepository.findAllByEmpresa(empresa, pageable);
         } else  {
-            listResult = inventarioActualRepository.search(empresa, filterText, pageable);
+            listResult = inventarioActualCostoRepository.search(empresa, filterText, pageable);
         }
 
         return listResult;
@@ -155,9 +157,9 @@ public class InventarioServiceImpl implements InventarioService {
     public int countInvActual(String filterText, Empresa empresa) {
         int count;
         if(filterText == null || filterText.isEmpty()) {
-            count = inventarioActualRepository.countAllByEmpresa(empresa);
+            count = inventarioActualCostoRepository.countAllByEmpresa(empresa);
         } else  {
-            count = inventarioActualRepository.countAllByEmpresaAndNombreProducto(empresa, filterText);
+            count = inventarioActualCostoRepository.countAllByEmpresaAndNombreProducto(empresa, filterText);
         }
 
         return count;
@@ -184,44 +186,28 @@ public class InventarioServiceImpl implements InventarioService {
         logger.info("--> "+methodName);
         try {
             Date fecha = new Date();
-            //Inventario Actual
-            InventarioActual invActual = inventarioActualRepository.findByProducto(producto);
-            if(invActual == null) {
-                if(infinite) {
-                    invActual = new InventarioActual(producto, BigDecimal.ZERO, infinite, fecha);
-                } else {
-                    invActual = new InventarioActual(producto, cantidad, infinite, fecha);
-                }
-            } else {
-                if(!infinite) {
-                    if (aumentarStock) {
-                        invActual.setCantidad(invActual.getCantidad().add(cantidad));
-                    } else {
-                        invActual.setCantidad(invActual.getCantidad().subtract(cantidad));
-                    }
-                }
-                invActual.setInfinite(infinite);
-                invActual.setFechaActualizacion(fecha);
-            }
 
-            inventarioActualRepository.save(invActual);
+            //Actualizar Inventario Costos
+            setInvActualCosto(producto, cantidad, precioCosto, infinite, fecha, tipoMovimiento);
+
+            //Actualizar Inventario Agrupado
+            setInvActualVenta(producto, aumentarStock, cantidad, infinite, fecha);
 
             if(updatePrices) {
                 //Producto Valores
-                ProductoValor productoValorNew = new ProductoValor();
-                ProductoValor productoValor = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
-                if (productoValor != null) {
-                    productoValor.setActivo(false);
-                    productoValoresRepository.save(productoValor);
+                ProductoValorVenta productoValorVentaNew = new ProductoValorVenta();
+                ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
+                if (productoValorVenta != null) {
+                    productoValorVenta.setActivo(false);
+                    productoValoresRepository.save(productoValorVenta);
                 }
                 //Nuevo ProductoValor
-                productoValorNew.setActivo(true);
-                productoValorNew.setFechaActualizacion(fecha);
-                productoValorNew.setPrecioVenta(precioVenta);
-                productoValorNew.setPrecioCosto(precioCosto);
-                productoValorNew.setProducto(producto);
+                productoValorVentaNew.setActivo(true);
+                productoValorVentaNew.setFechaActualizacion(fecha);
+                productoValorVentaNew.setValorVenta(precioVenta);
+                productoValorVentaNew.setProducto(producto);
 
-                productoValoresRepository.save(productoValorNew);
+                productoValoresRepository.save(productoValorVentaNew);
             }
 
             //Movimientos
@@ -245,5 +231,125 @@ public class InventarioServiceImpl implements InventarioService {
         return true;
     }
 
+    private void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean infinite, Date fecha, TipoMovimientoEnum tipoMovimiento) {
+        //Inventario Actual Costo
+        List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
+        List<InventarioActualCosto> result = new ArrayList<>();
+
+        switch (tipoMovimiento) {
+            case COMPRA:
+            case INV_INICIAL:
+                setInvCosto_CompraOrInicial(listInvActualCosto, result, producto, cantidad, precioCosto, infinite, fecha);
+                break;
+            case VENTA:
+                setInvCosto_Venta(listInvActualCosto, result, cantidad, infinite, fecha);
+                break;
+            case TRASLADO: setInvTraslado();
+                break;
+            case CREACION: setInvCreacion();
+                break;
+        }
+
+        inventarioActualCostoRepository.saveAll(result);
+    }
+
+    private void setInvActualVenta(Producto producto, boolean aumentarStock, BigDecimal cantidad, boolean infinite, Date fecha) {
+        InventarioActual invActualVenta = inventarioActualVentaRepository.findByProducto(producto);
+        if(invActualVenta != null){
+            if(!infinite) {
+                if (aumentarStock) {
+                    invActualVenta.setCantidad(invActualVenta.getCantidad().add(cantidad));
+                } else {
+                    invActualVenta.setCantidad(invActualVenta.getCantidad().subtract(cantidad));
+                }
+            }
+
+        } else {
+            invActualVenta = new InventarioActual();
+            invActualVenta.setInfinite(infinite);
+            invActualVenta.setProducto(producto);
+            invActualVenta.setEmpresa(producto.getEmpresa());
+            if(!infinite) {
+                if (aumentarStock) {
+                    invActualVenta.setCantidad(invActualVenta.getCantidad().add(cantidad));
+                } else {
+                    invActualVenta.setCantidad(invActualVenta.getCantidad().subtract(cantidad));
+                }
+            }
+        }
+        invActualVenta.setFechaActualizacion(fecha);
+
+        inventarioActualVentaRepository.save(invActualVenta);
+    }
+
+    private void setInvCosto_CompraOrInicial(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean infinite, Date fecha){
+        InventarioActualCosto invActualCosto;
+
+        if(listInvActualCosto.isEmpty()) {
+            invActualCosto = new InventarioActualCosto(producto, cantidad, precioCosto, infinite, fecha, fecha, producto.getEmpresa(), true);
+            invActualCosto.setInfinite(infinite);
+            invActualCosto.setFechaActualizacion(fecha);
+            result.add(invActualCosto);
+        }
+        if(!infinite) {
+            //Limited Stock
+            //Inv Inicial y Compras
+            invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto, precioCosto);
+            if (invActualCosto == null) {
+                //Don't Exists Inv With Price Equals
+                result.add(new InventarioActualCosto(producto, cantidad, precioCosto, infinite, fecha, fecha, producto.getEmpresa(), true));
+            } else {
+                invActualCosto.setCantidad(invActualCosto.getCantidad().add(cantidad));
+                invActualCosto.setFechaActualizacion(fecha);
+            }
+            result.add(invActualCosto);
+        } else {
+            //isInfinite Stock
+            invActualCosto = UtilsBackend.extractInvActCostByInfiniteAndCostPrice(listInvActualCosto, precioCosto);
+            if (invActualCosto == null) {
+                //Price Diferent
+                result.add(new InventarioActualCosto(producto, cantidad, precioCosto, infinite, fecha, fecha, producto.getEmpresa(), true));
+            }
+        }
+    }
+
+    private void setInvCosto_Venta(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean infinite, Date fecha){
+        InventarioActualCosto invActualCosto;
+        //Ventas
+        if(!infinite) {
+            invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
+            if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
+                    if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                        cantidad = cantidad.subtract(invActualCosto.getCantidad());
+                        invActualCosto.setCantidad(BigDecimal.ZERO);
+                        invActualCosto.setActivo(false);
+                        invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
+                    } else {
+                        invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
+                        cantidad = BigDecimal.ZERO;
+                    }
+                    invActualCosto.setFechaActualizacion(fecha);
+                    result.add(invActualCosto);
+                }
+            } else {
+                invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
+                if (invActualCosto.getCantidad().compareTo(BigDecimal.ZERO) == 0) {
+                    invActualCosto.setActivo(false);
+                }
+                invActualCosto.setFechaActualizacion(fecha);
+                result.add(invActualCosto);
+            }
+        }
+    }
+
+    private void setInvTraslado(){
+
+    }
+
+    private void setInvCreacion(){
+
+    }
 
 }
+

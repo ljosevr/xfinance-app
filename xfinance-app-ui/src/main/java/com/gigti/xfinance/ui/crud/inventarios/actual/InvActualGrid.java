@@ -6,14 +6,14 @@
 
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
-import com.gigti.xfinance.backend.data.InventarioActual;
+import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.GridVariant;
 import org.vaadin.klaudeta.PaginatedGrid;
 
-public class InvActualGrid extends PaginatedGrid<InventarioActual> {
+public class InvActualGrid extends PaginatedGrid<InventarioActualCosto> {
 
     public InvActualGrid() {
         setSizeFull();
@@ -29,7 +29,7 @@ public class InvActualGrid extends PaginatedGrid<InventarioActual> {
                 .setFlexGrow(3)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
-        addColumn(InventarioActual::getCantidad)
+        addColumn(InventarioActualCosto::getCantidad)
                 .setFlexGrow(5)
                 .setHeader("Cantidad");
 

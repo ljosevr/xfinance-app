@@ -3,7 +3,7 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
-import com.gigti.xfinance.backend.others.Utils;
+import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +36,9 @@ public class VentaServiceImpl implements VentaService {
     private ProductoValoresRepository productoValoresRepository;
 
     @Autowired
-    private InventarioActualRepository inventarioActualRepository;
+    private InventarioActualCostoRepository inventarioActualCostoRepository;
+    @Autowired
+    private InventarioActualVentaRepository inventarioActualVentaRepository;
 
     @Autowired
     private InventarioService inventarioService;
@@ -65,7 +67,7 @@ public class VentaServiceImpl implements VentaService {
             long cantidadFacturasxEmpresa = ventaRepository.countByUsuario_Empresa(usuario.getEmpresa());
             cantidadFacturasxEmpresa++;
             venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
-            venta.setNumeroFactura(Utils.generateNumberTicket(cantidadFacturasxEmpresa));
+            venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));
             venta.setTotalVenta(BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
             //venta.setD
             ventaRepository.save(venta);
@@ -74,25 +76,51 @@ public class VentaServiceImpl implements VentaService {
             //Items Factura
             listVenta.forEach(pv -> {
                 Producto producto = productoRepository.findById(pv.getIdProducto()).orElse(null);
+                List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
+                InventarioActualCosto invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
+                BigDecimal cantidad = pv.getCantidadVenta();
+                if(invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                    while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
+                        VentaItem item = new VentaItem();
+                        if(invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                            cantidad = cantidad.subtract(invActualCosto.getCantidad());
+                            invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
+                        } else {
+                            item.setCantidad(cantidad);
+                            cantidad = BigDecimal.ZERO;
+                        }
 
-                VentaItem item = new VentaItem();
-                item.setVenta(venta);
-                item.setProducto(producto);
-                item.setCantidad(pv.getCantidadVenta());
-                item.setPrecioCosto(pv.getPrecioCostoActual());
-                item.setPrecioVenta(pv.getPrecioVentaActual());
-                item.setItem(pv.getItem());
-                //item.setDescuentoArticulo(pv.getDescuento());
-                item.setImpuestoArticulo(pv.getImpuestoValor());
-                item.setImpuestoNombre(pv.getImpuestoNombre());
+                        item.setVenta(venta);
+                        item.setProducto(producto);
+                        item.setPrecioCosto(invActualCosto.getPrecioCosto());
+                        item.setPrecioVenta(pv.getPrecioVentaActual());
+                        item.setItem(pv.getItem());
+                        //item.setDescuentoArticulo(pv.getDescuento());
+                        item.setImpuestoArticulo(pv.getImpuestoValor());
+                        item.setImpuestoNombre(pv.getImpuestoNombre());
 
-                listItems.add(item);
+                        listItems.add(item);
+                    }
+                } else {
+                    VentaItem item = new VentaItem();
+                    item.setVenta(venta);
+                    item.setProducto(producto);
+                    item.setCantidad(pv.getCantidadVenta());
+                    item.setPrecioCosto(invActualCosto.getPrecioCosto());
+                    item.setPrecioVenta(pv.getPrecioVentaActual());
+                    item.setItem(pv.getItem());
+                    //item.setDescuentoArticulo(pv.getDescuento());
+                    item.setImpuestoArticulo(pv.getImpuestoValor());
+                    item.setImpuestoNombre(pv.getImpuestoNombre());
+
+                    listItems.add(item);
+                }
 
                 inventarioService.saveProcessInventarioActualAndPrecios(producto,
                         false,
                         pv.getCantidadVenta(),
                         pv.getPrecioVentaActual(),
-                        pv.getPrecioCostoActual(),
+                        BigDecimal.ZERO,
                         TipoMovimientoEnum.VENTA,
                         false,
                         pv.isInfinite(),
@@ -119,35 +147,36 @@ public class VentaServiceImpl implements VentaService {
         }
         List<PventaDTO> result = new ArrayList<>();
 
-        for(Producto p : listProductos) {
+        listProductos.forEach(p -> {
             BigDecimal inStock = BigDecimal.ZERO;
             boolean infinite = false;
-            InventarioActual actual = inventarioActualRepository.findByProducto(p);
+            InventarioActual actual = inventarioActualVentaRepository.findByProducto(p);
             if(actual != null) {
                 inStock = actual.getCantidad().compareTo(BigDecimal.ZERO) > 0 ? actual.getCantidad() : BigDecimal.ZERO;
                 infinite = actual.isInfinite();
             }
             if(inStock.compareTo(BigDecimal.ZERO) > 0 || infinite) {
-                ProductoValor pvalores = productoValoresRepository.findByProductoAndActivoIsTrue(p);
-                if (pvalores != null) {
-                    result.add(convertProductoToPventaDTO(p, pvalores, inStock, infinite));
+                ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(p);
+                if (productoValorVenta != null) {
+                    result.add(convertProductoToPventaDTO(p, productoValorVenta.getValorVenta(), inStock, infinite));
+                } else {
+                    result.add(convertProductoToPventaDTO(p, BigDecimal.ZERO, inStock, infinite));
                 }
             }
-        }
+        });
         logger.info("<-- "+methodName);
         return result;
     }
 
-    private PventaDTO convertProductoToPventaDTO(Producto p, ProductoValor pvalores, BigDecimal inStock, boolean infinite){
+    private PventaDTO convertProductoToPventaDTO(Producto p, BigDecimal precioVenta, BigDecimal inStock, boolean infinite){
         PventaDTO pv = new PventaDTO();
         pv.setIdProducto(p.getId());
         pv.setCodigoBarra(p.getCodigoBarra());
         pv.setNombreProducto(p.getNombreProducto());
         pv.setCantidadVenta(BigDecimal.ZERO);
-        pv.setPrecioCostoActual(pvalores.getPrecioCosto());
-        pv.setPrecioVentaActual(pvalores.getPrecioVenta());
+        pv.setPrecioVentaActual(precioVenta);
         pv.setInStock(inStock);
-        pv.setUnidadMedida(p.getTipoMedida() == null ? "NE" : p.getTipoMedida().toString());
+        pv.setUnidadMedida(p.getTipoMedida() == null ? "N.D" : p.getTipoMedida().toString());
         pv.setImpuestoId(p.getImpuesto().getId());
         pv.setImpuestoValor(p.getImpuesto().getValor());
         pv.setImpuestoNombre(p.getImpuesto().getNombre());

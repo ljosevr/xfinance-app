@@ -12,10 +12,11 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "inventario_actual")
+@Table(name = "inventario_actual_venta")
 public class InventarioActual extends AbstractEntity {
+
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
+    @JoinColumn(unique = true)
     private Producto producto;
 
     private BigDecimal cantidad;
@@ -25,4 +26,7 @@ public class InventarioActual extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActualizacion;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Empresa empresa;
 }

@@ -9,7 +9,7 @@ package com.gigti.xfinance.ui.authentication;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Response;
-import com.gigti.xfinance.backend.others.Utils;
+import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.vaadin.flow.server.VaadinSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class BasicAccessControl implements AccessControl {
         }
         String pass = "";
         try {
-            pass = Utils.encrytPass(password);
+            pass = UtilsBackend.encrytPass(password);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             response.setSuccess(false);
