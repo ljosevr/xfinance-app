@@ -8,7 +8,7 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.ProductoValor;
+import com.gigti.xfinance.backend.data.ProductoValorVenta;
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import com.gigti.xfinance.backend.others.Response;
@@ -127,14 +127,14 @@ public class ProductoServiceImpl implements ProductoService {
     public Response getPriceVenta(Producto producto) {
         logger.info("--> getPriceVenta");
         Response result = new Response();
-        ProductoValor pv = null;
+        ProductoValorVenta pv = null;
         try{
             pv = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
             if(pv == null) {
-                pv = new ProductoValor();
+                pv = new ProductoValorVenta();
                 pv.setActivo(true);
                 pv.setProducto(producto);
-                pv.setPrecioVenta(BigDecimal.ZERO);
+                pv.setValorVenta(BigDecimal.ZERO);
             }
             result.setSuccess(true);
             result.setMessage("OK");

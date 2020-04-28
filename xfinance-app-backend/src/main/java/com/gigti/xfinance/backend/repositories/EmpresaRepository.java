@@ -19,22 +19,23 @@ import java.util.List;
 @Repository
 public interface EmpresaRepository extends JpaRepository<Empresa, String> {
 
-    public List<Empresa> findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresaEnum tipoEmpresa, Pageable pageable);
+    List<Empresa> findByEliminadoIsFalseAndTipoEmpresaIs(TipoEmpresaEnum tipoEmpresa, Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE UPPER(e.nombreEmpresa) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
             "e.eliminado = FALSE AND "+
             "e.tipoEmpresa =:tipoEmpresa")
-    public List<Empresa> search(@Param("filter") String filter, TipoEmpresaEnum tipoEmpresa, Pageable pageable);
+    List<Empresa> search(@Param("filter") String filter, TipoEmpresaEnum tipoEmpresa, Pageable pageable);
 
     @Query("SELECT e FROM Empresa e " +
             "WHERE e.activo =:activo AND " +
             "e.eliminado = False")
-    public List<Empresa> findActivoOrInactivo(@Param("activo") boolean activo, Pageable pageable);
+    List<Empresa> findActivoOrInactivo(@Param("activo") boolean activo, Pageable pageable);
 
-    public Empresa findByIdentificacion(String identificacionCli);
-    public Empresa findByNombreEmpresa(String companyName);
-    public List<Empresa> findByNombreEmpresaContaining(String companyName);
+    Empresa findByIdentificacion(String identificacionCli);
+    Empresa findByNombreEmpresa(String companyName);
+    List<Empresa> findByNombreEmpresaContaining(String companyName);
 
-    public Empresa findByCodigoEmpresa(String codigoEmpresa);
+    @Query("Select e From Empresa e Where UPPER(e.codigoEmpresa) = UPPER(:codigoEmpresa)")
+    Empresa findByCodigoEmpresa(String codigoEmpresa);
 }

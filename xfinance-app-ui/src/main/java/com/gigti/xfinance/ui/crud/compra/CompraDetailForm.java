@@ -43,7 +43,7 @@ public class CompraDetailForm extends FormLayout {
     private Binder<Compra> binder;
     private CompraItemGrid itemsGrid;
     private ProductoService productoService;
-    private HorizontalLayout actionsLayout;
+    private VerticalLayout actionsLayout;
     private List<CompraItem> listaItems = new ArrayList<>();
     private Producto selectedProd;
     private CompraItem selectedItemGrid;
@@ -54,7 +54,7 @@ public class CompraDetailForm extends FormLayout {
     private TextField tfProducto;
     private BigDecimalField tfCosto;
     private ComboBox<Producto> cbProductos;
-    private ProductoValor productoValor;
+    private ProductoValorVenta productoValorVenta;
     private Button btnUpdate;
 
     public CompraDetailForm(ProductoService productoService) {
@@ -159,11 +159,11 @@ public class CompraDetailForm extends FormLayout {
             if(selectedProd != null) {
                 Response result = productoService.getPriceVenta(selectedProd);
                 if(result.isSuccess()) {
-                    productoValor = (ProductoValor) result.getObject();
+                    productoValorVenta = (ProductoValorVenta) result.getObject();
                     tfProducto.setValue(selectedProd.getNombreProducto());
                     tfCantidad.setValue(BigDecimal.valueOf(0));
                     tfCosto.setValue(BigDecimal.valueOf(0));
-                    tfVenta.setValue(productoValor.getPrecioVenta());
+                    tfVenta.setValue(productoValorVenta.getValorVenta());
                     btnAgregar.setEnabled(true);
                     tfCantidad.focus();
                 } else {
@@ -199,14 +199,15 @@ public class CompraDetailForm extends FormLayout {
         tfCantidad.setReadOnly(false);
         tfCantidad.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfCantidad.setAutoselect(true);
+        tfCantidad.setMaxWidth("60px");
 
-        tfCosto = new BigDecimalField("P. Costo");
+        tfCosto = new BigDecimalField("P. Costo Total");
         tfCosto.setReadOnly(false);
         tfCosto.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfCosto.setPrefixComponent(new Span("$"));
         tfCosto.setAutoselect(true);
 
-        tfVenta = new BigDecimalField("P. Venta");
+        tfVenta = new BigDecimalField("P. Venta Unitario");
         tfVenta.setReadOnly(false);
         tfVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfVenta.setPrefixComponent(new Span("$"));
@@ -264,6 +265,7 @@ public class CompraDetailForm extends FormLayout {
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");
+        gridLayout.setSizeFull();
 
         //Actions CENTER
         btnSave = new Button("Guardar");
@@ -280,11 +282,15 @@ public class CompraDetailForm extends FormLayout {
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
         btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
 
-        actionsLayout = new HorizontalLayout();
+        actionsLayout = new VerticalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
-        actionsLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        //actionsLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 
-        itemLayout.add(subTitle, formItemLayout, gridLayout, actionsLayout);
+        HorizontalLayout temp = new HorizontalLayout(gridLayout, actionsLayout);
+        temp.expand(gridLayout);
+        temp.setSizeFull();
+
+        itemLayout.add(subTitle, formItemLayout, temp);
 
         itemLayout.setMargin(false);
         itemLayout.setPadding(false);
@@ -302,7 +308,7 @@ public class CompraDetailForm extends FormLayout {
         btnAgregar.setEnabled(false);
         btnQuitar.setEnabled(false);
         btnUpdate.setEnabled(false);
-        productoValor = null;
+        productoValorVenta = null;
         cbProductos.focus();
     }
 

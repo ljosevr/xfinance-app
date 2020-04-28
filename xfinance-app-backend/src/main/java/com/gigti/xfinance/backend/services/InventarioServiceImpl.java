@@ -32,7 +32,7 @@ public class InventarioServiceImpl implements InventarioService {
     private InventarioActualCostoRepository inventarioActualCostoRepository;
 
     @Autowired
-    private InventarioActualVentaRepository inventarioActualVentaRepository;
+    private InventarioActualRepository inventarioActualRepository;
 
     @Autowired
     private ProductoRepository productoRepository;
@@ -254,7 +254,7 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     private void setInvActualVenta(Producto producto, boolean aumentarStock, BigDecimal cantidad, boolean infinite, Date fecha) {
-        InventarioActual invActualVenta = inventarioActualVentaRepository.findByProducto(producto);
+        InventarioActual invActualVenta = inventarioActualRepository.findByProducto(producto);
         if(invActualVenta != null){
             if(!infinite) {
                 if (aumentarStock) {
@@ -279,7 +279,7 @@ public class InventarioServiceImpl implements InventarioService {
         }
         invActualVenta.setFechaActualizacion(fecha);
 
-        inventarioActualVentaRepository.save(invActualVenta);
+        inventarioActualRepository.save(invActualVenta);
     }
 
     private void setInvCosto_CompraOrInicial(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean infinite, Date fecha){

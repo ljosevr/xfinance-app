@@ -14,11 +14,11 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/tupuntodeventa
     username: luisjose
-    password: jose410Angel
+    password: 123456
     driver-class-name: org.postgresql.Driver
   hikari:
     connectionTimeout: 20000
-    maximumPoolSize: 5
+    maximumPoolSize: 10
   # JPA properties
   jpa:
     hibernate:

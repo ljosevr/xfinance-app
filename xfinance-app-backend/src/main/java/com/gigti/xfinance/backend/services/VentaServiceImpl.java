@@ -38,7 +38,7 @@ public class VentaServiceImpl implements VentaService {
     @Autowired
     private InventarioActualCostoRepository inventarioActualCostoRepository;
     @Autowired
-    private InventarioActualVentaRepository inventarioActualVentaRepository;
+    private InventarioActualRepository inventarioActualRepository;
 
     @Autowired
     private InventarioService inventarioService;
@@ -150,7 +150,7 @@ public class VentaServiceImpl implements VentaService {
         listProductos.forEach(p -> {
             BigDecimal inStock = BigDecimal.ZERO;
             boolean infinite = false;
-            InventarioActual actual = inventarioActualVentaRepository.findByProducto(p);
+            InventarioActual actual = inventarioActualRepository.findByProducto(p);
             if(actual != null) {
                 inStock = actual.getCantidad().compareTo(BigDecimal.ZERO) > 0 ? actual.getCantidad() : BigDecimal.ZERO;
                 infinite = actual.isInfinite();

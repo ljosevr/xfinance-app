@@ -243,6 +243,7 @@ public class EmpresaServiceImpl implements EmpresaService {
                 Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
                 usuarioAdmin.setRol(rolAdmin);
                 usuarioAdmin.setTipoUsuario(TipoUsuarioEnum.ADMIN);
+                usuarioAdmin.setActivo(empresa.isActivo());
             }
 
             usuarioAdmin.setActivo(empresa.isActivo());

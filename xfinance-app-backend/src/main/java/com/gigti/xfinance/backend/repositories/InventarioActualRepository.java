@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface InventarioActualVentaRepository extends JpaRepository<InventarioActual, String> {
+public interface InventarioActualRepository extends JpaRepository<InventarioActual, String> {
 
     InventarioActual findByProducto(Producto producto);
 

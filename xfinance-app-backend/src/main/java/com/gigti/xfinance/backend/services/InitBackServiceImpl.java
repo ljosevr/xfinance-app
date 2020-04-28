@@ -277,7 +277,7 @@ public class InitBackServiceImpl implements InitBackService {
                 empresa.setSegundoNombrePersona("Steve");
                 empresa.setIdentificacionPersona("0011223344");
                 empresa.setTipoIdePersona(TipoIde.CEDULA);
-                empresa.setActivoUsuario(true);
+                empresa.setActivo(true);
                 empresa.setUsuarioNombre("demo");
                 empresa.setNombreEmpresa("Demo S.A.S");
                 empresa.setEliminado(false);
