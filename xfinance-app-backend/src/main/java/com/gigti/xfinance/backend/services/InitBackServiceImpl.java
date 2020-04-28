@@ -338,9 +338,9 @@ public class InitBackServiceImpl implements InitBackService {
                 }
 
             }
-            logger.info("<-- initBackObjetos");
+            logger.info("<-- initBackDemo");
         }catch(Exception e){
-            logger.log(Level.SEVERE, "Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
+            logger.log(Level.SEVERE, "Error al Crear InitBackDemo: "+e.getMessage(), e);
             e.printStackTrace();
         }
     }
