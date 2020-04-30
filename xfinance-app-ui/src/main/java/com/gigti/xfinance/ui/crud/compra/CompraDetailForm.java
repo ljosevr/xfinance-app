@@ -122,12 +122,16 @@ public class CompraDetailForm extends FormLayout {
         binder.forField(tfTelefonoProveedor).bind(Compra::getTelefonoProveedor, Compra::setTelefonoProveedor);
         binder.forField(tfDireccionProveedor).bind(Compra::getDireccionProveedor, Compra::setDireccionProveedor);
 
-        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid() && (listaItems != null && listaItems.size() > 0)));
+        binder.addStatusChangeListener(event -> enableButtonSave());
 
         formDataLayout.add(tfFactura, dpFechaCompra, tfProveedor,
                 tfTelefonoProveedor, tfDireccionProveedor);
 
         this.add(formDataLayout, 3);
+    }
+
+    private void enableButtonSave() {
+        btnSave.setEnabled(binder.isValid() && (listaItems != null && listaItems.size() > 0));
     }
 
     private void configureFormItems() {
@@ -226,8 +230,10 @@ public class CompraDetailForm extends FormLayout {
                 item.setCantidad(tfCantidad.getValue());
                 item.setPrecioTotalCosto(tfCosto.getValue());
                 item.setPrecioVenta(tfVenta.getValue());
+                item.setItem(listaItems.size()+1);
                 listaItems.add(item);
                 itemsGrid.setItems(listaItems);
+                enableButtonSave();
                 clearData();
             }
         });
@@ -239,6 +245,7 @@ public class CompraDetailForm extends FormLayout {
             listaItems.remove(selectedItemGrid);
             itemsGrid.setItems(listaItems);
             btnQuitar.setEnabled(false);
+            enableButtonSave();
         });
 
         btnUpdate = new Button(new Icon(VaadinIcon.CHECK_CIRCLE));

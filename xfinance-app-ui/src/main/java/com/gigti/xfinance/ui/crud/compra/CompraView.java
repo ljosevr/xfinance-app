@@ -43,7 +43,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
     private CompraService compraService;
     private Empresa empresa;
     private SearchFilterAndDatesComponent searchLayout;
-    private DataProvider<Compra, Void> dataProvider;
+    //private DataProvider<Compra, Void> dataProvider;
     private DatePicker dateEnd;
     private DatePicker dateStart;
     public static final String CREATE = "CREAR COMPRA";
@@ -71,6 +71,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
 
         gridLayout = new VerticalLayout(grid);
         gridLayout.addClassName("grid");
+        gridLayout.setPadding(false);
 
         add(title, searchLayout, gridLayout, form);
 
@@ -94,17 +95,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
     }
 
     public void configureProvider() {
-        dataProvider = DataProvider.fromCallbacks(
-                query -> {
-                    List<Compra> compras = compraService.
-                            findAll(filter.getValue(), empresa,
-                                    dateStart.getValue(), dateEnd.getValue(),
-                                    grid.getPage(), grid.getPageSize());
-
-                    return compras.stream();
-                },
-                query -> compraService.count(filter.getValue(), empresa, dateStart.getValue(), dateEnd.getValue())
-        );
+        //dataProvider = ;
     }
 
     public void configureGrid() {
@@ -118,7 +109,17 @@ public class CompraView extends VerticalLayout implements ICrudView {
     }
 
     public void updateList() {
-        grid.setDataProvider(dataProvider);
+        grid.setDataProvider(DataProvider.fromCallbacks(
+                query -> {
+                    List<Compra> compras = compraService.
+                            findAll(filter.getValue(), empresa,
+                                    dateStart.getValue(), dateEnd.getValue(),
+                                    grid.getPage(), grid.getPageSize());
+
+                    return compras.stream();
+                },
+                query -> compraService.count(filter.getValue(), empresa, dateStart.getValue(), dateEnd.getValue())
+        ));
     }
 
     public void configureSearchLayout() {
@@ -127,10 +128,13 @@ public class CompraView extends VerticalLayout implements ICrudView {
         searchLayout.getFilter().addValueChangeListener(event -> updateList());
         searchLayout.getFilter().focus();
         searchLayout.getBtnAdd().addClickListener(click -> addItem());
+        searchLayout.getBtnAdd().setMaxWidth("100px");
 
         filter = searchLayout.getFilter();
         dateStart = searchLayout.getDateStart();
+        dateStart.setMaxWidth("150px");
         dateEnd = searchLayout.getDateEnd();
+        dateEnd.setMaxWidth("150px");
 
         dateStart.addValueChangeListener(event -> {
             LocalDate selectedDate = event.getValue();

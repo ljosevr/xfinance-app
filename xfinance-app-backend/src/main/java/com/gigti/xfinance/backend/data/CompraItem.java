@@ -38,7 +38,4 @@ public class CompraItem extends AbstractEntity {
     @Transient
     private BigDecimal precioTotalCosto;
 
-    @Transient
-    private BigDecimal precioTotalVenta;
-
 }

@@ -20,12 +20,8 @@ import java.util.List;
 @Table(name="compras")
 public class Compra extends AbstractEntity {
     @NotEmpty
-    @Column(name="numero_factura",unique = true)
+    @Column(name="numero_factura", unique = true)
     private String numeroFactura;
-
-    @Column(name="numero_factura_interno", unique = true, updatable = false, nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long numeroFacturaInterno;
 
     private String descripcion;
 
@@ -44,7 +40,7 @@ public class Compra extends AbstractEntity {
     @JoinColumn
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "compra",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "compra", fetch = FetchType.EAGER)
     private List<CompraItem> items;
 
     @ManyToOne(fetch = FetchType.EAGER)

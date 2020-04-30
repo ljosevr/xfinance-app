@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -57,23 +58,41 @@ public class CompraServiceImpl implements CompraService {
         Pageable pageable = PageRequest.of(page, size);
         dateStart = dateStart == null ? LocalDate.of(2020,1,1) : dateStart;
         dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
-
         List<Compra> listResult;
-        if(filterText == null || filterText.isEmpty()) {
-            listResult = compraRepository.findAllByEmpresa(empresa,
-                    java.sql.Date.valueOf(dateStart),
-                    java.sql.Date.valueOf(dateEnd),
-                    pageable);
-        } else  {
-            listResult = compraRepository.search(empresa,
-                    filterText,
-                    java.sql.Date.valueOf(dateStart),
-                    java.sql.Date.valueOf(dateEnd),
-                    pageable);
+        try {
+            if (filterText == null || filterText.isEmpty()) {
+                listResult = compraRepository.findAllByEmpresa(empresa,
+                        java.sql.Date.valueOf(dateStart),
+                        java.sql.Date.valueOf(dateEnd),
+                        pageable);
+            } else {
+                listResult = compraRepository.search(empresa,
+                        filterText,
+                        java.sql.Date.valueOf(dateStart),
+                        java.sql.Date.valueOf(dateEnd),
+                        pageable);
+            }
+
+            logger.log(Level.INFO, "Cantidad de Registros: " + listResult.size());
+
+            for(Compra c : listResult) {
+                BigDecimal total = BigDecimal.ZERO;
+                logger.log(Level.INFO, "Compra: " + c.getNumeroFactura());
+                logger.log(Level.INFO, "Compra Items: " + c.getItems().size());
+                for(CompraItem item : c.getItems()) {
+                    logger.log(Level.INFO, "Item: " + item.getProducto().getNombreProducto());
+                    total = total.add(item.getPrecioCosto());
+                }
+                c.setTotalFactura(total);
+            }
+
+//            listResult.stream()
+//                    .peek(c -> System.out.println(c.getItems().size()))
+//                    .forEach(c -> c.setTotalFactura(BigDecimal.valueOf(c.getItems().stream().mapToDouble(i -> i.getPrecioCosto().doubleValue()).sum())));
+        } catch(Exception e) {
+            logger.log(Level.SEVERE, "Error al Obtener Registros: ");
+            listResult = new ArrayList<>();
         }
-
-        listResult.forEach(c -> c.setTotalFactura(BigDecimal.valueOf(c.getItems().stream().mapToDouble(i -> i.getPrecioTotalVenta().doubleValue()).sum())));
-
         return listResult;
     }
 
@@ -86,6 +105,7 @@ public class CompraServiceImpl implements CompraService {
         try {
             compra.setUsuario(usuario);
             compra.setFechaCreacion(new Date());
+            compra.setItems(null);
             compra = compraRepository.save(compra);
             if (compra != null) {
                 Compra finalCompra = compra;
