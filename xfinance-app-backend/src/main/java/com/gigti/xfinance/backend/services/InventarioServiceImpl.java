@@ -48,8 +48,8 @@ public class InventarioServiceImpl implements InventarioService {
 
 
     @Override
-    public List<InventarioInicial> findAll(String filterText, Empresa empresa, int page, int size) {
-        String methodName = "findAll";
+    public List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, int page, int size) {
+        String methodName = "findAllInvInicial";
         logger.info("--> "+methodName);
         Pageable pageable = PageRequest.of(page, size);
         final List<InventarioInicial> result = new ArrayList<>();
@@ -150,6 +150,7 @@ public class InventarioServiceImpl implements InventarioService {
             listResult = inventarioActualCostoRepository.search(empresa, filterText, pageable);
         }
 
+        logger.info("<-- "+methodName);
         return listResult;
     }
 

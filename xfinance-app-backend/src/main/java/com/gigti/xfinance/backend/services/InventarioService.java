@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface InventarioService {
 
-    List<InventarioInicial> findAll(String filterText, Empresa empresa, int page, int size);
+    List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, int page, int size);
     int getCount(String filterText, Empresa empresa);
     Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
 

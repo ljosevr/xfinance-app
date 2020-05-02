@@ -13,4 +13,6 @@ public interface CompraService {
     List<Compra> findAll(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd, int page, int size);
 
     Response saveCompra(Compra compra, Empresa empresa, Usuario usuario);
+
+    Response delete(String id);
 }

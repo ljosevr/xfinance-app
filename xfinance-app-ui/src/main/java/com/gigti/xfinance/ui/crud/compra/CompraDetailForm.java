@@ -49,7 +49,8 @@ public class CompraDetailForm extends FormLayout {
     private BigDecimalField tfVenta;
     private BigDecimalField tfCantidad;
     private TextField tfProducto;
-    private BigDecimalField tfCosto;
+    private BigDecimalField tfCostoTotal;
+    private BigDecimalField tfCostoUn;
     private ComboBox<Producto> cbProductos;
     private ProductoValorVenta productoValorVenta;
     private Button btnUpdate;
@@ -95,6 +96,13 @@ public class CompraDetailForm extends FormLayout {
         dpFechaCompra.getElement().setAttribute("theme", "align-center");
         dpFechaCompra.getElement().setAttribute("theme", "small");
 
+//        new DateFieldFormatter.Builder()
+//                .datePattern("yyyyMMdd")
+//                .delimiter("-")
+//                .dateMin(LocalDate.of(1900, 01, 01))
+//                .dateMax(LocalDate.of(2019, 9, 3))
+//                .build().extend(dpFechaCompra);
+
         TextField tfProveedor = new TextField("Nombre Proveedor");
         tfProveedor.setRequired(true);
         tfProveedor.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -119,7 +127,10 @@ public class CompraDetailForm extends FormLayout {
         binder.forField(tfFactura).asRequired("Digite # Factura").bind(Compra::getNumeroFactura, Compra::setNumeroFactura);
         binder.forField(dpFechaCompra).asRequired("Digite Fecha de Factura").bind(Compra::getFechaCompraLD, Compra::setFechaCompraLD);
         binder.forField(tfProveedor).bind(Compra::getProveedor, Compra::setProveedor);
-        binder.forField(tfTelefonoProveedor).bind(Compra::getTelefonoProveedor, Compra::setTelefonoProveedor);
+        binder.forField(tfTelefonoProveedor)
+                //.withValidator(new RegexpValidator("Solo Digitos Númericos","/^[0-9]*$/"))
+                .withValidator(max -> max.length() <= 10, "Maximo 10 Digitos")
+                .bind(Compra::getTelefonoProveedor, Compra::setTelefonoProveedor);
         binder.forField(tfDireccionProveedor).bind(Compra::getDireccionProveedor, Compra::setDireccionProveedor);
 
         binder.addStatusChangeListener(event -> enableButtonSave());
@@ -163,9 +174,10 @@ public class CompraDetailForm extends FormLayout {
                 if(result.isSuccess()) {
                     productoValorVenta = (ProductoValorVenta) result.getObject();
                     tfProducto.setValue(selectedProd.getNombreProducto());
-                    tfCantidad.setValue(BigDecimal.valueOf(0));
-                    tfCosto.setValue(BigDecimal.valueOf(0));
-                    tfVenta.setValue(productoValorVenta.getValorVenta());
+                    tfCantidad.setValue(BigDecimal.valueOf(0).setScale(2));
+                    tfCostoTotal.setValue(BigDecimal.valueOf(0).setScale(2));
+                    tfCostoUn.setValue(BigDecimal.ZERO.setScale(2));
+                    tfVenta.setValue(productoValorVenta.getValorVenta().setScale(2));
                     btnAgregar.setEnabled(true);
                     tfCantidad.focus();
                 } else {
@@ -191,7 +203,7 @@ public class CompraDetailForm extends FormLayout {
         formItemLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
                 new FormLayout.ResponsiveStep("32em", 3),
-                new FormLayout.ResponsiveStep("40em", 5));
+                new FormLayout.ResponsiveStep("40em", 6));
 
         tfProducto = new TextField("Producto");
         tfProducto.setReadOnly(true);
@@ -199,25 +211,35 @@ public class CompraDetailForm extends FormLayout {
 
         tfCantidad = new BigDecimalField("Cantidad");
         tfCantidad.setReadOnly(false);
-        tfCantidad.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        tfCantidad.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_CENTER);
         tfCantidad.setAutoselect(true);
         tfCantidad.setMaxWidth("60px");
-        tfCantidad.addKeyPressListener(Key.ENTER, keyPressEvent -> tfCosto.focus());
+        tfCantidad.addKeyPressListener(Key.ENTER, keyPressEvent -> tfCostoTotal.focus());
+        tfCantidad.addValueChangeListener(evt -> calculatedPriceCost());
 
-        tfCosto = new BigDecimalField("P. Costo Total");
-        tfCosto.setReadOnly(false);
-        tfCosto.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        tfCosto.setPrefixComponent(new Span("$"));
-        tfCosto.setAutoselect(true);
-        tfCosto.setMaxWidth("150px");
-        tfCosto.addKeyPressListener(Key.ENTER, keyPressEvent -> tfVenta.focus());
+        tfCostoTotal = new BigDecimalField("P. Costo Total");
+        tfCostoTotal.setReadOnly(false);
+        tfCostoTotal.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_RIGHT);
+        tfCostoTotal.setPrefixComponent(new Span("$"));
+        tfCostoTotal.setAutoselect(true);
+        tfCostoTotal.setMaxWidth("120px");
+        tfCostoTotal.addKeyPressListener(Key.ENTER, keyPressEvent -> tfVenta.focus());
+        tfCostoTotal.addValueChangeListener(evt -> calculatedPriceCost());
+
+//        new NumeralFieldFormatter(".", ",", 2).extend(tfCostoTotal);
+
+        tfCostoUn = new BigDecimalField("P. Costo Unitario");
+        tfCostoUn.setReadOnly(true);
+        tfCostoUn.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_RIGHT);
+        tfCostoUn.setPrefixComponent(new Span("$"));
+        tfCostoUn.setMaxWidth("120px");
 
         tfVenta = new BigDecimalField("P. Venta Unitario");
         tfVenta.setReadOnly(false);
-        tfVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        tfVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_RIGHT);
         tfVenta.setPrefixComponent(new Span("$"));
         tfVenta.setAutoselect(true);
-        tfVenta.setMaxWidth("150px");
+        tfVenta.setMaxWidth("120px");
         tfVenta.addKeyPressListener(Key.ENTER, keyPressEvent -> btnAgregar.focus());
 
         btnAgregar = new Button(new Icon(VaadinIcon.PLUS_CIRCLE));
@@ -228,7 +250,8 @@ public class CompraDetailForm extends FormLayout {
                 CompraItem item = new CompraItem();
                 item.setProducto(selectedProd);
                 item.setCantidad(tfCantidad.getValue());
-                item.setPrecioTotalCosto(tfCosto.getValue());
+                item.setPrecioTotalCosto(tfCostoTotal.getValue());
+                item.setPrecioCosto(tfCostoUn.getValue());
                 item.setPrecioVenta(tfVenta.getValue());
                 item.setItem(listaItems.size()+1);
                 listaItems.add(item);
@@ -246,6 +269,7 @@ public class CompraDetailForm extends FormLayout {
             itemsGrid.setItems(listaItems);
             btnQuitar.setEnabled(false);
             enableButtonSave();
+            clearData();
         });
 
         btnUpdate = new Button(new Icon(VaadinIcon.CHECK_CIRCLE));
@@ -256,7 +280,8 @@ public class CompraDetailForm extends FormLayout {
                 CompraItem item = new CompraItem();
                 item.setProducto(selectedProd);
                 item.setCantidad(tfCantidad.getValue());
-                item.setPrecioTotalCosto(tfCosto.getValue());
+                item.setPrecioTotalCosto(tfCostoTotal.getValue());
+                item.setPrecioCosto(tfCostoUn.getValue());
                 item.setPrecioVenta(tfVenta.getValue());
                 if(listaItems.removeIf(i -> i.getProducto().getId().equals(selectedProd.getId()))) {
                     listaItems.add(item);
@@ -264,14 +289,13 @@ public class CompraDetailForm extends FormLayout {
                 } else {
                     NotificacionesUtil.showError("No fue posible actualizar Item en la tabla");
                 }
-
                 clearData();
             }
         });
 
         formItemLayout.add(cbProductos);
-        formItemLayout.setColspan(cbProductos, 5);
-        formItemLayout.add(tfProducto, tfCantidad, tfCosto,tfVenta, new HorizontalLayout(btnAgregar, btnQuitar, btnUpdate));
+        formItemLayout.setColspan(cbProductos, 6);
+        formItemLayout.add(tfProducto, tfCantidad, tfCostoTotal, tfCostoUn,tfVenta, new HorizontalLayout(btnAgregar, btnQuitar, btnUpdate));
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");
@@ -290,18 +314,22 @@ public class CompraDetailForm extends FormLayout {
 
         btnDelete = new Button("Eliminar");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
-        btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
+        btnDelete.addClickListener(event -> validateAndDelete());
         btnDelete.setEnabled(false);
 
         VerticalLayout actionsLayout = new VerticalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
         //actionsLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 
-        HorizontalLayout temp = new HorizontalLayout(gridLayout, actionsLayout);
-        temp.expand(gridLayout);
-        temp.setSizeFull();
+//        HorizontalLayout temp = new HorizontalLayout(gridLayout, actionsLayout);
+//        temp.expand(gridLayout);
+//        temp.setSizeFull();
 
-        itemLayout.add(subTitle, formItemLayout, temp);
+        formItemLayout.add(gridLayout, 4);
+        formItemLayout.add(actionsLayout, 2);
+
+        //itemLayout.add(subTitle, formItemLayout, temp);
+        itemLayout.add(subTitle, formItemLayout);
 
         itemLayout.setMargin(false);
         itemLayout.setPadding(false);
@@ -309,13 +337,31 @@ public class CompraDetailForm extends FormLayout {
         this.add(itemLayout, 2);
     }
 
+    private void validateAndDelete() {
+        //TODO Make Eliminar
+        //NotificacionesUtil.openConfirmationDialog("Al Eliminar Compra, Afectará Saldos y de Productos. \n ¿Desea Continuar?", true, false);
+        NotificacionesUtil.showError("Acción Pendiente de Construir");
+        NotificacionesUtil.getSiButton().addClickListener(event -> {
+            if(NotificacionesUtil.getDialog().isOpened())
+                NotificacionesUtil.getDialog().close();
+            fireEvent(new DeleteEvent(this, binder.getBean()));
+        });
+        NotificacionesUtil.getNoButton().addClickListener(event -> {
+            if(NotificacionesUtil.getDialog().isOpened())
+                NotificacionesUtil.getDialog().close();
+            tfFactura.focus();
+        });
+    }
+
+
     private void clearData() {
         selectedProd = null;
         cbProductos.setValue(null);
         tfProducto.setValue("");
-        tfCantidad.setValue(BigDecimal.valueOf(0));
-        tfCosto.setValue(BigDecimal.valueOf(0));
-        tfVenta.setValue(BigDecimal.valueOf(0));
+        tfCantidad.setValue(BigDecimal.valueOf(0).setScale(2));
+        tfCostoTotal.setValue(BigDecimal.valueOf(0).setScale(2));
+        tfCostoUn.setValue(BigDecimal.ZERO.setScale(2));
+        tfVenta.setValue(BigDecimal.valueOf(0).setScale(2));
         btnAgregar.setEnabled(false);
         btnQuitar.setEnabled(false);
         btnUpdate.setEnabled(false);
@@ -332,9 +378,10 @@ public class CompraDetailForm extends FormLayout {
                 btnQuitar.setEnabled(evt.getValue() != null);
                 btnUpdate.setEnabled(evt.getValue() != null);
                 tfProducto.setValue(selectedItemGrid.getProducto().getNombreProducto());
-                tfCantidad.setValue(selectedItemGrid.getCantidad());
-                tfCosto.setValue(selectedItemGrid.getPrecioTotalCosto());
-                tfVenta.setValue(selectedItemGrid.getPrecioVenta());
+                tfCantidad.setValue(selectedItemGrid.getCantidad().setScale(2));
+                tfCostoTotal.setValue(selectedItemGrid.getPrecioTotalCosto().setScale(2));
+                tfCostoUn.setValue(selectedItemGrid.getPrecioCosto().setScale(2));
+                tfVenta.setValue(selectedItemGrid.getPrecioVenta().setScale(2));
                 selectedProd = selectedItemGrid.getProducto();
                 tfCantidad.focus();
             }
@@ -345,12 +392,16 @@ public class CompraDetailForm extends FormLayout {
         binder.setBean(compra);
         titleForm.setText(title);
         btnDelete.setEnabled(false);
+        listaItems = new ArrayList<>();
 
         if(compra != null && compra.getItems() != null) {
             listaItems =  compra.getItems();
-            itemsGrid.setItems(listaItems);
+            listaItems.forEach(item -> {
+                item.setPrecioTotalCosto(item.getPrecioCosto().multiply(item.getCantidad()));
+            });
             btnDelete.setEnabled(true);
         }
+        itemsGrid.setItems(listaItems);
 
         tfFactura.focus();
     }
@@ -362,6 +413,16 @@ public class CompraDetailForm extends FormLayout {
             fireEvent(new SaveEvent(this, compra));
         } else {
             NotificacionesUtil.showError("Validar Compra: "+binder.validate().getValidationErrors());
+        }
+    }
+
+    private void calculatedPriceCost() {
+        if(tfCostoTotal.getOptionalValue().isPresent() &&
+                tfCantidad.getOptionalValue().isPresent() &&
+                tfCostoTotal.getValue().compareTo(BigDecimal.ZERO) > 0 &&
+                tfCantidad.getValue().compareTo(BigDecimal.ZERO) > 0) {
+
+            tfCostoUn.setValue(tfCostoTotal.getValue().divide(tfCantidad.getValue()).setScale(2));
         }
     }
 

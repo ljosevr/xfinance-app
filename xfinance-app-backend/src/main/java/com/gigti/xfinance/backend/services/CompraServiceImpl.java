@@ -1,12 +1,11 @@
 package com.gigti.xfinance.backend.services;
 
-import com.gigti.xfinance.backend.data.Compra;
-import com.gigti.xfinance.backend.data.CompraItem;
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.repositories.CompraItemRepository;
 import com.gigti.xfinance.backend.repositories.CompraRepository;
+import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,6 +30,12 @@ public class CompraServiceImpl implements CompraService {
 
     @Autowired
     private CompraItemRepository compraItemRepository;
+
+    @Autowired
+    private InventarioService inventarioService;
+
+    @Autowired
+    private ProductoValoresRepository productoValoresRepository;
 
     @Override
     public int count(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd) {
@@ -109,9 +114,37 @@ public class CompraServiceImpl implements CompraService {
             compra = compraRepository.save(compra);
             if (compra != null) {
                 Compra finalCompra = compra;
-                listItems.forEach(item -> item.setCompra(finalCompra));
+                listItems.forEach(item -> {
+                    item.setCompra(finalCompra);
+                    item.setPrecioCosto(item.getPrecioTotalCosto().divide(item.getCantidad()));
+                });
                 compraItemRepository.saveAll(listItems);
-                
+
+                listItems.forEach(item -> {
+
+                    boolean updatePrice = false;
+                    //Validar Valor Venta
+                    ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(item.getProducto());
+                    if(productoValorVenta != null){
+                        if(productoValorVenta.getValorVenta().compareTo(item.getPrecioVenta()) != 0){
+                            updatePrice = true;
+                        }
+                    } else {
+                        updatePrice = true;
+                    }
+                            inventarioService.saveProcessInventarioActualAndPrecios(item.getProducto(),
+                                    true,
+                                    item.getCantidad(),
+                                    item.getPrecioVenta(),
+                                    item.getPrecioCosto(),
+                                    TipoMovimientoEnum.COMPRA,
+                                    updatePrice,
+                                    false,
+                                    item.getImpuestoArticulo() != null ? item.getImpuestoArticulo() : BigDecimal.ZERO,
+                                    "");
+                        }
+                );
+
                 result.setSuccess(true);
                 result.setMessage("Compra "+compra.getNumeroFactura() + " Guardada Exitosamente");
             } else {
@@ -125,5 +158,34 @@ public class CompraServiceImpl implements CompraService {
         }
         logger.info("<-- saveCompra");
         return result;
+    }
+
+    @Override
+    public Response delete(String id) {
+        Response response = new Response();
+        return response;
+        //TODO Make ELiminar
+//        try {
+//            Compra compra = compraRepository.findById(id).orElse(null);
+//            if (compra != null) {
+//                compra.setEliminado(true);
+//                compra = usuarioRepository.save(compra);
+//                if(compra != null) {
+//                    response.setSuccess(true);
+//                    response.setMessage("Usuario Eliminado Correctamente");
+//                } else {
+//                    response.setSuccess(false);
+//                    response.setMessage("No Fue Posible eliminar Usuario");
+//                }
+//            } else {
+//                response.setSuccess(false);
+//                response.setMessage("Usuario No encontrado para eliminar");
+//            }
+//        } catch(Exception e) {
+//            logger.log(Level.SEVERE,"Error: "+e.getMessage(),e);
+//            response.setSuccess(false);
+//            response.setMessage("Error al Eliminar Compra");
+//        }
+//        return response;
     }
 }

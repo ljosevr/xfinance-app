@@ -58,6 +58,8 @@ public class Compra extends AbstractEntity {
 
     private String direccionProveedor;
 
+    //TODO
+    //private boolean eliminado;
 
     public LocalDate getFechaCompraLD(){
         return fechaCompra != null ? fechaCompra.toInstant()

@@ -196,8 +196,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
 
     public void delete(ComponentEvent evt) {
         Compra compra = ((CompraDetailForm.SaveEvent) evt).getCompra();
-        Response response = null;
-        //compraService.delete(compra.getId());
+        Response response = compraService.delete(compra.getId());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
             updateList();

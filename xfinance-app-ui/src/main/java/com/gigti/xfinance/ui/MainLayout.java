@@ -14,6 +14,7 @@ import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.authentication.LoginView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
+import com.gigti.xfinance.ui.util.ValidateDevice;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -76,7 +77,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
     }
 
     private void createHeader(){
-        H1 appTitle = new H1("X Finance App");
+        H1 appTitle = new H1("TPV");
         appTitle.addClassName("logo");
 
 
@@ -97,13 +98,12 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         H1 bienvenida = new H1(empresaname.toUpperCase() + " - Bienvenido: "+personname);
         bienvenida.addClassName("logo");
 
-        UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
-            if(details.getWindowInnerWidth() < 600) {
-                bienvenida.setVisible(false);
-            } else {
-                bienvenida.setVisible(true);
-            }
-        });
+
+        if(ValidateDevice.isMobile(UI.getCurrent().getPage())) {
+            bienvenida.setVisible(false);
+        } else {
+            bienvenida.setVisible(true);
+        }
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);
 
@@ -119,10 +119,10 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         if(CurrentUser.get() != null) {
             VerticalLayout layoutDrawer = new VerticalLayout();
 
-            Image logo = new Image("/frontend/images/icon.png", "Logo");
+            Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
             //logo.addClassName("hide-on-mobile");
-            logo.setHeight("45px");
-            logo.setWidth("45px");
+            logo.setMaxHeight("60px");
+            logo.setMaxWidth("60px");
 
             H2 titleMenu = new H2("MENU");
             titleMenu.setClassName("titleMenu");

@@ -99,6 +99,10 @@
     .ProductoView.form {
         max-width: 450px;
     }
+
+    .panel-principal-login{
+        margin: 150px 0px;
+    }
 }
 
 /* MOBILE*/
@@ -167,6 +171,11 @@
     .ProductoView.editing .grid {
         display: none;
     }
+
+    .panel-principal-login{
+        margin: 20px 0px;
+    }
+
 }
 
 a[highlight] {
@@ -272,6 +281,3 @@ a[highlight] {
     padding: 2px;
 }
 
-.panel-principal-login{
-    margin: 150px 0px;
-}

@@ -53,6 +53,12 @@ public class InitBackServiceImpl implements InitBackService {
     private InventarioActualRepository inventarioActualRepository;
 
     @Autowired
+    private InventarioActualCostoRepository inventarioActualCostoRepository;
+
+    @Autowired
+    private ProductoValoresRepository productoValoresRepository;
+
+    @Autowired
     private CategoriaProductoService categoriaProductoService;
 
     @Autowired
@@ -322,8 +328,31 @@ public class InitBackServiceImpl implements InitBackService {
                             actual.setFechaActualizacion(new Date());
                             actual.setCantidad(BigDecimal.valueOf((i + 1) * 2));
                             actual.setProducto(producto);
+                            actual.setEmpresa(emp);
 
                             inventarioActualRepository.save(actual);
+
+                            //Inventario Actual Costo
+                            InventarioActualCosto invACtualCosto = new InventarioActualCosto();
+                            invACtualCosto.setCantidad(BigDecimal.valueOf((i + 1) * 2));
+                            invACtualCosto.setFechaCreacion(new Date());
+                            invACtualCosto.setFechaActualizacion(new Date());
+                            invACtualCosto.setActivo(true);
+                            invACtualCosto.setInfinite(false);
+                            invACtualCosto.setEmpresa(emp);
+                            invACtualCosto.setProducto(producto);
+                            invACtualCosto.setPrecioCosto(BigDecimal.valueOf(i * 100 * 2));
+
+                            inventarioActualCostoRepository.save(invACtualCosto);
+
+                            //Valor Venta
+                            ProductoValorVenta valorVenta = new ProductoValorVenta();
+                            valorVenta.setProducto(producto);
+                            valorVenta.setActivo(true);
+                            valorVenta.setValorVenta(BigDecimal.valueOf((i * 100 * 2) * 1.20 ));
+                            valorVenta.setFechaActualizacion(new Date());
+
+                            productoValoresRepository.save(valorVenta);
                         }
 
                         parche = new Parche(Constantes.INIT5,java.sql.Date.valueOf(LocalDate.now()),true, null);

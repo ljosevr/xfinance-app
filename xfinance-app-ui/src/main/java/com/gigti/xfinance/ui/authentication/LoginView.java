@@ -12,18 +12,20 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InitBackService;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.util.ValidateDevice;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.BoxSizing;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -59,16 +61,23 @@ public class LoginView extends VerticalLayout {
         this.setSizeUndefined();
         this.setJustifyContentMode(JustifyContentMode.CENTER);
         this.addClassName("panel-principal-login");
+
+//        FormLayout formLayout = new FormLayout();
+//        formLayout.setClassName("formLayout");
+//        formLayout.setResponsiveSteps(
+//                new FormLayout.ResponsiveStep("25em", 1),
+//                new FormLayout.ResponsiveStep("40em", 2));
+
+//        formLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+//        formLayout.setBoxSizing(BoxSizing.CONTENT_BOX);
+
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         loginLayout.setBoxSizing(BoxSizing.CONTENT_BOX);
         loginLayout.addClassName("login-panel");
         loginLayout.setSizeUndefined();
 
-
-
-        H1 loginInfoHeader = new H1(Constantes.VIEW_MAIN.toUpperCase());
-        loginInfoHeader.setClassName("h1-login");
+        Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
 
         H2 titleLogin = new H2("INICIAR SESIÓN");
 
@@ -97,8 +106,22 @@ public class LoginView extends VerticalLayout {
 
         RouterLink forgot = new RouterLink("Olvide el Password", ForgotPasswordView.class);
 
-        loginLayout.add(loginInfoHeader, titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
-        this.add(loginLayout);
+        loginLayout.add(titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
+
+//        formLayout.add(logo,loginLayout);
+//        formLayout.setColspan(logo,1);
+//        formLayout.setColspan(loginLayout,1);
+        if(ValidateDevice.isMobile(UI.getCurrent().getPage())) {
+            //logo.setHeight(loginLayout.getHeight());
+            logo.setMaxWidth("150px");
+            this.add(logo, loginLayout);
+            this.setJustifyContentMode(JustifyContentMode.START);
+        } else {
+            logo.setMaxHeight("250px");
+            logo.setMaxWidth("250px");
+            this.add(new HorizontalLayout(logo, loginLayout));
+        }
+
         tfCodigoEmpresa.focus();
     }
 

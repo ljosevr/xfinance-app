@@ -1,5 +1,5 @@
 server:
-  port: 9090
+  port: 5000
 
 # Ensure application is run in Vaadin 14/npm mode
 vaadin:
@@ -12,13 +12,14 @@ spring:
   # Uncomment if using PostgreSQL
   # Database
   datasource:
-    url: jdbc:postgresql://localhost:5432/tupuntodeventa
-    username: luisjose
-    password: 123456
+    url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  hikari:
-    connectionTimeout: 20000
-    maximumPoolSize: 10
+#  hikari:
+#    connectionTimeout: 20000
+#    maximumPoolSize: 10
+
   # JPA properties
   jpa:
     hibernate:

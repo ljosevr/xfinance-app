@@ -100,7 +100,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
                 // First callback fetches items based on a query
                 query -> {
                     List<InventarioInicial> inventarioInicials = inventarioService.
-                            findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
+                            findAllInvInicial(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
 
                     return inventarioInicials.stream();
                 },
