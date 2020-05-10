@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.inventarios.inicial;
 
+import com.gigti.xfinance.backend.data.Impuesto;
 import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
@@ -26,6 +28,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * A form for editing a single Usuario Admin.
@@ -36,7 +39,7 @@ public class InvInicialForm extends FormLayout {
     private Button btnSave;
     private Binder<InventarioInicial> binder;
 
-    public InvInicialForm() {
+    public InvInicialForm(List<Impuesto> listImpuestos) {
         binder = new BeanValidationBinder<>(InventarioInicial.class);
         this.addClassName("form-inv");
 
@@ -77,6 +80,12 @@ public class InvInicialForm extends FormLayout {
         tfPrecioVenta.setAutoselect(true);
         tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
+        ComboBox<Impuesto> cbImpuesto = new ComboBox<>();
+        cbImpuesto.setLabel("Impuesto");
+        cbImpuesto.setItems(listImpuestos);
+        cbImpuesto.setRequired(true);
+        cbImpuesto.setItemLabelGenerator(Impuesto::getNombre);
+
         binder.forField(tfProducto)
                 .bind(inv -> {
                     return inv.getProducto().getNombreProducto();
@@ -99,6 +108,9 @@ public class InvInicialForm extends FormLayout {
                 });
 
         binder.forField(chkInfinite).bind("infinite");
+        binder.forField(cbImpuesto)
+                .asRequired("Seleccione un Impuesto")
+                .bind(InventarioInicial::getImpuesto, InventarioInicial::setImpuesto);
 
         binder.addStatusChangeListener(event -> {
              btnSave.setEnabled(binder.isValid());
@@ -119,7 +131,7 @@ public class InvInicialForm extends FormLayout {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnClose);
 
-        this.add(tfProducto, tfCantidad, chkInfinite, tfPrecioCosto, tfPrecioVenta, actionsLayout);
+        this.add(tfProducto, tfCantidad, chkInfinite, tfPrecioCosto, tfPrecioVenta, cbImpuesto, actionsLayout);
     }
 
     public void setInventario(InventarioInicial inventarioInicial) {

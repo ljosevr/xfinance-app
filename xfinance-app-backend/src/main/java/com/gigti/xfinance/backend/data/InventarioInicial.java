@@ -39,12 +39,11 @@ public class InventarioInicial extends AbstractEntity {
     @JoinColumn
     private Usuario usuario;
 
-    @Transient
     private BigDecimal precioCosto;
 
-    @Transient
     private BigDecimal precioVenta;
 
-    @Transient
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     private Impuesto impuesto;
 }

@@ -32,20 +32,23 @@ public class Constantes {
     public static final String VIEW_R_ROL = "roles";
     public static final String VIEW_R_REPORTS = "reports";
     public static final String VIEW_R_GANANCIAS_Y_PERDIDAS = "balance";
+    public static final String VIEW_R_VENTAS = "ventas";
+
     public static final String VIEW_R_CONFIG_PERFIL = "perfil";
     public static final String VIEW_R_CONFIG_EMPRESA = "dataEmpresa";
     public static final String VIEW_R_CONFIG_PASSWORD = "changePass";
+
 
     //VIEW-NAME
     public static final String VIEW_MAIN = "Tu Punto de Venta";
     public static final String VIEW_LOGIN = "Login";
     public static final String VIEW_PVENTA = "Punto de Venta";
-    public static final String VIEW_REGISTRAR = "Registrar";
+    public static final String VIEW_REGISTRAR = "Registrar Venta";
     public static final String VIEW_PRODUCTO = "Productos";
     public static final String VIEW_CATEGORIA = "Categorias Productos";
 
     public static final String VIEW_PRODUCTO_ADMIN = "Administrar Productos";
-    public static final String VIEW_COMPRAS = "Compras";
+    public static final String VIEW_COMPRAS = "Registrar Compras";
     public static final String VIEW_INVENTARIO_INICIAL = "Inventario Inicial";
     public static final String VIEW_INVENTARIO_ACTUAL = "Inventario Actual";
 
@@ -60,6 +63,7 @@ public class Constantes {
 
     public static final String VIEW_REPORTS = "Reportes";
     public static final String VIEW_INVENTARIO = "Inventarios";
+    public static final String VIEW_VENTAS = "Ventas";
     public static final String VIEW_GANANCIAS_Y_PERDIDAS = "Ganancias y Perdidas";
     public static final String VIEW_CONFIG_PERFIL = "Perfil";
     public static final String VIEW_CONFIG_EMPRESA = "Datos Empresa";

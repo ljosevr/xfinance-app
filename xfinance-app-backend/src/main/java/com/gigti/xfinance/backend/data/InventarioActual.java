@@ -12,7 +12,7 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "inventario_actual_venta")
+@Table(name = "inventario_actual")
 public class InventarioActual extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)

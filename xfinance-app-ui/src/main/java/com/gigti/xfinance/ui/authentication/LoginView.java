@@ -12,7 +12,6 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InitBackService;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.util.ValidateDevice;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -25,7 +24,6 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.BoxSizing;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -78,6 +76,7 @@ public class LoginView extends VerticalLayout {
         loginLayout.setSizeUndefined();
 
         Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
+        logo.addClassName("logoLogin");
 
         H2 titleLogin = new H2("INICIAR SESIÓN");
 
@@ -107,21 +106,7 @@ public class LoginView extends VerticalLayout {
         RouterLink forgot = new RouterLink("Olvide el Password", ForgotPasswordView.class);
 
         loginLayout.add(titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
-
-//        formLayout.add(logo,loginLayout);
-//        formLayout.setColspan(logo,1);
-//        formLayout.setColspan(loginLayout,1);
-        if(ValidateDevice.isMobile(UI.getCurrent().getPage())) {
-            //logo.setHeight(loginLayout.getHeight());
-            logo.setMaxWidth("150px");
-            this.add(logo, loginLayout);
-            this.setJustifyContentMode(JustifyContentMode.START);
-        } else {
-            logo.setMaxHeight("250px");
-            logo.setMaxWidth("250px");
-            this.add(new HorizontalLayout(logo, loginLayout));
-        }
-
+        this.add(logo, loginLayout);
         tfCodigoEmpresa.focus();
     }
 

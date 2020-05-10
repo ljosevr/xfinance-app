@@ -38,4 +38,5 @@ public class InventarioActualCosto extends AbstractEntity {
     private Empresa empresa;
 
     private boolean activo;
+
 }

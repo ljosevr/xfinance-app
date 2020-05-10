@@ -17,12 +17,10 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
 
         addColumn(CategoriaProducto::getNombre)
                 .setHeader("Nombre")
-                //.setFlexGrow(20)
                 .setSortable(true);
 
         addColumn(CategoriaProducto::getDescripcion)
                 .setHeader("Descripción")
-                //.setFlexGrow(30)
                 .setSortable(true);
 
         final String activoTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
@@ -31,7 +29,6 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
                 .setHeader("Activo")
                 .setComparator(Comparator.comparing(CategoriaProducto::getActivoS))
                 .setSortable(true);
-                //.setFlexGrow(5);
 
         addColumn(categoria -> {
             Empresa empresa = categoria.getEmpresa();

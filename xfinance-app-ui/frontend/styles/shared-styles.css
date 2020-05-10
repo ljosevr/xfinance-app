@@ -31,11 +31,6 @@
         margin: 5px 5px 5px 5px;
     }
 
-    .login-panel {
-        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-        border-radius: 7px;
-    }
-
     .main-layout {
         flex-direction: row;
         --top-bar-height: 75px;
@@ -102,7 +97,32 @@
 
     .panel-principal-login{
         margin: 150px 0px;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
     }
+
+    .login-panel {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        border-radius: 7px;
+    }
+
+    .logoLogin {
+        max-width: 250px;
+        max-height: 250px;
+    }
+
+    .appBarSaludo {
+        font-size: 1em;
+        margin: var(--lumo-space-m);
+    }
+
+    .logoDrawer {
+        width: 35%;
+    }
+
 }
 
 /* MOBILE*/
@@ -141,11 +161,6 @@
         /*visibility: hidden;*/
     }
 
-    .login-panel {
-        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
-        border-radius: 7px;
-    }
-
     .titleBar {
         height: 15em;
         margin: 14px 0px 14px;
@@ -162,20 +177,42 @@
         box-sizing: content-box;
     }
 
-    .InventarioInicialView.editing .searchBar,
-    .InventarioInicialView.editing .grid {
+    .view.editing .searchBar,
+    .view.editing .grid {
         display: none;
     }
 
-    .ProductoView.editing .searchBar,
-    .ProductoView.editing .grid {
-        display: none;
-    }
+    /*.ProductoView.editing .searchBar,*/
+    /*.ProductoView.editing .grid {*/
+    /*    display: none;*/
+    /*}*/
 
     .panel-principal-login{
         margin: 20px 0px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        align-content: center;
     }
 
+    .login-panel {
+        box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+        border-radius: 7px;
+        width: 90%;
+    }
+
+    .logoLogin {
+        width: 70%;
+    }
+
+    .appBarSaludo {
+        display: none;
+    }
+
+    .logoDrawer {
+        width: 35%;
+    }
 }
 
 a[highlight] {
@@ -187,11 +224,10 @@ a[highlight] {
     padding: 0 var(--lumo-space-m);
 }
 
-.header h1.logo {
+.header h1.titlesAppBar {
     font-size: 1em;
     margin: var(--lumo-space-m);
 }
-
 
 .menu-header {
     padding: 11px 16px;

@@ -31,5 +31,19 @@ public interface CategoriaProductoRepository extends PagingAndSortingRepository<
             "UPPER(c.descripcion) LIKE CONCAT('%', UPPER(:filter),'%') AND " +
             "c.empresa =:empresa AND " +
             "c.eliminado = FALSE")
-    public List<CategoriaProducto> findByNombreOrDescripcion(@Param("filter") String filter, @Param("empresa") Empresa empresa, Pageable pageable);
+    List<CategoriaProducto> findByNombreOrDescripcion(@Param("filter") String filter, @Param("empresa") Empresa empresa, Pageable pageable);
+
+    @Query("SELECT c FROM CategoriaProducto c " +
+            "WHERE c.empresa =:empresa AND " +
+            "lower(c.nombre) like lower(concat('%', :filter, '%')) AND " +
+            "c.eliminado = false")
+    List<CategoriaProducto> search(String filter, Empresa empresa, Pageable pageable);
+
+    int countByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa);
+
+    @Query("SELECT COUNT(c) FROM CategoriaProducto c " +
+            "WHERE UPPER(c.nombre) LIKE CONCAT('%', UPPER(:categoryName),'%') " +
+            "AND c.empresa =:empresa AND " +
+            "c.eliminado = FALSE")
+    int countByEmpresaAndNombre(Empresa empresa, String categoryName);
 }

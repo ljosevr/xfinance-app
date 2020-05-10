@@ -14,6 +14,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import org.apache.commons.lang3.StringUtils;
 import org.vaadin.klaudeta.PaginatedGrid;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Currency;
 import java.util.Locale;
@@ -48,7 +49,7 @@ public class InvInicialGrid extends PaginatedGrid<InventarioInicial> {
             decimalFormat.setMaximumFractionDigits(2);
             decimalFormat.setMinimumFractionDigits(0);
 
-            return "$ "+decimalFormat.format(inventario.getPrecioCosto());
+            return "$ "+decimalFormat.format(inventario.getPrecioCosto() != null ? inventario.getPrecioCosto() : BigDecimal.ZERO);
         }).setHeader("Precio Costo")
         .setKey("pcosto");
 

@@ -14,7 +14,6 @@ import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.authentication.LoginView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
-import com.gigti.xfinance.ui.util.ValidateDevice;
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
@@ -46,7 +45,6 @@ import java.util.stream.Collectors;
 /**
  * The main layout. Contains the navigation menu.
  */
-//@PreserveOnRefresh
 @Route("")
 @PWA(
         name = "Tu Punto De Venta",
@@ -54,8 +52,7 @@ import java.util.stream.Collectors;
         offlineResources = {
                 "./styles/offline.css",
                 "./images/offline.png"
-        },
-        enableInstallPrompt = false
+        }
 )
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
@@ -78,7 +75,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
 
     private void createHeader(){
         H1 appTitle = new H1("TPV");
-        appTitle.addClassName("logo");
+        appTitle.addClassName("titlesAppBar");
 
 
         menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
@@ -96,14 +93,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
         }
 
         H1 bienvenida = new H1(empresaname.toUpperCase() + " - Bienvenido: "+personname);
-        bienvenida.addClassName("logo");
-
-
-        if(ValidateDevice.isMobile(UI.getCurrent().getPage())) {
-            bienvenida.setVisible(false);
-        } else {
-            bienvenida.setVisible(true);
-        }
+        bienvenida.setClassName("appBarSaludo");
 
         HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);
 
@@ -120,9 +110,7 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
             VerticalLayout layoutDrawer = new VerticalLayout();
 
             Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
-            //logo.addClassName("hide-on-mobile");
-            logo.setMaxHeight("60px");
-            logo.setMaxWidth("60px");
+            logo.addClassName("logoDrawer");
 
             H2 titleMenu = new H2("MENU");
             titleMenu.setClassName("titleMenu");

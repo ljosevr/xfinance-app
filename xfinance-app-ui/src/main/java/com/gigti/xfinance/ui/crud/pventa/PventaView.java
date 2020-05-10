@@ -26,6 +26,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
@@ -36,15 +37,14 @@ import static com.gigti.xfinance.ui.util.NotificacionesUtil.getSiButton;
 
 @Route(value = Constantes.VIEW_R_VENTA, layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_VENTA, layout = MainLayout.class)
+@PageTitle(value = Constantes.VIEW_PVENTA +" | "+ Constantes.VIEW_MAIN)
 public class PventaView extends VerticalLayout {
 
     private boolean isModified;
     private PventaGrid grid;
     private NumberField nfCantidad, nfSubTotal, nfImpuestos;
-    //private NumberField nfDescuentos;
     private TextField tfNombreProducto;
     private H2 lblTotal;
-    //private List<PventaDTO> lista;
 
     private Map<String, PventaDTO> mapItemsventa;
     private PventaDTO pventaDTO;

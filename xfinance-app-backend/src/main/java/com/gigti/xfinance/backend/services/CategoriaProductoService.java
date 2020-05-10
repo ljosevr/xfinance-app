@@ -2,6 +2,7 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.others.Response;
 
 import java.util.List;
 
@@ -11,17 +12,17 @@ public interface CategoriaProductoService {
 
     List<CategoriaProducto> findAll(Empresa empresa, int page, int size);
 
-    public List<CategoriaProducto> findActivoOrInactivo(boolean activo, Empresa empresa, int page, int size);
+    List<CategoriaProducto> findAll(String filterText, Empresa empresa, int page, int size);
 
-    public boolean deleteCategoria(String id);
+    List<CategoriaProducto> findActivoOrInactivo(boolean activo, Empresa empresa, int page, int size);
 
-    public CategoriaProducto saveCategoria(CategoriaProducto categoria);
+    Response delete(String id);
 
-    public CategoriaProducto findById(String id);
+    CategoriaProducto saveCategoria(CategoriaProducto categoria);
 
-    public List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa, int page, int size);
+    CategoriaProducto findById(String id);
 
-//    public static IcategoriaProductoService get() {
-//        return MockDataService.getInstance();
-//    }
+    List<CategoriaProducto> findByNombreOrDescripcion(String filter, Empresa empresa, int page, int size);
+
+    int count(String filterText, Empresa empresa);
 }

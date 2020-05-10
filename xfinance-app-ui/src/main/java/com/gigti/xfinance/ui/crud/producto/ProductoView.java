@@ -47,7 +47,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
         this.productoService = iServiceProd;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
 
-        addClassName("ProductoView");
+        addClassName("view");
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
@@ -157,7 +157,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
     }
 
     public void delete(ComponentEvent evt) {
-        Producto producto = ((ProductoForm.SaveEvent) evt).getProducto();
+        Producto producto = ((ProductoForm.DeleteEvent) evt).getProducto();
         Response response = productoService.delete(producto.getId());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());

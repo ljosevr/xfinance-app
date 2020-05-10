@@ -38,7 +38,7 @@ public class UsuarioView extends VerticalLayout {
         this.usuarioService = iService;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
 
-        addClassName("UsuarioCrudView");
+        addClassName("view");
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
@@ -59,12 +59,15 @@ public class UsuarioView extends VerticalLayout {
         VerticalLayout barAndGridLayout = new VerticalLayout();
         barAndGridLayout.add(title);
 
+        VerticalLayout gridLayout = new VerticalLayout(grid);
+        gridLayout.addClassName("grid");
+
         barAndGridLayout.add(component);
-        barAndGridLayout.add(grid);
-        barAndGridLayout.setFlexGrow(1, grid);
+        barAndGridLayout.add(gridLayout);
+        barAndGridLayout.setFlexGrow(1, gridLayout);
         barAndGridLayout.setFlexGrow(0, component);
         barAndGridLayout.setSizeFull();
-        barAndGridLayout.expand(grid);
+        barAndGridLayout.expand(gridLayout);
 
         add(barAndGridLayout);
 

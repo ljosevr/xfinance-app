@@ -10,6 +10,7 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
+import com.gigti.xfinance.backend.services.ImpuestoService;
 import com.gigti.xfinance.backend.services.InventarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -40,13 +41,13 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
     private SearchFilterComponent searchLayout;
     private DataProvider<InventarioInicial, Void> dataProvider;
 
-    public InvInicialView(InventarioService inventarioService) {
+    public InvInicialView(InventarioService inventarioService, ImpuestoService impuestoService) {
         this.inventarioService = inventarioService;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
 
         configureProvider();
 
-        addClassName("InventarioInicialView");
+        addClassName("view");
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
@@ -58,7 +59,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
 
         configureGrid();
 
-        form = new InvInicialForm();
+        form = new InvInicialForm(impuestoService.findAll(empresa));
         configureForm();
 
         VerticalLayout gridLayout = new VerticalLayout(grid);

@@ -1,12 +1,13 @@
 package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyModifier;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -15,38 +16,29 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import org.apache.commons.lang3.StringUtils;
+import com.vaadin.flow.shared.Registration;
 
-public class CategoriaForm extends Dialog {
+public class CategoriaForm extends FormLayout {
+    private H4 titleForm;
     private TextField tfCatNombre;
-    private FormLayout content;
-
     private Button btnSave;
-    private Button btnDelete;
-
-    private CategoriaCrud viewLogic;
     private Binder<CategoriaProducto> binder;
-    private CategoriaProducto currentCategoria;
 
-    public CategoriaForm(CategoriaCrud categoriaCrudLogic) {
-        content = new FormLayout();
-        content.setClassName("formLayoutDialog");
-        content.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 2));
+    public CategoriaForm() {
 
-        H4 title = new H4("Crear o Editar Categoria");
-        title.addClassName("subTitleView");
-        content.add(title, 3);
+        this.addClassName("form");
+        this.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("40em", 1));
 
-        viewLogic = categoriaCrudLogic;
+        titleForm = new H4("");
+        titleForm.addClassName("subTitleView");
+        this.add(titleForm,1);
 
         tfCatNombre = new TextField("Nombre Categoria");
         tfCatNombre.setRequired(true);
         tfCatNombre.setValueChangeMode(ValueChangeMode.EAGER);
         tfCatNombre.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
         tfCatNombre.setClearButtonVisible(true);
-        //tfCatNombre.setWidth("70%");
         tfCatNombre.focus();
 
         TextField tfCatDescripcion = new TextField("Descripción Categoria");
@@ -55,80 +47,88 @@ public class CategoriaForm extends Dialog {
         tfCatDescripcion.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
         tfCatDescripcion.setClearButtonVisible(true);
 
-        content.add(tfCatNombre, tfCatDescripcion);
-
-        Checkbox cbCatActivo = new Checkbox("Activo");
-        cbCatActivo.setValue(true);
-        content.add(cbCatActivo, 3);
+        Checkbox chkCatActivo = new Checkbox("Activo");
+        chkCatActivo.setValue(true);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
-        binder.forField(tfCatNombre).bind(CategoriaProducto::getNombre,
+        binder.forField(tfCatNombre).asRequired("Digite Nombre de Categoria").bind(CategoriaProducto::getNombre,
                 CategoriaProducto::setNombre);
         binder.forField(tfCatDescripcion).bind(CategoriaProducto::getDescripcion,
                 CategoriaProducto::setDescripcion);
-        binder.forField(cbCatActivo).bind(CategoriaProducto::isActivo,
+        binder.forField(chkCatActivo).bind(CategoriaProducto::isActivo,
                 CategoriaProducto::setActivo);
         binder.bindInstanceFields(this);
 
         // enable/disable save button while editing
-        binder.addStatusChangeListener(event -> {
-            boolean isValid = !event.hasValidationErrors();
-            boolean hasChanges = binder.hasChanges();
-            btnSave.setEnabled(hasChanges && isValid);
-        });
+        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
-        btnSave.addClickListener(event -> {
-            if (currentCategoria != null
-                    && binder.writeBeanIfValid(currentCategoria)) {
-                viewLogic.save(currentCategoria);
-            }
-        });
-        btnSave.addClickShortcut(Key.KEY_S, KeyModifier.CONTROL);
+        btnSave.addClickListener(event -> validateAndSave());
+        btnSave.addClickShortcut(Key.ENTER);
 
-        Button btnCancel = new Button("Cancelar");
-        btnCancel.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        btnCancel.addClickListener(event -> viewLogic.cancelar());
-        btnCancel.addClickShortcut(Key.ESCAPE);
-        getElement()
-                .addEventListener("keydown", event -> viewLogic.cancelar())
-                .setFilter("event.key == 'Escape'");
+        Button btnClose = new Button("Cerrar");
+        btnClose.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        btnClose.addClickShortcut(Key.ESCAPE);
 
-        btnDelete = new Button("Eliminar");
-        //btnDelete.setWidth("100%");
-        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY,ButtonVariant.LUMO_SMALL);
-        btnDelete.addClickListener(event -> {
-            if (currentCategoria != null) {
-                viewLogic.delete(currentCategoria);
-            }
-        });
+        Button btnDelete = new Button("Eliminar");
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
+        btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
-        actionsLayout.add(btnSave, btnDelete, btnCancel);
-        content.add(actionsLayout,3);
+        actionsLayout.add(btnSave, btnDelete, btnClose);
 
-        this.setCloseOnEsc(true);
-        this.setCloseOnOutsideClick(false);
-        this.add(content);
+        this.add(titleForm,tfCatNombre,tfCatDescripcion,chkCatActivo, actionsLayout);
+
     }
 
-    public void editCategoria(CategoriaProducto categoria) {
-        if (categoria == null) {
-            categoria = new CategoriaProducto();
-            categoria.setActivo(true);
-            btnDelete.setEnabled(false);
-        } else if(StringUtils.isBlank(categoria.getId())){
-            categoria.setActivo(true);
-            btnDelete.setEnabled(false);
+    public void setCategoria(CategoriaProducto categoria) {
+        binder.setBean(categoria);
+        tfCatNombre.focus();
+    }
+
+    private void validateAndSave() {
+        if (binder.validate().isOk()) {
+            fireEvent(new SaveEvent(this, binder.getBean()));
         } else {
-            btnDelete.setEnabled(true);
+            NotificacionesUtil.showError("Validar Categoria: "+binder.validate().getValidationErrors());
         }
-        currentCategoria = categoria;
-        binder.readBean(categoria);
     }
 
-    public TextField getTfCatNombre() {
-        return tfCatNombre;
+    // Events
+    public static abstract class CategoriaFormEvent extends ComponentEvent<CategoriaForm> {
+        private CategoriaProducto categoria;
+
+        CategoriaFormEvent(CategoriaForm source, CategoriaProducto categoria) {
+            super(source, false);
+            this.categoria = categoria;
+        }
+
+        public CategoriaProducto getCategoria() {
+            return categoria;
+        }
+    }
+
+    public static class SaveEvent extends CategoriaForm.CategoriaFormEvent {
+        SaveEvent(CategoriaForm source, CategoriaProducto producto) {
+            super(source, producto);
+        }
+    }
+
+    public static class DeleteEvent extends CategoriaForm.CategoriaFormEvent {
+        DeleteEvent(CategoriaForm source, CategoriaProducto producto) {
+            super(source, producto);
+        }
+    }
+
+    public static class CloseEvent extends CategoriaForm.CategoriaFormEvent {
+        CloseEvent(CategoriaForm source) {
+            super(source, null);
+        }
+    }
+
+    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener) {
+        return getEventBus().addListener(eventType, listener);
     }
 }

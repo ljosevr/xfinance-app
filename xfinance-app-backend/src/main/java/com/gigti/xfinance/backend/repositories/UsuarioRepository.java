@@ -24,7 +24,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario) AND u.empresa =:empresa")
     public Usuario findByNombreUsuarioAndEmpresa(String nombreUsuario, Empresa empresa);
 
-    public List<Usuario> findByNombreUsuarioContaining(String nombreUsuario);
+    @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario)")
+    Usuario findByNombreUsuario(String nombreUsuario);
 
     @Query("Select u From Usuario u where u.persona.identificacion =: identificacion")
     public List<Usuario> findByIdentificacion(@Param("identificacion") String identificacion);

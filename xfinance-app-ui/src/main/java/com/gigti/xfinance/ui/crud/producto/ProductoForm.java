@@ -89,19 +89,17 @@ public class ProductoForm extends FormLayout {
         binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         btnSave = new Button("Guardar");
-        btnSave.setWidth("100%");
-        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> validateAndSave());
         btnSave.addClickShortcut(Key.ENTER);
 
         Button btnClose = new Button("Cerrar");
-        btnClose.setWidth("100%");
-        btnClose.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnClose.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
         btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
         btnClose.addClickShortcut(Key.ESCAPE);
 
         Button btnDelete = new Button("Eliminar");
-        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_PRIMARY);
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();

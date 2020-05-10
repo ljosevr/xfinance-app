@@ -1,150 +1,161 @@
 package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.util.ICrudView;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
+import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.data.provider.DataProvider;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
 
-import java.util.Iterator;
 import java.util.List;
 
 @Route(value = Constantes.VIEW_R_CATEGORIA, layout = MainLayout.class)
 @RouteAlias(value = "categoria", layout = MainLayout.class)
-@PageTitle(value = Constantes.VIEW_MAIN)
-public class CategoriaView extends HorizontalLayout
-        implements HasUrlParameter<String> {
+@PageTitle(value = Constantes.VIEW_CATEGORIA +" | "+ Constantes.VIEW_MAIN)
+public class CategoriaView extends VerticalLayout implements ICrudView {
 
     private CategoriaGrid grid;
     private CategoriaForm form;
     private TextField filter;
-    private CategoriaCrud viewLogic;
-    private List<CategoriaProducto> lista;
-    private SearchFilterComponent component;
+    private CategoriaProductoService categoriaProductoService;
+    private Empresa empresa;
+    private SearchFilterComponent searchLayout;
+    private DataProvider<CategoriaProducto, Void> dataProvider;
 
     public CategoriaView(CategoriaProductoService iService) {
-        viewLogic = new CategoriaCrud(iService, this);
+        this.categoriaProductoService = iService;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+
+        addClassName("view");
         setSizeFull();
-        configureTopBar();
-        filter = component.getFilter();
-
-        configureGrid();
-
-        form = new CategoriaForm(viewLogic);
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         H3 title = new H3(Constantes.VIEW_CATEGORIA);
         title.addClassName("titleView2");
 
-        VerticalLayout barAndGridLayout = new VerticalLayout();
-        barAndGridLayout.add(title);
+        configureSearchLayout();
 
-        barAndGridLayout.add(component);
-        barAndGridLayout.add(grid);
-        barAndGridLayout.setFlexGrow(1, grid);
-        barAndGridLayout.setFlexGrow(0, component);
-        barAndGridLayout.setSizeFull();
-        barAndGridLayout.expand(grid);
+        filter = searchLayout.getFilter();
 
-        add(barAndGridLayout);
-        //add(form);
+        configureGrid();
+        form = new CategoriaForm();
 
-        viewLogic.init();
-//        }else{
-//            UI.getCurrent().navigate(MainLayout.class);
-//        }
+        configureForm();
+
+        VerticalLayout gridLayout = new VerticalLayout(grid);
+        gridLayout.addClassName("grid");
+
+        FlexLayout flexLayout = new FlexLayout(gridLayout, form);
+        flexLayout.addClassName("content");
+        flexLayout.setSizeFull();
+        flexLayout.setFlexGrow(2, gridLayout);
+        flexLayout.setFlexGrow(1, form);
+
+        add(title, searchLayout, flexLayout);
+
+        updateList();
+        closeEditor();
     }
 
-    private void configureGrid() {
+    @Override
+    public void closeEditor() {
+        form.setCategoria(null);
+        form.setVisible(false);
+        grid.deselectAll();
+        removeClassName("editing");
+    }
+
+    @Override
+    public void updateList() {
+        grid.setDataProvider(DataProvider.fromCallbacks(
+                // First callback fetches items based on a query
+                query -> {
+                    List<CategoriaProducto> categorias = categoriaProductoService.
+                            findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
+
+                    return categorias.stream();
+                },
+                // Second callback fetches the number of items
+                // for a query
+                query -> categoriaProductoService.count(filter.getValue(), empresa)
+        ));
+    }
+
+    @Override
+    public void configureProvider() {
+    }
+
+    public void configureGrid() {
         grid = new CategoriaGrid();
-        lista = viewLogic.findAll();
-        grid.setItems(lista);
-        grid.asSingleSelect().addValueChangeListener(
-                event -> viewLogic.rowSelected(event.getValue()));
-
-        grid.getColumns().forEach(col -> col.setAutoWidth(true)); //
+        grid.setSizeFull();
+        grid.asSingleSelect().addValueChangeListener(evt -> edit(evt.getValue()));
+        grid.addPageChangeListener(evt -> grid.setPage(evt.getNewPage()));
     }
 
-    public void configureTopBar() {
-
-        component = new SearchFilterComponent("Nueva", "", "Filtro por Nombre", false, true);
-        component.getFilter().addValueChangeListener(event -> {
-            lista = viewLogic.setFilter(event.getValue());
-            if (lista != null)
-                grid.setItems(lista);
-        });
-        component.getFilter().focus();
-        component.getBtnAdd().addClickListener(click -> viewLogic.newItem());
+    @Override
+    public void configureSearchLayout() {
+        searchLayout = new SearchFilterComponent("Nuevo", "", "Filtro por Nombre", false, true);
+        searchLayout.getFilter().addValueChangeListener(event -> updateList());
+        searchLayout.getFilter().focus();
+        searchLayout.getBtnAdd().addClickListener(click -> addItem());
     }
 
-    public void showError(String msg) {
-        Notification.show(msg);
+    @Override
+    public void configureForm() {
+        form.addListener(CategoriaForm.SaveEvent.class, this::save);
+        form.addListener(CategoriaForm.DeleteEvent.class, this::delete);
+        form.addListener(CategoriaForm.CloseEvent.class, e -> closeEditor());
     }
 
-    public void showSaveNotification(String msg) {
-        Notification.show(msg);
-    }
-
-    public void clearSelection() {
-        grid.getSelectionModel().deselectAll();
-    }
-
-    public void selectRow(CategoriaProducto row) {
-        grid.getSelectionModel().select(row);
-    }
-
-    public void editCategoria(CategoriaProducto categoria) {
-        form.editCategoria(categoria);
-        showForm(categoria != null);
-    }
-
-    public void showForm(boolean show) {
-        if (show) {
-            form.open();
+    @Override
+    public void edit(Object categoria) {
+        if (categoria == null) {
+            closeEditor();
         } else {
-            filter.focus();
-            form.close();
+            form.setCategoria((CategoriaProducto) categoria);
+            form.setVisible(true);
+            addClassName("editing");
         }
     }
 
     @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter String parameter) {
-        viewLogic.enter(parameter);
+    public void save(ComponentEvent event) {
+        CategoriaProducto categoria = ((CategoriaForm.SaveEvent) event).getCategoria();
+        categoria.setEmpresa(empresa);
+        categoriaProductoService.saveCategoria(categoria);
+        updateList();
+        closeEditor();
     }
 
-    public void refresh() {
-        lista = viewLogic.findAll();
-        grid.setItems(lista);
-    }
-
-    public void refresh(CategoriaProducto categoria) {
-        for (Iterator<CategoriaProducto> it = lista.iterator(); it.hasNext(); ) {
-            CategoriaProducto p = it.next();
-            if (p.getId().equals(categoria.getId())) {
-                it.remove();
-                lista.remove(p);
-                break;
-            }
+    @Override
+    public void delete(ComponentEvent event) {
+        CategoriaProducto categoria = ((CategoriaForm.DeleteEvent) event).getCategoria();
+        Response response = categoriaProductoService.delete(categoria.getId());
+        if(response.isSuccess()){
+            NotificacionesUtil.showSuccess(response.getMessage());
+            updateList();
+            closeEditor();
+        } else {
+            NotificacionesUtil.showError(response.getMessage());
         }
-        lista.add(categoria);
-        grid.setItems(lista);
-        grid.refresh(categoria);
     }
 
-    public CategoriaGrid getGrid() {
-        return grid;
-    }
-
-    public List<CategoriaProducto> getItemsGrid() {
-        return lista;
-    }
-
-    public TextField getFilter() {
-        return filter;
+    @Override
+    public void addItem() {
+        grid.asSingleSelect().clear();
+        edit(new CategoriaProducto());
     }
 }

@@ -64,6 +64,9 @@ public class InitBackServiceImpl implements InitBackService {
     @Autowired
     private ImpuestoRepository impuestoRepository;
 
+    @Autowired
+    private InventarioService inventarioService;
+
     // Tipos de Datos
     @Transactional
     @Override
@@ -80,7 +83,7 @@ public class InitBackServiceImpl implements InitBackService {
                 logger.info("Tipos IDE");
 
                 //Vistas
-                Vista vista_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
+                Vista vista_punto_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
                 Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 2, null));
                 Vista vista_usuarios = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO,null,null,3,null));
 
@@ -93,14 +96,13 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_config = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG,null, null, 7, null));
 
                 //1.Punto de Venta
-                Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_R_VENTA, vista_venta, 11, "CASH"));//CASH
+                Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_R_VENTA, vista_punto_venta, 11, "CASH"));//CASH
 
                 //2. Productos
                 Vista vista_admin_prod = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO_ADMIN,Constantes.VIEW_R_PRODUCTO, vista_producto, 21,"CUBE"));//COMPILE
                 Vista vista_categoria = vistaRepository.save(new Vista(Constantes.VIEW_CATEGORIA,Constantes.VIEW_R_CATEGORIA, vista_producto, 22,"CUBES"));
                 Vista vista_compras = vistaRepository.save(new Vista(Constantes.VIEW_COMPRAS,Constantes.VIEW_R_COMPRAS,vista_producto, 23, "CART_O"));
                 Vista vista_invInicial = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_INICIAL,Constantes.VIEW_R_INVENTARIO_INICIAL,vista_producto,24, "STOCK"));
-                Vista vista_invActual = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_ACTUAL,Constantes.VIEW_R_INVENTARIO_ACTUAL,vista_producto,25, "STORAGE"));
 
                 //3.Usuarios
                 Vista vista_admin_usu = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO_ADMIN,Constantes.VIEW_R_USUARIOS,vista_usuarios,31, "GROUP"));
@@ -111,14 +113,14 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_usuario_emp = vistaRepository.save(new Vista(Constantes.VIEW_EMP_USU_ADMIN,Constantes.VIEW_R_USUARIOADMIN,vista_empresaMaster, 52, "GROUP"));
 
                 //6.Reportes
-                Vista vista_invHoy = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO,Constantes.VIEW_R_INVENTARIO,vista_reportes, 61, "STORAGE"));
+                Vista vista_invActual = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_ACTUAL,Constantes.VIEW_R_INVENTARIO_ACTUAL,vista_reportes,61, "STORAGE"));
                 Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_R_GANANCIAS_Y_PERDIDAS,vista_reportes, 62,"CHART_LINE"));
+                Vista vista_ventas = vistaRepository.save(new Vista(Constantes.VIEW_VENTAS,Constantes.VIEW_R_VENTAS,vista_reportes, 63,"OUTBOX"));
 
                 //7. Config
                 Vista vista_config_perfil = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PERFIL,Constantes.VIEW_R_CONFIG_PERFIL,vista_config, 63, "COG"));
                 Vista vista_config_empresa = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_EMPRESA,Constantes.VIEW_R_CONFIG_EMPRESA,vista_config, 64,"COGS"));
                 Vista vista_config_password = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PASSWORD,Constantes.VIEW_R_CONFIG_PASSWORD,vista_config, 65, "PASSWORD"));
-
                 logger.info("Vistas");
 
                 //Roles
@@ -132,25 +134,24 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ROOT.getVistas().add(vista_config_password);
                 Rol.ROOT.setFechaActivacion(new Date());
                 rolRepository.save(Rol.ROOT);
-
                 logger.info("Rol Root");
 
                 //2. ADMIN
                 Rol.ADMIN.setVistas(new HashSet<>());
-                Rol.ADMIN.getVistas().add(vista_venta);
+                Rol.ADMIN.getVistas().add(vista_punto_venta);
                 Rol.ADMIN.getVistas().add(vista_vender);
                 Rol.ADMIN.getVistas().add(vista_producto);
                 Rol.ADMIN.getVistas().add(vista_admin_prod);
                 Rol.ADMIN.getVistas().add(vista_categoria);
                 Rol.ADMIN.getVistas().add(vista_compras);
                 Rol.ADMIN.getVistas().add(vista_invInicial);
-                Rol.ADMIN.getVistas().add(vista_invActual);
                 Rol.ADMIN.getVistas().add(vista_usuarios);
                 Rol.ADMIN.getVistas().add(vista_admin_usu);
                 Rol.ADMIN.getVistas().add(vista_rol);
                 Rol.ADMIN.getVistas().add(vista_reportes);
-                Rol.ADMIN.getVistas().add(vista_invHoy);
+                Rol.ADMIN.getVistas().add(vista_invActual);
                 Rol.ADMIN.getVistas().add(vista_balance);
+                Rol.ADMIN.getVistas().add(vista_ventas);
                 Rol.ADMIN.getVistas().add(vista_config);
                 Rol.ADMIN.getVistas().add(vista_config_perfil);
                 Rol.ADMIN.getVistas().add(vista_config_empresa);
@@ -161,10 +162,12 @@ public class InitBackServiceImpl implements InitBackService {
 
                 //3.VENDEDOR
                 Rol.VENDEDOR.setVistas(new HashSet<>());
-                Rol.VENDEDOR.getVistas().add(vista_venta);
+                Rol.VENDEDOR.getVistas().add(vista_punto_venta);
                 Rol.VENDEDOR.getVistas().add(vista_vender);
                 Rol.VENDEDOR.getVistas().add(vista_producto);
+                Rol.VENDEDOR.getVistas().add(vista_reportes);
                 Rol.VENDEDOR.getVistas().add(vista_invActual);
+                Rol.VENDEDOR.getVistas().add(vista_ventas);
                 Rol.VENDEDOR.getVistas().add(vista_config);
                 Rol.VENDEDOR.getVistas().add(vista_config_perfil);
                 Rol.VENDEDOR.getVistas().add(vista_config_password);
@@ -174,12 +177,16 @@ public class InitBackServiceImpl implements InitBackService {
 
                 //4.AUXILIAR
                 Rol.AUXILIAR.setVistas(new HashSet<>());
-                Rol.AUXILIAR.getVistas().add(vista_venta);
+                Rol.AUXILIAR.getVistas().add(vista_punto_venta);
                 Rol.AUXILIAR.getVistas().add(vista_vender);
                 Rol.AUXILIAR.getVistas().add(vista_producto);
                 Rol.AUXILIAR.getVistas().add(vista_admin_prod);
                 Rol.AUXILIAR.getVistas().add(vista_categoria);
+
+                Rol.AUXILIAR.getVistas().add(vista_reportes);
                 Rol.AUXILIAR.getVistas().add(vista_invActual);
+                Rol.AUXILIAR.getVistas().add(vista_ventas);
+
                 Rol.AUXILIAR.getVistas().add(vista_config);
                 Rol.AUXILIAR.getVistas().add(vista_config_perfil);
                 Rol.AUXILIAR.getVistas().add(vista_config_password);
@@ -287,7 +294,7 @@ public class InitBackServiceImpl implements InitBackService {
                 empresa.setUsuarioNombre("demo");
                 empresa.setNombreEmpresa("Demo S.A.S");
                 empresa.setEliminado(false);
-                empresa.setTipoEmpresa(TipoEmpresaEnum.NORMAL);
+                empresa.setTipoEmpresa(TipoEmpresaEnum.DEMO);
                 empresa.setDireccion("Wakanda");
                 empresa.setIdentificacion("800900700600");
                 empresa = empresaService.saveEmpresa(empresa);
@@ -308,51 +315,66 @@ public class InitBackServiceImpl implements InitBackService {
                     TipoMedidaEnum[] tipos =  TipoMedidaEnum.values();
                     if(emp != null) {
                         for(int i = 0; i < 50 ; i++) {
+                            int item = i + 1;
                             Producto producto = new Producto();
                             producto.setActivo(true);
                             producto.setCategoria(categoria);
-                            producto.setCodigoBarra(StringUtils.leftPad((i + 1) + "", 10, "0"));
-                            producto.setDescripcion("Producto Demo " + (i + 1));
+                            producto.setCodigoBarra(StringUtils.leftPad((item + 1) + "", 10, "0"));
+                            producto.setDescripcion("Producto Demo " + (item + 1));
                             producto.setEmpresa(emp);
                             Double aleatorio = Math.floor(Math.random()*5);
                             producto.setImpuesto(impuestos.get(aleatorio.intValue()));
-                            producto.setNombreProducto("Producto # " + (i + 1));
+                            producto.setNombreProducto("Producto # " + (item + 1));
                             aleatorio = Math.floor(Math.random()*8);
                             producto.setTipoMedida(tipos[aleatorio.intValue()]);
 
                             producto = productoRepository.save(producto);
 
+                            //Inventario Inicial
+
+                            Usuario usuarioRoot = usuarioRepository.findByNombreUsuario("demo");
+
+                            InventarioInicial inventarioInicial = new InventarioInicial();
+                            inventarioInicial.setProducto(producto);
+                            inventarioInicial.setPrecioCosto(BigDecimal.valueOf(item * 100 * 2));
+                            inventarioInicial.setPrecioVenta(BigDecimal.valueOf((item * 100 * 2) * 1.20 ));
+                            inventarioInicial.setCantidad(BigDecimal.valueOf((item + 1) * 2));
+                            inventarioInicial.setImpuesto(producto.getImpuesto());
+                            inventarioInicial.setFechaActualizacion(new Date());
+                            inventarioInicial.setInfinite(false);
+                            inventarioService.saveInventarioInicial(inventarioInicial, usuarioRoot);
+
                             //Inventario Actual
-                            InventarioActual actual = new InventarioActual();
-                            actual.setInfinite(false);
-                            actual.setFechaActualizacion(new Date());
-                            actual.setCantidad(BigDecimal.valueOf((i + 1) * 2));
-                            actual.setProducto(producto);
-                            actual.setEmpresa(emp);
-
-                            inventarioActualRepository.save(actual);
-
-                            //Inventario Actual Costo
-                            InventarioActualCosto invACtualCosto = new InventarioActualCosto();
-                            invACtualCosto.setCantidad(BigDecimal.valueOf((i + 1) * 2));
-                            invACtualCosto.setFechaCreacion(new Date());
-                            invACtualCosto.setFechaActualizacion(new Date());
-                            invACtualCosto.setActivo(true);
-                            invACtualCosto.setInfinite(false);
-                            invACtualCosto.setEmpresa(emp);
-                            invACtualCosto.setProducto(producto);
-                            invACtualCosto.setPrecioCosto(BigDecimal.valueOf(i * 100 * 2));
-
-                            inventarioActualCostoRepository.save(invACtualCosto);
-
-                            //Valor Venta
-                            ProductoValorVenta valorVenta = new ProductoValorVenta();
-                            valorVenta.setProducto(producto);
-                            valorVenta.setActivo(true);
-                            valorVenta.setValorVenta(BigDecimal.valueOf((i * 100 * 2) * 1.20 ));
-                            valorVenta.setFechaActualizacion(new Date());
-
-                            productoValoresRepository.save(valorVenta);
+//                            InventarioActual actual = new InventarioActual();
+//                            actual.setInfinite(false);
+//                            actual.setFechaActualizacion(new Date());
+//                            actual.setCantidad(BigDecimal.valueOf((item + 1) * 2));
+//                            actual.setProducto(producto);
+//                            actual.setEmpresa(emp);
+//
+//                            inventarioActualRepository.save(actual);
+//
+//                            //Inventario Actual Costo
+//                            InventarioActualCosto invACtualCosto = new InventarioActualCosto();
+//                            invACtualCosto.setCantidad(BigDecimal.valueOf((item + 1) * 2));
+//                            invACtualCosto.setFechaCreacion(new Date());
+//                            invACtualCosto.setFechaActualizacion(new Date());
+//                            invACtualCosto.setActivo(true);
+//                            invACtualCosto.setInfinite(false);
+//                            invACtualCosto.setEmpresa(emp);
+//                            invACtualCosto.setProducto(producto);
+//                            invACtualCosto.setPrecioCosto(BigDecimal.valueOf(item * 100 * 2));
+//
+//                            inventarioActualCostoRepository.save(invACtualCosto);
+//
+//                            //Valor Venta
+//                            ProductoValorVenta valorVenta = new ProductoValorVenta();
+//                            valorVenta.setProducto(producto);
+//                            valorVenta.setActivo(true);
+//                            valorVenta.setValorVenta(BigDecimal.valueOf((item * 100 * 2) * 1.20 ));
+//                            valorVenta.setFechaActualizacion(new Date());
+//
+//                            productoValoresRepository.save(valorVenta);
                         }
 
                         parche = new Parche(Constantes.INIT5,java.sql.Date.valueOf(LocalDate.now()),true, null);

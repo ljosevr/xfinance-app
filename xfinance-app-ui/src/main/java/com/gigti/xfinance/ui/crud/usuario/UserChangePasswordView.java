@@ -2,18 +2,20 @@ package com.gigti.xfinance.ui.crud.usuario;
 
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.dto.UsuarioChangePasswordDTO;
+import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.BoxSizing;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -36,8 +38,11 @@ public class UserChangePasswordView extends VerticalLayout {
 
     public UserChangePasswordView(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-        setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        //setSizeFull();
+        this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        this.setSizeUndefined();
+        this.setJustifyContentMode(JustifyContentMode.CENTER);
+        this.setBoxSizing(BoxSizing.CONTENT_BOX);
 
         H3 title = new H3("Cambiar Password");
         title.addClassName("titleView2");
@@ -108,15 +113,19 @@ public class UserChangePasswordView extends VerticalLayout {
             status.notifyBindingValidationStatusHandlers();
         }
 
-        if(binder.isValid()){
-            if(pfNewPassword1.getValue().equals(pfNewPassword2.getValue())) {
-                Response response = usuarioService.changePassword(CurrentUser.get().getId(), pfOldPassword.getValue(), pfNewPassword1.getValue(), pfNewPassword2.getValue());
-                if(response.isSuccess()){
-                    Notification.show(response.getMessage(), 3000, Notification.Position.MIDDLE);
-                    CurrentUser.set((Usuario) response.getObject());
-                    UI.getCurrent().navigate(MainLayout.class);
-                } else {
-                    Notification.show(response.getMessage(), 3000, Notification.Position.MIDDLE);
+        if(CurrentUser.get().getEmpresa().getTipoEmpresa().equals(TipoEmpresaEnum.DEMO)) {
+            NotificacionesUtil.showError("Usuario DEMO - NO Puede cambiar Password");
+        } else {
+            if (binder.isValid()) {
+                if (pfNewPassword1.getValue().equals(pfNewPassword2.getValue())) {
+                    Response response = usuarioService.changePassword(CurrentUser.get().getId(), pfOldPassword.getValue(), pfNewPassword1.getValue(), pfNewPassword2.getValue());
+                    if (response.isSuccess()) {
+                        NotificacionesUtil.showSuccess(response.getMessage());
+                        CurrentUser.set((Usuario) response.getObject());
+                        UI.getCurrent().navigate(MainLayout.class);
+                    } else {
+                        NotificacionesUtil.showError(response.getMessage());
+                    }
                 }
             }
         }
