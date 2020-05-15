@@ -126,19 +126,16 @@ public class UsuarioForm extends Dialog {
         });
 
         btnSave = new Button("Guardar");
-        btnSave.setWidth("100%");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> validateAndSave());
         btnSave.addClickShortcut(Key.ENTER);
 
         Button btnClose = new Button("Cerrar");
-        btnClose.setWidth("100%");
         btnClose.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
         btnClose.addClickShortcut(Key.ESCAPE);
 
         Button btnDelete = new Button("Eliminar");
-        btnDelete.setWidth("100%");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binderUsuario.getBean())));
 

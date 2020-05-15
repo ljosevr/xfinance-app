@@ -220,6 +220,34 @@
     .logoDrawer {
         width: 35%;
     }
+
+    .PventaView .content {
+        display: flex;
+        width: 100%;
+        flex-direction: column;
+        flex-wrap: wrap;
+        height: 250px;
+    }
+
+    .PventaView .grid {
+        flex: 3;
+        /*max-height: 50%;*/
+        height: 250px;
+    }
+    .PventaView .gridPro {
+        flex: 3;
+        /*max-height: 50%;*/
+        height: 250px;
+    }
+
+    .PventaView .rightLayout {
+        flex: 1;
+        padding: var(--lumo-space-m);
+        padding-top: 0;
+        /*max-height: 80%;*/
+        height: 250px;
+    }
+
 }
 
 a[highlight] {
