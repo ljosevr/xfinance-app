@@ -12,7 +12,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Data
@@ -42,9 +41,6 @@ public class VentaItem extends AbstractEntity {
     private BigDecimal impuestoArticulo;
 
     private String impuestoNombre;
-
-    @Min(value = 1)
-    private int item;
 
     @Transient
     private BigDecimal precioTotalCosto;

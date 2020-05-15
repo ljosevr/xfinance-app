@@ -3,26 +3,27 @@ package com.gigti.xfinance.ui.crud.pventa;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Venta;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
+import com.gigti.xfinance.backend.data.enums.TipoBusquedaEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.AllUtils;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
-import com.gigti.xfinance.ui.util.SearchFilterComponent;
-import com.gigti.xfinance.ui.util.SearchProductByNameComponent;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Page;
-import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -41,25 +42,26 @@ import static com.gigti.xfinance.ui.util.NotificacionesUtil.getSiButton;
 public class PventaView extends VerticalLayout {
 
     private boolean isModified;
-    private PventaGrid grid;
-    private NumberField nfCantidad, nfSubTotal, nfImpuestos;
+    private final PventaGrid grid;
+    private BigDecimalField nfCantidad, nfSubTotal, nfImpuestos;
     private TextField tfNombreProducto;
     private H2 lblTotal;
-
+    private H3 lblImpuesto;
     private Map<String, PventaDTO> mapItemsventa;
     private PventaDTO pventaDTO;
-    private BigDecimal totalFactura;
-    private VerticalLayout dataLayout;
-    private SearchProductByNameComponent searchLayout;
-    private VentaService ventaService;
+    private final VerticalLayout dataLayout;
+    private final VentaService ventaService;
     private TextField filter;
     private Button btnDelete;
     private Button btnSave;
-    private Page page;
+    private ComboBox<TipoBusquedaEnum> cbTipoBusqueda;
+    private final Empresa empresa;
+    private Grid<PventaDTO> gridPro;
+    private VerticalLayout gridProLayout;
 
     public PventaView(VentaService ventaService) {
         this.ventaService = ventaService;
-        Empresa empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
         addClassName("PventaView");
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.START);
@@ -73,20 +75,21 @@ public class PventaView extends VerticalLayout {
 
         configureTopBar();
         configureDataLayout();
-        confgureSearchLayout();
+        configureSearchGrid();
 
         grid = new PventaGrid();
         grid.addClassName("grid");
+
         Div divLayout = new Div();
         divLayout.addClassName("content");
         divLayout.setSizeFull();
 
-        divLayout.add(grid, dataLayout, searchLayout);
+        divLayout.add(grid, gridProLayout, dataLayout);
 
         grid.addItemClickListener(event -> {
-            nfCantidad.setValue(event.getItem().getCantidadVenta().doubleValue());
-            nfSubTotal.setValue(event.getItem().getCantidadVenta().multiply(event.getItem().getPrecioVentaActual()).doubleValue());
-            nfImpuestos.setValue(AllUtils.percentage(event.getItem().getPrecioVentaActual(), event.getItem().getImpuestoValor()).doubleValue());
+            nfCantidad.setValue(event.getItem().getCantidadVenta());
+            nfSubTotal.setValue(event.getItem().getCantidadVenta().multiply(event.getItem().getPrecioVentaActual()));
+            nfImpuestos.setValue(AllUtils.percentage(event.getItem().getPrecioVentaActual(), event.getItem().getImpuestoValor()));
             pventaDTO = event.getItem();
             nfCantidad.focus();
             isModified = true;
@@ -95,25 +98,76 @@ public class PventaView extends VerticalLayout {
         });
 
         add(divLayout);
-        showSearch(false);
     }
 
-    private void showSearch(boolean show) {
-        searchLayout.setVisible(show);
-        if(show) {
-            searchLayout.clear();
-            searchLayout.getFilter().focus();
+    private void search() {
+
+        if(cbTipoBusqueda.getValue().equals(TipoBusquedaEnum.CODIGO)) {
+            //Busqueda por Codigo de Barras
+            selectedItem(ventaService.findByBarCode(filter.getValue(), empresa));
+        } else {
+            //Busqueda por Nombre
+            List<PventaDTO> listResult = ventaService.findByName(filter.getValue(), empresa, 0, 10);
+            gridPro.setItems(listResult);
+            if(!listResult.isEmpty()) {
+                //Ocultar Tabla principal
+                gridProLayout.setVisible(true);
+                //MOstrar tabla de busqueda
+                grid.setVisible(false);
+            }
+
+            //Seleccionar
+            //Mostar Tabla principal
+            //Ocultar tabla de busqueda
         }
-        dataLayout.setVisible(!show);
     }
 
     private void configureTopBar() {
 
-        SearchFilterComponent topBarLayout = new SearchFilterComponent("Nuevo", "", "Filtro por Codigo de Barras del Producto", true, false);
-        filter = topBarLayout.getFilter();
+        VerticalLayout topBarLayout = new VerticalLayout();
+        topBarLayout.addClassName("searchBar");
+
+        filter = new TextField();
+        filter.setPlaceholder("Buscar por Código de Barras");
+        filter.setPrefixComponent(new Icon(VaadinIcon.BARCODE));
+        filter.setValueChangeMode(ValueChangeMode.LAZY);
+        filter.setClearButtonVisible(true);
+        filter.setAutoselect(true);
+        filter.addFocusShortcut(Key.F3);
+        filter.setMaxWidth("70%");
+        filter.addKeyPressListener(Key.ENTER, evt -> search());
+
+        cbTipoBusqueda = new ComboBox<>();
+        cbTipoBusqueda.setItems(TipoBusquedaEnum.values());
+        cbTipoBusqueda.setValue(TipoBusquedaEnum.CODIGO);
+        cbTipoBusqueda.setAllowCustomValue(false);
+        cbTipoBusqueda.addValueChangeListener(evt -> {
+           if(evt.getValue().name().equalsIgnoreCase(TipoBusquedaEnum.CODIGO.name())){
+               filter.setPrefixComponent(new Icon(VaadinIcon.BARCODE));
+               filter.setPlaceholder("Buscar Por Código de Barras");
+               filter.focus();
+           }
+           if(evt.getValue().name().equalsIgnoreCase(TipoBusquedaEnum.NOMBRE.name())){
+               filter.setPrefixComponent(new Icon(VaadinIcon.BOOK));
+               filter.setPlaceholder("Buscar Por Nombre del producto");
+               filter.focus();
+           }
+        });
+
+        Button btnSearch = new Button("", new Icon(VaadinIcon.SEARCH));
+        btnSearch.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        btnSearch.setVisible(true);
+        btnSearch.addClickShortcut(Key.F4);
+        btnSearch.addClickListener(click -> search());
+
+        HorizontalLayout hLayout = new HorizontalLayout(filter, cbTipoBusqueda, btnSearch);
+        hLayout.setSizeFull();
+        hLayout.expand(filter);
+        topBarLayout.add(hLayout);
+
         filter.focus();
         topBarLayout.setDefaultHorizontalComponentAlignment(Alignment.START);
-        topBarLayout.getBtnSearch().addClickListener(click -> showSearch(true));
+
         this.add(topBarLayout);
 
         btnSave = new Button("Guardar");
@@ -133,101 +187,112 @@ public class PventaView extends VerticalLayout {
         this.add(new HorizontalLayout(btnSave, btnDelete, btnCancel));
     }
 
-    private void confgureSearchLayout() {
-        searchLayout = new SearchProductByNameComponent(ventaService, "", "Buscar por Nombre del Producto");
-        searchLayout.addClassName("rightLayout");
+    private void configureSearchGrid() {
 
-        searchLayout.getFilter().addKeyPressListener(Key.ENTER, listener -> {
-            if(!searchLayout.getListData().isEmpty()){
-                PventaDTO item = searchLayout.getListData().get(0);
-                NotificacionesUtil.openConfirmationDialog("Desea Seleccionar el Producto: "+item.getNombreProducto(), true, false);
-                NotificacionesUtil.getSiButton().addClickListener(event -> {
-                    if(NotificacionesUtil.getDialog().isOpened())
-                        NotificacionesUtil.getDialog().close();
-                    selectedItem(item);
-                });
-                NotificacionesUtil.getNoButton().addClickListener(event -> {
-                    if(NotificacionesUtil.getDialog().isOpened())
-                        NotificacionesUtil.getDialog().close();
-                    searchLayout.getFilter().focus();
-                });
-            }
-        });
-        searchLayout.getFilter().addKeyPressListener(Key.ESCAPE, listener -> showSearch(false));
-        searchLayout.getBtnClose().addClickListener(listner -> showSearch(false));
+        gridProLayout = new VerticalLayout();
+        gridProLayout.addClassName("gridPro");
+        gridProLayout.setVisible(false);
 
-        configMobile();
-    }
+        gridPro = new Grid<>(PventaDTO.class);
+        gridPro.setColumns("nombreProducto", "unidadMedida");
 
-    private void configMobile() {
-        UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
-            if(details.getWindowInnerWidth() < 600) {
-                searchLayout.getGrid().addItemClickListener(click -> {
-                    pventaDTO = click.getItem();
-                    selectedItem(pventaDTO);
-                });
+        Button btnSelect = new Button("Seleccionar");
+        btnSelect.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+        btnSelect.addClickListener(evt -> {
+            if(gridPro.getSelectionModel().getFirstSelectedItem().isPresent()){
+                selectedItem(gridPro.getSelectionModel().getFirstSelectedItem().get());
             } else {
-                searchLayout.getGrid().addItemDoubleClickListener(click -> {
-                    pventaDTO = click.getItem();
-                    selectedItem(pventaDTO);
-                });
+                NotificacionesUtil.showError("Debe seleccionar 1 Item de la Tabla");
             }
         });
+
+        gridPro.addItemDoubleClickListener(evt -> selectedItem(evt.getItem()));
+        gridProLayout.add(gridPro, btnSelect);
+
+        //configMobile();
     }
+
+//    private void configMobile() {
+//        UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
+//            if(details.getWindowInnerWidth() < 600) {
+//                searchLayout.getGrid().addItemClickListener(click -> {
+//                    pventaDTO = click.getItem();
+//                    selectedItem(pventaDTO);
+//                });
+//            } else {
+//                searchLayout.getGrid().addItemDoubleClickListener(click -> {
+//                    pventaDTO = click.getItem();
+//                    selectedItem(pventaDTO);
+//                });
+//            }
+//        });
+//    }
 
     private void configureDataLayout() {
 
-        nfCantidad = new NumberField("Cantidad");
-        nfCantidad.setValue(0.0);
+        nfCantidad = new BigDecimalField("Cantidad");
+        nfCantidad.setValue(BigDecimal.valueOf(0.0));
         nfCantidad.setAutoselect(true);
         nfCantidad.setReadOnly(true);
         nfCantidad.setValueChangeMode(ValueChangeMode.EAGER);
         nfCantidad.addThemeVariants(TextFieldVariant.LUMO_ALIGN_CENTER, TextFieldVariant.LUMO_SMALL);
         nfCantidad.addKeyPressListener(Key.ENTER, listener -> addItem(nfCantidad.getValue()));
 
-        nfSubTotal = new NumberField("SubTotal");
+        nfSubTotal = new BigDecimalField("SubTotal");
         nfSubTotal.setReadOnly(true);
-        nfSubTotal.setValue(0.0);
+        nfSubTotal.setValue(BigDecimal.valueOf(0.0));
         nfSubTotal.setPrefixComponent(new Span("$"));
         nfSubTotal.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT, TextFieldVariant.LUMO_SMALL);
 
-        nfImpuestos = new NumberField("Impuestos");
+        nfImpuestos = new BigDecimalField("Impuestos");
         nfImpuestos.setReadOnly(true);
-        nfImpuestos.setValue(0.0);
+        nfImpuestos.setValue(BigDecimal.valueOf(0.0));
         nfImpuestos.setPrefixComponent(new Span("$"));
         nfImpuestos.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT, TextFieldVariant.LUMO_SMALL);
 
+        Button btnAgregar = new Button("Agregar");
+        btnAgregar.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+        btnAgregar.addClickListener(evt -> addItem(nfCantidad.getValue()));
 //        nfDescuentos = new NumberField("Descuento");
 //        nfDescuentos.setReadOnly(true);
 //        nfDescuentos.setValue(0.0);
 //        nfDescuentos.setPrefixComponent(new Span("$"));
 //        nfDescuentos.addThemeVariants(TextFieldVariant.LUMO_ALIGN_RIGHT, TextFieldVariant.LUMO_SMALL);
 
-        totalFactura = BigDecimal.ZERO;
-
         lblTotal = new H2();
-        lblTotal.setText("TOTAL: " + totalFactura);
+        lblTotal.setText("TOTAL: " + BigDecimal.ZERO);
+
+        lblImpuesto = new H3();
+        lblImpuesto.setText("Impuestos: " + BigDecimal.ZERO);
 
         tfNombreProducto = new TextField("Producto");
         tfNombreProducto.setReadOnly(true);
         tfNombreProducto.setValue("");
         tfNombreProducto.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_CENTER);
 
+        HorizontalLayout hlayout = new HorizontalLayout(nfImpuestos, btnAgregar);
+        hlayout.setDefaultVerticalComponentAlignment(Alignment.END);
+        //hlayout.setAlignItems(Alignment.END);
+
         isModified = false;
-        dataLayout.add(tfNombreProducto, new HorizontalLayout(nfCantidad, nfSubTotal), new HorizontalLayout(nfImpuestos), lblTotal);
+        dataLayout.add(tfNombreProducto,
+                new HorizontalLayout(nfCantidad, nfSubTotal),
+                hlayout,
+                lblImpuesto, lblTotal);
     }
 
     private void selectedItem(PventaDTO pventaDTO) {
         if (pventaDTO != null) {
-            showSearch(false);
             if (mapItemsventa == null) mapItemsventa = new HashMap<>();
             nfCantidad.setReadOnly(false);
-            nfCantidad.setValue(1.0);
-            nfSubTotal.setValue(pventaDTO.getPrecioVentaActual().doubleValue());
-            nfImpuestos.setValue(AllUtils.percentage(pventaDTO.getPrecioVentaActual(), pventaDTO.getImpuestoValor()).doubleValue());
+            nfCantidad.setValue(BigDecimal.valueOf(1.0));
+            nfSubTotal.setValue(pventaDTO.getPrecioVentaActual());
+            nfImpuestos.setValue(AllUtils.percentage(pventaDTO.getPrecioVentaActual(), pventaDTO.getImpuestoValor()));
             nfCantidad.focus();
             tfNombreProducto.setValue(pventaDTO.getNombreProducto());
             this.pventaDTO = pventaDTO;
+            gridProLayout.setVisible(false);
+            grid.setVisible(true);
         }
     }
 
@@ -262,17 +327,17 @@ public class PventaView extends VerticalLayout {
      * Metodo para agregar un Item a la tabla
      * @param value
      */
-    private void addItem(double value) {
+    private void addItem(BigDecimal value) {
         if (pventaDTO != null) {
-            if (value > 0) {
-                if ((quantityAccumalted(pventaDTO) + value) <= pventaDTO.getInStock().doubleValue() || pventaDTO.isInfinite()) {
-                    int item = mapItemsventa.size();
+            if (value.compareTo(BigDecimal.ZERO) > 0) {
+                BigDecimal accumulatedQ = accumulatedQuantity(pventaDTO);
+                if ((value.add(accumulatedQ)).compareTo(pventaDTO.getInStock()) < 0 || pventaDTO.isInfinite()) {
                     if (isModified) {
                         isModified = false;
                         if (pventaDTO == null) {
                             NotificacionesUtil.showWarn("para modificar debe seleccionar un registro de la lista");
                         } else {
-                            pventaDTO.setCantidadVenta(BigDecimal.valueOf(value));
+                            pventaDTO.setCantidadVenta(value);
                             mapItemsventa.put(pventaDTO.getIdProducto(), pventaDTO);
                             putInGrid(mapItemsventa);
                             btnSave.setEnabled(true);
@@ -281,15 +346,15 @@ public class PventaView extends VerticalLayout {
                         PventaDTO pv = mapItemsventa.get(pventaDTO.getIdProducto());
                         if (pv != null) {
                             //Existe
-                            pv.setCantidadVenta(pv.getCantidadVenta().add(BigDecimal.valueOf(value)));
-                            if (!mapItemsventa.replace(pv.getIdProducto(), pventaDTO, pv)) {
+                            if (mapItemsventa.remove(pv.getIdProducto(), pv)) {
+                                pv.setCantidadVenta(accumulatedQ.add(value));
+                                mapItemsventa.put(pv.getIdProducto(), pv);
+                            } else {
                                 NotificacionesUtil.showError("Error: No se pudo Asociar Articulo");
                             }
                         } else {
                             //Nuevo
-                            item++;
-                            pventaDTO.setItem(item);
-                            pventaDTO.setCantidadVenta(BigDecimal.valueOf(value));
+                            pventaDTO.setCantidadVenta(value);
                             mapItemsventa.put(pventaDTO.getIdProducto(), pventaDTO);
                         }
                         putInGrid(mapItemsventa);
@@ -301,8 +366,8 @@ public class PventaView extends VerticalLayout {
                     pventaDTO = null;
                     activeBtnSave();
                 } else {
-                    double temp = pventaDTO.getInStock().doubleValue() - quantityAccumalted(pventaDTO);
-                    if (temp > 0) {
+                    BigDecimal temp = pventaDTO.getInStock().subtract(accumulatedQuantity(pventaDTO));
+                    if (temp.compareTo(BigDecimal.ZERO) > 0) {
                         NotificacionesUtil.openConfirmationDialog("Solo existen " + pventaDTO.getInStock() + " en Stock, No puedes vender más de esa cantidad.\n" +
                                 "¿Deseas Agregar " + temp + " a la Compra actual?", true, false);
 
@@ -337,11 +402,7 @@ public class PventaView extends VerticalLayout {
     }
 
     private void activeBtnSave() {
-        if (mapItemsventa.isEmpty()) {
-            btnSave.setEnabled(false);
-        } else {
-            btnSave.setEnabled(true);
-        }
+        btnSave.setEnabled(!mapItemsventa.isEmpty());
     }
 
     /**
@@ -350,13 +411,15 @@ public class PventaView extends VerticalLayout {
      * @param pventa Objeto ProductoVentaDTO
      * @return retorna cantidad acumulada
      */
-    private double quantityAccumalted(PventaDTO pventa) {
-        return mapItemsventa
-                .values()
-                .stream()
-                .filter(v -> v.getIdProducto().equals(pventa.getIdProducto()))
-                .mapToDouble(venta -> venta.getCantidadVenta().doubleValue())
-                .sum();
+    private BigDecimal accumulatedQuantity(PventaDTO pventa) {
+        BigDecimal result = BigDecimal.ZERO;
+        for(PventaDTO pventa1 : mapItemsventa.values()){
+            if(pventa1.getIdProducto().equals(pventa.getIdProducto())) {
+                result = result.add(pventa1.getCantidadVenta());
+            }
+        }
+
+        return result;
     }
 
     private void putInGrid(Map<String, PventaDTO> mapItemsventa) {
@@ -364,12 +427,17 @@ public class PventaView extends VerticalLayout {
     }
 
     private void calculteTotalFactura() {
-        double subtotal = mapItemsventa.values()
-                .stream()
-                .mapToDouble(v -> v.getSubTotal().doubleValue())
-                .sum();
 
-        lblTotal.setText("TOTAL: " + AllUtils.numberFormat(BigDecimal.valueOf(subtotal)));
+        BigDecimal subtotal = BigDecimal.ZERO;
+        BigDecimal subImpuesto = BigDecimal.ZERO;
+
+        for(PventaDTO pv : mapItemsventa.values()) {
+            subtotal = subtotal.add(pv.getSubTotal());
+            subImpuesto = subImpuesto.add(pv.getSubImpuesto());
+        }
+
+        lblTotal.setText(String.format("TOTAL: %s", AllUtils.numberFormat(subtotal)));
+        lblImpuesto.setText(String.format("Impuestos: %s", AllUtils.numberFormat(subImpuesto)));
     }
 
     public PventaGrid getGrid() {
@@ -380,16 +448,16 @@ public class PventaView extends VerticalLayout {
         grid.setItems(new ArrayList<>());
         clearFormData();
         mapItemsventa = null;
-        totalFactura = BigDecimal.ZERO;
-        lblTotal.setText("TOTAL: " + totalFactura);
+        lblTotal.setText(String.format("TOTAL: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
+        lblImpuesto.setText(String.format("Impuestos: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
         filter.focus();
     }
 
     private void clearFormData(){
-        nfCantidad.setValue(0.0);
-        nfSubTotal.setValue(0.0);
+        nfCantidad.setValue(BigDecimal.valueOf(0.0));
+        nfSubTotal.setValue(BigDecimal.valueOf(0.0));
         tfNombreProducto.setValue("");
-        nfImpuestos.setValue(0.0);
+        nfImpuestos.setValue(BigDecimal.valueOf(0.0));
         nfCantidad.setReadOnly(true);
     }
 }

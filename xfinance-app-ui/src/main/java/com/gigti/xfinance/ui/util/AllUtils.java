@@ -12,14 +12,14 @@ public class AllUtils {
     private static final BigDecimal ONE_HUNDRED = new BigDecimal(100);
 
     public static BigDecimal percentage(BigDecimal base, BigDecimal pct){
-        return base.multiply(pct).divide(ONE_HUNDRED);
+        return base.multiply(pct).divide(ONE_HUNDRED).setScale(2);
     }
 
     public static String numberFormat(BigDecimal value){
         final DecimalFormat decimalFormat = new DecimalFormat();
         decimalFormat.setCurrency(Currency.getInstance(Locale.US));
         decimalFormat.setMaximumFractionDigits(2);
-        decimalFormat.setMinimumFractionDigits(0);
+        decimalFormat.setMinimumFractionDigits(2);
 
         return "$ "+decimalFormat.format(value);
     }

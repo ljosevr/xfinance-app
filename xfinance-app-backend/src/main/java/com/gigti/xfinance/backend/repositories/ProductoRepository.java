@@ -56,8 +56,13 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
 
     @Query("SELECT p FROM Producto p " +
             "WHERE p.empresa =:empresa AND " +
-            "(p.codigoBarra =:filter OR " +
-            "lower(p.nombreProducto) like lower(concat('%', :filter, '%'))) AND " +
+            "lower(p.nombreProducto) like lower(concat('%', :filter, '%')) AND " +
             "p.eliminado = false")
     List<Producto> search(String filter, Empresa empresa, Pageable pageable);
+
+    @Query("SELECT p FROM Producto p " +
+            "WHERE p.empresa =:empresa AND " +
+            "p.codigoBarra =:filter AND " +
+            "p.eliminado = false")
+    Producto findByBarCode(String filter, Empresa empresa);
 }

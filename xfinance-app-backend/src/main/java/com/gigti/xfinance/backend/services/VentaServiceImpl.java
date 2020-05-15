@@ -44,10 +44,16 @@ public class VentaServiceImpl implements VentaService {
     private InventarioService inventarioService;
 
     @Override
-    public List<PventaDTO> findAll(String filter, Empresa empresa, int page, int size) {
-        logger.info("--> findAll");
+    public List<PventaDTO> findByName(String filter, Empresa empresa, int page, int size) {
+        logger.info("--> findByName");
         Pageable pageable = PageRequest.of(page, size);
         return getListPventaDTO(filter, empresa, pageable);
+    }
+
+    @Override
+    public PventaDTO findByBarCode(String filter, Empresa empresa) {
+        logger.info("--> findByBarCode");
+        return getPventaDTO(filter, empresa);
     }
 
     @Override
@@ -94,7 +100,6 @@ public class VentaServiceImpl implements VentaService {
                         item.setProducto(producto);
                         item.setPrecioCosto(invActualCosto.getPrecioCosto());
                         item.setPrecioVenta(pv.getPrecioVentaActual());
-                        item.setItem(pv.getItem());
                         //item.setDescuentoArticulo(pv.getDescuento());
                         item.setImpuestoArticulo(pv.getImpuestoValor());
                         item.setImpuestoNombre(pv.getImpuestoNombre());
@@ -108,7 +113,6 @@ public class VentaServiceImpl implements VentaService {
                     item.setCantidad(pv.getCantidadVenta());
                     item.setPrecioCosto(invActualCosto.getPrecioCosto());
                     item.setPrecioVenta(pv.getPrecioVentaActual());
-                    item.setItem(pv.getItem());
                     //item.setDescuentoArticulo(pv.getDescuento());
                     item.setImpuestoArticulo(pv.getImpuestoValor());
                     item.setImpuestoNombre(pv.getImpuestoNombre());
@@ -139,7 +143,7 @@ public class VentaServiceImpl implements VentaService {
     private List<PventaDTO> getListPventaDTO(String filter, Empresa empresa, Pageable pageable){
         String methodName = "getListPventaDTO";
         logger.info("--> "+methodName);
-        List<Producto> listProductos = new ArrayList<>();
+        List<Producto> listProductos;
         if(filter == null || filter.isEmpty()) {
             listProductos = productoRepository.findByEmpresa(empresa, pageable);
         } else {
@@ -164,6 +168,34 @@ public class VentaServiceImpl implements VentaService {
                 }
             }
         });
+        logger.info("<-- "+methodName);
+        return result;
+    }
+
+    private PventaDTO getPventaDTO(String filter, Empresa empresa){
+        String methodName = "getPventaDTO";
+        logger.info("--> "+methodName);
+
+        Producto producto = productoRepository.findByBarCode(filter, empresa);
+        PventaDTO result = null;
+        if(producto != null) {
+
+            BigDecimal inStock = BigDecimal.ZERO;
+            boolean infinite = false;
+            InventarioActual actual = inventarioActualRepository.findByProducto(producto);
+            if (actual != null) {
+                inStock = actual.getCantidad().compareTo(BigDecimal.ZERO) > 0 ? actual.getCantidad() : BigDecimal.ZERO;
+                infinite = actual.isInfinite();
+            }
+            if (inStock.compareTo(BigDecimal.ZERO) > 0 || infinite) {
+                ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
+                if (productoValorVenta != null) {
+                    result = convertProductoToPventaDTO(producto, productoValorVenta.getValorVenta(), inStock, infinite);
+                } else {
+                    result = convertProductoToPventaDTO(producto, BigDecimal.ZERO, inStock, infinite);
+                }
+            }
+        }
         logger.info("<-- "+methodName);
         return result;
     }

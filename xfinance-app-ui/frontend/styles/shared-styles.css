@@ -75,16 +75,23 @@
 
     .PventaView .content {
         display: flex;
+        max-height: 80%;
     }
 
     .PventaView .grid {
         flex: 3;
+        max-height: 80%;
+    }
+    .PventaView .gridPro {
+        flex: 3;
+        max-height: 80%;
     }
 
     .PventaView .rightLayout {
         flex: 1;
         padding: var(--lumo-space-m);
         padding-top: 0;
+        max-height: 80%;
     }
 
     .InventarioInicialView.form {

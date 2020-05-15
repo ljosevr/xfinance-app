@@ -74,8 +74,7 @@ public class SearchProductByNameComponent extends VerticalLayout {
         btnClose = new Button("Cerrar");
         btnClose.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
 
-        gridPro = new Grid<>(Producto.class);
-        gridPro.setColumns("nombreProducto");
+
 
         this.add(new HorizontalLayout(filter, btnClose), gridPro);
     }
@@ -83,7 +82,7 @@ public class SearchProductByNameComponent extends VerticalLayout {
 
     private void updateGrid() {
         if(StringUtils.isNotBlank(filter.getValue())) {
-            listData = ventaService.findAll(filter.getValue(), empresa, 0, 20);
+            listData = ventaService.findByName(filter.getValue(), empresa, 0, 20);
             grid.setItems(listData);
         }
     }

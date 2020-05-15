@@ -12,9 +12,9 @@ public class PventaGrid extends Grid<PventaDTO> {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COLUMN_BORDERS);
 
-        addColumn(PventaDTO::getItem)
-                .setFlexGrow(1)
-                .setVisible(true);
+//        addColumn(PventaDTO::getItem)
+//                .setFlexGrow(1)
+//                .setVisible(true);
 
         addColumn(PventaDTO::getNombreProducto)
                 .setHeader("Producto")
@@ -55,8 +55,7 @@ public class PventaGrid extends Grid<PventaDTO> {
     }
 
     private String formatImpuesto(PventaDTO pventaDTO) {
-
-        return AllUtils.numberFormat(AllUtils.percentage(pventaDTO.getPrecioVentaActual(), pventaDTO.getImpuestoValor()));
+        return AllUtils.numberFormat(AllUtils.percentage(pventaDTO.getPrecioVentaActual(), pventaDTO.getImpuestoValor()).multiply(pventaDTO.getCantidadVenta()));
     }
 
 }

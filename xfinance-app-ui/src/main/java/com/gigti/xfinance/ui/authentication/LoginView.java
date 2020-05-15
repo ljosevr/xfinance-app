@@ -60,15 +60,6 @@ public class LoginView extends VerticalLayout {
         this.setJustifyContentMode(JustifyContentMode.CENTER);
         this.addClassName("panel-principal-login");
 
-//        FormLayout formLayout = new FormLayout();
-//        formLayout.setClassName("formLayout");
-//        formLayout.setResponsiveSteps(
-//                new FormLayout.ResponsiveStep("25em", 1),
-//                new FormLayout.ResponsiveStep("40em", 2));
-
-//        formLayout.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-//        formLayout.setBoxSizing(BoxSizing.CONTENT_BOX);
-
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
         loginLayout.setBoxSizing(BoxSizing.CONTENT_BOX);

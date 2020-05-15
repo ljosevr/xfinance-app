@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface VentaService {
 
-    public List<PventaDTO> findAll(String filter, Empresa empresa, int page, int size);
+    public List<PventaDTO> findByName(String filter, Empresa empresa, int page, int size);
+
+    PventaDTO findByBarCode(String filter, Empresa empresa);
 
     public int count(Empresa empresa);
 

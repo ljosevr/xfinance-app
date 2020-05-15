@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class PventaDTO implements Serializable {
 
-    private int item;
+    //private int item;
     private String idProducto;
     private String nombreProducto;
     private String codigoBarra;
@@ -29,6 +29,10 @@ public class PventaDTO implements Serializable {
 
     public BigDecimal getSubTotal(){
         return  precioVentaActual.multiply(cantidadVenta);
+    }
+
+    public BigDecimal getSubImpuesto(){
+        return  precioVentaActual.multiply(impuestoValor).divide(BigDecimal.valueOf(100)).multiply(cantidadVenta);
     }
 
 }
