@@ -19,7 +19,7 @@ import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterAndDatesComponent;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.datepicker.DatePicker;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -46,8 +46,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
     //private DataProvider<Compra, Void> dataProvider;
     private DatePicker dateEnd;
     private DatePicker dateStart;
-    public static final String CREATE = "CREAR COMPRA";
-    public static final String EDIT = "EDITAR COMPRA";
+
 
     public CompraView(CompraService compraService, ProductoService productoService) {
         this.compraService = compraService;
@@ -58,7 +57,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
         setSpacing(false);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        H3 title = new H3(Constantes.VIEW_COMPRAS);
+        H1 title = new H1(Constantes.VIEW_COMPRAS.toUpperCase());
         title.setClassName("titleView2");
 
         configureProvider();
@@ -170,9 +169,9 @@ public class CompraView extends VerticalLayout implements ICrudView {
             closeEditor();
         } else {
             if(StringUtil.isBlank(((Compra) compra).getId())){
-                form.setCompra((Compra) compra, CREATE);
+                form.setCompra((Compra) compra, Constantes.CREATE_BUY);
             } else {
-                form.setCompra((Compra) compra, EDIT);
+                form.setCompra((Compra) compra, Constantes.EDIT_BUY);
             }
             form.setVisible(true);
             gridLayout.setVisible(false);

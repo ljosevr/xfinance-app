@@ -11,7 +11,7 @@ import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -19,6 +19,7 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import org.jsoup.internal.StringUtil;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class CategoriaView extends VerticalLayout implements ICrudView {
     private CategoriaProductoService categoriaProductoService;
     private Empresa empresa;
     private SearchFilterComponent searchLayout;
-    private DataProvider<CategoriaProducto, Void> dataProvider;
+
 
     public CategoriaView(CategoriaProductoService iService) {
         this.categoriaProductoService = iService;
@@ -41,9 +42,10 @@ public class CategoriaView extends VerticalLayout implements ICrudView {
 
         addClassName("view");
         setSizeFull();
+        setSpacing(false);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        H3 title = new H3(Constantes.VIEW_CATEGORIA);
+        H1 title = new H1(Constantes.VIEW_CATEGORIA.toUpperCase());
         title.addClassName("titleView2");
 
         configureSearchLayout();
@@ -72,7 +74,7 @@ public class CategoriaView extends VerticalLayout implements ICrudView {
 
     @Override
     public void closeEditor() {
-        form.setCategoria(null);
+        form.setCategoria(null, "");
         form.setVisible(false);
         grid.deselectAll();
         removeClassName("editing");
@@ -125,7 +127,11 @@ public class CategoriaView extends VerticalLayout implements ICrudView {
         if (categoria == null) {
             closeEditor();
         } else {
-            form.setCategoria((CategoriaProducto) categoria);
+            if(StringUtil.isBlank(((CategoriaProducto) categoria).getId())){
+                form.setCategoria((CategoriaProducto) categoria, Constantes.CREATE_CATEGORY);
+            } else {
+                form.setCategoria((CategoriaProducto) categoria, Constantes.EDIT_CATEGORY);
+            }
             form.setVisible(true);
             addClassName("editing");
         }
@@ -156,6 +162,8 @@ public class CategoriaView extends VerticalLayout implements ICrudView {
     @Override
     public void addItem() {
         grid.asSingleSelect().clear();
-        edit(new CategoriaProducto());
+        CategoriaProducto c = new CategoriaProducto();
+        c.setActivo(true);
+        edit(c);
     }
 }

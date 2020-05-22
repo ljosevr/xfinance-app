@@ -14,7 +14,7 @@ import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -40,6 +40,7 @@ public class UsuarioView extends VerticalLayout {
 
         addClassName("view");
         setSizeFull();
+        setSpacing(false);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         configureTopBar();
@@ -52,12 +53,10 @@ public class UsuarioView extends VerticalLayout {
         form.addListener(UsuarioForm.DeleteEvent.class, this::delete);
         form.addListener(UsuarioForm.CloseEvent.class, e -> closeEditor());
 
-        H3 title = new H3(Constantes.VIEW_USUARIO);
+        H1 title = new H1(Constantes.VIEW_USUARIO.toUpperCase());
         title.addClassName("titleView2");
-        title.setClassName("Date");
 
         VerticalLayout barAndGridLayout = new VerticalLayout();
-        barAndGridLayout.add(title);
 
         VerticalLayout gridLayout = new VerticalLayout(grid);
         gridLayout.addClassName("grid");
@@ -69,7 +68,7 @@ public class UsuarioView extends VerticalLayout {
         barAndGridLayout.setSizeFull();
         barAndGridLayout.expand(gridLayout);
 
-        add(barAndGridLayout);
+        add(title, barAndGridLayout);
 
         updateList();
         closeEditor();

@@ -23,7 +23,7 @@ public class InvInicialGrid extends PaginatedGrid<InventarioInicial> {
 
     public InvInicialGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         addColumn(producto -> producto.getProducto().getNombreProducto())
                 .setHeader("Nombre Producto")

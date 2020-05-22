@@ -6,7 +6,6 @@
 
 package com.gigti.xfinance.ui.authentication;
 
-import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.UsuarioService;
 
@@ -20,8 +19,6 @@ public interface AccessControl extends Serializable {
     Response signIn(String codigoEmpresa, String username, String password, UsuarioService iusu);
 
     boolean isUserSignedIn();
-
-    boolean isUserInRole(Usuario currentUser);
 
     void signOut();
 }

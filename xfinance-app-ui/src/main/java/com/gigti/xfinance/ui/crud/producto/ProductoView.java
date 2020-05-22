@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.ui.crud.producto;
 
+import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.others.Constantes;
@@ -19,7 +20,7 @@ import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -27,6 +28,7 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import org.jsoup.internal.StringUtil;
 
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
     private ProductoService productoService;
     private Empresa empresa;
     private SearchFilterComponent searchLayout;
-    private DataProvider<Producto, Void> dataProvider;
+    private List<CategoriaProducto> listCategoria;
 
     public ProductoView(CategoriaProductoService categoriaProductoService, ProductoService iServiceProd, ImpuestoService impuestoService) {
         this.productoService = iServiceProd;
@@ -51,7 +53,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        H3 title = new H3(Constantes.VIEW_PRODUCTO);
+        H1 title = new H1(Constantes.VIEW_PRODUCTO_ADMIN.toUpperCase());
         title.addClassName("titleView2");
 
         configureProvider();
@@ -60,8 +62,9 @@ public class ProductoView extends VerticalLayout implements ICrudView {
         filter = searchLayout.getFilter();
 
         configureGrid();
+        listCategoria = categoriaProductoService.findAll(empresa);
         form = new ProductoForm(
-                categoriaProductoService.findAll(empresa),
+                listCategoria,
                 productoService.getAllTipoMedidaEnum(),
                 impuestoService.findAll(empresa)
         );
@@ -90,25 +93,14 @@ public class ProductoView extends VerticalLayout implements ICrudView {
     }
 
     public void closeEditor() {
-        form.setProducto(null);
+        form.setProducto(null, "");
         form.setVisible(false);
         grid.deselectAll();
         removeClassName("editing");
     }
 
     public void configureProvider() {
-        dataProvider = DataProvider.fromCallbacks(
-                // First callback fetches items based on a query
-                query -> {
-                    List<Producto> productos = productoService.
-                            findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
 
-                    return productos.stream();
-                },
-                // Second callback fetches the number of items
-                // for a query
-                query -> productoService.count(filter.getValue(), empresa)
-        );
     }
 
     public void configureGrid() {
@@ -122,7 +114,18 @@ public class ProductoView extends VerticalLayout implements ICrudView {
     }
 
     public void updateList() {
-        grid.setDataProvider(dataProvider);
+        grid.setDataProvider(DataProvider.fromCallbacks(
+                // First callback fetches items based on a query
+                query -> {
+                    List<Producto> productos = productoService.
+                            findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
+
+                    return productos.stream();
+                },
+                // Second callback fetches the number of items
+                // for a query
+                query -> productoService.count(filter.getValue(), empresa)
+        ));
     }
 
     public void configureSearchLayout() {
@@ -135,14 +138,21 @@ public class ProductoView extends VerticalLayout implements ICrudView {
 
     public void addItem() {
         grid.asSingleSelect().clear();
-        edit(new Producto());
+        Producto p = new Producto();
+        p.setActivo(true);
+        p.setCategoria(listCategoria.get(0));
+        edit(p);
     }
 
     public void edit(Object producto) {
         if (producto == null) {
             closeEditor();
         } else {
-            form.setProducto((Producto) producto);
+            if(StringUtil.isBlank(((Producto) producto).getId())){
+                form.setProducto((Producto) producto, Constantes.CREATE_PRODUCT);
+            } else {
+                form.setProducto((Producto) producto, Constantes.EDIT_PRODUCT);
+            }
             form.setVisible(true);
             addClassName("editing");
         }

@@ -48,18 +48,18 @@ import java.util.stream.Collectors;
 @Route("")
 @PWA(
         name = "Tu Punto De Venta",
-        shortName = "TPV",
-        offlineResources = {
-                "./styles/offline.css",
-                "./images/offline.png"
-        }
+        shortName = "TPV"
+//        shortName = "TPV",
+//        offlineResources = {
+//                "./styles/offline.css",
+//                "./images/offline.png"
+//        },
+//        enableInstallPrompt = true
 )
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
-//@Theme(value = Material.class)
 @PageTitle(value = Constantes.VIEW_MAIN)
 @JsModule("@vaadin/vaadin-lumo-styles/presets/compact.js")
-//@Push
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
     private Accordion menus_varios;

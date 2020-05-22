@@ -13,7 +13,7 @@ public class CategoriaGrid extends PaginatedGrid<CategoriaProducto> {
 
     public CategoriaGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COLUMN_BORDERS);
 
         addColumn(CategoriaProducto::getNombre)
                 .setHeader("Nombre")

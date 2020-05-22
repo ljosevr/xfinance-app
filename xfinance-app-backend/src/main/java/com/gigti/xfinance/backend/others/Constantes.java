@@ -78,5 +78,12 @@ public class Constantes {
     public static final int PAGE_SIZE_20 = 20;
     public static final int PAGINATOR_SIZE = 3;
 
+    //Subtitles
+    public static final String CREATE_PRODUCT = "Crear Producto";
+    public static final String EDIT_PRODUCT = "Editar Producto";
+    public static final String CREATE_CATEGORY = "Crear Categoría";
+    public static final String EDIT_CATEGORY = "Editar Categoría";
+    public static final String CREATE_BUY = "Registrar Compra";
+    public static final String EDIT_BUY = "Editar Compra";
 
 }

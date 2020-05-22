@@ -16,7 +16,7 @@ public class CompraGrid extends PaginatedGrid<Compra> {
 
     public CompraGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         addColumn(Compra::getNumeroFactura)
                 .setHeader("#Numero de Factura")
@@ -41,6 +41,10 @@ public class CompraGrid extends PaginatedGrid<Compra> {
         setPageSize(Constantes.PAGE_SIZE_10);
         setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
+    }
+
+    public void refresh(Compra compra) {
+        getDataCommunicator().refresh(compra);
     }
 
     @Override

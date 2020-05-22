@@ -1,4 +1,4 @@
-package com.gigti.xfinance.ui.crud.usuario;
+package com.gigti.xfinance.ui.crud.configuracion;
 
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.dto.UsuarioChangePasswordDTO;
@@ -14,7 +14,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.BoxSizing;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -44,7 +44,7 @@ public class UserChangePasswordView extends VerticalLayout {
         this.setJustifyContentMode(JustifyContentMode.CENTER);
         this.setBoxSizing(BoxSizing.CONTENT_BOX);
 
-        H3 title = new H3("Cambiar Password");
+        H1 title = new H1(Constantes.VIEW_CONFIG_PASSWORD.toUpperCase());
         title.addClassName("titleView2");
 
         FormLayout formLayout = new FormLayout();

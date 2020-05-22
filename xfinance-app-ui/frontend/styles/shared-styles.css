@@ -303,7 +303,9 @@ a[highlight] {
 
 .titleView2 {
     text-align: center;
-    color: #2dd013;
+    color: #1061e8;
+    /*text-decoration: underline;*/
+    margin: 5px;
 }
 
 .subTitleView {
@@ -352,3 +354,6 @@ a[highlight] {
     padding: 2px;
 }
 
+.underConstruction {
+    color: #880000;
+}

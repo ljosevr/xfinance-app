@@ -62,8 +62,8 @@ public class CompraDetailForm extends FormLayout {
         listaItems = new ArrayList<>();
 
         titleForm = new H4("");
-        titleForm.addClassName("subTitleView");
-        this.add(titleForm,3);
+        titleForm.addClassName("subTitleView2");
+        this.add(titleForm,1);
 
         this.setClassName("formLayout");
         this.setResponsiveSteps(
@@ -319,11 +319,6 @@ public class CompraDetailForm extends FormLayout {
 
         VerticalLayout actionsLayout = new VerticalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
-        //actionsLayout.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-
-//        HorizontalLayout temp = new HorizontalLayout(gridLayout, actionsLayout);
-//        temp.expand(gridLayout);
-//        temp.setSizeFull();
 
         formItemLayout.add(gridLayout, 4);
         formItemLayout.add(actionsLayout, 2);

@@ -15,10 +15,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -64,12 +61,12 @@ public class PventaView extends VerticalLayout {
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
         addClassName("PventaView");
         setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.START);
+        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         dataLayout = new VerticalLayout();
         dataLayout.addClassName("rightLayout");
 
-        H3 title = new H3(Constantes.VIEW_PVENTA);
+        H1 title = new H1(Constantes.VIEW_REGISTRAR.toUpperCase());
         title.addClassName("titleView2");
         this.add(title);
 

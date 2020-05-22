@@ -25,6 +25,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
+import dev.mett.vaadin.tooltip.Tooltips;
 
 import java.util.List;
 
@@ -33,26 +34,28 @@ import java.util.List;
  */
 public class ProductoForm extends FormLayout {
 
+    private final H4 titleForm;
     private TextField tfProdNombre;
     private Button btnSave;
     private Binder<Producto> binder;
 
     public ProductoForm(List<CategoriaProducto> listCategoria, List<TipoMedidaEnum> listaTipoMedida, List<Impuesto> listImpuestos) {
         this.addClassName("form");
+        //this.getElement().setAttribute("max-width", "450px");
         this.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("25em", 1),
                 new FormLayout.ResponsiveStep("32em", 2));
 
-        H4 title = new H4("Crear o Editar Producto");
-        title.addClassName("subTitleView");
-        this.add(title,3);
+        titleForm = new H4("");
+        titleForm.addClassName("subTitleView");
+        this.add(titleForm,3);
 
         tfProdNombre = new TextField("Nombre Producto");
         tfProdNombre.setRequired(true);
         tfProdNombre.focus();
 
         TextField tfProdCodigoB = new TextField("Codigo de barras");
-        tfProdCodigoB.setRequired(false);
+        //tfProdCodigoB.setRequired(false);
 
         TextField tfProdDescripcion = new TextField("Descripción");
 
@@ -60,16 +63,16 @@ public class ProductoForm extends FormLayout {
         cbTipoMedida.setItems(listaTipoMedida);
         cbTipoMedida.setLabel("Tipo Medida");
         cbTipoMedida.setRequired(true);
+        Tooltips.getCurrent().setTooltip(cbTipoMedida, "Campo para determinar que medida usa el Producto");
 
         Checkbox chkActivo = new Checkbox("Activo");
-        chkActivo.setValue(true);
 
         ComboBox<CategoriaProducto> cbCategorias = new ComboBox<>();
         cbCategorias.setLabel("Categoria");
         cbCategorias.setItems(listCategoria);
-        //cbCategorias.setValue(listCategoria.isEmpty() ? null : listCategoria.get(0));
         cbCategorias.setRequired(true);
         cbCategorias.setItemLabelGenerator(CategoriaProducto::getNombre);
+        Tooltips.getCurrent().setTooltip(cbCategorias, "Puedes Agrupar en Grupos los Productos\nLas categorias se pueden crear");
 
         ComboBox<Impuesto> cbImpuesto = new ComboBox<>();
         cbImpuesto.setLabel("Impuesto");
@@ -80,7 +83,7 @@ public class ProductoForm extends FormLayout {
         binder = new BeanValidationBinder<>(Producto.class);
         binder.forField(tfProdNombre).asRequired("Digite Nombre").bind(Producto::getNombreProducto, Producto::setNombreProducto);
         binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
-        binder.forField(tfProdCodigoB).asRequired("Digite el Codigo de Barras").bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
+        binder.forField(tfProdCodigoB).bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
         binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
         binder.forField(cbCategorias).asRequired("Seleccione una Categoria").bind(Producto::getCategoria, Producto::setCategoria);
         binder.forField(cbTipoMedida).asRequired("Seleccione una Unidad de Medida").bind(Producto::getTipoMedida, Producto::setTipoMedida);
@@ -112,8 +115,9 @@ public class ProductoForm extends FormLayout {
 
     }
 
-    public void setProducto(Producto producto) {
+    public void setProducto(Producto producto, String title) {
         binder.setBean(producto);
+        titleForm.setText(title);
         tfProdNombre.focus();
     }
 

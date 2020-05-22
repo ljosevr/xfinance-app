@@ -15,7 +15,7 @@ import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -46,7 +46,7 @@ public class InvActualView extends VerticalLayout  implements ICrudView {
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        H3 title = new H3(Constantes.VIEW_INVENTARIO_ACTUAL);
+        H1 title = new H1(Constantes.VIEW_INVENTARIO_ACTUAL.toUpperCase());
         title.addClassName("titleView2");
 
         configureSearchLayout();

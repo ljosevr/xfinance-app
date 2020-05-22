@@ -83,8 +83,9 @@ public class CategoriaForm extends FormLayout {
 
     }
 
-    public void setCategoria(CategoriaProducto categoria) {
+    public void setCategoria(CategoriaProducto categoria, String title) {
         binder.setBean(categoria);
+        titleForm.setText(title);
         tfCatNombre.focus();
     }
 
