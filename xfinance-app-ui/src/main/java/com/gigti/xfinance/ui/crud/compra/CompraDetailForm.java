@@ -4,7 +4,10 @@ import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.components.MyButton;
+import com.gigti.xfinance.ui.util.AllUtils;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -13,35 +16,43 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.BoxSizing;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.shared.Registration;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class CompraDetailForm extends FormLayout {
+@PreserveOnRefresh
+public class CompraDetailForm extends VerticalLayout {
 
-    private H4 titleForm;
-    private Empresa empresa;
+    private final H4 titleForm;
+    private final Empresa empresa;
     private TextField tfFactura;
     private Button btnSave;
     private Binder<Compra> binder;
     private CompraItemGrid itemsGrid;
-    private ProductoService productoService;
-    private List<CompraItem> listaItems = new ArrayList<>();
+    private final ProductoService productoService;
+    private List<CompraItem> listaItems;
     private Producto selectedProd;
     private CompraItem selectedItemGrid;
     private Button btnAgregar;
@@ -55,34 +66,86 @@ public class CompraDetailForm extends FormLayout {
     private ProductoValorVenta productoValorVenta;
     private Button btnUpdate;
     private Button btnDelete;
-
+    private FlexLayout flexLayoutItems;
+    private TextField tfMedida;
+    private Tab tabData;
+    private Tab tabItems;
+    private Tab tabFinish;
+    private VerticalLayout page1, page2, page3;
     public CompraDetailForm(ProductoService productoService) {
         this.productoService = productoService;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
         listaItems = new ArrayList<>();
 
-        titleForm = new H4("");
-        titleForm.addClassName("subTitleView2");
-        this.add(titleForm,1);
+        this.addClassName("CompraDetailFormView");
+        this.setDefaultHorizontalComponentAlignment(Alignment.START);
 
-        this.setClassName("formLayout");
-        this.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1)/*,
-                new FormLayout.ResponsiveStep("32em", 2),
-                new FormLayout.ResponsiveStep("40em", 3)*/);
+        titleForm = new H4("");
+        titleForm.addClassName("subTitleView");
+        this.add(titleForm);
+
+        configureTabs();
+
+        //this.setClassName("formLayout");
+//        this.setResponsiveSteps(
+//                new FormLayout.ResponsiveStep("25em", 1),
+//                new FormLayout.ResponsiveStep("40em", 2)/*,
+//                new FormLayout.ResponsiveStep("40em", 3)*/);
 
         configureFormData();
         configureFormItems();
+        configureActionButtons();
+    }
+
+    private void configureTabs() {
+        tabData = new Tab("Datos Factura");
+        tabItems = new Tab("Productos");
+        tabFinish = new Tab("Guardar");
+        Tabs tabs = new Tabs(tabData, tabItems, tabFinish);
+
+        page1  = new VerticalLayout();
+        page1.setVisible(true);
+
+        page2  = new VerticalLayout();
+        page2.setVisible(false);
+
+        page3  = new VerticalLayout();
+        page3.setVisible(false);
+
+        Map<Tab, Component> tabsToPages = new HashMap<>();
+        tabsToPages.put(tabData, page1);
+        tabsToPages.put(tabItems, page2);
+        tabsToPages.put(tabFinish, page3);
+
+        Set<Component> pagesShown = Stream.of(page1)
+                .collect(Collectors.toSet());
+
+        tabs.addSelectedChangeListener(event -> {
+            pagesShown.forEach(page -> page.setVisible(false));
+            pagesShown.clear();
+            Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+            selectedPage.setVisible(true);
+            pagesShown.add(selectedPage);
+        });
+
+        tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
+        this.add(tabs);
+        Div pages = new Div(page1, page2, page3);
+        this.add(pages);
     }
 
     private void configureFormData() {
 
+        H4 subTitleData = new H4("Datos Factura");
+        subTitleData.addClassName("subTitleView");
+
         FormLayout formDataLayout = new FormLayout();
         formDataLayout.setClassName("formLayout");
         formDataLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 3),
-                new FormLayout.ResponsiveStep("40em", 5));
+                new FormLayout.ResponsiveStep("300Px", 1),
+                new FormLayout.ResponsiveStep("450px", 3),
+                new FormLayout.ResponsiveStep("800px", 4),
+                new FormLayout.ResponsiveStep("1100px", 5));
         tfFactura = new TextField("# Factura");
         tfFactura.setRequired(true);
         tfFactura.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -138,7 +201,7 @@ public class CompraDetailForm extends FormLayout {
         formDataLayout.add(tfFactura, dpFechaCompra, tfProveedor,
                 tfTelefonoProveedor, tfDireccionProveedor);
 
-        this.add(formDataLayout, 3);
+        page1.add(subTitleData, formDataLayout);
     }
 
     private void enableButtonSave() {
@@ -146,12 +209,12 @@ public class CompraDetailForm extends FormLayout {
     }
 
     private void configureFormItems() {
-        VerticalLayout itemLayout = new VerticalLayout();
-        itemLayout.setSpacing(false);
-        itemLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.START);
+//        VerticalLayout itemLayout = new VerticalLayout();
+//        itemLayout.setSpacing(false);
+//        itemLayout.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.START);
 
-        H4 subTitle = new H4("Items Compra");
-        subTitle.addClassName("subTitleView");
+        H4 subTitleItems = new H4("Seleccionar Productos");
+        subTitleItems.addClassName("subTitleView");
 
         configureItemGrid();
 
@@ -172,8 +235,13 @@ public class CompraDetailForm extends FormLayout {
             if(selectedProd != null) {
                 Response result = productoService.getPriceVenta(selectedProd);
                 if(result.isSuccess()) {
+                    tfCantidad.setEnabled(true);
+                    tfCostoTotal.setEnabled(true);
+                    tfVenta.setEnabled(true);
+
                     productoValorVenta = (ProductoValorVenta) result.getObject();
                     tfProducto.setValue(selectedProd.getNombreProducto());
+                    tfMedida.setValue(AllUtils.formatUnidadMedida(selectedProd.getTipoMedida().name()));
                     tfCantidad.setValue(BigDecimal.valueOf(0).setScale(2));
                     tfCostoTotal.setValue(BigDecimal.valueOf(0).setScale(2));
                     tfCostoUn.setValue(BigDecimal.ZERO.setScale(2));
@@ -198,31 +266,41 @@ public class CompraDetailForm extends FormLayout {
                 .withProperty("nombre", prod -> prod.getNombreProducto().toUpperCase())
                 .withProperty("tipMedida", prod -> prod.getTipoMedida().toString().toLowerCase()));
 
+        VerticalLayout layoutComboProd = new VerticalLayout();
+        layoutComboProd.add(cbProductos);
+        layoutComboProd.addClassName("comboProd");
+        layoutComboProd.expand(cbProductos);
+
         FormLayout formItemLayout = new FormLayout();
         formItemLayout.setClassName("formLayout");
         formItemLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 3),
-                new FormLayout.ResponsiveStep("40em", 6));
+                new FormLayout.ResponsiveStep("300Px", 1),
+                new FormLayout.ResponsiveStep("450px", 3),
+                new FormLayout.ResponsiveStep("800px", 4));
 
         tfProducto = new TextField("Producto");
         tfProducto.setReadOnly(true);
         tfProducto.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
+        tfMedida = new TextField("Med");
+        tfMedida.setReadOnly(true);
+        tfMedida.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        tfMedida.setMaxWidth("60px");
+
         tfCantidad = new BigDecimalField("Cantidad");
-        tfCantidad.setReadOnly(false);
         tfCantidad.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_CENTER);
         tfCantidad.setAutoselect(true);
         tfCantidad.setMaxWidth("60px");
         tfCantidad.addKeyPressListener(Key.ENTER, keyPressEvent -> tfCostoTotal.focus());
         tfCantidad.addValueChangeListener(evt -> calculatedPriceCost());
+        tfCantidad.setEnabled(false);
 
         tfCostoTotal = new BigDecimalField("P. Costo Total");
-        tfCostoTotal.setReadOnly(false);
         tfCostoTotal.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_RIGHT);
         tfCostoTotal.setPrefixComponent(new Span("$"));
         tfCostoTotal.setAutoselect(true);
         tfCostoTotal.setMaxWidth("120px");
+        tfCostoTotal.setEnabled(false);
         tfCostoTotal.addKeyPressListener(Key.ENTER, keyPressEvent -> tfVenta.focus());
         tfCostoTotal.addValueChangeListener(evt -> calculatedPriceCost());
 
@@ -240,11 +318,11 @@ public class CompraDetailForm extends FormLayout {
         tfVenta.setPrefixComponent(new Span("$"));
         tfVenta.setAutoselect(true);
         tfVenta.setMaxWidth("120px");
+        tfVenta.setEnabled(false);
         tfVenta.addKeyPressListener(Key.ENTER, keyPressEvent -> btnAgregar.focus());
 
-        btnAgregar = new Button(new Icon(VaadinIcon.PLUS_CIRCLE));
-        btnAgregar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnAgregar.setEnabled(false);
+        btnAgregar = MyButton.MyButton("", new Icon(VaadinIcon.PLUS_CIRCLE),
+                "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, false, false);
         btnAgregar.addClickListener(evt -> {
             if(selectedProd != null) {
                 CompraItem item = new CompraItem();
@@ -261,9 +339,8 @@ public class CompraDetailForm extends FormLayout {
             }
         });
 
-        btnQuitar = new Button(new Icon(VaadinIcon.CLOSE_CIRCLE));
-        btnQuitar.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        btnQuitar.setEnabled(false);
+        btnQuitar = MyButton.MyButton("", new Icon(VaadinIcon.CLOSE_CIRCLE),
+                "Eliminar Producto de la tabla", ButtonVariant.LUMO_ERROR, false, false);
         btnQuitar.addClickListener(evt -> {
             listaItems.remove(selectedItemGrid);
             itemsGrid.setItems(listaItems);
@@ -272,9 +349,8 @@ public class CompraDetailForm extends FormLayout {
             clearData();
         });
 
-        btnUpdate = new Button(new Icon(VaadinIcon.CHECK_CIRCLE));
-        btnUpdate.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
-        btnUpdate.setEnabled(false);
+        btnUpdate = MyButton.MyButton("", new Icon(VaadinIcon.CHECK_CIRCLE),
+                "Actualizar Producto en tabla", ButtonVariant.LUMO_SUCCESS, false, false);
         btnUpdate.addClickListener(evt -> {
             if(selectedProd != null) {
                 CompraItem item = new CompraItem();
@@ -293,13 +369,30 @@ public class CompraDetailForm extends FormLayout {
             }
         });
 
-        formItemLayout.add(cbProductos);
-        formItemLayout.setColspan(cbProductos, 6);
-        formItemLayout.add(tfProducto, tfCantidad, tfCostoTotal, tfCostoUn,tfVenta, new HorizontalLayout(btnAgregar, btnQuitar, btnUpdate));
+        formItemLayout.add(tfProducto, tfMedida, tfCantidad, tfCostoTotal);
+        HorizontalLayout layoutActions = new HorizontalLayout(btnAgregar, btnQuitar, btnUpdate);
+        formItemLayout.add(tfCostoUn,tfVenta, layoutActions);
+        formItemLayout.setColspan(layoutActions, 2);
+        //formItemLayout.setSizeFull();
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");
         gridLayout.setSizeFull();
+
+        formItemLayout.add(gridLayout, 4);
+
+
+        flexLayoutItems = new FlexLayout();
+        flexLayoutItems.add(formItemLayout);
+        flexLayoutItems.addClassName("content");
+        flexLayoutItems.setSizeFull();
+        //flexLayoutItems.setFlexGrow(9, formItemLayout);
+
+        page2.add(subTitleItems,layoutComboProd, flexLayoutItems);
+
+    }
+
+    private void configureActionButtons() {
 
         //Actions CENTER
         btnSave = new Button("Guardar");
@@ -319,17 +412,10 @@ public class CompraDetailForm extends FormLayout {
 
         VerticalLayout actionsLayout = new VerticalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
+        actionsLayout.setSizeUndefined();
+        actionsLayout.setBoxSizing(BoxSizing.CONTENT_BOX);
 
-        formItemLayout.add(gridLayout, 4);
-        formItemLayout.add(actionsLayout, 2);
-
-        //itemLayout.add(subTitle, formItemLayout, temp);
-        itemLayout.add(subTitle, formItemLayout);
-
-        itemLayout.setMargin(false);
-        itemLayout.setPadding(false);
-
-        this.add(itemLayout, 2);
+        page3.add(actionsLayout);
     }
 
     private void validateAndDelete() {
@@ -353,6 +439,10 @@ public class CompraDetailForm extends FormLayout {
         selectedProd = null;
         cbProductos.setValue(null);
         tfProducto.setValue("");
+        tfMedida.setValue("");
+        tfCantidad.setEnabled(false);
+        tfCostoTotal.setEnabled(false);
+        tfVenta.setEnabled(false);
         tfCantidad.setValue(BigDecimal.valueOf(0).setScale(2));
         tfCostoTotal.setValue(BigDecimal.valueOf(0).setScale(2));
         tfCostoUn.setValue(BigDecimal.ZERO.setScale(2));
@@ -373,6 +463,7 @@ public class CompraDetailForm extends FormLayout {
                 btnQuitar.setEnabled(evt.getValue() != null);
                 btnUpdate.setEnabled(evt.getValue() != null);
                 tfProducto.setValue(selectedItemGrid.getProducto().getNombreProducto());
+                tfMedida.setValue(AllUtils.formatUnidadMedida(selectedItemGrid.getProducto().getTipoMedida().name()));
                 tfCantidad.setValue(selectedItemGrid.getCantidad().setScale(2));
                 tfCostoTotal.setValue(selectedItemGrid.getPrecioTotalCosto().setScale(2));
                 tfCostoUn.setValue(selectedItemGrid.getPrecioCosto().setScale(2));

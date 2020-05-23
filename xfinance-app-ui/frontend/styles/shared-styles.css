@@ -102,6 +102,15 @@
         max-width: 450px;
     }
 
+    .CompraDetailFormView.comboProd {
+        margin: 10px;
+        padding: var(--lumo-space-m);
+        max-width: 500px;
+        border: 2px solid black;
+        border-radius: 7px;
+        box-sizing: content-box;
+    }
+
     .panel-principal-login{
         margin: 150px 0px;
         display: flex;

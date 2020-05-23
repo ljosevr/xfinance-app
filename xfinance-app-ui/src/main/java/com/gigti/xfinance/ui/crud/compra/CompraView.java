@@ -24,6 +24,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import org.jsoup.internal.StringUtil;
@@ -34,6 +35,7 @@ import java.util.List;
 @Route(value = Constantes.VIEW_R_COMPRAS, layout = MainLayout.class)
 @RouteAlias(value = "compra", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_COMPRAS +" | "+ Constantes.VIEW_MAIN)
+@PreserveOnRefresh
 public class CompraView extends VerticalLayout implements ICrudView {
 
     private final VerticalLayout gridLayout;
@@ -54,7 +56,8 @@ public class CompraView extends VerticalLayout implements ICrudView {
 
         addClassName("CompraView");
         setSizeFull();
-        setSpacing(false);
+        setSpacing(true);
+        setPadding(true);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         H1 title = new H1(Constantes.VIEW_COMPRAS.toUpperCase());
