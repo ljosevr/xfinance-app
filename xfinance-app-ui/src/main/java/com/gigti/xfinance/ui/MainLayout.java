@@ -8,7 +8,6 @@ package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.Vista;
-import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -23,8 +22,6 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -33,10 +30,9 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.PWA;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.RouterLayout;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.*;
@@ -45,21 +41,21 @@ import java.util.stream.Collectors;
 /**
  * The main layout. Contains the navigation menu.
  */
-@Route("")
-@PWA(
-        name = "Tu Punto De Venta",
-        shortName = "TPV",
-        offlineResources = {
-                "./styles/offline.css",
-                "./images/offline.png"
-        },
-        enableInstallPrompt = true
-)
-@CssImport("./styles/shared-styles.css")
-@Theme(value = Lumo.class)
-@PageTitle(value = Constantes.VIEW_MAIN)
-@JsModule("@vaadin/vaadin-lumo-styles/presets/compact.js")
-@PreserveOnRefresh
+//@Route("")
+//@PWA(
+//        name = "Tu Punto De Venta",
+//        shortName = "TPV",
+//        offlineResources = {
+//                "./styles/offline.css",
+//                "./images/offline.png"
+//        },
+//        enableInstallPrompt = true
+//)
+//@CssImport("./styles/shared-styles.css")
+//@Theme(value = Lumo.class)
+//@PageTitle(value = Constantes.VIEW_MAIN)
+//@JsModule("@vaadin/vaadin-lumo-styles/presets/compact.js")
+//@PreserveOnRefresh
 public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
     private Accordion menus_varios;

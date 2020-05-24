@@ -84,43 +84,43 @@ public class InitBackServiceImpl implements InitBackService {
 
                 //Vistas
                 Vista vista_punto_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 1, null));//CASH
-                Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 2, null));
-                Vista vista_usuarios = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO,null,null,3,null));
+                Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 2, "COMPILE"));
+                Vista vista_usuarios = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO,null,null,3,"GROUP"));
 
                 //PERFIL
                 Vista vista_empresa = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA,Constantes.VIEW_R_EMPRESA, null, 4, "OFFICE"));
 
                 Vista vista_empresaMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESAS,null, null, 5, null));
-                Vista vista_reportes = vistaRepository.save(new Vista(Constantes.VIEW_REPORTS,null, null, 6, null));
+                Vista vista_reportes = vistaRepository.save(new Vista(Constantes.VIEW_REPORTS,null, null, 6, "FILE_TEXT_O"));
 
-                Vista vista_config = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG,null, null, 7, null));
+                Vista vista_config = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG,null, null, 7, "TOOLS"));
 
                 //1.Punto de Venta
-                Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_R_VENTA, vista_punto_venta, 11, "CASH"));//CASH
+                Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_C_VENTA, vista_punto_venta, 11, "CASH"));//CASH
 
                 //2. Productos
-                Vista vista_admin_prod = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO_ADMIN,Constantes.VIEW_R_PRODUCTO, vista_producto, 21,"CUBE"));//COMPILE
-                Vista vista_categoria = vistaRepository.save(new Vista(Constantes.VIEW_CATEGORIA,Constantes.VIEW_R_CATEGORIA, vista_producto, 22,"CUBES"));
-                Vista vista_compras = vistaRepository.save(new Vista(Constantes.VIEW_COMPRAS,Constantes.VIEW_R_COMPRAS,vista_producto, 23, "CART_O"));
-                Vista vista_invInicial = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_INICIAL,Constantes.VIEW_R_INVENTARIO_INICIAL,vista_producto,24, "STOCK"));
+                Vista vista_admin_prod = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO_ADMIN,Constantes.VIEW_C_PRODUCTO, vista_producto, 21,"CUBE"));//COMPILE
+                Vista vista_categoria = vistaRepository.save(new Vista(Constantes.VIEW_CATEGORIA,Constantes.VIEW_C_CATEGORIA, vista_producto, 22,"CUBES"));
+                Vista vista_compras = vistaRepository.save(new Vista(Constantes.VIEW_COMPRAS,Constantes.VIEW_C_COMPRAS,vista_producto, 23, "CART_O"));
+                Vista vista_invInicial = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_INICIAL,Constantes.VIEW_C_INVENTARIO_INICIAL,vista_producto,24, "STOCK"));
 
                 //3.Usuarios
-                Vista vista_admin_usu = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO_ADMIN,Constantes.VIEW_R_USUARIOS,vista_usuarios,31, "GROUP"));
-                Vista vista_rol = vistaRepository.save(new Vista(Constantes.VIEW_ROL,Constantes.VIEW_R_ROL,vista_usuarios, 32,"DOCTOR"));
+                Vista vista_admin_usu = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO_ADMIN,Constantes.VIEW_C_USUARIOS,vista_usuarios,31, "MALE"));
+                Vista vista_rol = vistaRepository.save(new Vista(Constantes.VIEW_ROL,Constantes.VIEW_C_ROL,vista_usuarios, 32,"USER_CARD"));
 
                 //5.Empresa Master
-                Vista vista_admin_empMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA_ADMIN,Constantes.VIEW_R_EMPRESA_MASTER, vista_empresaMaster, 51, "OFFICE"));
-                Vista vista_usuario_emp = vistaRepository.save(new Vista(Constantes.VIEW_EMP_USU_ADMIN,Constantes.VIEW_R_USUARIOADMIN,vista_empresaMaster, 52, "GROUP"));
+                Vista vista_admin_empMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA_ADMIN,Constantes.VIEW_C_EMPRESA_MASTER, vista_empresaMaster, 51, "OFFICE"));
+                //Vista vista_usuario_emp = vistaRepository.save(new Vista(Constantes.VIEW_EMP_USU_ADMIN,Constantes.VIEW_C_USUARIOADMIN,vista_empresaMaster, 52, "GROUP"));
 
                 //6.Reportes
-                Vista vista_invActual = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_ACTUAL,Constantes.VIEW_R_INVENTARIO_ACTUAL,vista_reportes,61, "STORAGE"));
-                Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_R_GANANCIAS_Y_PERDIDAS,vista_reportes, 62,"CHART_LINE"));
-                Vista vista_ventas = vistaRepository.save(new Vista(Constantes.VIEW_VENTAS,Constantes.VIEW_R_VENTAS,vista_reportes, 63,"OUTBOX"));
+                Vista vista_invActual = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_ACTUAL,Constantes.VIEW_C_INVENTARIO_ACTUAL,vista_reportes,61, "STORAGE"));
+                Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_C_GANANCIAS_Y_PERDIDAS,vista_reportes, 62,"CHART_LINE"));
+                Vista vista_ventas = vistaRepository.save(new Vista(Constantes.VIEW_VENTAS,Constantes.VIEW_C_VENTAS,vista_reportes, 63,"TRENDING_UP"));
 
                 //7. Config
-                Vista vista_config_perfil = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PERFIL,Constantes.VIEW_R_CONFIG_PERFIL,vista_config, 63, "COG"));
-                Vista vista_config_empresa = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_EMPRESA,Constantes.VIEW_R_CONFIG_EMPRESA,vista_config, 64,"COGS"));
-                Vista vista_config_password = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PASSWORD,Constantes.VIEW_R_CONFIG_PASSWORD,vista_config, 65, "PASSWORD"));
+                Vista vista_config_perfil = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PERFIL,Constantes.VIEW_C_CONFIG_PERFIL,vista_config, 63, "COG"));
+                Vista vista_config_empresa = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_EMPRESA,Constantes.VIEW_C_CONFIG_EMPRESA,vista_config, 64,"COGS"));
+                Vista vista_config_password = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PASSWORD,Constantes.VIEW_C_CONFIG_PASSWORD,vista_config, 65, "PASSWORD"));
                 logger.info("Vistas");
 
                 //Roles
@@ -128,7 +128,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ROOT.setVistas(new HashSet<>());
                 Rol.ROOT.getVistas().add(vista_empresaMaster);
                 Rol.ROOT.getVistas().add(vista_admin_empMaster);
-                Rol.ROOT.getVistas().add(vista_usuario_emp);
+                //Rol.ROOT.getVistas().add(vista_usuario_emp);
                 Rol.ROOT.getVistas().add(vista_config);
                 Rol.ROOT.getVistas().add(vista_config_perfil);
                 Rol.ROOT.getVistas().add(vista_config_password);

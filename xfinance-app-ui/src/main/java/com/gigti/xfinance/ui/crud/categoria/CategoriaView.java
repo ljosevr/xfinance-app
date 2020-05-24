@@ -6,6 +6,7 @@ import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
@@ -23,7 +24,7 @@ import org.jsoup.internal.StringUtil;
 
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_CATEGORIA, layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_CATEGORIA, layout = MainLayout2.class)
 @RouteAlias(value = "categoria", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_CATEGORIA +" | "+ Constantes.VIEW_MAIN)
 public class CategoriaView extends VerticalLayout implements ICrudView {

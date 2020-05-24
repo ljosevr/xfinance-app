@@ -14,7 +14,7 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.backend.services.ImpuestoService;
 import com.gigti.xfinance.backend.services.ProductoService;
-import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
@@ -32,8 +32,8 @@ import org.jsoup.internal.StringUtil;
 
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout.class)
-@RouteAlias(value = "producto", layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_PRODUCTO, layout = MainLayout2.class)
+@RouteAlias(value = "producto", layout = MainLayout2.class)
 @PageTitle(value = Constantes.VIEW_PRODUCTO +" | "+ Constantes.VIEW_MAIN)
 public class ProductoView extends VerticalLayout implements ICrudView {
 

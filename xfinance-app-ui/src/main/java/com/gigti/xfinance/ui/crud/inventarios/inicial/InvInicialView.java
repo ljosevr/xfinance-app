@@ -12,7 +12,7 @@ import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ImpuestoService;
 import com.gigti.xfinance.backend.services.InventarioService;
-import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
@@ -29,7 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_INVENTARIO_INICIAL, layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_INVENTARIO_INICIAL, layout = MainLayout2.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_INICIAL +" | "+ Constantes.VIEW_MAIN)
 public class InvInicialView extends VerticalLayout  implements ICrudView {
 

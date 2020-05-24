@@ -9,7 +9,7 @@ package com.gigti.xfinance.backend.data;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -32,7 +32,7 @@ public class Vista extends AbstractEntity {
     private String iconMenu;
 
     @OneToMany(mappedBy="vistaPadre",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Collection<Vista> subVistas;
+    private List<Vista> subVistas;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, mappedBy ="vistas")
     private Set<Rol> roles;

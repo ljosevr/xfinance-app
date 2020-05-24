@@ -7,6 +7,7 @@ import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
@@ -26,7 +27,7 @@ import com.vaadin.flow.data.binder.BinderValidationStatus;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = Constantes.VIEW_R_CONFIG_PASSWORD, layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_CONFIG_PASSWORD, layout = MainLayout2.class)
 @PageTitle(value = Constantes.VIEW_CONFIG_PASSWORD +" | "+ Constantes.VIEW_MAIN)
 public class UserChangePasswordView extends VerticalLayout {
 

@@ -175,6 +175,8 @@ public class CompraDetailForm extends VerticalLayout {
         tfTelefonoProveedor.setRequired(false);
         tfTelefonoProveedor.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfTelefonoProveedor.setClearButtonVisible(true);
+        tfTelefonoProveedor.setPattern("[0-9]*");
+        tfTelefonoProveedor.setPreventInvalidInput(true);
 
         TextField tfDireccionProveedor = new TextField("Dirección Proveedor");
         tfDireccionProveedor.setRequired(false);

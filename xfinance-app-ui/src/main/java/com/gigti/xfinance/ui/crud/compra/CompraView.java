@@ -13,6 +13,7 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.CompraService;
 import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
@@ -32,7 +33,7 @@ import org.jsoup.internal.StringUtil;
 import java.time.LocalDate;
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_COMPRAS, layout = MainLayout.class)
+@Route(value = Constantes.VIEW_R_COMPRAS, layout = MainLayout2.class)
 @RouteAlias(value = "compra", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_COMPRAS +" | "+ Constantes.VIEW_MAIN)
 @PreserveOnRefresh

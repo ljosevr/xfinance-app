@@ -9,22 +9,39 @@ public class Constantes {
     public static final String INIT4 = "PI Back - 4 - Roles";
     public static final String INIT5 = "PI Back - 5 - DEMO";
 
+    //VIEWS-CLASS-NAME
+    public static final String VIEW_C_VENTA = "com.gigti.xfinance.ui.crud.pventa.PventaView";
+    public static final String VIEW_C_PRODUCTO = "com.gigti.xfinance.ui.crud.producto.ProductoView";
+    public static final String VIEW_C_CATEGORIA = "com.gigti.xfinance.ui.crud.categoria.CategoriaView";
+    public static final String VIEW_C_COMPRAS = "com.gigti.xfinance.ui.crud.compra.CompraView";
+    public static final String VIEW_C_INVENTARIO_INICIAL = "com.gigti.xfinance.ui.crud.inventarios.inicial.InvInicialView";
+    public static final String VIEW_C_INVENTARIO_ACTUAL = "com.gigti.xfinance.ui.crud.inventarios.actual.InvActualView";
+    public static final String VIEW_C_USUARIOS = "com.gigti.xfinance.ui.crud.usuario.UsuarioView";
+    public static final String VIEW_C_ROL = "com.gigti.xfinance.ui.crud.usuario.rol.RolView";
+    public static final String VIEW_C_VENTAS = "com.gigti.xfinance.ui.crud.reportes.VentasView";
+    public static final String VIEW_C_GANANCIAS_Y_PERDIDAS = "com.gigti.xfinance.ui.crud.reportes.GanancisYPerdidasView";
+    public static final String VIEW_C_EMPRESA_MASTER = "com.gigti.xfinance.ui.crud.empresa.EmpresaMasterView";
+    public static final String VIEW_C_CONFIG_PASSWORD = "com.gigti.xfinance.ui.crud.configuracion.UserChangePasswordView";
+    public static final String VIEW_C_CONFIG_PERFIL = "com.gigti.xfinance.ui.crud.configuracion.PerfilView";
+    public static final String VIEW_C_CONFIG_EMPRESA = "com.gigti.xfinance.ui.crud.configuracion.DatosEmpresaView";
+    //public static final String VIEW_C_USUARIOADMIN = "usuarioAdmin";
+
     //VIEWS-ROUTE
     public static final String VIEW_R_LOGIN = "Login";
-
     public static final String VIEW_R_VENTA = "pventa";
 
     public static final String VIEW_R_PRODUCTO = "productos";
     public static final String VIEW_R_CATEGORIA = "categorias";
     public static final String VIEW_R_COMPRAS = "compras";
+
     public static final String VIEW_R_INVENTARIO_INICIAL = "invInicial";
     public static final String VIEW_R_INVENTARIO_ACTUAL = "invActual";
 
     public static final String VIEW_R_USUARIOS = "usuarios";
-
     public static final String VIEW_R_EMPRESA_MASTER = "empresaMaster";
     public static final String VIEW_R_EMPRESA = "empresa";
     public static final String VIEW_R_USUARIOADMIN = "usuarioAdmin";
+
 
     public static final String VIEW_R_FORGOT = "forgotPassword";
     public static final String VIEW_R_INVENTARIO = "inventario";
@@ -59,7 +76,7 @@ public class Constantes {
     public static final String VIEW_EMPRESA = "Empresa";
     public static final String VIEW_EMPRESAS = "Empresas";
     public static final String VIEW_EMPRESA_ADMIN = "Administrar Empresas";
-    public static final String VIEW_EMP_USU_ADMIN = "Usuarios Admin Empresa";
+    //public static final String VIEW_EMP_USU_ADMIN = "Usuarios Admin Empresa";
 
     public static final String VIEW_REPORTS = "Reportes";
     public static final String VIEW_INVENTARIO = "Inventarios";
