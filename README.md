@@ -5,5 +5,5 @@
 * Java 11
 * Vaadin 14 (Web y Mobile PWA)
 * Spring Boot
-* ApiRest
+* ApiRest (Proximamente)
 * PostgresSQL
