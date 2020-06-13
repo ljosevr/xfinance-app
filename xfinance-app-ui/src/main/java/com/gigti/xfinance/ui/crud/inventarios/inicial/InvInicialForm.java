@@ -87,23 +87,19 @@ public class InvInicialForm extends FormLayout {
         cbImpuesto.setItemLabelGenerator(Impuesto::getNombre);
 
         binder.forField(tfProducto)
-                .bind(inv -> {
-                    return inv.getProducto().getNombreProducto();
-                }, (inv, data) -> inv.setProducto(binder.getBean().getProducto()));
+                .bind(inv -> inv.getProducto().getNombreProducto()
+                , (inv, data) -> inv.setProducto(binder.getBean().getProducto()));
         binder.forField(tfCantidad).asRequired("Digite Cantidad")
-                .bind(inv -> {
-                    return inv.getCantidad().doubleValue();
-                }, (inv, data) -> inv.setCantidad(BigDecimal.valueOf(data)));
+                .bind(inv -> inv.getCantidad().doubleValue()
+                        , (inv, data) -> inv.setCantidad(BigDecimal.valueOf(data)));
         binder.forField(tfPrecioCosto).asRequired("Digite Precio de Costo")
-                .bind(inv -> {
-                    return inv.getPrecioCosto().doubleValue();
-                }, (inv, data) -> {
+                .bind(inv -> inv.getPrecioCosto().doubleValue()
+                , (inv, data) -> {
                     inv.setPrecioCosto(BigDecimal.valueOf(data));
                 });
         binder.forField(tfPrecioVenta).asRequired("Digite Precio de Venta")
-                .bind(inv -> {
-                    return inv.getPrecioVenta().doubleValue();
-                }, (inv, data) -> {
+                .bind(inv -> inv.getPrecioVenta().doubleValue()
+                , (inv, data) -> {
                     inv.setPrecioVenta(BigDecimal.valueOf(data));
                 });
 

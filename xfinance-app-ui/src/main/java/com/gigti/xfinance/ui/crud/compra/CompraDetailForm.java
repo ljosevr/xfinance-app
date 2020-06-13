@@ -36,6 +36,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.shared.Registration;
+import dev.mett.vaadin.tooltip.Tooltips;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -50,6 +51,7 @@ public class CompraDetailForm extends VerticalLayout {
     private TextField tfFactura;
     private Button btnSave;
     private Binder<Compra> binder;
+    private Binder<CompraItem> binderItem;
     private CompraItemGrid itemsGrid;
     private final ProductoService productoService;
     private List<CompraItem> listaItems;
@@ -306,8 +308,6 @@ public class CompraDetailForm extends VerticalLayout {
         tfCostoTotal.addKeyPressListener(Key.ENTER, keyPressEvent -> tfVenta.focus());
         tfCostoTotal.addValueChangeListener(evt -> calculatedPriceCost());
 
-//        new NumeralFieldFormatter(".", ",", 2).extend(tfCostoTotal);
-
         tfCostoUn = new BigDecimalField("P. Costo Unitario");
         tfCostoUn.setReadOnly(true);
         tfCostoUn.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.LUMO_ALIGN_RIGHT);
@@ -323,23 +323,44 @@ public class CompraDetailForm extends VerticalLayout {
         tfVenta.setEnabled(false);
         tfVenta.addKeyPressListener(Key.ENTER, keyPressEvent -> btnAgregar.focus());
 
+        binderItem = new BeanValidationBinder<>(CompraItem.class);
+        binderItem.forField(tfCantidad)
+                .asRequired("Obligatorio")
+                .withValidator(cantidad -> cantidad.compareTo(BigDecimal.ZERO) > 0, "Cantidad debe ser Mayor a 0(Cero)")
+                .bind(CompraItem::getCantidad, CompraItem::setCantidad);
+
+        binderItem.forField(tfCostoTotal)
+                .asRequired("Obligatorio")
+                .withValidator(v -> v.compareTo(BigDecimal.ZERO) > 0, "Costo Total debe ser Mayor a 0(Cero)")
+                .bind(CompraItem::getPrecioTotalCosto, CompraItem::setPrecioTotalCosto);
+
+        binderItem.forField(tfVenta)
+                .asRequired("Obligatorio")
+                .withValidator(v -> v.compareTo(BigDecimal.ZERO) > 0, "Valor Venta debe ser Mayor a 0(Cero)")
+                .bind(CompraItem::getPrecioVenta, CompraItem::setPrecioVenta);
+
+        binderItem.forField(tfProducto).asRequired("Seleccione un Producto")
+                .bind(p -> p.getProducto().getNombreProducto(),
+                        (p,data) -> p.setProducto(cbProductos.getValue()));
+
+        binderItem.forField(tfCostoUn).bind(CompraItem::getPrecioCosto, CompraItem::setPrecioCosto);
+
         btnAgregar = MyButton.MyButton("", new Icon(VaadinIcon.PLUS_CIRCLE),
                 "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, false, false);
+
         btnAgregar.addClickListener(evt -> {
             if(selectedProd != null) {
-                CompraItem item = new CompraItem();
-                item.setProducto(selectedProd);
-                item.setCantidad(tfCantidad.getValue());
-                item.setPrecioTotalCosto(tfCostoTotal.getValue());
-                item.setPrecioCosto(tfCostoUn.getValue());
-                item.setPrecioVenta(tfVenta.getValue());
-                item.setItem(listaItems.size()+1);
-                listaItems.add(item);
-                itemsGrid.setItems(listaItems);
-                enableButtonSave();
-                clearData();
+                if(binderItem.validate().isOk()) {
+                    CompraItem item = binderItem.getBean();
+                    item.setItem(listaItems.size() + 1);
+                    listaItems.add(item);
+                    itemsGrid.setItems(listaItems);
+                    enableButtonSave();
+                    clearData();
+                }
             }
         });
+        Tooltips.getCurrent().setTooltip(btnAgregar, "Agregar Producto");
 
         btnQuitar = MyButton.MyButton("", new Icon(VaadinIcon.CLOSE_CIRCLE),
                 "Eliminar Producto de la tabla", ButtonVariant.LUMO_ERROR, false, false);
@@ -350,6 +371,7 @@ public class CompraDetailForm extends VerticalLayout {
             enableButtonSave();
             clearData();
         });
+        Tooltips.getCurrent().setTooltip(btnQuitar, "Eliminar Producto Seleccionado");
 
         btnUpdate = MyButton.MyButton("", new Icon(VaadinIcon.CHECK_CIRCLE),
                 "Actualizar Producto en tabla", ButtonVariant.LUMO_SUCCESS, false, false);
@@ -370,6 +392,7 @@ public class CompraDetailForm extends VerticalLayout {
                 clearData();
             }
         });
+        Tooltips.getCurrent().setTooltip(btnUpdate, "Actualizar Producto Modificado");
 
         formItemLayout.add(tfProducto, tfMedida, tfCantidad, tfCostoTotal);
         HorizontalLayout layoutActions = new HorizontalLayout(btnAgregar, btnQuitar, btnUpdate);
@@ -454,6 +477,7 @@ public class CompraDetailForm extends VerticalLayout {
         btnUpdate.setEnabled(false);
         productoValorVenta = null;
         cbProductos.focus();
+        binderItem.removeBean();
     }
 
     private void configureItemGrid() {
