@@ -26,23 +26,30 @@ public class CompraItemGrid extends PaginatedGrid<CompraItem> {
                 .setKey("name");
                 //.setFlexGrow(10);
 
+        addColumn(ci -> ci.getProducto().getTipoMedida())
+                .setHeader("Medida")
+                .setKey("med");
+
         addColumn(CompraItem::getCantidad)
                 .setHeader("Cantidad")
                 .setKey("cantidad").setTextAlign(ColumnTextAlign.CENTER);
                 //.setFlexGrow(10);
 
         addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioTotalCosto()) : BigDecimal.ZERO)
+        //addColumn(CompraItem::getPrecioTotalCosto)
                 .setHeader("P. Costo Total")
                 .setKey("costoT")
                 .setTextAlign(ColumnTextAlign.END);
                 //.setFlexGrow(8);
 
-        addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioTotalCosto().divide(ci.getCantidad())) : BigDecimal.ZERO)
+        addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioCosto()) : BigDecimal.ZERO)
+        //addColumn(CompraItem::getPrecioCosto)
                 .setHeader("P. Costo Un")
                 .setKey("costoU")
                 .setTextAlign(ColumnTextAlign.END);
 
         addColumn(ci -> ci.getPrecioVenta() != null ? AllUtils.numberFormat(ci.getPrecioVenta()) : BigDecimal.ZERO)
+        //addColumn(CompraItem::getPrecioVenta)
                 .setHeader("P. Venta Un")
                 .setKey("ventaU").setTextAlign(ColumnTextAlign.END);
 

@@ -32,8 +32,10 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.*;
@@ -41,7 +43,6 @@ import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -121,7 +122,8 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
         }
 
         Component appBar = AppBarBuilder.get()
-                .add(menu_salir)
+                .add(new HorizontalLayout(new Span("Bienvenido: "+personname),
+                        new Span("Empresa: "+ empresaname), menu_salir))
                 .build();
 
         Usuario user = CurrentUser.get();
@@ -132,25 +134,9 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
         Component appMenu = null;
         LeftAppMenuBuilder appMenuBuilder = LeftAppMenuBuilder.get()
                 .addToSection(HEADER,
-                        new LeftHeaderItem(personname, empresaname, "/frontend/images/logo.png")
+                        new LeftHeaderItem(null, null, "/frontend/images/Logo5.png")
                 );
 
-//                .add(
-//                        new LeftNavigationItem("Home", VaadinIcon.HOME.create(), View1.class),
-//                        new LeftNavigationItem("Grid", VaadinIcon.TABLE.create(), GridTest.class),
-//                        LeftSubMenuBuilder.get("My Submenu", VaadinIcon.PLUS.create())
-//                                .add(LeftSubMenuBuilder.get("My Submenu", VaadinIcon.PLUS.create())
-//                                                .add(new LeftNavigationItem("Charts", VaadinIcon.SPLINE_CHART.create(), View2.class),
-//                                                        new LeftNavigationItem("Contact", VaadinIcon.CONNECT.create(), View3.class),
-//                                                        new LeftNavigationItem("More", VaadinIcon.COG.create(), View4.class))
-//                                                .build(),
-//                                        new LeftNavigationItem("Contact1", VaadinIcon.CONNECT.create(), View5.class))
-//                                .add(new LeftNavigationItem("More1", VaadinIcon.COG.create(), View6.class))
-//                                .build(),
-//                        new LeftNavigationItem("Menu", VaadinIcon.MENU.create(), View7.class))
-//                .build();
-
-        List<Component> listMenu = new ArrayList<>();
         for(Vista view : listVista) {
             try {
                 if (view.getVistaPadre() == null) {
@@ -198,7 +184,6 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                         Key.KEY_L, KeyModifier.CONTROL);
 
         if (accessControl.isUserSignedIn()) {
-//            createDrawer();
         }
     }
 

@@ -58,7 +58,7 @@ public class CompraServiceImpl implements CompraService {
 
     @Override
     public List<Compra> findAll(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd, int page, int size) {
-        String methodName = "findAllCompra";
+        String methodName = "findAll-Compra";
         logger.info("--> "+methodName);
         Pageable pageable = PageRequest.of(page, size);
         dateStart = dateStart == null ? LocalDate.of(2020,1,1) : dateStart;

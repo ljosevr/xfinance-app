@@ -24,6 +24,8 @@ public class Constantes {
     public static final String VIEW_C_CONFIG_PASSWORD = "com.gigti.xfinance.ui.crud.configuracion.UserChangePasswordView";
     public static final String VIEW_C_CONFIG_PERFIL = "com.gigti.xfinance.ui.crud.configuracion.PerfilView";
     public static final String VIEW_C_CONFIG_EMPRESA = "com.gigti.xfinance.ui.crud.configuracion.DatosEmpresaView";
+    public static final String VIEW_C_ADMIN_CLIENTE = "com.gigti.xfinance.ui.crud.cliente.ClienteView";
+    public static final String VIEW_C_ADMIN_PROVEEDOR = "com.gigti.xfinance.ui.crud.proveedor.ProveedorView";
     //public static final String VIEW_C_USUARIOADMIN = "usuarioAdmin";
 
     //VIEWS-ROUTE
@@ -50,6 +52,8 @@ public class Constantes {
     public static final String VIEW_R_REPORTS = "reports";
     public static final String VIEW_R_GANANCIAS_Y_PERDIDAS = "balance";
     public static final String VIEW_R_VENTAS = "ventas";
+    public static final String VIEW_R_ADMIN_CLIENTE = "clientes";
+    public static final String VIEW_R_ADMIN_PROVEEDOR = "proveedores";
 
     public static final String VIEW_R_CONFIG_PERFIL = "perfil";
     public static final String VIEW_R_CONFIG_EMPRESA = "dataEmpresa";
@@ -62,10 +66,15 @@ public class Constantes {
     public static final String VIEW_PVENTA = "Punto de Venta";
     public static final String VIEW_REGISTRAR = "Registrar Venta";
     public static final String VIEW_PRODUCTO = "Productos";
+    public static final String VIEW_INVENTARIO = "Inventarios";
     public static final String VIEW_CATEGORIA = "Categorias Productos";
+    public static final String VIEW_CLIENTES = "Clientes";
+    public static final String VIEW_PROVEEDORES = "Proveedores";
+    public static final String VIEW_ADMIN_CLIENTE = "Administrar Clientes";
+    public static final String VIEW_ADMIN_PROVEEDOR = "Administrar Proveedores";
 
     public static final String VIEW_PRODUCTO_ADMIN = "Administrar Productos";
-    public static final String VIEW_COMPRAS = "Registrar Compras";
+    public static final String VIEW_COMPRAS = "Administrar Compras";
     public static final String VIEW_INVENTARIO_INICIAL = "Inventario Inicial";
     public static final String VIEW_INVENTARIO_ACTUAL = "Inventario Actual";
 
@@ -79,7 +88,7 @@ public class Constantes {
     //public static final String VIEW_EMP_USU_ADMIN = "Usuarios Admin Empresa";
 
     public static final String VIEW_REPORTS = "Reportes";
-    public static final String VIEW_INVENTARIO = "Inventarios";
+
     public static final String VIEW_VENTAS = "Ventas";
     public static final String VIEW_GANANCIAS_Y_PERDIDAS = "Ganancias y Perdidas";
     public static final String VIEW_CONFIG_PERFIL = "Perfil";

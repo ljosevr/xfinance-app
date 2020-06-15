@@ -19,6 +19,7 @@ import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterAndDatesComponent;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -46,7 +47,6 @@ public class CompraView extends VerticalLayout implements ICrudView {
     private CompraService compraService;
     private Empresa empresa;
     private SearchFilterAndDatesComponent searchLayout;
-    //private DataProvider<Compra, Void> dataProvider;
     private DatePicker dateEnd;
     private DatePicker dateStart;
 
@@ -127,17 +127,18 @@ public class CompraView extends VerticalLayout implements ICrudView {
 
     public void configureSearchLayout() {
 
-        searchLayout = new SearchFilterAndDatesComponent("Nueva", "", "Filtro por # Numero de Factura", false, true, "Fecha Inicio", "Fecha Fin");
+        searchLayout = new SearchFilterAndDatesComponent("Nueva", "", "Filtro por # Numero de Factura", true, true, "Fecha Inicio", "Fecha Fin");
         searchLayout.getFilter().addValueChangeListener(event -> updateList());
         searchLayout.getFilter().focus();
         searchLayout.getBtnAdd().addClickListener(click -> addItem());
         searchLayout.getBtnAdd().setMaxWidth("100px");
+        searchLayout.getBtnSearch().addClickListener(evt -> updateList());
+        searchLayout.getBtnSearch().setMaxWidth("30px");
+        searchLayout.getBtnSearch().addThemeVariants(ButtonVariant.LUMO_SUCCESS);
 
         filter = searchLayout.getFilter();
         dateStart = searchLayout.getDateStart();
-        dateStart.setMaxWidth("150px");
         dateEnd = searchLayout.getDateEnd();
-        dateEnd.setMaxWidth("150px");
 
         dateStart.addValueChangeListener(event -> {
             LocalDate selectedDate = event.getValue();

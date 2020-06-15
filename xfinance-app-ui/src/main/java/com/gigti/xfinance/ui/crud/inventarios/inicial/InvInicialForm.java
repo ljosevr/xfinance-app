@@ -17,7 +17,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -43,8 +43,8 @@ public class InvInicialForm extends FormLayout {
         binder = new BeanValidationBinder<>(InventarioInicial.class);
         this.addClassName("form-inv");
 
-        H4 title = new H4("Crear Inventario Inicial");
-        title.addClassName("subTitleView");
+        H2 title = new H2("Crear Inventario Inicial");
+        title.addClassName("titleView");
         this.add(title,3);
 
         TextField tfProducto = new TextField("Producto");
