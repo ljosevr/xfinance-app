@@ -86,9 +86,9 @@ public class InitBackServiceImpl implements InitBackService {
 
                 Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 100, "COMPILE"));
                 Vista vista_inventario = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO ,null, null, 200, "STOCK"));
-                Vista vista_punto_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 300, null));//CASH
-                Vista vista_clientes = vistaRepository.save(new Vista(Constantes.VIEW_CLIENTES,null,null, 400, null));//CASH
-                Vista vista_proveedores = vistaRepository.save(new Vista(Constantes.VIEW_PROVEEDORES,null,null, 500, null));//CASH
+                //Vista vista_punto_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 300, null));//CASH
+                //Vista vista_clientes = vistaRepository.save(new Vista(Constantes.VIEW_CLIENTES,null,null, 400, null));//CASH
+                //Vista vista_proveedores = vistaRepository.save(new Vista(Constantes.VIEW_PROVEEDORES,null,null, 500, null));//CASH
 
                 Vista vista_reportes = vistaRepository.save(new Vista(Constantes.VIEW_REPORTS,null, null, 600, "FILE_TEXT_O"));
                 Vista vista_usuarios = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO,null,null,700,"GROUP"));
@@ -106,13 +106,13 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_invActual  = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO_ACTUAL,Constantes.VIEW_C_INVENTARIO_ACTUAL,vista_inventario,202, "STORAGE"));
 
                 //300.Punto de Venta
-                Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_C_VENTA, vista_punto_venta, 301, "CASH"));//CASH
+                Vista vista_vender = vistaRepository.save(new Vista(Constantes.VIEW_REGISTRAR,Constantes.VIEW_C_VENTA, null, 301, "CASH"));//CASH
 
                 //400.Clientes
-                Vista vista_admin_cliente = vistaRepository.save(new Vista(Constantes.VIEW_ADMIN_CLIENTE,Constantes.VIEW_C_ADMIN_CLIENTE, vista_clientes, 401, "HANDSHAKE"));//CASH
+                Vista vista_admin_cliente = vistaRepository.save(new Vista(Constantes.VIEW_ADMIN_CLIENTE,Constantes.VIEW_C_ADMIN_CLIENTE, null, 401, "HANDSHAKE"));//CASH
 
                 //500.Proveedores
-                Vista vista_admin_proveedor = vistaRepository.save(new Vista(Constantes.VIEW_ADMIN_PROVEEDOR,Constantes.VIEW_C_ADMIN_PROVEEDOR, vista_proveedores, 501, "CLUSTER"));//CASH
+                Vista vista_admin_proveedor = vistaRepository.save(new Vista(Constantes.VIEW_ADMIN_PROVEEDOR,Constantes.VIEW_C_ADMIN_PROVEEDOR, null, 501, "CLUSTER"));//CASH
 
                 //600.Reportes
                 Vista vista_balance = vistaRepository.save(new Vista(Constantes.VIEW_GANANCIAS_Y_PERDIDAS,Constantes.VIEW_C_GANANCIAS_Y_PERDIDAS,vista_reportes, 601,"CHART_LINE"));
@@ -157,13 +157,10 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.ADMIN.getVistas().add(vista_invInicial);
                 Rol.ADMIN.getVistas().add(vista_invActual);
                 //Punto de Venta
-                Rol.ADMIN.getVistas().add(vista_punto_venta);
                 Rol.ADMIN.getVistas().add(vista_vender);
                 //Clientes
-                Rol.ADMIN.getVistas().add(vista_clientes);
                 Rol.ADMIN.getVistas().add(vista_admin_cliente);
                 //Proveedores
-                Rol.ADMIN.getVistas().add(vista_proveedores);
                 Rol.ADMIN.getVistas().add(vista_admin_proveedor);
                 //Reportes
                 Rol.ADMIN.getVistas().add(vista_reportes);
@@ -184,13 +181,11 @@ public class InitBackServiceImpl implements InitBackService {
 
                 //3.VENDEDOR
                 Rol.VENDEDOR.setVistas(new HashSet<>());
-                Rol.VENDEDOR.getVistas().add(vista_punto_venta);
                 Rol.VENDEDOR.getVistas().add(vista_vender);
                 //Inventario
                 Rol.VENDEDOR.getVistas().add(vista_inventario);
                 Rol.VENDEDOR.getVistas().add(vista_invActual);
                 //Clientes
-                Rol.VENDEDOR.getVistas().add(vista_clientes);
                 Rol.VENDEDOR.getVistas().add(vista_admin_cliente);
                 //Reportes
                 Rol.VENDEDOR.getVistas().add(vista_reportes);
@@ -206,7 +201,6 @@ public class InitBackServiceImpl implements InitBackService {
                 //4.AUXILIAR
                 Rol.AUXILIAR.setVistas(new HashSet<>());
                 //Puntos de Venta
-                Rol.AUXILIAR.getVistas().add(vista_punto_venta);
                 Rol.AUXILIAR.getVistas().add(vista_vender);
                 //producto
                 Rol.AUXILIAR.getVistas().add(vista_producto);
@@ -214,12 +208,11 @@ public class InitBackServiceImpl implements InitBackService {
                 Rol.AUXILIAR.getVistas().add(vista_categoria);
                 Rol.AUXILIAR.getVistas().add(vista_compras);
                 //Inventario
+                Rol.AUXILIAR.getVistas().add(vista_inventario);
                 Rol.AUXILIAR.getVistas().add(vista_invActual);
                 //Clientes
-                Rol.AUXILIAR.getVistas().add(vista_clientes);
                 Rol.AUXILIAR.getVistas().add(vista_admin_cliente);
                 //Proveedores
-                Rol.AUXILIAR.getVistas().add(vista_proveedores);
                 Rol.AUXILIAR.getVistas().add(vista_admin_proveedor);
                 //Reportes
                 Rol.AUXILIAR.getVistas().add(vista_reportes);

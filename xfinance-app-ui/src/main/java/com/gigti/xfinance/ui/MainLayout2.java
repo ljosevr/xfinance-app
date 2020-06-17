@@ -92,24 +92,6 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
 
     }
 
-    private void createDrawer(){
-
-//        if(CurrentUser.get() != null) {
-//            VerticalLayout layoutDrawer = new VerticalLayout();
-//
-//            Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
-//            logo.addClassName("logoDrawer");
-//
-//            H2 titleMenu = new H2("MENU");
-//            titleMenu.setClassName("titleMenu");
-//
-//            layoutDrawer.add(logo);
-//            layoutDrawer.add(titleMenu);
-//            layoutDrawer.add(createMenu());
-//            this.addToDrawer(layoutDrawer);
-//        }
-    }
-
     private void createMenu() {
 
         String username = "";
@@ -127,10 +109,13 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                 .build();
 
         Usuario user = CurrentUser.get();
+        System.out.println(user);
+        System.out.println(user.getRol());
+
         List<Vista> listVista =  user.getRol().getVistas().stream()
                 .sorted(Comparator.comparing(Vista::getOrderVista))
                 .collect(Collectors.toList());
-
+        System.out.println(listVista);
         Component appMenu = null;
         LeftAppMenuBuilder appMenuBuilder = LeftAppMenuBuilder.get()
                 .addToSection(HEADER,
@@ -151,14 +136,15 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                     }
                     if (view.getSubVistas().size() > 1) {
                         LeftSubMenuBuilder subMenu = LeftSubMenuBuilder.get(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
-                        for (Vista v : view.getSubVistas()) {
+                        List<Vista> listTemp = getSubMenu(view, listVista);
+                        for (Vista v : listTemp) {
                             subMenu.add(new LeftNavigationItem(v.getNombreVista(), new Icon(VaadinIcon.valueOf(v.getIconMenu())), (Class<? extends Component>) Class.forName(v.getRouteVista())));
                         }
                         appMenuBuilder.add(subMenu.build());
                     }
                 }
             } catch(Exception e){
-
+                e.printStackTrace();
             }
         }
         appMenu = appMenuBuilder.build();
@@ -170,6 +156,17 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                 .withAppMenu(appMenu)
                 .build());
 
+    }
+
+    private List<Vista> getSubMenu(Vista view, List<Vista> listVista) {
+        return listVista.stream()
+                .filter(v -> {
+                    if(v.getVistaPadre() != null) {
+                        return v.getVistaPadre().getId().equals(view.getId());
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
 

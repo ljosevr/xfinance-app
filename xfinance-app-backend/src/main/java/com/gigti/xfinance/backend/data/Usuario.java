@@ -58,6 +58,13 @@ public class Usuario extends AbstractEntity {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Venta> ventas;
 
+    @PrePersist
+    private void validateUser() {
+        if(tipoUsuario == null) {
+            tipoUsuario = TipoUsuarioEnum.NORMAL;
+        }
+    }
+
     public Usuario(){
         super();
     }
