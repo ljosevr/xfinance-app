@@ -19,7 +19,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -34,7 +34,7 @@ import java.util.List;
  */
 public class ProductoForm extends FormLayout {
 
-    private final H4 titleForm;
+    private final H2 titleForm;
     private TextField tfProdNombre;
     private Button btnSave;
     private Binder<Producto> binder;
@@ -46,8 +46,8 @@ public class ProductoForm extends FormLayout {
                 new FormLayout.ResponsiveStep("25em", 1),
                 new FormLayout.ResponsiveStep("32em", 2));
 
-        titleForm = new H4("");
-        titleForm.addClassName("subTitleView");
+        titleForm = new H2("");
+        titleForm.addClassName("titleView");
         this.add(titleForm,3);
 
         tfProdNombre = new TextField("Nombre Producto");

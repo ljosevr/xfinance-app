@@ -11,7 +11,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -33,12 +33,13 @@ public class EmpresaMasterForm extends Dialog {
         FormLayout content = new FormLayout();
         content.setClassName("formLayout");
         content.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 2),
-                new FormLayout.ResponsiveStep("40em", 3));
+                new FormLayout.ResponsiveStep("300Px", 1),
+                new FormLayout.ResponsiveStep("450px", 3),
+                new FormLayout.ResponsiveStep("800px", 4),
+                new FormLayout.ResponsiveStep("1000px", 5));
 
-        H4 title = new H4("Crear o Editar Empresa");
-        title.addClassName("subTitleView");
+        H2 title = new H2("Crear o Editar Empresa");
+        title.addClassName("titleView");
         content.add(title, 3);
 
         TextField tfNombreEmpresa = new TextField("Nombre Empresa");

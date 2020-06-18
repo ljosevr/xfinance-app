@@ -32,8 +32,10 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.*;
@@ -41,7 +43,6 @@ import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -91,24 +92,6 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
 
     }
 
-    private void createDrawer(){
-
-//        if(CurrentUser.get() != null) {
-//            VerticalLayout layoutDrawer = new VerticalLayout();
-//
-//            Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
-//            logo.addClassName("logoDrawer");
-//
-//            H2 titleMenu = new H2("MENU");
-//            titleMenu.setClassName("titleMenu");
-//
-//            layoutDrawer.add(logo);
-//            layoutDrawer.add(titleMenu);
-//            layoutDrawer.add(createMenu());
-//            this.addToDrawer(layoutDrawer);
-//        }
-    }
-
     private void createMenu() {
 
         String username = "";
@@ -121,36 +104,24 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
         }
 
         Component appBar = AppBarBuilder.get()
-                .add(menu_salir)
+                .add(new HorizontalLayout(new Span("Bienvenido: "+personname),
+                        new Span("Empresa: "+ empresaname), menu_salir))
                 .build();
 
         Usuario user = CurrentUser.get();
+        System.out.println(user);
+        System.out.println(user.getRol());
+
         List<Vista> listVista =  user.getRol().getVistas().stream()
                 .sorted(Comparator.comparing(Vista::getOrderVista))
                 .collect(Collectors.toList());
-
+        System.out.println(listVista);
         Component appMenu = null;
         LeftAppMenuBuilder appMenuBuilder = LeftAppMenuBuilder.get()
                 .addToSection(HEADER,
-                        new LeftHeaderItem(personname, empresaname, "/frontend/images/logo.png")
+                        new LeftHeaderItem(null, null, "/frontend/images/Logo5.png")
                 );
 
-//                .add(
-//                        new LeftNavigationItem("Home", VaadinIcon.HOME.create(), View1.class),
-//                        new LeftNavigationItem("Grid", VaadinIcon.TABLE.create(), GridTest.class),
-//                        LeftSubMenuBuilder.get("My Submenu", VaadinIcon.PLUS.create())
-//                                .add(LeftSubMenuBuilder.get("My Submenu", VaadinIcon.PLUS.create())
-//                                                .add(new LeftNavigationItem("Charts", VaadinIcon.SPLINE_CHART.create(), View2.class),
-//                                                        new LeftNavigationItem("Contact", VaadinIcon.CONNECT.create(), View3.class),
-//                                                        new LeftNavigationItem("More", VaadinIcon.COG.create(), View4.class))
-//                                                .build(),
-//                                        new LeftNavigationItem("Contact1", VaadinIcon.CONNECT.create(), View5.class))
-//                                .add(new LeftNavigationItem("More1", VaadinIcon.COG.create(), View6.class))
-//                                .build(),
-//                        new LeftNavigationItem("Menu", VaadinIcon.MENU.create(), View7.class))
-//                .build();
-
-        List<Component> listMenu = new ArrayList<>();
         for(Vista view : listVista) {
             try {
                 if (view.getVistaPadre() == null) {
@@ -165,14 +136,15 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                     }
                     if (view.getSubVistas().size() > 1) {
                         LeftSubMenuBuilder subMenu = LeftSubMenuBuilder.get(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
-                        for (Vista v : view.getSubVistas()) {
+                        List<Vista> listTemp = getSubMenu(view, listVista);
+                        for (Vista v : listTemp) {
                             subMenu.add(new LeftNavigationItem(v.getNombreVista(), new Icon(VaadinIcon.valueOf(v.getIconMenu())), (Class<? extends Component>) Class.forName(v.getRouteVista())));
                         }
                         appMenuBuilder.add(subMenu.build());
                     }
                 }
             } catch(Exception e){
-
+                e.printStackTrace();
             }
         }
         appMenu = appMenuBuilder.build();
@@ -184,6 +156,17 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                 .withAppMenu(appMenu)
                 .build());
 
+    }
+
+    private List<Vista> getSubMenu(Vista view, List<Vista> listVista) {
+        return listVista.stream()
+                .filter(v -> {
+                    if(v.getVistaPadre() != null) {
+                        return v.getVistaPadre().getId().equals(view.getId());
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
 
@@ -198,7 +181,6 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
                         Key.KEY_L, KeyModifier.CONTROL);
 
         if (accessControl.isUserSignedIn()) {
-//            createDrawer();
         }
     }
 

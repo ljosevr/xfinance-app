@@ -9,7 +9,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -19,7 +19,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.shared.Registration;
 
 public class CategoriaForm extends FormLayout {
-    private H4 titleForm;
+    private H2 titleForm;
     private TextField tfCatNombre;
     private Button btnSave;
     private Binder<CategoriaProducto> binder;
@@ -30,8 +30,8 @@ public class CategoriaForm extends FormLayout {
         this.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("40em", 1));
 
-        titleForm = new H4("");
-        titleForm.addClassName("subTitleView");
+        titleForm = new H2("");
+        titleForm.addClassName("titleView");
         this.add(titleForm,1);
 
         tfCatNombre = new TextField("Nombre Categoria");

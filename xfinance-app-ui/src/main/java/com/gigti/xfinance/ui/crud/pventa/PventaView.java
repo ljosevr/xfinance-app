@@ -31,8 +31,6 @@ import com.vaadin.flow.router.RouteAlias;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.gigti.xfinance.ui.util.NotificacionesUtil.getSiButton;
-
 @Route(value = Constantes.VIEW_R_VENTA, layout = MainLayout2.class)
 @RouteAlias(value = Constantes.VIEW_R_VENTA, layout = MainLayout2.class)
 @PageTitle(value = Constantes.VIEW_PVENTA +" | "+ Constantes.VIEW_MAIN)
@@ -113,9 +111,6 @@ public class PventaView extends VerticalLayout {
                 grid.setVisible(false);
             }
 
-            //Seleccionar
-            //Mostar Tabla principal
-            //Ocultar tabla de busqueda
         }
     }
 
@@ -206,24 +201,7 @@ public class PventaView extends VerticalLayout {
         gridPro.addItemDoubleClickListener(evt -> selectedItem(evt.getItem()));
         gridProLayout.add(gridPro, btnSelect);
 
-        //configMobile();
     }
-
-//    private void configMobile() {
-//        UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
-//            if(details.getWindowInnerWidth() < 600) {
-//                searchLayout.getGrid().addItemClickListener(click -> {
-//                    pventaDTO = click.getItem();
-//                    selectedItem(pventaDTO);
-//                });
-//            } else {
-//                searchLayout.getGrid().addItemDoubleClickListener(click -> {
-//                    pventaDTO = click.getItem();
-//                    selectedItem(pventaDTO);
-//                });
-//            }
-//        });
-//    }
 
     private void configureDataLayout() {
 
@@ -269,7 +247,6 @@ public class PventaView extends VerticalLayout {
 
         HorizontalLayout hlayout = new HorizontalLayout(nfImpuestos, btnAgregar);
         hlayout.setDefaultVerticalComponentAlignment(Alignment.END);
-        //hlayout.setAlignItems(Alignment.END);
 
         isModified = false;
         dataLayout.add(tfNombreProducto,
@@ -328,7 +305,7 @@ public class PventaView extends VerticalLayout {
         if (pventaDTO != null) {
             if (value.compareTo(BigDecimal.ZERO) > 0) {
                 BigDecimal accumulatedQ = accumulatedQuantity(pventaDTO);
-                if ((value.add(accumulatedQ)).compareTo(pventaDTO.getInStock()) < 0 || pventaDTO.isInfinite()) {
+                if ((value.add(accumulatedQ)).compareTo(pventaDTO.getInStock()) <= 0 || pventaDTO.isInfinite()) {
                     if (isModified) {
                         isModified = false;
                         if (pventaDTO == null) {
@@ -363,26 +340,18 @@ public class PventaView extends VerticalLayout {
                     pventaDTO = null;
                     activeBtnSave();
                 } else {
-                    BigDecimal temp = pventaDTO.getInStock().subtract(accumulatedQuantity(pventaDTO));
+                    BigDecimal acumulado = accumulatedQuantity(pventaDTO);
+                    BigDecimal temp = pventaDTO.getInStock().subtract(acumulado);
                     if (temp.compareTo(BigDecimal.ZERO) > 0) {
-                        NotificacionesUtil.openConfirmationDialog("Solo existen " + pventaDTO.getInStock() + " en Stock, No puedes vender más de esa cantidad.\n" +
-                                "¿Deseas Agregar " + temp + " a la Compra actual?", true, false);
-
-                        Objects.requireNonNull(NotificacionesUtil.getDialog()).addDialogCloseActionListener(
-                                listener -> filter.focus());
-
-                        getSiButton().focus();
-
-                        getSiButton().addClickListener(event -> {
-                            if (NotificacionesUtil.getDialog().isOpened())
-                                NotificacionesUtil.getDialog().close();
-                            addItem(temp);
-                        });
-
-                        NotificacionesUtil.getNoButton().addClickListener(event -> {
-                            if (NotificacionesUtil.getDialog().isOpened())
-                                NotificacionesUtil.getDialog().close();
-                        });
+                        String acumuladoStr = "";
+                        if(acumulado.compareTo(BigDecimal.ZERO) > 0) {
+                            acumuladoStr = "Ya se agregaron "+acumulado + " en la venta \n";
+                        }
+                        NotificacionesUtil.showError("Solo existen " + pventaDTO.getInStock() + " en Stock, " +
+                                "No puedes vender más de esa cantidad.\n" +
+                                acumuladoStr +
+                                "Debe solo agregar " + temp + " a la Compra actual.\n" +
+                                "Por favor contacta al Administrador");
                     } else {
                         NotificacionesUtil.showWarn("No existen inventario para este producto, No se puede vender. \nSi tiene 1 o más en " +
                                 "mano contacta al administrador");
@@ -447,6 +416,8 @@ public class PventaView extends VerticalLayout {
         mapItemsventa = null;
         lblTotal.setText(String.format("TOTAL: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
         lblImpuesto.setText(String.format("Impuestos: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
+        filter.setValue("");
+        cbTipoBusqueda.setValue(TipoBusquedaEnum.CODIGO);
         filter.focus();
     }
 

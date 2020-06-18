@@ -24,9 +24,10 @@ public class SearchFilterAndDatesComponent extends FormLayout {
         this.addClassName("searchBar");
 
         this.setResponsiveSteps(
-                new ResponsiveStep("25em", 1),
-                new ResponsiveStep("32em", 2),
-                new ResponsiveStep("40em", 4));
+                new FormLayout.ResponsiveStep("300Px", 1),
+                new FormLayout.ResponsiveStep("450px", 3),
+                new FormLayout.ResponsiveStep("800px", 4),
+                new FormLayout.ResponsiveStep("1000px", 5));
 
         filter = new TextField(labelFilter);
         filter.setPlaceholder(placeHolderFilter);
@@ -57,10 +58,7 @@ public class SearchFilterAndDatesComponent extends FormLayout {
         dateEnd.getElement().setAttribute("theme", "align-center");
         dateEnd.getElement().setAttribute("theme", "small");
 
-        //HorizontalLayout hLayout = new HorizontalLayout(filter,btnSearch,dateStart, dateEnd, btnAdd);
-        //hLayout.setSizeFull();
-        //hLayout.expand(filter);
-        add(filter,btnSearch,dateStart, dateEnd, btnAdd);
+        add(filter,dateStart, dateEnd, btnSearch, btnAdd);
     }
 
     public TextField getFilter() {

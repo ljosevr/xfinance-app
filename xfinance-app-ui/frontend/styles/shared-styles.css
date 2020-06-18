@@ -102,13 +102,10 @@
         max-width: 450px;
     }
 
-    .CompraDetailFormView.comboProd {
+    .CompraDetailFormView .comboProd {
         margin: 10px;
         padding: var(--lumo-space-m);
-        max-width: 500px;
-        border: 2px solid black;
-        border-radius: 7px;
-        box-sizing: content-box;
+        min-width: 300px;
     }
 
     .panel-principal-login{
@@ -303,17 +300,15 @@ a[highlight] {
 }
 
 .titleView {
-    height: 20px;
     border-spacing: 0.5px;
-    /*margin: auto;*/
     text-align: left;
-    color: #2dd013;
+    color: #555555;
+    text-decoration: underline overline;
 }
 
 .titleView2 {
     text-align: center;
     color: #1061e8;
-    /*text-decoration: underline;*/
     margin: 5px;
 }
 

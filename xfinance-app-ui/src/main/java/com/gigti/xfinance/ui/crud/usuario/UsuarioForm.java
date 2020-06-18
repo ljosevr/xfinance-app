@@ -18,7 +18,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -48,8 +48,8 @@ public class UsuarioForm extends Dialog {
                 new FormLayout.ResponsiveStep("32em", 2),
                 new FormLayout.ResponsiveStep("40em", 3));
 
-        H4 title = new H4("Crear o Editar Producto");
-        title.addClassName("subTitleView");
+        H2 title = new H2("Crear o Editar Usuario");
+        title.addClassName("titleView");
         content.add(title,3);
 
         TextField tfUsuario = new TextField("Nombre Usuario");
