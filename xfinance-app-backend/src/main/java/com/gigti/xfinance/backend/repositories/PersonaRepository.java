@@ -8,6 +8,7 @@ package com.gigti.xfinance.backend.repositories;
 
 
 import com.gigti.xfinance.backend.data.Persona;
+import com.gigti.xfinance.backend.data.TipoIde;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,9 +17,17 @@ import java.util.List;
 @Repository
 public interface PersonaRepository extends JpaRepository<Persona, String> {
 
-    public List<Persona> findByPrimerApellidoContaining(String lastName);
+    List<Persona> findByPrimerApellidoContaining(String lastName);
 
-    public List<Persona> findByPrimerNombreContaining(String lastName);
+    List<Persona> findByPrimerNombreContaining(String lastName);
 
-    public Persona findByIdentificacion(String identification);
+    Persona findByIdentificacion(String identification);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndIdentificacionIsNot(String email, String identificacion);
+
+    boolean existsByIdentificacionAndTipoIde(String identificacion, TipoIde tipoIde);
+
+    boolean existsByIdentificacionAndTipoIdeAndIdIsNot(String identificacion, TipoIde tipoIde, String id);
 }

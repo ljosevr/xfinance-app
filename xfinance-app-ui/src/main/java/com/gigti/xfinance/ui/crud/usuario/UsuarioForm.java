@@ -35,12 +35,15 @@ import java.util.logging.Logger;
 public class UsuarioForm extends Dialog {
 
     private static final Logger logger = Logger.getLogger(UsuarioForm.class.getName());
+    private final TextField tfUsuario;
     private Button btnSave;
 
     private Binder<UsuarioDTO> binderUsuario;
     public UsuarioForm(List<Rol> listRoles) {
         binderUsuario = new BeanValidationBinder<>(UsuarioDTO.class);
-
+        this.setDraggable(true);
+        this.setModal(true);
+        this.setResizable(true);
         FormLayout content = new FormLayout();
         content.setClassName("formLayout");
         content.setResponsiveSteps(
@@ -52,9 +55,10 @@ public class UsuarioForm extends Dialog {
         title.addClassName("titleView");
         content.add(title,3);
 
-        TextField tfUsuario = new TextField("Nombre Usuario");
+        tfUsuario = new TextField("Nombre Usuario");
         tfUsuario.setRequired(true);
         tfUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        tfUsuario.focus();
 
         ComboBox<Rol> cbRoles = new ComboBox<>();
         cbRoles.setLabel("Rol Usuario");
@@ -151,6 +155,7 @@ public class UsuarioForm extends Dialog {
     }
 
     public void setUser(UsuarioDTO usuario) {
+        tfUsuario.focus();
         binderUsuario.setBean(usuario);
     }
 

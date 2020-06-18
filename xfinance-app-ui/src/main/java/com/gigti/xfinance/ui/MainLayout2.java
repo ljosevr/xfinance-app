@@ -65,6 +65,8 @@ import static com.github.appreciated.app.layout.entity.Section.HEADER;
 )
 @CssImport("./styles/shared-styles.css")
 @Theme(value = Lumo.class)
+//@CssImport("./styles/my-lumo-theme.css")
+//@CssImport(value = "./styles/my-button-theme.css", themeFor = "theme for Vaadin Button")
 @PageTitle(value = Constantes.VIEW_MAIN)
 @JsModule("@vaadin/vaadin-lumo-styles/presets/compact.js")
 @PreserveOnRefresh
@@ -125,16 +127,15 @@ public class MainLayout2 extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> i
         for(Vista view : listVista) {
             try {
                 if (view.getVistaPadre() == null) {
-                    if (view.getSubVistas().size() == 1) {
-                        Vista subView = view.getSubVistas().get(0);
+                    if (view.getSubVistas().size() == 0) {
                         try {
-                            Class<?> cl = Class.forName(subView.getRouteVista());
-                            appMenuBuilder.add(new LeftNavigationItem(subView.getNombreVista(), new Icon(VaadinIcon.valueOf(subView.getIconMenu())), (Class<? extends Component>) cl));
+                            Class<?> cl = Class.forName(view.getRouteVista());
+                            appMenuBuilder.add(new LeftNavigationItem(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())), (Class<? extends Component>) cl));
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
                     }
-                    if (view.getSubVistas().size() > 1) {
+                    if (view.getSubVistas().size() > 0) {
                         LeftSubMenuBuilder subMenu = LeftSubMenuBuilder.get(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
                         List<Vista> listTemp = getSubMenu(view, listVista);
                         for (Vista v : listTemp) {

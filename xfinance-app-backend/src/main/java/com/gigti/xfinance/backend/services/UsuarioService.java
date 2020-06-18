@@ -14,7 +14,7 @@ public interface UsuarioService {
 
     public List<Rol> findAllRol(Empresa empresa, boolean eliminado);
 
-    UsuarioDTO saveUsuario(UsuarioDTO usuario);
+    Response saveUsuario(UsuarioDTO usuario);
 
     Response deleteUsuario(String id);
 

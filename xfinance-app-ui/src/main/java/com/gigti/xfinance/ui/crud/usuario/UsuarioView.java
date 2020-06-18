@@ -14,6 +14,7 @@ import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
@@ -77,7 +78,9 @@ public class UsuarioView extends VerticalLayout {
 
     public void addUser() {
         grid.asSingleSelect().clear();
-        editUser(new UsuarioDTO());
+        UsuarioDTO user = new UsuarioDTO();
+        user.setActivo(true);
+        editUser(user);
     }
 
     public void configureGrid() {
@@ -120,9 +123,14 @@ public class UsuarioView extends VerticalLayout {
     public void save(UsuarioForm.SaveEvent evt) {
         UsuarioDTO usuario = evt.getUsuario();
         usuario.setEmpresa(empresa);
-        usuarioService.saveUsuario(usuario);
-        updateList();
-        closeEditor();
+        Response response = usuarioService.saveUsuario(usuario);
+        if(response.isSuccess()) {
+            NotificacionesUtil.showSuccess(response.getMessage());
+            updateList();
+            closeEditor();
+        } else {
+            NotificacionesUtil.showError(response.getMessage());
+        }
     }
 
     private void delete(UsuarioForm.DeleteEvent evt) {

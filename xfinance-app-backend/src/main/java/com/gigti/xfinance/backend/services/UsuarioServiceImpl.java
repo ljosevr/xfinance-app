@@ -72,33 +72,76 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioDTO saveUsuario(UsuarioDTO usuarioDTO) {
+    public Response saveUsuario(UsuarioDTO usuarioDTO) {
         logger.log(Level.INFO, "saveUsuario");
+        Response response = new Response();
         try{
             Optional<Empresa> empresa = empresaRepository.findById(usuarioDTO.getEmpresa().getId());
             if(empresa.isPresent()){
                 logger.log(Level.INFO, "isPresent Empresa");
                 usuarioDTO.setEmpresa(empresa.get());
             }else{
+                response.setSuccess(false);
+                response.setMessage("no existe Empresa. Contacte al administrador");
                 logger.log(Level.INFO, "NOT Present Empresa");
-                return null;
+                return response;
             }
             Usuario usuario = ConvertUsuario.convertDtoToEntity(usuarioDTO);
             Persona persona = personaRepository.findByIdentificacion(usuario.getPersona().getIdentificacion());
 
             if(persona != null) {
                 logger.log(Level.INFO, "persona found");
+                if(usuario.getPersona().getId() == null) {
+                    response.setSuccess(false);
+                    response.setMessage("Identificación Ya se encuentra Registrada en Otro usuario");
+                    return response;
+                }
+                if(!usuario.getPersona().getEmail().equalsIgnoreCase(persona.getEmail())) {
+                    //Validar Email
+                    if(personaRepository.existsByEmailAndIdentificacionIsNot(usuario.getPersona().getEmail(), usuario.getPersona().getIdentificacion())) {
+                        response.setSuccess(false);
+                        response.setMessage("Email Ya se encuentra Registrado en Otro usuario");
+                        return response;
+                    }
+
+                    //Validar Email
+                    if(personaRepository.existsByIdentificacionAndTipoIdeAndIdIsNot(usuario.getPersona().getIdentificacion(),
+                            usuario.getPersona().getTipoIde(), usuario.getPersona().getId())) {
+                        response.setSuccess(false);
+                        response.setMessage("Identificación Ya se encuentra Registrada en Otro usuario");
+                        return response;
+                    }
+                }
+
                 usuario.getPersona().setId(persona.getId());
             } else {
+                //Validar Email
+                if(personaRepository.existsByEmail(usuario.getPersona().getEmail())) {
+                    response.setSuccess(false);
+                    response.setMessage("Email Ya se encuentra Registrado en Otro usuario");
+                    return response;
+                }
+                //Validar Identificacion
+                if(personaRepository.existsByIdentificacionAndTipoIde(usuario.getPersona().getIdentificacion(), usuario.getPersona().getTipoIde())) {
+                    response.setSuccess(false);
+                    response.setMessage("Identificación Ya se encuentra Registrado en Otro usuario");
+                    return response;
+                }
+
                 String pass = UtilsBackend.encrytPass("123456");
                 usuario.setPasswordUsuario(pass);
             }
             usuario.setPersona(personaRepository.save(usuario.getPersona()));
             usuario = usuarioRepository.save(usuario);
-            return ConvertUsuario.convertEntityToDTO(usuario);
+            response.setObject(ConvertUsuario.convertEntityToDTO(usuario));
+            response.setSuccess(true);
+            response.setMessage("Usuario Guardado Correctamente");
+            return response;
         }catch(Exception e){
             logger.log(Level.SEVERE, e.getMessage(), e);
-            return null;
+            response.setSuccess(false);
+            response.setMessage("Error al Guardar Usuario");
+            return response;
         }
     }
 
