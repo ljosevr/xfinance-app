@@ -83,17 +83,13 @@ public class InitBackServiceImpl implements InitBackService {
                 logger.info("Tipos IDE");
 
                 //Vistas
-
                 Vista vista_producto = vistaRepository.save(new Vista(Constantes.VIEW_PRODUCTO ,null, null, 100, "COMPILE"));
                 Vista vista_inventario = vistaRepository.save(new Vista(Constantes.VIEW_INVENTARIO ,null, null, 200, "STOCK"));
-                //Vista vista_punto_venta = vistaRepository.save(new Vista(Constantes.VIEW_PVENTA,null,null, 300, null));//CASH
-                //Vista vista_clientes = vistaRepository.save(new Vista(Constantes.VIEW_CLIENTES,null,null, 400, null));//CASH
-                //Vista vista_proveedores = vistaRepository.save(new Vista(Constantes.VIEW_PROVEEDORES,null,null, 500, null));//CASH
 
                 Vista vista_reportes = vistaRepository.save(new Vista(Constantes.VIEW_REPORTS,null, null, 600, "FILE_TEXT_O"));
                 Vista vista_usuarios = vistaRepository.save(new Vista(Constantes.VIEW_USUARIO,null,null,700,"GROUP"));
-                Vista vista_empresa = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA,Constantes.VIEW_R_EMPRESA, null, 800, "OFFICE"));
-                Vista vista_empresaMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESAS,null, null, 900, null));
+                //Vista vista_empresa = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA,Constantes.VIEW_R_EMPRESA, null, 800, "OFFICE"));
+                //Vista vista_empresaMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESAS,null, null, 900, null));
                 Vista vista_config = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG,null, null, 1000, "TOOLS"));
 
                 //100. Productos
@@ -123,7 +119,7 @@ public class InitBackServiceImpl implements InitBackService {
                 Vista vista_rol = vistaRepository.save(new Vista(Constantes.VIEW_ROL,Constantes.VIEW_C_ROL,vista_usuarios, 702,"USER_CARD"));
 
                 //900.Empresa Master
-                Vista vista_admin_empMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA_ADMIN,Constantes.VIEW_C_EMPRESA_MASTER, vista_empresaMaster, 901, "OFFICE"));
+                Vista vista_admin_empMaster = vistaRepository.save(new Vista(Constantes.VIEW_EMPRESA_ADMIN,Constantes.VIEW_C_EMPRESA_MASTER, null, 901, "OFFICE"));
 
                 //1000. Config
                 Vista vista_config_perfil = vistaRepository.save(new Vista(Constantes.VIEW_CONFIG_PERFIL,Constantes.VIEW_C_CONFIG_PERFIL,vista_config, 1001, "COG"));
@@ -135,7 +131,7 @@ public class InitBackServiceImpl implements InitBackService {
                 //1. ROOT
                 //Empresa Master
                 Rol.ROOT.setVistas(new HashSet<>());
-                Rol.ROOT.getVistas().add(vista_empresaMaster);
+                //Rol.ROOT.getVistas().add(vista_empresaMaster);
                 Rol.ROOT.getVistas().add(vista_admin_empMaster);
                 //Config
                 Rol.ROOT.getVistas().add(vista_config);

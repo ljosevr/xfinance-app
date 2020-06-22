@@ -6,7 +6,7 @@ import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoBusquedaEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.VentaService;
-import com.gigti.xfinance.ui.MainLayout2;
+import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.AllUtils;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
@@ -31,8 +31,8 @@ import com.vaadin.flow.router.RouteAlias;
 import java.math.BigDecimal;
 import java.util.*;
 
-@Route(value = Constantes.VIEW_R_VENTA, layout = MainLayout2.class)
-@RouteAlias(value = Constantes.VIEW_R_VENTA, layout = MainLayout2.class)
+@Route(value = Constantes.VIEW_R_VENTA, layout = MainLayout.class)
+@RouteAlias(value = Constantes.VIEW_R_VENTA, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_PVENTA +" | "+ Constantes.VIEW_MAIN)
 public class PventaView extends VerticalLayout {
 

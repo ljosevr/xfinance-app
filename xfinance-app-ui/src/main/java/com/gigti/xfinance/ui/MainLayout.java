@@ -8,180 +8,172 @@ package com.gigti.xfinance.ui;
 
 import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.Vista;
+import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.authentication.AccessControl;
 import com.gigti.xfinance.ui.authentication.AccessControlFactory;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.authentication.LoginView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
+import com.github.appreciated.app.layout.component.appbar.AppBarBuilder;
+import com.github.appreciated.app.layout.component.applayout.LeftLayouts;
+import com.github.appreciated.app.layout.component.builder.AppLayoutBuilder;
+import com.github.appreciated.app.layout.component.menu.left.builder.LeftAppMenuBuilder;
+import com.github.appreciated.app.layout.component.menu.left.builder.LeftSubMenuBuilder;
+import com.github.appreciated.app.layout.component.menu.left.items.LeftHeaderItem;
+import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigationItem;
+import com.github.appreciated.app.layout.component.router.AppLayoutRouterLayout;
 import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyModifier;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.accordion.Accordion;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.RouterLayout;
-import org.apache.commons.collections.CollectionUtils;
+import com.vaadin.flow.component.page.Push;
+import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.github.appreciated.app.layout.entity.Section.HEADER;
 
 /**
  * The main layout. Contains the navigation menu.
  */
-//@Route("")
-//@PWA(
-//        name = "Tu Punto De Venta",
-//        shortName = "TPV",
-//        offlineResources = {
-//                "./styles/offline.css",
-//                "./images/offline.png"
-//        },
-//        enableInstallPrompt = true
-//)
-//@CssImport("./styles/shared-styles.css")
-//@Theme(value = Lumo.class)
-//@PageTitle(value = Constantes.VIEW_MAIN)
+@Route("")
+@PWA(
+        name = "Tu Punto De Venta",
+        shortName = "TPV",
+        offlineResources = {
+                "./styles/offline.css",
+                "./images/offline.png"
+        },
+        enableInstallPrompt = true
+)
+@Theme(value = Lumo.class)
+@CssImport(value = "./styles/shared-styles.css", themeFor = "My Theme Lumo")
+@CssImport(value = "./styles/my-button-theme.css", themeFor = "theme for Vaadin Button")
+@PageTitle(value = Constantes.VIEW_MAIN)
 //@JsModule("@vaadin/vaadin-lumo-styles/presets/compact.js")
-//@PreserveOnRefresh
-public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterObserver {
+@PreserveOnRefresh
+@Push
+@Viewport("width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes")
+public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> implements RouterLayout, BeforeEnterObserver {
     private final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-    private Accordion menus_varios;
     private Button menu_salir;
-
+    private static final String VIEW_MAIN = "com.gigti.xfinance.ui.MainLayout";
+    private static final String VIEW_ROOT = "";
     public MainLayout() {
-
-        this.setDrawerOpened(true);
-        createHeader();
-
-        this.setPrimarySection(Section.DRAWER);
+        if (accessControl.isUserSignedIn()) {
+            createHeader();
+            createMenu();
+        }
     }
 
     private void createHeader(){
         H1 appTitle = new H1("TPV");
         appTitle.addClassName("titlesAppBar");
 
-
         menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
         menu_salir.addThemeVariants(ButtonVariant.LUMO_TERTIARY,ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_ICON);
         menu_salir.addClickListener(listener -> signOut());
         menu_salir.setClassName("menubutton");
 
+    }
+
+    private void createMenu() {
+
         String username = "";
         String personname = "";
         String empresaname = "";
         if(CurrentUser.get() != null){
-            username = CurrentUser.get().getNombreUsuario();
-            personname = CurrentUser.get().getPersona().getPrimerNombre();
-            empresaname = CurrentUser.get().getEmpresa().getNombreEmpresa();
+            username = Objects.requireNonNull(CurrentUser.get()).getNombreUsuario();
+            personname = Objects.requireNonNull(CurrentUser.get()).getPersona().getPrimerNombre();
+            empresaname = Objects.requireNonNull(CurrentUser.get()).getEmpresa().getNombreEmpresa();
         }
 
-        H1 bienvenida = new H1(empresaname.toUpperCase() + " - Bienvenido: "+personname);
-        bienvenida.setClassName("appBarSaludo");
+        Span welcome = new Span("Bienvenido: ");
+        welcome.getElement().getStyle().set("font-weight", "bold");
 
-        HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), appTitle, bienvenida, menu_salir);
+        Span company = new Span("Empresa: ");
+        company.getElement().getStyle().set("font-weight", "bold");
 
-        header.setDefaultVerticalComponentAlignment(
-                FlexComponent.Alignment.CENTER); //
-        header.setWidth("100%");
-        header.addClassName("header");
-        header.expand(appTitle);
-        addToNavbar(header);
-    }
+        Component appBar = AppBarBuilder.get()
+                .add(new HorizontalLayout(welcome, new Span(personname),
+                        company, new Span(empresaname), menu_salir))
+                .build();
 
-    private void createDrawer(){
-        if(CurrentUser.get() != null) {
-            VerticalLayout layoutDrawer = new VerticalLayout();
-
-            Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
-            logo.addClassName("logoDrawer");
-
-            H2 titleMenu = new H2("MENU");
-            titleMenu.setClassName("titleMenu");
-
-            layoutDrawer.add(logo);
-            layoutDrawer.add(titleMenu);
-            layoutDrawer.add(createMenu());
-            this.addToDrawer(layoutDrawer);
-        }
-    }
-
-    private VerticalLayout createMenu() {
-        VerticalLayout layoutMenu = new VerticalLayout();
-        layoutMenu.setClassName("menuLayout");
         Usuario user = CurrentUser.get();
-        List<Vista> listVista =  user.getRol().getVistas().stream()
-                .sorted(Comparator.comparing(Vista::getOrderVista))
-                .collect(Collectors.toList());
 
-        Map<Vista, List<Vista>> mapMenu = new HashMap<>();
+        List<Vista> listVista = getVistasRol(user);
+
+        Component appMenu = null;
+        LeftAppMenuBuilder appMenuBuilder = LeftAppMenuBuilder.get()
+                .addToSection(HEADER,
+                        new LeftHeaderItem(null, null, "/frontend/images/Logo5.png")
+                );
+
         for(Vista view : listVista) {
-
-            if(view.getVistaPadre() == null) {
-                if (view.getSubVistas().isEmpty()) {
-                    //SOLO MENU
-                    Button menu = new Button(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
-                    menu.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-                    menu.addClickListener(l -> UI.getCurrent().navigate(view.getRouteVista()));
-                    menu.setClassName("menubutton");
-                    layoutMenu.add(menu);
+            try {
+                if (view.getVistaPadre() == null) {
+                    if (view.getSubVistas().size() == 0) {
+                        try {
+                            Class<?> cl = Class.forName(view.getRouteVista());
+                            appMenuBuilder.add(new LeftNavigationItem(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())), (Class<? extends Component>) cl));
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (view.getSubVistas().size() > 0) {
+                        LeftSubMenuBuilder subMenu = LeftSubMenuBuilder.get(view.getNombreVista(), new Icon(VaadinIcon.valueOf(view.getIconMenu())));
+                        List<Vista> listTemp = getSubMenu(view, listVista);
+                        for (Vista v : listTemp) {
+                            subMenu.add(new LeftNavigationItem(v.getNombreVista(), new Icon(VaadinIcon.valueOf(v.getIconMenu())), (Class<? extends Component>) Class.forName(v.getRouteVista())));
+                        }
+                        appMenuBuilder.add(subMenu.build());
+                    }
                 }
-            }
-
-            if (view.getVistaPadre() != null) {
-                List<Vista> list = mapMenu.get(view.getVistaPadre());
-                if (CollectionUtils.isEmpty(list)) {
-                    list = new ArrayList<>();
-                    list.add(view);
-                    mapMenu.put(view.getVistaPadre(), list);
-                } else {
-                    list.add(view);
-                    mapMenu.putIfAbsent(view.getVistaPadre(), list);
-                }
+            } catch(Exception e){
+                e.printStackTrace();
             }
         }
+        appMenu = appMenuBuilder.build();
 
-        Map<Vista, List<Vista>> result2 = new LinkedHashMap<>();
-        mapMenu.entrySet().stream()
-                .sorted(Map.Entry.comparingByKey(Comparator.comparing(Vista::getOrderVista)))
-                .forEachOrdered(x -> result2.put(x.getKey(), x.getValue()));
+        init(AppLayoutBuilder
+                .get(LeftLayouts.LeftHybrid.class)
+                .withTitle("TPV")
+                .withAppBar(appBar)
+                .withAppMenu(appMenu)
+                .build());
 
-        for(Map.Entry<Vista, List<Vista>> entry : result2.entrySet()){
-            Vista vista = entry.getKey();
-            List<Vista> vistas = entry.getValue();
+    }
 
-            VerticalLayout  layout_menu_sub = new VerticalLayout();
-            if(menus_varios == null) {
-                menus_varios = new Accordion();
-            }
+    private List<Vista> getVistasRol(Usuario user) {
+        return user.getRol().getVistas().stream()
+                    .sorted(Comparator.comparing(Vista::getOrderVista))
+                    .collect(Collectors.toList());
+    }
 
-            for(Vista sub : vistas){
-                Button menu_sub = new Button(sub.getNombreVista(), new Icon(VaadinIcon.valueOf(sub.getIconMenu())));
-                menu_sub.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
-                menu_sub.addClickListener(l -> UI.getCurrent().navigate(sub.getRouteVista()));
-                menu_sub.setClassName("subMenu-Layout");
-                layout_menu_sub.add(menu_sub);
-            }
-            menus_varios.add(vista.getNombreVista(), layout_menu_sub);
-        }
-
-        if(menus_varios != null){
-            layoutMenu.add(menus_varios);
-        }
-
-        return layoutMenu;
+    private List<Vista> getSubMenu(Vista view, List<Vista> listVista) {
+        return listVista.stream()
+                .filter(v -> {
+                    if(v.getVistaPadre() != null) {
+                        return v.getVistaPadre().getId().equals(view.getId());
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
 
@@ -195,15 +187,41 @@ public class MainLayout extends AppLayout implements RouterLayout, BeforeEnterOb
                                 .createAccessControl().signOut(),
                         Key.KEY_L, KeyModifier.CONTROL);
 
-        if (accessControl.isUserSignedIn()) {
-            createDrawer();
-        }
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        if (!accessControl.isUserSignedIn()) {
+        toLoginViewNotAccess(beforeEnterEvent);
+        permissionTarget(beforeEnterEvent);
+    }
+
+    private void toLoginViewNotAccess(BeforeEnterEvent beforeEnterEvent) {
+        Class target = beforeEnterEvent.getNavigationTarget();
+        if (!LoginView.class.equals(target) && !accessControl.isUserSignedIn()) {
             beforeEnterEvent.forwardTo(LoginView.class);
+        }
+    }
+
+    private void permissionTarget(BeforeEnterEvent beforeEnterEvent) {
+        Class target = beforeEnterEvent.getNavigationTarget();
+        if(CurrentUser.get() != null && target != null && target.getName() != VIEW_MAIN && target.getName() != VIEW_ROOT) {
+            boolean accessGranted = false;
+            List<Vista> listVista = getVistasRol(Objects.requireNonNull(CurrentUser.get()));
+            for(Vista view : listVista) {
+                if(view.getRouteVista() != null) {
+                    try {
+                        Class<?> cl = Class.forName(view.getRouteVista());
+                        if (cl == target) {
+                            accessGranted = true;
+                        }
+                    } catch (ClassNotFoundException e) {
+                        beforeEnterEvent.forwardTo(NotAccessView.class);
+                    }
+                }
+            }
+            if(!accessGranted) {
+                beforeEnterEvent.forwardTo(NotAccessView.class);
+            }
         }
     }
 

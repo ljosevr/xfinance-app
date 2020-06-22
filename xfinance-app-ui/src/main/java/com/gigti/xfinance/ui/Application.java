@@ -3,7 +3,6 @@ package com.gigti.xfinance.ui;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -14,8 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan({"com.gigti.xfinance"})
 @EnableJpaRepositories(basePackages = "com.gigti.xfinance.backend.repositories")
 @EntityScan(basePackages = "com.gigti.xfinance.backend.data")
-public class Application extends SpringBootServletInitializer {
-//public class Application {
+public class Application { //extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

@@ -22,15 +22,14 @@ spring:
   # JPA properties
   jpa:
     hibernate:
-#     ddl-auto: update
-     ddl-auto: create-drop
+     ddl-auto: update
+#     ddl-auto: create-drop
     show-sql: false
     generate-ddl: false
     properties:
       hibernate:
-        jdbc:
-          lob:
-            non_contextual_creation: true
+        temp:
+           use_jdbc_metadata_defaults: false
         enable_lazy_load_no_trans: true
     open-in-view: false
   devtools:

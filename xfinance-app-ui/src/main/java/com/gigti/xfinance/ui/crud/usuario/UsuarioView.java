@@ -12,7 +12,6 @@ import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
-import com.gigti.xfinance.ui.MainLayout2;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
@@ -24,7 +23,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 
-@Route(value = Constantes.VIEW_R_USUARIOS, layout = MainLayout2.class)
+@Route(value = Constantes.VIEW_R_USUARIOS, layout = MainLayout.class)
 @RouteAlias(value = "usuario", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_USUARIO +" | "+ Constantes.VIEW_MAIN)
 public class UsuarioView extends VerticalLayout {

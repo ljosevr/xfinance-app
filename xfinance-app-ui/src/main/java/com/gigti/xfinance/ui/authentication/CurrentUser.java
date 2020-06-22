@@ -7,9 +7,10 @@
 package com.gigti.xfinance.ui.authentication;
 
 import com.gigti.xfinance.backend.data.Usuario;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinRequest;
 import com.vaadin.flow.server.VaadinService;
-import com.vaadin.flow.server.VaadinSession;
+//import com.vaadin.flow.server.VaadinSession;
 
 /**
  * Class for retrieving and setting the name of the current user of the current
@@ -47,10 +48,8 @@ public final class CurrentUser {
         String ip_address_session = (String) getCurrentRequest().getWrappedSession()
                 .getAttribute(CURRENT_USER_IP_ADDRESS_SESSION_ATTRIBUTE_KEY);
 
-        //NotificacionesUtil.showWarn(getClientIpAddr(VaadinRequest.getCurrent()) + " - "+VaadinRequest.getCurrent().getHeader("X-Forwarded-For"));
-
         if(ip_address_session != null && !ip_address_session.isEmpty()) {
-            String ip_actual = VaadinSession.getCurrent().getBrowser().getAddress();
+            String ip_actual = UI.getCurrent().getSession().getBrowser().getAddress();
             if(ip_actual.equals(ip_address_session)) {
                 if (currentUser == null) {
                     return current;
@@ -60,10 +59,6 @@ public final class CurrentUser {
             }
         } else {
             return null;
-        }
-
-        if (currentUser == null) {
-            return current;
         }
 
         return currentUser;
@@ -90,7 +85,7 @@ public final class CurrentUser {
                     CURRENT_USER_SESSION_ATTRIBUTE_KEY, currentUser);
 
             getCurrentRequest().getWrappedSession().setAttribute(
-                    CURRENT_USER_IP_ADDRESS_SESSION_ATTRIBUTE_KEY, VaadinSession.getCurrent().getBrowser().getAddress());
+                    CURRENT_USER_IP_ADDRESS_SESSION_ATTRIBUTE_KEY, UI.getCurrent().getSession().getBrowser().getAddress());
 
             current = currentUser;
         }
@@ -104,26 +99,5 @@ public final class CurrentUser {
         }
         return request;
     }
-
-    private static String getClientIpAddr(VaadinRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
-    }
-
 
 }

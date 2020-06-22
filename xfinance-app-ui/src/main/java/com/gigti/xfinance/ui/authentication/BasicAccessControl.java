@@ -10,10 +10,11 @@ import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.services.UsuarioService;
-import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.component.UI;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
+
 
 /**
  * Default mock implementation of {@link AccessControl}. This implementation
@@ -72,8 +73,8 @@ public class BasicAccessControl implements AccessControl {
 
     @Override
     public void signOut() {
-        VaadinSession.getCurrent().getSession().invalidate();
+        //UI.getCurrent().getSession().invalidate();
         CurrentUser.set(null);
-        VaadinSession.getCurrent().close();
+        UI.getCurrent().getSession().close();
     }
 }

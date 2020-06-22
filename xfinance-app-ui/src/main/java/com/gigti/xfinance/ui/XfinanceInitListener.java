@@ -6,9 +6,6 @@
 
 package com.gigti.xfinance.ui;
 
-import com.gigti.xfinance.ui.authentication.AccessControl;
-import com.gigti.xfinance.ui.authentication.AccessControlFactory;
-import com.gigti.xfinance.ui.authentication.LoginView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.*;
@@ -38,11 +35,6 @@ public class XfinanceInitListener implements VaadinServiceInitListener, SessionI
     }
 
     private void authenticateNavigation(BeforeEnterEvent event) {
-        final AccessControl accessControl = AccessControlFactory.getInstance().createAccessControl();
-        if (!LoginView.class.equals(event.getNavigationTarget())
-                && !accessControl.isUserSignedIn()) { //
-            event.rerouteTo(LoginView.class);
-        }
     }
 
     @Override

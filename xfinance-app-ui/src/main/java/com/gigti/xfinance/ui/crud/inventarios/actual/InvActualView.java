@@ -10,7 +10,7 @@ import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.InventarioService;
-import com.gigti.xfinance.ui.MainLayout2;
+import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
@@ -25,7 +25,7 @@ import com.vaadin.flow.router.Route;
 
 import java.util.List;
 
-@Route(value = Constantes.VIEW_R_INVENTARIO_ACTUAL, layout = MainLayout2.class)
+@Route(value = Constantes.VIEW_R_INVENTARIO_ACTUAL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_ACTUAL +" | "+ Constantes.VIEW_MAIN)
 public class InvActualView extends VerticalLayout  implements ICrudView {
 

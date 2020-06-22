@@ -7,10 +7,7 @@ vaadin:
   bowerMode : false
   disableUsageStatistics : true
 
-# Workaround for https://github.com/vaadin/flow/issues/5947
 spring:
-  # Uncomment if using PostgreSQL
-  # Database
   datasource:
     url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
     username: ${RDS_USERNAME}
@@ -29,9 +26,8 @@ spring:
     generate-ddl: false
     properties:
       hibernate:
-        jdbc:
-          lob:
-            non_contextual_creation: true
+        temp:
+           use_jdbc_metadata_defaults: false
         enable_lazy_load_no_trans: true
     open-in-view: false
   devtools:

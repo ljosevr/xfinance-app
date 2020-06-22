@@ -4,7 +4,7 @@ import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.EmpresaService;
-import com.gigti.xfinance.ui.MainLayout2;
+import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
@@ -13,7 +13,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = Constantes.VIEW_R_EMPRESA_MASTER, layout = MainLayout2.class)
+@Route(value = Constantes.VIEW_R_EMPRESA_MASTER, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_EMPRESA_ADMIN + " | " + Constantes.VIEW_MAIN)
 public class EmpresaMasterView extends VerticalLayout {
 

@@ -11,7 +11,7 @@ import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InitBackService;
 import com.gigti.xfinance.backend.services.UsuarioService;
-import com.gigti.xfinance.ui.MainLayout2;
+import com.gigti.xfinance.ui.MainLayout;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -105,7 +105,7 @@ public class LoginView extends VerticalLayout {
         if(binder.isValid()) {
             Response response = accessControl.signIn(codigoEmpresa, userName, password, usuarioService);
             if (response.isSuccess()) {
-                UI.getCurrent().navigate(MainLayout2.class);
+                UI.getCurrent().navigate(MainLayout.class);
             } else {
                 Notification.show(response.getMessage(),5000, Notification.Position.MIDDLE);
             }
