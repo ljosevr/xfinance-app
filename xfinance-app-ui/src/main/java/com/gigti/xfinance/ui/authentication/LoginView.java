@@ -66,7 +66,7 @@ public class LoginView extends VerticalLayout {
         loginLayout.addClassName("login-panel");
         loginLayout.setSizeUndefined();
 
-        Image logo = new Image("/frontend/images/Logo5_2.png", "Logo");
+        Image logo = new Image("/frontend/images/logo.png", "Logo");
         logo.addClassName("logoLogin");
 
         H2 titleLogin = new H2("INICIAR SESIÓN");

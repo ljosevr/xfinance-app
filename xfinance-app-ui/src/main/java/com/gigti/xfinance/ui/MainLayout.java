@@ -53,8 +53,8 @@ import static com.github.appreciated.app.layout.entity.Section.HEADER;
  */
 @Route("")
 @PWA(
-        name = "Tu Punto De Venta",
-        shortName = "TPV",
+        name = "Tu Inventario Seguro",
+        shortName = "TIS",
         offlineResources = {
                 "./styles/offline.css",
                 "./images/offline.png"
@@ -82,7 +82,7 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> im
     }
 
     private void createHeader(){
-        H1 appTitle = new H1("TPV");
+        H1 appTitle = new H1("TIS");
         appTitle.addClassName("titlesAppBar");
 
         menu_salir = new Button("Salir", new Icon(VaadinIcon.EXIT));
@@ -106,12 +106,11 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> im
         Span welcome = new Span("Bienvenido: ");
         welcome.getElement().getStyle().set("font-weight", "bold");
 
-        Span company = new Span("Empresa: ");
-        company.getElement().getStyle().set("font-weight", "bold");
+        HorizontalLayout hlBar = new HorizontalLayout(welcome, new Span(personname));
+        hlBar.addClassName("welcomeBar");
 
         Component appBar = AppBarBuilder.get()
-                .add(new HorizontalLayout(welcome, new Span(personname),
-                        company, new Span(empresaname), menu_salir))
+                .add(menu_salir)
                 .build();
 
         Usuario user = CurrentUser.get();
@@ -121,7 +120,7 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> im
         Component appMenu = null;
         LeftAppMenuBuilder appMenuBuilder = LeftAppMenuBuilder.get()
                 .addToSection(HEADER,
-                        new LeftHeaderItem(null, null, "/frontend/images/Logo5.png")
+                        new LeftHeaderItem(personname, empresaname, "/frontend/images/logo.png")
                 );
 
         for(Vista view : listVista) {
@@ -152,7 +151,7 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> im
 
         init(AppLayoutBuilder
                 .get(LeftLayouts.LeftHybrid.class)
-                .withTitle("TPV")
+                .withTitle("TIS")
                 .withAppBar(appBar)
                 .withAppMenu(appMenu)
                 .build());
