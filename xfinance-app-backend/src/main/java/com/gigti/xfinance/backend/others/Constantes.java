@@ -10,6 +10,8 @@ public class Constantes {
     public static final String INIT5 = "PI Back - 5 - DEMO";
 
     //VIEWS-CLASS-NAME
+    public static final String VIEW_C_MAIN = "com.gigti.xfinance.ui.MainLayout";
+    public static final String VIEW_C_ROOT = "";
     public static final String VIEW_C_VENTA = "com.gigti.xfinance.ui.crud.pventa.PventaView";
     public static final String VIEW_C_PRODUCTO = "com.gigti.xfinance.ui.crud.producto.ProductoView";
     public static final String VIEW_C_CATEGORIA = "com.gigti.xfinance.ui.crud.categoria.CategoriaView";
@@ -61,7 +63,7 @@ public class Constantes {
 
 
     //VIEW-NAME
-    public static final String VIEW_MAIN = "Tu Punto de Venta";
+    public static final String VIEW_MAIN = "Tu Inventario Seguro";
     public static final String VIEW_LOGIN = "Login";
     public static final String VIEW_PVENTA = "Punto de Venta";
     public static final String VIEW_REGISTRAR = "Registrar Venta";

@@ -38,7 +38,7 @@ public class XfinanceInitListener implements VaadinServiceInitListener, SessionI
     }
 
     @Override
-    public void sessionInit(SessionInitEvent event) throws ServiceException {
+    public void sessionInit(SessionInitEvent event) {
         event.getSession().setLocale(new Locale("es", "CO"));
     }
 }
