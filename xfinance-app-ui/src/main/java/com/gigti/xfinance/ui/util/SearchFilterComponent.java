@@ -27,15 +27,18 @@ public class SearchFilterComponent extends VerticalLayout {
         filter.setClearButtonVisible(true);
         filter.setAutoselect(true);
         filter.addFocusShortcut(Key.F3);
+        filter.getElement().setAttribute("title", placeHolderFilter);
 
         btnSearch = new Button("", new Icon(VaadinIcon.SEARCH));
         btnSearch.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
+        btnSearch.getElement().setAttribute("title", "Buscar - F4");
         btnSearch.setVisible(visibleSearchBtn);
         btnSearch.addClickShortcut(Key.F4);
 
         btnAdd = new Button(labelAddBtn);
         btnAdd.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
         btnAdd.setIcon(VaadinIcon.PLUS_CIRCLE.create());
+        btnAdd.getElement().setAttribute("title", "Agregar - F7");
         btnAdd.addClickShortcut(Key.F7);
         btnAdd.setVisible(visibleAddBtn);
 

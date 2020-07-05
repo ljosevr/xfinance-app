@@ -18,6 +18,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.Icon;
@@ -56,9 +57,13 @@ public class LoginView extends VerticalLayout {
 
     private void buildUI() {
         this.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
-        this.setSizeUndefined();
+        this.setSizeFull();
         this.setJustifyContentMode(JustifyContentMode.CENTER);
-        this.addClassName("panel-principal-login");
+        VerticalLayout subLayout = new VerticalLayout();
+        subLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        subLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        subLayout.addClassName("panel-principal-login");
+        //this.setMaxHeight("800px");
 
         VerticalLayout loginLayout = new VerticalLayout();
         loginLayout.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -97,8 +102,38 @@ public class LoginView extends VerticalLayout {
         RouterLink forgot = new RouterLink("Olvide el Password", ForgotPasswordView.class);
 
         loginLayout.add(titleLogin, tfCodigoEmpresa, tfUsername, tfPassword, btnIngresar, forgot);
-        this.add(logo, loginLayout);
+
+        Button btnDemo = new Button("Demo");
+        btnDemo.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnDemo.addClickListener(evt -> openDialogDemo());
+        btnDemo.getElement().setAttribute("align-self","flex-end");
+
+        subLayout.add(logo, loginLayout);
+        this.add(subLayout, btnDemo);
         tfCodigoEmpresa.focus();
+    }
+
+    private void openDialogDemo() {
+        Dialog dialog = new Dialog();
+        dialog.setModal(true);
+        dialog.setCloseOnEsc(true);
+        dialog.setCloseOnOutsideClick(true);
+        dialog.setDraggable(true);
+
+        TextField tfUsuario = new TextField("Usuario: ");
+        tfUsuario.setReadOnly(true);
+        tfUsuario.setValue("demo");
+
+        TextField tfCompany = new TextField("Empresa");
+        tfCompany.setReadOnly(true);
+        tfCompany.setValue("demo");
+
+        TextField tfPassword = new TextField("Contraseña");
+        tfPassword.setReadOnly(true);
+        tfPassword.setValue("123456");
+
+        dialog.add(new VerticalLayout(tfCompany,tfUsuario, tfPassword));
+        dialog.open();
     }
 
     private void login(String codigoEmpresa, String userName, String password) {

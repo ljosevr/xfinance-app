@@ -43,7 +43,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
 
     public InvInicialView(InventarioService inventarioService, ImpuestoService impuestoService) {
         this.inventarioService = inventarioService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         configureProvider();
 

@@ -8,6 +8,7 @@ package com.gigti.xfinance.backend.data;
 
 import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @Entity
 @Table(name = "productos")
+@ToString
 public class Producto extends AbstractEntity {
 
     @NotNull

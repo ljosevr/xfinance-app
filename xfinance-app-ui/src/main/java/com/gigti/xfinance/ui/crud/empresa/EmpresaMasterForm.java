@@ -2,6 +2,7 @@ package com.gigti.xfinance.ui.crud.empresa;
 
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -32,11 +33,7 @@ public class EmpresaMasterForm extends Dialog {
 
         FormLayout content = new FormLayout();
         content.setClassName("formLayout");
-        content.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("300Px", 1),
-                new FormLayout.ResponsiveStep("450px", 3),
-                new FormLayout.ResponsiveStep("800px", 4),
-                new FormLayout.ResponsiveStep("1000px", 5));
+        content.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         H2 title = new H2("Crear o Editar Empresa");
         title.addClassName("titleView");

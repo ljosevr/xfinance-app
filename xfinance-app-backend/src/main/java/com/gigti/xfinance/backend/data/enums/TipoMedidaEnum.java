@@ -7,6 +7,6 @@ public enum TipoMedidaEnum {
     LIBRA,
     GRAMO,
     LITRO,
-    MILI_LITRO,
+    MILILITRO,
     CENTIMETRO
 }

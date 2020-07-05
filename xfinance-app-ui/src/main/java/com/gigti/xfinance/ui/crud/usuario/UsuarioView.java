@@ -37,7 +37,7 @@ public class UsuarioView extends VerticalLayout {
 
     public UsuarioView(UsuarioService iService) {
         this.usuarioService = iService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         addClassName("view");
         setSizeFull();

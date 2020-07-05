@@ -34,11 +34,11 @@ public class AllUtils {
                 return "kg";
             case "LIBRA":
                 return "lb";
-            case "LITRO":
-                return "l";
             case "GRAMO":
                 return "g";
-            case "MILI_LITRO":
+            case "LITRO":
+                return "l";
+            case "MILILITRO":
                 return "ml";
             case "CENTIMETRO":
                 return "cm";

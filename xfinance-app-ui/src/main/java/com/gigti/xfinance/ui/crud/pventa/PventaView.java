@@ -9,11 +9,13 @@ import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
@@ -56,7 +58,7 @@ public class PventaView extends VerticalLayout {
 
     public PventaView(VentaService ventaService) {
         this.ventaService = ventaService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
         addClassName("PventaView");
         setSizeFull();
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
@@ -117,7 +119,12 @@ public class PventaView extends VerticalLayout {
     private void configureTopBar() {
 
         VerticalLayout topBarLayout = new VerticalLayout();
-        topBarLayout.addClassName("searchBar");
+        topBarLayout.setDefaultHorizontalComponentAlignment(Alignment.START);
+
+        FormLayout topFormLayout = new FormLayout();
+        topFormLayout.addClassName("searchBar");
+        //topBarLayout.addClassName("form");
+        topFormLayout.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         filter = new TextField();
         filter.setPlaceholder("Buscar por Código de Barras");
@@ -133,6 +140,7 @@ public class PventaView extends VerticalLayout {
         cbTipoBusqueda.setItems(TipoBusquedaEnum.values());
         cbTipoBusqueda.setValue(TipoBusquedaEnum.CODIGO);
         cbTipoBusqueda.setAllowCustomValue(false);
+        cbTipoBusqueda.setMaxWidth("160px");
         cbTipoBusqueda.addValueChangeListener(evt -> {
            if(evt.getValue().name().equalsIgnoreCase(TipoBusquedaEnum.CODIGO.name())){
                filter.setPrefixComponent(new Icon(VaadinIcon.BARCODE));
@@ -151,16 +159,16 @@ public class PventaView extends VerticalLayout {
         btnSearch.setVisible(true);
         btnSearch.addClickShortcut(Key.F4);
         btnSearch.addClickListener(click -> search());
+        btnSearch.setMaxWidth("60px");
 
-        HorizontalLayout hLayout = new HorizontalLayout(filter, cbTipoBusqueda, btnSearch);
-        hLayout.setSizeFull();
-        hLayout.expand(filter);
-        topBarLayout.add(hLayout);
+//        HorizontalLayout hLayout = new HorizontalLayout(filter, cbTipoBusqueda, btnSearch);
+//        hLayout.setSizeFull();
+//        hLayout.expand(filter);
+        //topFormLayout.add(hLayout);
+        topFormLayout.add(filter, cbTipoBusqueda, btnSearch);
+
 
         filter.focus();
-        topBarLayout.setDefaultHorizontalComponentAlignment(Alignment.START);
-
-        this.add(topBarLayout);
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
@@ -176,7 +184,9 @@ public class PventaView extends VerticalLayout {
         btnCancel.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
         btnCancel.addClickListener(listener -> clearAll());
 
-        this.add(new HorizontalLayout(btnSave, btnDelete, btnCancel));
+        topBarLayout.add(topFormLayout);
+        topBarLayout.add(new HorizontalLayout(btnSave, btnDelete, btnCancel));
+        this.add(topBarLayout);
     }
 
     private void configureSearchGrid() {

@@ -9,11 +9,13 @@ package com.gigti.xfinance.backend.repositories;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Venta;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, String> {
 
-    //public long countFacturaByUsuarioEmpresa(Empresa empresa);
-    public long countByUsuario_Empresa(Empresa empresa);
+    @Query("Select COUNT(v) FROM Venta v " +
+            "WHERE v.usuario.persona.empresa =:empresa")
+    long countByUsuarioEmpresa(Empresa empresa);
 }

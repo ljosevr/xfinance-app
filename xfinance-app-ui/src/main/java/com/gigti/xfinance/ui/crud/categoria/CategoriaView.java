@@ -38,7 +38,7 @@ public class CategoriaView extends VerticalLayout implements ICrudView {
 
     public CategoriaView(CategoriaProductoService iService) {
         this.categoriaProductoService = iService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         addClassName("view");
         setSizeFull();

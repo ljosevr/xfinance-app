@@ -125,7 +125,7 @@ html {
     }
 
     .panel-principal-login{
-        margin: 150px 0px;
+        /*margin: 150px 0px 0px;*/
         display: flex;
         flex-direction: row;
         justify-content: center;
@@ -149,6 +149,10 @@ html {
 
     .logoDrawer {
         width: 35%;
+    }
+
+    .form {
+        margin: 0px 10px;
     }
 
 }
@@ -209,11 +213,6 @@ html {
     .view.editing .grid {
         display: none;
     }
-
-    /*.ProductoView.editing .searchBar,*/
-    /*.ProductoView.editing .grid {*/
-    /*    display: none;*/
-    /*}*/
 
     .panel-principal-login{
         margin: 20px 0px;

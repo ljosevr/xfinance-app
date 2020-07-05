@@ -65,9 +65,6 @@ public class Empresa extends AbstractEntity {
     @Transient
     private String activoS;
 
-    @OneToMany(mappedBy = "empresa",cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Usuario> usuarios;
-
     @OneToMany(mappedBy = "empresa", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Producto> productos;
 

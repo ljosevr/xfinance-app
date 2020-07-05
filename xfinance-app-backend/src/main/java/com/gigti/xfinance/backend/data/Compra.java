@@ -52,11 +52,10 @@ public class Compra extends AbstractEntity {
 
     private BigDecimal descuentoFactura;
 
-    private String proveedor;
-
-    private String telefonoProveedor;
-
-    private String direccionProveedor;
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Proveedor proveedor;
 
     //TODO
     //private boolean eliminado;

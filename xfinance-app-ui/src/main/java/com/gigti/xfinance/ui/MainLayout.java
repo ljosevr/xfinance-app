@@ -54,7 +54,7 @@ import static com.github.appreciated.app.layout.entity.Section.HEADER;
 @Route("")
 @PWA(
         name = "Tu Inventario Seguro",
-        iconPath = "/frontend/images/iconTis.png",
+        iconPath = "/frontend/images/icon.png",
         shortName = "TIS",
         offlineResources = {
                 "/styles/offline.css",
@@ -63,6 +63,7 @@ import static com.github.appreciated.app.layout.entity.Section.HEADER;
         display = "fullscreen",
         manifestPath = "manifest.json"
 )
+//@Theme(value = Lumo.class, variant = "dark")
 @Theme(value = Lumo.class)
 @CssImport(value = "./styles/shared-styles.css", themeFor = "My Theme Lumo")
 @CssImport(value = "./styles/my-button-theme.css", themeFor = "theme for Vaadin Button")
@@ -95,7 +96,7 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> im
 
         if(CurrentUser.get() != null) {
             String personname = Objects.requireNonNull(CurrentUser.get()).getPersona().getPrimerNombre();
-            String empresaname = Objects.requireNonNull(CurrentUser.get()).getEmpresa().getNombreEmpresa();
+            String empresaname = Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa().getNombreEmpresa();
 
             Span welcome = new Span("Bienvenido: ");
             welcome.getElement().getStyle().set("font-weight", "bold");
@@ -112,7 +113,7 @@ public class MainLayout extends AppLayoutRouterLayout<LeftLayouts.LeftHybrid> im
             Component appMenu;
             LeftAppMenuBuilder appMenuBuilder = LeftAppMenuBuilder.get()
                     .addToSection(HEADER,
-                            new LeftHeaderItem(personname, empresaname, "/frontend/images/iconTis60.png")
+                            new LeftHeaderItem(personname, empresaname, "/frontend/images/icon.png")
                     );
 
             for (Vista view : listVista) {

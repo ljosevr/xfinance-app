@@ -21,7 +21,7 @@ import java.util.List;
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
-    @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario) AND u.empresa =:empresa")
+    @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario) AND u.persona.empresa =:empresa")
     public Usuario findByNombreUsuarioAndEmpresa(String nombreUsuario, Empresa empresa);
 
     @Query("Select u From Usuario u Where UPPER(u.nombreUsuario) =UPPER(:nombreUsuario)")
@@ -31,7 +31,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     public List<Usuario> findByIdentificacion(@Param("identificacion") String identificacion);
 
     @Query("SELECT u FROM Usuario  u " +
-            "WHERE u.empresa =:empresa AND " +
+            "WHERE u.persona.empresa =:empresa AND " +
             "u.eliminado = false")
     public List<Usuario> findByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa, Pageable pageable);
 
@@ -44,8 +44,17 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     public List<Usuario> findAllByActivoIsFalse();
 
     @Query("SELECT u FROM Usuario  u " +
-            "WHERE u.empresa =:empresa AND " +
+            "WHERE u.persona.empresa =:empresa AND " +
             "lower(u.nombreUsuario) like lower(concat('%', :filter, '%')) AND " +
             "u.eliminado = false")
     List<Usuario> search(@Param("filter") String filter, Empresa empresa, Pageable pageable);
+
+    Usuario findByEmail(String email);
+
+    @Query("SELECT u FROM Usuario  u " +
+            "WHERE u.persona.empresa =:empresa AND " +
+            "u.eliminado = false AND "+
+            "u.tipoUsuario = :tipoUsuario AND " +
+            "u.adminDefecto =:isdefault")
+    Usuario findByEmpresaAndTipoUsuario(@Param("empresa") Empresa empresa, String tipoUsuario, boolean isdefault);
 }

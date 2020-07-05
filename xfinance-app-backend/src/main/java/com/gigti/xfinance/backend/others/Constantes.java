@@ -113,5 +113,8 @@ public class Constantes {
     public static final String EDIT_CATEGORY = "Editar Categoría";
     public static final String CREATE_BUY = "Registrar Compra";
     public static final String EDIT_BUY = "Editar Compra";
-
+    public static final String CREATE_PROVEEDOR = "Crear Proveedor";
+    public static final String EDIT_PROVEEDOR = "Editar Proveedor";
+    public static final String EDIT_CLIENT = "Editar Cliente";
+    public static final String CREATE_CLIENT = "Crear Cliente";
 }

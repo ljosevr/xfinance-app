@@ -22,7 +22,7 @@ public class CompraGrid extends PaginatedGrid<Compra> {
                 .setHeader("#Numero de Factura")
                 .setFlexGrow(10);
 
-        addColumn(Compra::getProveedor)
+        addColumn(compra -> compra.getProveedor().getNombre())
                 .setHeader("Proveedor")
                 .setFlexGrow(10);
 

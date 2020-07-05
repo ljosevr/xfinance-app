@@ -12,6 +12,7 @@ import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.CompraService;
 import com.gigti.xfinance.backend.services.ProductoService;
+import com.gigti.xfinance.backend.services.ProveedorService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
@@ -50,9 +51,9 @@ public class CompraView extends VerticalLayout implements ICrudView {
     private DatePicker dateStart;
 
 
-    public CompraView(CompraService compraService, ProductoService productoService) {
+    public CompraView(CompraService compraService, ProductoService productoService, ProveedorService proveedorService) {
         this.compraService = compraService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         addClassName("CompraView");
         setSizeFull();
@@ -68,7 +69,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
         configureSearchLayout();
 
         configureGrid();
-        form = new CompraDetailForm(productoService);
+        form = new CompraDetailForm(productoService, proveedorService);
         configureForm();
 
         gridLayout = new VerticalLayout(grid);

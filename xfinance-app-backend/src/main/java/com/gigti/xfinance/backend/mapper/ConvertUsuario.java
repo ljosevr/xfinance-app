@@ -16,11 +16,11 @@ public class ConvertUsuario {
             usuarioDTO.setRol(usuario.getRol());
             usuarioDTO.setUsuarioid(usuario.getId());
             usuarioDTO.setNombreUsuario(usuario.getNombreUsuario());
-            usuarioDTO.setEmpresa(usuario.getEmpresa());
+            usuarioDTO.setEmpresa(usuario.getPersona().getEmpresa());
             usuarioDTO.setActivo(usuario.isActivo());
             usuarioDTO.setEliminado(usuario.isEliminado());
             usuarioDTO.setDireccion(usuario.getPersona().getDireccion());
-            usuarioDTO.setEmail(usuario.getPersona().getEmail());
+            usuarioDTO.setEmail(usuario.getEmail());
             usuarioDTO.setIdentificacion(usuario.getPersona().getIdentificacion());
             usuarioDTO.setTipoIde(usuario.getPersona().getTipoIde());
             usuarioDTO.setPrimerApellido(usuario.getPersona().getPrimerApellido());
@@ -46,14 +46,15 @@ public class ConvertUsuario {
 
             usuario.setRol(usuarioDTO.getRol());
             usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
-            usuario.setEmpresa(usuarioDTO.getEmpresa());
+
             usuario.setActivo(usuarioDTO.isActivo());
             usuario.setEliminado(usuarioDTO.isEliminado());
+            usuario.setEmail(usuarioDTO.getEmail());
 
             Persona persona = new Persona();
 
             persona.setDireccion(usuarioDTO.getDireccion());
-            persona.setEmail(usuarioDTO.getEmail());
+            persona.setEmpresa(usuarioDTO.getEmpresa());
             persona.setIdentificacion(usuarioDTO.getIdentificacion());
             persona.setTipoIde(usuarioDTO.getTipoIde());
             persona.setPrimerApellido(usuarioDTO.getPrimerApellido());

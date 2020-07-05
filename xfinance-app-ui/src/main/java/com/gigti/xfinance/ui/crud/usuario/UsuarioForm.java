@@ -9,6 +9,7 @@ package com.gigti.xfinance.ui.crud.usuario;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -46,14 +47,11 @@ public class UsuarioForm extends Dialog {
         this.setResizable(true);
         FormLayout content = new FormLayout();
         content.setClassName("formLayout");
-        content.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 2),
-                new FormLayout.ResponsiveStep("40em", 3));
+        content.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         H2 title = new H2("Crear o Editar Usuario");
         title.addClassName("titleView");
-        content.add(title,3);
+
 
         tfUsuario = new TextField("Nombre Usuario");
         tfUsuario.setRequired(true);
@@ -122,7 +120,7 @@ public class UsuarioForm extends Dialog {
         binderUsuario.bind(tfSegundoApellidoUsuario, UsuarioDTO::getSegundoApellido, UsuarioDTO::setSegundoApellido);
         binderUsuario.bind(tfDireccion, UsuarioDTO::getDireccion, UsuarioDTO::setDireccion);
         binderUsuario.bind(tfTelefono, UsuarioDTO::getTelefono, UsuarioDTO::setTelefono);
-        binderUsuario.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Dirección").bind(UsuarioDTO::getEmail, UsuarioDTO::setEmail);
+        binderUsuario.forField(tfEmail).withValidator(new EmailValidator("Ingresa un Email Valido")).asRequired("Digite Email").bind(UsuarioDTO::getEmail, UsuarioDTO::setEmail);
         //binderPersona.bindInstanceFields(this);
 
         binderUsuario.addStatusChangeListener(event -> {
@@ -146,8 +144,9 @@ public class UsuarioForm extends Dialog {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
 
-        content.add(tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
+        content.add(title, tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
                 tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
+        content.setColspan(title, content.getResponsiveSteps().size());
 
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);

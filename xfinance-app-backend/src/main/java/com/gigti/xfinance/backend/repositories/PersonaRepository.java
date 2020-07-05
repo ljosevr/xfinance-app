@@ -23,11 +23,8 @@ public interface PersonaRepository extends JpaRepository<Persona, String> {
 
     Persona findByIdentificacion(String identification);
 
-    boolean existsByEmail(String email);
-
-    boolean existsByEmailAndIdentificacionIsNot(String email, String identificacion);
-
     boolean existsByIdentificacionAndTipoIde(String identificacion, TipoIde tipoIde);
 
     boolean existsByIdentificacionAndTipoIdeAndIdIsNot(String identificacion, TipoIde tipoIde, String id);
+
 }

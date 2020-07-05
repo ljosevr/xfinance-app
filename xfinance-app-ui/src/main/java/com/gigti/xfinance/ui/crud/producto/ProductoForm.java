@@ -10,6 +10,7 @@ import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Impuesto;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -40,15 +41,11 @@ public class ProductoForm extends FormLayout {
     private Binder<Producto> binder;
 
     public ProductoForm(List<CategoriaProducto> listCategoria, List<TipoMedidaEnum> listaTipoMedida, List<Impuesto> listImpuestos) {
-        this.addClassName("form");
-        //this.getElement().setAttribute("max-width", "450px");
-        this.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("25em", 1),
-                new FormLayout.ResponsiveStep("32em", 2));
+        this.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         titleForm = new H2("");
         titleForm.addClassName("titleView");
-        this.add(titleForm,3);
+        this.add(titleForm,this.getResponsiveSteps().size());
 
         tfProdNombre = new TextField("Nombre Producto");
         tfProdNombre.setRequired(true);
@@ -107,7 +104,7 @@ public class ProductoForm extends FormLayout {
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete,btnClose);
-
+        this.setColspan(actionsLayout, this.getResponsiveSteps().size());
         this.add(tfProdNombre,tfProdCodigoB,
                 tfProdDescripcion, cbTipoMedida,
                 cbCategorias, cbImpuesto,

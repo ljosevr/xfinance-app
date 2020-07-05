@@ -19,6 +19,7 @@ public class UsuarioDTO extends Persona {
     private boolean activo;
     private String activoS;
     private Empresa empresa;
+    private String email;
 
     public String getActivoS() {
         return this.isActivo() ? "SI" : "NO";

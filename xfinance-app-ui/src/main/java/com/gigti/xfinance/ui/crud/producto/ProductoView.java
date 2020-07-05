@@ -47,7 +47,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
 
     public ProductoView(CategoriaProductoService categoriaProductoService, ProductoService iServiceProd, ImpuestoService impuestoService) {
         this.productoService = iServiceProd;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         addClassName("view");
         setSizeFull();
@@ -75,9 +75,9 @@ public class ProductoView extends VerticalLayout implements ICrudView {
         gridLayout.addClassName("grid");
 
         FlexLayout flexLayout = new FlexLayout(gridLayout, form);
-        flexLayout.addClassName("content");
+        //flexLayout.addClassName("content");
         flexLayout.setSizeFull();
-        flexLayout.setFlexGrow(2, gridLayout);
+        flexLayout.setFlexGrow(3, gridLayout);
         flexLayout.setFlexGrow(1, form);
 
         add(title, searchLayout, flexLayout);
@@ -130,7 +130,7 @@ public class ProductoView extends VerticalLayout implements ICrudView {
 
     public void configureSearchLayout() {
 
-        searchLayout = new SearchFilterComponent("Nuevo", "", "Filtro por Nombre", false, true);
+        searchLayout = new SearchFilterComponent("", "", "Filtro por Nombre", false, true);
         searchLayout.getFilter().addValueChangeListener(event -> updateList());
         searchLayout.getFilter().focus();
         searchLayout.getBtnAdd().addClickListener(click -> addItem());

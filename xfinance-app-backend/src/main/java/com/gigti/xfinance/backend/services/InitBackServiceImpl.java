@@ -261,9 +261,9 @@ public class InitBackServiceImpl implements InitBackService {
                         "Villarreal",
                         "Rincón",
                         java.sql.Date.valueOf(LocalDate.of(1985, 6, 11)),
-                        "ljosevr@gmail.com",
                         "3006520012",
-                        "calle 191A#11A-92"
+                        "calle 191A#11A-92",
+                        emp
                 );
 
                 persona = personaRepository.save(persona);
@@ -278,9 +278,9 @@ public class InitBackServiceImpl implements InitBackService {
                         pass,
                         true,
                         persona,
-                        emp,
                         rolRoot,
-                        TipoUsuarioEnum.ROOT
+                        TipoUsuarioEnum.ROOT,
+                        "ljosevr@gmail.com"
                 );
 
                 usuarioRepository.save(userRoot);

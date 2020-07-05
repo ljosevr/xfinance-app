@@ -38,7 +38,7 @@ public class InvActualView extends VerticalLayout  implements ICrudView {
 
     public InvActualView(InventarioService inventarioService) {
         this.inventarioService = inventarioService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         configureProvider();
 

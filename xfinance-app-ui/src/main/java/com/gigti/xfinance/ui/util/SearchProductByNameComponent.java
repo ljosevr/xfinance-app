@@ -34,7 +34,7 @@ public class SearchProductByNameComponent extends VerticalLayout {
 
     public SearchProductByNameComponent(VentaService ventaService, String labelFilter, String placeHolderFilter) {
         this.ventaService = ventaService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         filter = new TextField(labelFilter);
         filter.setPlaceholder(placeHolderFilter);
@@ -58,7 +58,7 @@ public class SearchProductByNameComponent extends VerticalLayout {
 
     public SearchProductByNameComponent(ProductoService productoService, String labelFilter, String placeHolderFilter) {
         this.productoService = productoService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
 
         filter = new TextField(labelFilter);
         filter.setPlaceholder(placeHolderFilter);

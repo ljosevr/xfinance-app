@@ -9,32 +9,33 @@ package com.gigti.xfinance.backend.data;
 import lombok.Data;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.Objects;
 
-@Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
+@Data
 @Entity
-@Table(name = "personas")
-public class Persona extends AbstractEntity{
+@Table(name = "personas", uniqueConstraints={@UniqueConstraint(columnNames={"identificacion", "empresa_id"})})
+public class Persona extends AbstractEntity {
 
-    @NotNull
+    @NotNull(message = "No puede estar Vacio")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn
     private TipoIde tipoIde;
 
-    @NotEmpty
+    @NotNull(message = "No puede estar Vacio")
     @Column(unique = true)
     private String identificacion;
-    @NotEmpty
+
+    @NotNull(message = "No puede estar Vacio")
     @Column(name = "primer_nombre")
     private String primerNombre;
+
     @Column(name = "segundo_nombre")
     private String segundoNombre;
-    @NotEmpty
+
     @Column(name = "primer_apellido")
     private String primerApellido;
+
     @Column(name = "segundo_apellido")
     private String segundoApellido;
 
@@ -42,16 +43,18 @@ public class Persona extends AbstractEntity{
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;
 
-    @NotEmpty
-    @Column(unique = true)
-    private String email;
-
     private String telefono;
+
     private String direccion;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Empresa empresa;
 
     public Persona(){}
 
-    public Persona(TipoIde tipoIde, String identificacion, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido, Date fechaNacimiento, String email, String telefono, String direccion) {
+    public Persona(TipoIde tipoIde, String identificacion, String primerNombre, String segundoNombre, String primerApellido, String segundoApellido, Date fechaNacimiento, String telefono, String direccion, Empresa empresa) {
         this.tipoIde = tipoIde;
         this.identificacion = identificacion;
         this.primerNombre = primerNombre;
@@ -59,66 +62,28 @@ public class Persona extends AbstractEntity{
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
         this.fechaNacimiento = fechaNacimiento;
-        this.email = email;
         this.telefono = telefono;
         this.direccion = direccion;
+        this.empresa = empresa;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        Persona persona = (Persona) o;
-        return Objects.equals(tipoIde, persona.tipoIde) &&
-                Objects.equals(identificacion, persona.identificacion) &&
-                Objects.equals(primerNombre, persona.primerNombre) &&
-                Objects.equals(segundoNombre, persona.segundoNombre) &&
-                Objects.equals(primerApellido, persona.primerApellido) &&
-                Objects.equals(segundoApellido, persona.segundoApellido) &&
-                Objects.equals(fechaNacimiento, persona.fechaNacimiento) &&
-                Objects.equals(email, persona.email) &&
-                Objects.equals(telefono, persona.telefono) &&
-                Objects.equals(direccion, persona.direccion);
-    }
+//    public static Persona dummy(double number){
+//        Persona persona = new Persona(TipoIde.CEDULA,
+//                        "100"+number,
+//                        "Luis",
+//                "José",
+//                "Villarreal",
+//                "Rincón",
+//                 new Date(),
+//                "ljosevr"+number+"@gmail.com",
+//                "3006520012",
+//                "Laplace",
+//                );
+//
+//        return persona;
+//    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), tipoIde, identificacion, primerNombre, segundoNombre, primerApellido, segundoApellido, fechaNacimiento, email, telefono, direccion);
-    }
-
-    @Override
-    public String toString() {
-        return "Persona{" +
-                "tipoIde=" + tipoIde +
-                ", identificacion='" + identificacion + '\'' +
-                ", primerNombre='" + primerNombre + '\'' +
-                ", segundoNombre='" + segundoNombre + '\'' +
-                ", primerApellido='" + primerApellido + '\'' +
-                ", segundoApellido='" + segundoApellido + '\'' +
-                ", fechaNacimiento=" + fechaNacimiento +
-                ", email='" + email + '\'' +
-                ", telefono='" + telefono + '\'' +
-                ", direccion='" + direccion + '\'' +
-                '}';
-    }
-
-    public static Persona dummy(double number){
-        Persona persona = new Persona(TipoIde.CEDULA,
-                        "100"+number,
-                        "Luis",
-                "José",
-                "Villarreal",
-                "Rincón",
-                 new Date(),
-                "ljosevr"+number+"@gmail.com",
-                "3006520012",
-                "Laplace");
-
-        return persona;
-    }
-
-    public String getCompleteName(){
-        return String.format("%s %s %s %s", primerNombre, segundoNombre, primerApellido, segundoApellido);
+    public String getNombreCompleto(){
+        return String.format("%s %s %s %s", primerNombre, segundoNombre != null ? segundoNombre : "", primerApellido, segundoApellido != null ? segundoApellido : "");
     }
 }

@@ -70,7 +70,7 @@ public class VentaServiceImpl implements VentaService {
             venta.setFechaCreacion(new Date());
             //TODO Luego cambiar por # Factura de Dian
             // TODO Agregar luego iniciar factura en Numero XXX definido por los usuarios
-            long cantidadFacturasxEmpresa = ventaRepository.countByUsuario_Empresa(usuario.getEmpresa());
+            long cantidadFacturasxEmpresa = ventaRepository.countByUsuarioEmpresa(usuario.getPersona().getEmpresa());
             cantidadFacturasxEmpresa++;
             venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
             venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));

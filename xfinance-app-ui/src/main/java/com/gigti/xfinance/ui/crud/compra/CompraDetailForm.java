@@ -3,8 +3,10 @@ package com.gigti.xfinance.ui.crud.compra;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ProductoService;
+import com.gigti.xfinance.backend.services.ProveedorService;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.components.MyButton;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -29,9 +31,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.shared.Registration;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -45,6 +49,7 @@ public class CompraDetailForm extends VerticalLayout {
     private Binder<Compra> binder;
     private CompraItemGrid itemsGrid;
     private final ProductoService productoService;
+    private ProveedorService proveedorService;
     private List<CompraItem> listaItems;
     private Producto selectedProd;
     private BigDecimalField tfVenta;
@@ -59,11 +64,13 @@ public class CompraDetailForm extends VerticalLayout {
     private Button btnDelete;
     private Button btnClose;
     private Editor<CompraItem> itemGridEditor;
+    private DataProvider<Proveedor, String> dataProviderProveedores;
 
 
-    public CompraDetailForm(ProductoService productoService) {
+    public CompraDetailForm(ProductoService productoService, ProveedorService proveedorService) {
         this.productoService = productoService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getEmpresa() : null;
+        this.proveedorService = proveedorService;
+        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
         listaItems = new ArrayList<>();
 
         this.addClassName("CompraDetailFormView");
@@ -85,11 +92,7 @@ public class CompraDetailForm extends VerticalLayout {
 
         FormLayout formDataLayout = new FormLayout();
         formDataLayout.setClassName("formLayout");
-        formDataLayout.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("300Px", 1),
-                new FormLayout.ResponsiveStep("450px", 3),
-                new FormLayout.ResponsiveStep("800px", 4),
-                new FormLayout.ResponsiveStep("1000px", 5));
+        formDataLayout.setResponsiveSteps(MyResponsiveStep.getMyList());
         tfFactura = new TextField("# Factura");
         tfFactura.setRequired(true);
         tfFactura.addThemeVariants(TextFieldVariant.LUMO_SMALL);
@@ -102,6 +105,27 @@ public class CompraDetailForm extends VerticalLayout {
         dpFechaCompra.setClearButtonVisible(true);
         dpFechaCompra.getElement().setAttribute("theme", "align-center");
         dpFechaCompra.getElement().setAttribute("theme", "small");
+
+        ComboBox<Proveedor> cbProveedores = new ComboBox<>("Proveedor");
+        cbProveedores.getElement().setAttribute("theme", "small");
+        cbProveedores.setItemLabelGenerator(Proveedor::getNombre);
+        cbProveedores.setPlaceholder("Buscar por Nombre o Nit");
+
+        ComboBox.ItemFilter<Proveedor> filter = (prov, filterString) ->
+                prov.getNombre().toLowerCase()
+                        .contains(filterString.toLowerCase());
+
+        cbProveedores.setItems(filter, proveedorService.find("", empresa, null));
+
+        cbProveedores.setAllowCustomValue(true);
+        configureProvider();
+        cbProveedores.setDataProvider(dataProviderProveedores);
+        cbProveedores.setClearButtonVisible(true);
+        cbProveedores.setRenderer(TemplateRenderer.<Proveedor>of(
+                "<div>[[item.nombre]]<br><small>[[item.identificacion]]</small></div>")
+                .withProperty("nombre", prov -> prov.getNombre().toUpperCase())
+                .withProperty("identificacion", prov -> prov.getIdentificacion().toLowerCase()));
+
 
         TextField tfProveedor = new TextField("Nombre Proveedor");
         tfProveedor.setRequired(true);
@@ -128,18 +152,25 @@ public class CompraDetailForm extends VerticalLayout {
         binder = new BeanValidationBinder<>(Compra.class);
         binder.forField(tfFactura).asRequired("Digite # Factura").bind(Compra::getNumeroFactura, Compra::setNumeroFactura);
         binder.forField(dpFechaCompra).asRequired("Digite Fecha de Factura").bind(Compra::getFechaCompraLD, Compra::setFechaCompraLD);
-        binder.forField(tfProveedor).asRequired("Digite Nombre del Proveedor").bind(Compra::getProveedor, Compra::setProveedor);
-        binder.forField(tfTelefonoProveedor)
-                .withValidator(max -> max.length() <= 10, "Maximo 10 Digitos")
-                .bind(Compra::getTelefonoProveedor, Compra::setTelefonoProveedor);
-        binder.forField(tfDireccionProveedor).bind(Compra::getDireccionProveedor, Compra::setDireccionProveedor);
-
+        binder.forField(cbProveedores).asRequired("Seleccione Proveedor").bind(Compra::getProveedor, Compra::setProveedor);
         binder.addStatusChangeListener(event -> enableButtonSave());
 
-        formDataLayout.add(tfFactura, dpFechaCompra, tfProveedor,
-                tfTelefonoProveedor, tfDireccionProveedor);
+        formDataLayout.add(tfFactura, dpFechaCompra, cbProveedores);
 
         this.add(subTitleData, formDataLayout);
+    }
+
+    public void configureProvider() {
+        dataProviderProveedores = DataProvider.fromFilteringCallbacks(
+                        query -> {
+                            String filter = query.getFilter().orElse(null);
+                            return proveedorService.find(filter, empresa, new OffsetBasedPageRequest(query)).stream();
+                        },
+                        query -> {
+                            String filter = query.getFilter().orElse(null);
+                            return (int) proveedorService.countSearch(filter, empresa);
+                        }
+        );
     }
 
     private void enableButtonSave() {
@@ -156,6 +187,7 @@ public class CompraDetailForm extends VerticalLayout {
         cbProductos.getElement().setAttribute("theme", "small");
         cbProductos.setItemLabelGenerator(Producto::getNombreProducto);
         cbProductos.setPlaceholder("Buscar Producto");
+        cbProductos.getElement().setAttribute("align-self:","flex-start");
 
         ComboBox.ItemFilter<Producto> filter = (prod, filterString) ->
                 prod.getNombreProducto().toLowerCase()
@@ -184,7 +216,7 @@ public class CompraDetailForm extends VerticalLayout {
                 .withProperty("tipMedida", prod -> prod.getTipoMedida().toString().toLowerCase()));
 
         btnAgregar = MyButton.MyButton("Adicionar", new Icon(VaadinIcon.PLUS_CIRCLE),
-                "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, false, false);
+                "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, true, false);
         btnAgregar.addClickListener(evt -> {
             if(selectedProd != null) {
                 Response result = productoService.getPriceVenta(selectedProd);
@@ -210,7 +242,7 @@ public class CompraDetailForm extends VerticalLayout {
             }
         });
 
-        cbProductos.addClassName("comboProd");
+        //cbProductos.addClassName("comboProd");
         this.add(subTitleItems, new HorizontalLayout(cbProductos, btnAgregar));
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);

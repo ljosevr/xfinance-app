@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -27,12 +28,10 @@ public class CategoriaForm extends FormLayout {
     public CategoriaForm() {
 
         this.addClassName("form");
-        this.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("40em", 1));
-
+        this.setResponsiveSteps(MyResponsiveStep.getMyList());
         titleForm = new H2("");
         titleForm.addClassName("titleView");
-        this.add(titleForm,1);
+        this.add(titleForm,this.getResponsiveSteps().size());
 
         tfCatNombre = new TextField("Nombre Categoria");
         tfCatNombre.setRequired(true);
@@ -80,7 +79,9 @@ public class CategoriaForm extends FormLayout {
         actionsLayout.add(btnSave, btnDelete, btnClose);
 
         this.add(titleForm,tfCatNombre,tfCatDescripcion,chkCatActivo, actionsLayout);
+        this.setColspan(actionsLayout, this.getResponsiveSteps().size());
 
+        //this.getElement().setAttribute("flex-wrap", "wrap");
     }
 
     public void setCategoria(CategoriaProducto categoria, String title) {

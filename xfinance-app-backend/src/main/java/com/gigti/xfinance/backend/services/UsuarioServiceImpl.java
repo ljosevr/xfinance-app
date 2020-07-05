@@ -96,35 +96,15 @@ public class UsuarioServiceImpl implements UsuarioService {
                     response.setMessage("Identificación Ya se encuentra Registrada en Otro usuario");
                     return response;
                 }
-                if(!usuario.getPersona().getEmail().equalsIgnoreCase(persona.getEmail())) {
-                    //Validar Email
-                    if(personaRepository.existsByEmailAndIdentificacionIsNot(usuario.getPersona().getEmail(), usuario.getPersona().getIdentificacion())) {
-                        response.setSuccess(false);
-                        response.setMessage("Email Ya se encuentra Registrado en Otro usuario");
-                        return response;
-                    }
-
-                    //Validar Email
-                    if(personaRepository.existsByIdentificacionAndTipoIdeAndIdIsNot(usuario.getPersona().getIdentificacion(),
-                            usuario.getPersona().getTipoIde(), usuario.getPersona().getId())) {
-                        response.setSuccess(false);
-                        response.setMessage("Identificación Ya se encuentra Registrada en Otro usuario");
-                        return response;
-                    }
+                //Validar Email
+                if(validarEmailUsuario(usuario, response)) {
+                    return response;
                 }
 
                 usuario.getPersona().setId(persona.getId());
             } else {
                 //Validar Email
-                if(personaRepository.existsByEmail(usuario.getPersona().getEmail())) {
-                    response.setSuccess(false);
-                    response.setMessage("Email Ya se encuentra Registrado en Otro usuario");
-                    return response;
-                }
-                //Validar Identificacion
-                if(personaRepository.existsByIdentificacionAndTipoIde(usuario.getPersona().getIdentificacion(), usuario.getPersona().getTipoIde())) {
-                    response.setSuccess(false);
-                    response.setMessage("Identificación Ya se encuentra Registrado en Otro usuario");
+                if(validarEmailUsuario(usuario, response)) {
                     return response;
                 }
 
@@ -143,6 +123,18 @@ public class UsuarioServiceImpl implements UsuarioService {
             response.setMessage("Error al Guardar Usuario");
             return response;
         }
+    }
+
+    private boolean validarEmailUsuario(Usuario usuario, Response response) {
+        Usuario u = usuarioRepository.findByEmail(usuario.getEmail());
+        if (u != null) {
+            if(!u.getPersona().getIdentificacion().equalsIgnoreCase(usuario.getPersona().getIdentificacion())) {
+                response.setSuccess(false);
+                response.setMessage("Email Ya se encuentra Registrado en Otro Usuario");
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

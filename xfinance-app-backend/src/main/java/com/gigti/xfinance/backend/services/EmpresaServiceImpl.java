@@ -59,16 +59,8 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     private EmpresaDTO getData(Empresa emp) {
         if(emp != null){
-            Usuario user = null;
-            if (emp.getUsuarios() != null) {
-                for(Usuario user1 : emp.getUsuarios()){
-                    if(user1.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN)){
-                        user = user1;
-                        break;
-                    }
-                }
-            }
-            EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(emp, user);
+            Usuario admin = usuarioRepository.findByEmpresaAndTipoUsuario(emp, TipoUsuarioEnum.ADMIN.name(), true);
+            EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(emp, admin);
 
             return empresaDTO;
         } else {
@@ -83,13 +75,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         List<EmpresaDTO> listResult = new ArrayList<>();
         for(Empresa empresa : listTemp){
             if(empresa != null){
-                Usuario user = null;
-                for(Usuario user1 : empresa.getUsuarios()) {
-                    if (user1.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN)) {
-                        user = user1;
-                        break;
-                    }
-                }
+                Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN.name(), true);
                 EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
                 listResult.add(empresaDTO);
             }
@@ -102,10 +88,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         EmpresaDTO empresaDTO = new EmpresaDTO();
         Empresa empresa = empresaRepository.findById(id).orElse(null);
         if(empresa != null){
-            Usuario user = empresa.getUsuarios().stream()
-                    .filter(usu -> usu.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN))
-                    .findFirst()
-                    .orElse(null);
+            Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN.name(), true);
             empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
         }
         return empresaDTO;
@@ -117,9 +100,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         List<EmpresaDTO> listResult = new ArrayList<>();
 
         listTemp.forEach(empresa -> {
-            Usuario user = empresa.getUsuarios().stream()
-                    .filter(usu -> usu.getTipoUsuario().equals(TipoUsuarioEnum.ADMIN))
-                    .findFirst().orElse(null);
+            Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN.name(), true);
             EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
             listResult.add(empresaDTO);
         });
@@ -239,7 +220,7 @@ public class EmpresaServiceImpl implements EmpresaService {
                 //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
                 usuarioAdmin.setPasswordUsuario(UtilsBackend.encrytPass("123456"));
                 usuarioAdmin.setAdminDefecto(true);
-                usuarioAdmin.setEmpresa(empresaEnt);
+
                 Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
                 usuarioAdmin.setRol(rolAdmin);
                 usuarioAdmin.setTipoUsuario(TipoUsuarioEnum.ADMIN);
@@ -270,13 +251,14 @@ public class EmpresaServiceImpl implements EmpresaService {
             persona.setSegundoNombre(empresa.getSegundoNombrePersona());
             persona.setPrimerApellido(empresa.getPrimerApellidoPersona());
             persona.setSegundoApellido(empresa.getSegundoApellidoPersona());
-            persona.setEmail(empresa.getEmailPersona());
+            persona.setEmpresa(empresaEnt);
             persona.setTelefono(empresa.getTelefonoPersona());
             persona.setDireccion(empresa.getDireccionPersona());
 
             persona = personaRepository.save(persona);
 
             usuarioAdmin.setPersona(persona);
+            usuarioAdmin.setEmail(empresa.getEmailPersona());
 
             usuarioAdmin = usuarioRepository.save(usuarioAdmin);
 

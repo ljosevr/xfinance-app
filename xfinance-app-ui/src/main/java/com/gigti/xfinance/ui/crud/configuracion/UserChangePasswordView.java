@@ -113,7 +113,7 @@ public class UserChangePasswordView extends VerticalLayout {
             status.notifyBindingValidationStatusHandlers();
         }
 
-        if(CurrentUser.get().getEmpresa().getTipoEmpresa().equals(TipoEmpresaEnum.DEMO)) {
+        if(CurrentUser.get().getPersona().getEmpresa().getTipoEmpresa().equals(TipoEmpresaEnum.DEMO)) {
             NotificacionesUtil.showError("Usuario DEMO - NO Puede cambiar Password");
         } else {
             if (binder.isValid()) {

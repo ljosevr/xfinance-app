@@ -10,16 +10,16 @@ import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Data
 @Entity
-@Table(name = "usuarios", uniqueConstraints={@UniqueConstraint(columnNames={"nombre_usuario","empresa_id"})})
+@Table(name = "usuarios", uniqueConstraints={@UniqueConstraint(columnNames={"nombre_usuario"})})
 public class Usuario extends AbstractEntity {
 
-    @Column(name="nombre_usuario")
+    @Column(name="nombre_usuario", unique = true)
     @Size(min = 4, max = 25)
     @NotNull
     private String nombreUsuario;
@@ -42,11 +42,6 @@ public class Usuario extends AbstractEntity {
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
-    private Empresa empresa;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn
     private Rol rol;
 
     private boolean adminDefecto;
@@ -55,8 +50,10 @@ public class Usuario extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private TipoUsuarioEnum tipoUsuario;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Venta> ventas;
+    @NotNull(message = "No puede estar Vacio")
+    @Column(unique = true)
+    @Email
+    private String email;
 
     @PrePersist
     private void validateUser() {
@@ -69,15 +66,15 @@ public class Usuario extends AbstractEntity {
         super();
     }
 
-    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Empresa empresa, Rol rol, TipoUsuarioEnum tipoUsuario) {
+    public Usuario(String nombreUsuario, String passwordUsuario, Boolean activo, Persona persona, Rol rol, TipoUsuarioEnum tipoUsuario, String email) {
         this.nombreUsuario = nombreUsuario;
         this.passwordUsuario = passwordUsuario;
         this.activo = activo;
         this.persona = persona;
-        this.empresa = empresa;
         this.rol = rol;
         this.tipoUsuario = tipoUsuario;
         this.eliminado = false;
+        this.email = email;
     }
 
     public String getActivoS() {
