@@ -55,7 +55,7 @@ import static com.github.appreciated.app.layout.entity.Section.HEADER;
 @PWA(
         name = "Tu Inventario Seguro",
         iconPath = "/frontend/images/icon.png",
-        shortName = "TIS",
+        shortName = "Tu Iventario Seguro",
         offlineResources = {
                 "/styles/offline.css",
                 "/images/offline.png"
