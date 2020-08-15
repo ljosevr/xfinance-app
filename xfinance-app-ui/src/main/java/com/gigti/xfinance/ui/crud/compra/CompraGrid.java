@@ -7,48 +7,32 @@
 package com.gigti.xfinance.ui.crud.compra;
 
 import com.gigti.xfinance.backend.data.Compra;
-import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.util.AllUtils;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import org.vaadin.klaudeta.PaginatedGrid;
 
-public class CompraGrid extends PaginatedGrid<Compra> {
+public class CompraGrid extends Grid<Compra> {
 
     public CompraGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT);
 
         addColumn(Compra::getNumeroFactura)
-                .setHeader("#Numero de Factura")
-                .setFlexGrow(10);
+                .setHeader("#Numero de Factura");
 
         addColumn(compra -> compra.getProveedor().getNombre())
-                .setHeader("Proveedor")
-                .setFlexGrow(10);
+                .setHeader("Proveedor");
 
         addColumn(compra -> AllUtils.formatDate(compra.getFechaCompra()))
-                .setHeader("Fecha Compra")
-                .setFlexGrow(8);
+                .setHeader("Fecha Compra");
 
         addColumn(compra -> AllUtils.formatDate(compra.getFechaCreacion()))
-                .setHeader("Fecha Creación")
-                .setFlexGrow(8);
+                .setHeader("Fecha Creación");
 
         addColumn(compra -> AllUtils.numberFormat(compra.getTotalFactura()))
-                .setHeader("Total Factura")
-                .setFlexGrow(8);
+                .setHeader("Total Factura");
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(Compra compra) {
-        getDataCommunicator().refresh(compra);
-    }
-
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
-    }
 }

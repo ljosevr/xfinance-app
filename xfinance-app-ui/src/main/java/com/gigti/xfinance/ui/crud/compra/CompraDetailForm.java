@@ -70,7 +70,7 @@ public class CompraDetailForm extends VerticalLayout {
     public CompraDetailForm(ProductoService productoService, ProveedorService proveedorService) {
         this.productoService = productoService;
         this.proveedorService = proveedorService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
         listaItems = new ArrayList<>();
 
         this.addClassName("CompraDetailFormView");
@@ -127,23 +127,6 @@ public class CompraDetailForm extends VerticalLayout {
                 .withProperty("identificacion", prov -> prov.getIdentificacion().toLowerCase()));
 
 
-        TextField tfProveedor = new TextField("Nombre Proveedor");
-        tfProveedor.setRequired(true);
-        tfProveedor.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        tfProveedor.setClearButtonVisible(true);
-
-        TextField tfTelefonoProveedor = new TextField("Telefono Proveedor");
-        tfTelefonoProveedor.setRequired(false);
-        tfTelefonoProveedor.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        tfTelefonoProveedor.setClearButtonVisible(true);
-        tfTelefonoProveedor.setPattern("[0-9]*");
-        tfTelefonoProveedor.setPreventInvalidInput(true);
-
-        TextField tfDireccionProveedor = new TextField("Dirección Proveedor");
-        tfDireccionProveedor.setRequired(false);
-        tfDireccionProveedor.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        tfDireccionProveedor.setClearButtonVisible(true);
-
         BigDecimalField tfTotalFactura = new BigDecimalField("Total Factura");
         tfTotalFactura.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfTotalFactura.setReadOnly(true);
@@ -188,12 +171,13 @@ public class CompraDetailForm extends VerticalLayout {
         cbProductos.setItemLabelGenerator(Producto::getNombreProducto);
         cbProductos.setPlaceholder("Buscar Producto");
         cbProductos.getElement().setAttribute("align-self:","flex-start");
+        //cbProductos.setMinWidth("350px");
 
         ComboBox.ItemFilter<Producto> filter = (prod, filterString) ->
                 prod.getNombreProducto().toLowerCase()
                         .contains(filterString.toLowerCase());
 
-        cbProductos.setItems(filter, productoService.findAll(empresa));
+        cbProductos.setItems(filter, productoService.findAllByEmpresaAndNotInfinite(empresa));
         selectedProd = new Producto();
 
         cbProductos.addValueChangeListener(evt -> {
@@ -213,7 +197,7 @@ public class CompraDetailForm extends VerticalLayout {
         cbProductos.setRenderer(TemplateRenderer.<Producto>of(
                 "<div>[[item.nombre]]<br><small>[[item.tipMedida]]</small></div>")
                 .withProperty("nombre", prod -> prod.getNombreProducto().toUpperCase())
-                .withProperty("tipMedida", prod -> prod.getTipoMedida().toString().toLowerCase()));
+                .withProperty("tipMedida", prod -> prod.getTipoMedida().getSimbolo().toLowerCase()));
 
         btnAgregar = MyButton.MyButton("Adicionar", new Icon(VaadinIcon.PLUS_CIRCLE),
                 "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, true, false);
@@ -242,8 +226,11 @@ public class CompraDetailForm extends VerticalLayout {
             }
         });
 
-        //cbProductos.addClassName("comboProd");
-        this.add(subTitleItems, new HorizontalLayout(cbProductos, btnAgregar));
+        FormLayout formProductos = new FormLayout();
+        formProductos.setResponsiveSteps(MyResponsiveStep.getMyList());
+        formProductos.setClassName("formLayout");
+        formProductos.add(cbProductos, btnAgregar);
+        this.add(subTitleItems, formProductos);
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");

@@ -6,14 +6,15 @@ import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ClienteService;
+import com.gigti.xfinance.backend.services.TipoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -26,85 +27,75 @@ import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_ADMIN_CLIENTE, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_ADMIN_CLIENTE +" | "+Constantes.VIEW_MAIN)
-public class ClienteView extends VerticalLayout implements ICrudView {
+public class ClienteView extends VerticalLayout implements ICrudView<Cliente> {
 
     private ClienteGrid grid;
     private final ClienteForm form;
-    private final TextField filter;
+    private TextField filter;
     private final ClienteService clienteService;
     private final Empresa empresa;
     private SearchFilterComponent searchLayout;
+    private DataProvider<Cliente, Void> dataProvider;
 
-    public ClienteView(ClienteService clienteService) {
+    public ClienteView(ClienteService clienteService, TipoService tipoService) {
         this.clienteService = clienteService;
         empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
 
+        detailLayout(this);
+
         H1 title = new H1(Constantes.VIEW_ADMIN_CLIENTE.toUpperCase());
         title.addClassName("titleView2");
-
-        addClassName("view");
-        setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         configureProvider();
 
         configureSearchLayout();
         filter = searchLayout.getFilter();
 
-        configureGrid();
+        configureGrid(grid = new ClienteGrid());
 
-        form = new ClienteForm();
+        form = new ClienteForm(tipoService.getTiposIdentificacion());
 
         configureForm();
 
-        FlexLayout flexLayout = new FlexLayout(grid, form);
-        flexLayout.addClassName("content");
-        flexLayout.setSizeFull();
-        flexLayout.setFlexGrow(3, grid);
-        flexLayout.setFlexGrow(1, form);
+        add(title, searchLayout, grid);
 
-        add(title, searchLayout, flexLayout);
-
-        updateList();
+        updateList(grid, dataProvider);
         closeEditor();
     }
 
     @Override
     public void closeEditor() {
         form.setCliente(null, "");
-        form.setVisible(false);
         grid.deselectAll();
-        removeClassName("editing");
-    }
-
-    @Override
-    public void updateList() {
-        grid.setDataProvider(
-                DataProvider.fromCallbacks(
-                        query -> clienteService.find(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
-                        query -> (int) clienteService.countSearch(filter.getValue(), empresa)
-                ));
+        showForm(false, form, this, filter);
     }
 
     @Override
     public void configureProvider() {
-
-    }
-
-    @Override
-    public void configureGrid() {
-        grid = new ClienteGrid();
-        grid.addClassName("grid");
-        grid.setSizeFull();
-        grid.asSingleSelect().addValueChangeListener(evt -> edit(evt.getValue()));
+        dataProvider =
+                DataProvider.fromCallbacks(
+                        query -> clienteService.find(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
+                        query -> clienteService.countSearch(filter.getValue(), empresa)
+                );
     }
 
     @Override
     public void configureSearchLayout() {
-        searchLayout = new SearchFilterComponent("", "", "Filtro por Nombre o Identificación", false, true);
-        searchLayout.getFilter().addValueChangeListener(event -> updateList());
+        searchLayout = new SearchFilterComponent("", true,
+                "", "Filtro Nombre Producto",
+                "", true,
+                "", true,
+                "", false);
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
         searchLayout.getFilter().focus();
-        searchLayout.getBtnAdd().addClickListener(click -> addItem());
+        searchLayout.getBtnAdd().addClickListener(click -> {
+            Cliente c = new Cliente();
+            c.setPersona(new Persona());
+            addItem(grid, c);
+        });
+        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
+        filter = searchLayout.getFilter();
     }
 
     @Override
@@ -115,7 +106,7 @@ public class ClienteView extends VerticalLayout implements ICrudView {
     }
 
     @Override
-    public void edit(Object cliente) {
+    public void editItem(Object cliente) {
         if (cliente == null) {
             closeEditor();
         } else {
@@ -125,8 +116,13 @@ public class ClienteView extends VerticalLayout implements ICrudView {
                 form.setCliente((Cliente) cliente, Constantes.EDIT_CLIENT);
             }
             form.setVisible(true);
-            addClassName("editing");
+            showForm(true, form, this, filter);
         }
+    }
+
+    @Override
+    public void deleteItem(Object obj) {
+
     }
 
     @Override
@@ -136,7 +132,7 @@ public class ClienteView extends VerticalLayout implements ICrudView {
         Response response = clienteService.save(cliente, CurrentUser.get());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
+            updateList(grid, dataProvider);
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
@@ -149,18 +145,11 @@ public class ClienteView extends VerticalLayout implements ICrudView {
         Response response = clienteService.delete(cliente, CurrentUser.get());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
+            updateList(grid, dataProvider);
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
         }
     }
 
-    @Override
-    public void addItem() {
-        grid.asSingleSelect().clear();
-        Cliente c = new Cliente();
-        c.setPersona(new Persona());
-        edit(c);
-    }
 }

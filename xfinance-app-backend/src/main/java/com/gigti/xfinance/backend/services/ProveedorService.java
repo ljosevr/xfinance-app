@@ -15,5 +15,5 @@ public interface ProveedorService {
     Response findById(String id);
     List<Proveedor> find(String filter, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
     int countSearch(String filterText, Empresa empresa);
-
+    boolean deleteAllByEmpresa(Empresa empresa);
 }

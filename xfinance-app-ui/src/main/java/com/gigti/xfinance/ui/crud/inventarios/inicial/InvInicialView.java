@@ -18,107 +18,75 @@ import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.apache.commons.lang3.StringUtils;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import java.util.List;
+import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_INVENTARIO_INICIAL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_INICIAL +" | "+ Constantes.VIEW_MAIN)
-public class InvInicialView extends VerticalLayout  implements ICrudView {
+public class InvInicialView extends VerticalLayout  implements ICrudView<InventarioInicial> {
 
-    private Empresa empresa;
+    private final Empresa empresa;
     private InvInicialGrid grid;
     private TextField filter;
-    private InventarioService inventarioService;
-    private InvInicialForm form;
+    private final InventarioService inventarioService;
+    private final InvInicialForm form;
     private SearchFilterComponent searchLayout;
     private DataProvider<InventarioInicial, Void> dataProvider;
 
     public InvInicialView(InventarioService inventarioService, ImpuestoService impuestoService) {
         this.inventarioService = inventarioService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
 
-        configureProvider();
-
-        addClassName("view");
-        setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        detailLayout(this);
 
         H1 title = new H1(Constantes.VIEW_INVENTARIO_INICIAL.toUpperCase());
         title.addClassName("titleView2");
 
         configureSearchLayout();
-        filter = searchLayout.getFilter();
 
-        configureGrid();
+        configureProvider();
+
+        configureGrid(grid = new InvInicialGrid());
 
         form = new InvInicialForm(impuestoService.findAll(empresa));
         configureForm();
 
-        VerticalLayout gridLayout = new VerticalLayout(grid);
-        gridLayout.addClassName("grid");
+        add(title, searchLayout, grid);
 
-        FlexLayout flexLayout = new FlexLayout(gridLayout, form);
-        flexLayout.addClassName("content");
-        flexLayout.setSizeFull();
-        flexLayout.setFlexGrow(3, gridLayout);
-        flexLayout.setFlexGrow(1, form);
-
-        add(title, searchLayout, flexLayout);
-
-        updateList();
-        closeEditor();
+        updateList(grid, dataProvider);
+        //closeEditor();
     }
 
     public void closeEditor() {
-        form.setInventario(null);
-        form.setVisible(false);
+        form.setInventario(null, Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_ADD);
         grid.deselectAll();
-        removeClassName("editing");
-    }
-
-    public void configureGrid() {
-        grid = new InvInicialGrid();
-        grid.setSizeFull();
-        grid.asSingleSelect().addValueChangeListener(evt -> edit(evt.getValue()));
-        grid.addPageChangeListener(evt -> grid.setPage(evt.getNewPage()));
-    }
-
-    public void updateList() {
-        grid.setDataProvider(dataProvider);
+        showForm(false, form, this, filter);
     }
 
     @Override
     public void configureProvider() {
         dataProvider = DataProvider.fromCallbacks(
-                // First callback fetches items based on a query
-                query -> {
-                    List<InventarioInicial> inventarioInicials = inventarioService.
-                            findAllInvInicial(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
-
-                    return inventarioInicials.stream();
-                },
-                // Second callback fetches the number of items
-                // for a query
+                query -> inventarioService.findAllInvInicial(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
                 query -> inventarioService.getCount(filter.getValue(), empresa)
         );
     }
 
-    public void edit(Object inventario) {
+    public void editItem(Object inventario) {
         if (inventario == null) {
             closeEditor();
         } else {
             if(StringUtils.isBlank(((InventarioInicial)inventario).getId())) {
-                form.setInventario(((InventarioInicial)inventario));
-                form.setVisible(true);
-                addClassName("editing");
+                form.setInventario(((InventarioInicial)inventario), Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_EDIT);
+                showForm(true, form, this, filter);
             } else {
                 NotificacionesUtil.showError("Este Inventario No se puede modificar, ya fue actualizado");
             }
@@ -126,25 +94,17 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
     }
 
     public void configureSearchLayout() {
-        searchLayout = new SearchFilterComponent("Nueva", "", "Filtro por Nombre", false, false);
-        searchLayout.getFilter().addValueChangeListener(event -> updateList());
+        searchLayout = new SearchFilterComponent("", false,
+                "", "Filtro Nombre Producto",
+                "", true,
+                "", true,
+                "", false);
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
         searchLayout.getFilter().focus();
+        searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
+        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        filter = searchLayout.getFilter();
     }
-
-    public void save(ComponentEvent evt) {
-        InventarioInicial inventario = ((InvInicialForm.SaveEvent) evt).getInventario();
-
-        Response response = inventarioService.saveInventarioInicial(inventario, CurrentUser.get());
-
-        if(response.isSuccess()) {
-            NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
-            closeEditor();
-        } else {
-            NotificacionesUtil.showError(response.getMessage());
-        }
-    }
-
 
     @Override
     public void configureForm() {
@@ -157,7 +117,21 @@ public class InvInicialView extends VerticalLayout  implements ICrudView {
     }
 
     @Override
-    public void addItem() {
+    public void deleteItem(Object obj) {
+
     }
 
+    public void save(ComponentEvent evt) {
+        InventarioInicial inventario = ((InvInicialForm.SaveEvent) evt).getInventario();
+
+        Response response = inventarioService.saveInventarioInicial(inventario, CurrentUser.get());
+
+        if(response.isSuccess()) {
+            NotificacionesUtil.showSuccess(response.getMessage());
+            updateList(grid, dataProvider);
+            closeEditor();
+        } else {
+            NotificacionesUtil.showError(response.getMessage());
+        }
+    }
 }

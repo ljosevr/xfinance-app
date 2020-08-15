@@ -36,4 +36,6 @@ public interface InventarioActualRepository extends JpaRepository<InventarioActu
             "a.producto.empresa =:empresa AND " +
             "a.producto.eliminado = false")
     int countAllByEmpresaAndNombreProducto(Empresa empresa, String productName);
+
+    Integer deleteAllByProductoIn(List<Producto> productosList);
 }

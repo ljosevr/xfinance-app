@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +19,7 @@ import java.util.Optional;
 @Service
 public class ImpuestoServiceImpl implements ImpuestoService{
 
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(ImpuestoServiceImpl.class);
 
     @Autowired
     private EmpresaRepository empresaRepository;
@@ -64,5 +66,19 @@ public class ImpuestoServiceImpl implements ImpuestoService{
     public List<Impuesto> findByNombreOrDescripcion(String filter, Empresa empresa, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return impuestoRepository.findByNombreOrDescripcion(filter, empresa, pageable);
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllByEmpresa(Empresa empresa) {
+        logger.info("--> deleteAllByEmpresa");
+        try{
+            logger.info("Impuestos Delete: "+impuestoRepository.deleteAllByEmpresa(empresa));
+            logger.info("<-- deleteAllByEmpresa");
+            return true;
+        }catch(Exception e){
+            logger.error("Error: "+e.getMessage(), e);
+            return false;
+        }
     }
 }

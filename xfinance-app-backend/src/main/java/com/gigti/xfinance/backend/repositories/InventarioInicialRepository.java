@@ -32,4 +32,5 @@ public interface InventarioInicialRepository extends JpaRepository<InventarioIni
 
     InventarioInicial findByProducto(Producto p);
 
+    Integer deleteAllByProductoIn(List<Producto> productosList);
 }

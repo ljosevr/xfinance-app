@@ -19,7 +19,7 @@ import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterAndDatesComponent;
 import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -30,30 +30,32 @@ import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import org.jsoup.internal.StringUtil;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_COMPRAS, layout = MainLayout.class)
 @RouteAlias(value = "compra", layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_COMPRAS +" | "+ Constantes.VIEW_MAIN)
 @PreserveOnRefresh
-public class CompraView extends VerticalLayout implements ICrudView {
+public class CompraView extends VerticalLayout implements ICrudView<Compra> {
 
-    private final VerticalLayout gridLayout;
+    //private final VerticalLayout gridLayout;
     private CompraGrid grid;
-    private CompraDetailForm form;
+    private final CompraDetailForm form;
     private TextField filter;
-    private CompraService compraService;
-    private Empresa empresa;
+    private final CompraService compraService;
+    private final Empresa empresa;
     private SearchFilterAndDatesComponent searchLayout;
     private DatePicker dateEnd;
     private DatePicker dateStart;
+    private DataProvider<Compra, Void> dataProvider;
 
 
     public CompraView(CompraService compraService, ProductoService productoService, ProveedorService proveedorService) {
         this.compraService = compraService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
 
         addClassName("CompraView");
         setSizeFull();
@@ -68,17 +70,13 @@ public class CompraView extends VerticalLayout implements ICrudView {
 
         configureSearchLayout();
 
-        configureGrid();
+        configureGrid(grid = new CompraGrid());
         form = new CompraDetailForm(productoService, proveedorService);
         configureForm();
 
-        gridLayout = new VerticalLayout(grid);
-        gridLayout.addClassName("grid");
-        gridLayout.setPadding(false);
+        add(title, searchLayout, grid, form);
 
-        add(title, searchLayout, gridLayout, form);
-
-        updateList();
+        updateList(grid, dataProvider);
         closeEditor();
     }
 
@@ -91,50 +89,34 @@ public class CompraView extends VerticalLayout implements ICrudView {
     public void closeEditor() {
         form.setCompra(null, "");
         form.setVisible(false);
-        gridLayout.setVisible(true);
+        grid.setVisible(true);
         searchLayout.setVisible(true);
         grid.deselectAll();
         removeClassName("editing");
     }
 
     public void configureProvider() {
-        //dataProvider = ;
-    }
-
-    public void configureGrid() {
-        grid = new CompraGrid();
-        grid.setSizeFull();
-        grid.asSingleSelect().addValueChangeListener(evt -> edit(evt.getValue()));
-
-        grid.addPageChangeListener(evt -> {
-            grid.setPage(evt.getNewPage());
-        });
-    }
-
-    public void updateList() {
-        grid.setDataProvider(DataProvider.fromCallbacks(
-                query -> {
-                    List<Compra> compras = compraService.
-                            findAll(filter.getValue(), empresa,
-                                    dateStart.getValue(), dateEnd.getValue(),
-                                    grid.getPage(), grid.getPageSize());
-
-                    return compras.stream();
-                },
-                query -> compraService.count(filter.getValue(), empresa, dateStart.getValue(), dateEnd.getValue())
-        ));
+        dataProvider = DataProvider.fromCallbacks(
+                query -> compraService.findAll(filter.getValue(), empresa,
+                        dateStart.getValue(), dateEnd.getValue(),
+                        new OffsetBasedPageRequest(query)).stream(),
+                query -> compraService.count(filter.getValue(), empresa, dateStart.getValue(), dateEnd.getValue()));
     }
 
     public void configureSearchLayout() {
 
-        searchLayout = new SearchFilterAndDatesComponent("Nueva", "", "Filtro por # Numero de Factura", true, true, "Fecha Inicio", "Fecha Fin");
-        searchLayout.getFilter().addValueChangeListener(event -> updateList());
+        searchLayout = new SearchFilterAndDatesComponent("", true,
+                "", "Filtro x Número de Factura",
+                "", true,
+                "", true,
+                "", false, "Fecha Inicio", "Fecha Fin");
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
         searchLayout.getFilter().focus();
         searchLayout.getBtnAdd().addClickListener(click -> addItem());
-        searchLayout.getBtnAdd().setMaxWidth("100px");
-        searchLayout.getBtnSearch().addClickListener(evt -> updateList());
-        searchLayout.getBtnSearch().setMaxWidth("30px");
-        searchLayout.getBtnSearch().addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
+        searchLayout.getBtnDelete().addClickListener(click -> deleteItem(grid.asSingleSelect().getValue()));
+        filter = searchLayout.getFilter();
 
         filter = searchLayout.getFilter();
         dateStart = searchLayout.getDateStart();
@@ -155,21 +137,22 @@ public class CompraView extends VerticalLayout implements ICrudView {
 
         dateEnd.addValueChangeListener(event -> {
             LocalDate selectedDate = event.getValue();
-            LocalDate startDate = dateStart.getValue();
-            if (selectedDate != null) {
-                dateStart.setMax(selectedDate);
-            } else {
-                dateStart.setMax(null);
-            }
+            //LocalDate startDate = dateStart.getValue();
+            dateStart.setMax(selectedDate);
         });
     }
 
     public void addItem() {
         grid.asSingleSelect().clear();
-        edit(new Compra());
+        editItem(new Compra());
     }
 
-    public void edit(Object compra) {
+    @Override
+    public void deleteItem(Object obj) {
+
+    }
+
+    public void editItem(Object compra) {
         if (compra == null) {
             closeEditor();
         } else {
@@ -179,7 +162,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
                 form.setCompra((Compra) compra, Constantes.EDIT_BUY);
             }
             form.setVisible(true);
-            gridLayout.setVisible(false);
+            grid.setVisible(false);
             searchLayout.setVisible(false);
             addClassName("editing");
         }
@@ -191,7 +174,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
         Response response = compraService.saveCompra(compra, empresa, CurrentUser.get());
         if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
+            updateList(grid, dataProvider);
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
@@ -203,7 +186,7 @@ public class CompraView extends VerticalLayout implements ICrudView {
         Response response = compraService.delete(compra.getId());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
+            updateList(grid, dataProvider);
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());

@@ -3,15 +3,15 @@ package com.gigti.xfinance.backend.repositories;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Empresa;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface CategoriaProductoRepository extends PagingAndSortingRepository<CategoriaProducto, String> {
+public interface CategoriaProductoRepository extends JpaRepository<CategoriaProducto, String> {
 
     List<CategoriaProducto> findAllByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa);
 
@@ -46,4 +46,6 @@ public interface CategoriaProductoRepository extends PagingAndSortingRepository<
             "AND c.empresa =:empresa AND " +
             "c.eliminado = FALSE")
     int countByEmpresaAndNombre(Empresa empresa, String categoryName);
+
+    Integer deleteAllByEmpresa(Empresa empresa);
 }

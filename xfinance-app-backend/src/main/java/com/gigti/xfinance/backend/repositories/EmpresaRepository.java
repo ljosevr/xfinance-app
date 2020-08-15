@@ -38,4 +38,6 @@ public interface EmpresaRepository extends JpaRepository<Empresa, String> {
 
     @Query("Select e From Empresa e Where UPPER(e.codigoEmpresa) = UPPER(:codigoEmpresa)")
     Empresa findByCodigoEmpresa(String codigoEmpresa);
+
+    Empresa findByTipoEmpresa(TipoEmpresaEnum demo);
 }

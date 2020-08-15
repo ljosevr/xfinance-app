@@ -5,23 +5,24 @@ import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class VentaServiceImpl implements VentaService {
 
-    private static final Logger logger = Logger.getLogger(UsuarioServiceImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(VentaServiceImpl.class);
 
     @Autowired
     private VentaRepository ventaRepository;
@@ -54,6 +55,20 @@ public class VentaServiceImpl implements VentaService {
     public PventaDTO findByBarCode(String filter, Empresa empresa) {
         logger.info("--> findByBarCode");
         return getPventaDTO(filter, empresa);
+    }
+
+    @Override
+    public List<PventaDTO> findByBarCodeAndName(String filter, Empresa empresa, int page, int size) {
+        logger.info("--> findByBarCodeAndName");
+        Pageable pageable = PageRequest.of(page, size);
+        PventaDTO pventa = getPventaDTO(filter, empresa);
+        if(pventa != null) {
+            List<PventaDTO> lista = new ArrayList<>();
+            lista.add(pventa);
+            return lista;
+        } else {
+            return getListPventaDTO(filter, empresa, pageable);
+        }
     }
 
     @Override
@@ -135,7 +150,7 @@ public class VentaServiceImpl implements VentaService {
             ventaItemRepository.saveAll(listItems);
             return venta;
         }catch(Exception e){
-            logger.log(Level.SEVERE, "Error: al generar Factura: "+e.getMessage(), e);
+            logger.error("Error: al generar Factura: "+e.getMessage(), e);
             return null;
         }
     }
@@ -145,7 +160,7 @@ public class VentaServiceImpl implements VentaService {
         logger.info("--> "+methodName);
         List<Producto> listProductos;
         if(filter == null || filter.isEmpty()) {
-            listProductos = productoRepository.findByEmpresa(empresa, pageable);
+            listProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
         } else {
             listProductos = productoRepository.search(filter, empresa, pageable);
         }
@@ -215,6 +230,25 @@ public class VentaServiceImpl implements VentaService {
         pv.setInfinite(infinite);
 
         return pv;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllVentas(Empresa emp, List<Producto> productoList) {
+        logger.info("--> deleteAllVentas");
+        try {
+
+            Integer cantidad = ventaItemRepository.deleteAllByProductoIn(productoList);
+            logger.info("Items Delete: "+cantidad);
+            logger.info("Ventas Delete: "+ventaRepository.deleteAllByEmpresa(emp));
+            ventaItemRepository.flush();
+            ventaRepository.flush();
+            logger.info("<-- deleteAllVentas");
+            return true;
+        }catch(Exception e) {
+            logger.error("Error al eliminar ventas: "+e.getMessage(), e);
+            return false;
+        }
     }
 
 }

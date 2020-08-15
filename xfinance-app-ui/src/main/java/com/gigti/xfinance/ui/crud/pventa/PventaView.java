@@ -3,7 +3,6 @@ package com.gigti.xfinance.ui.crud.pventa;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Venta;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
-import com.gigti.xfinance.backend.data.enums.TipoBusquedaEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
@@ -14,7 +13,6 @@ import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
@@ -51,7 +49,7 @@ public class PventaView extends VerticalLayout {
     private TextField filter;
     private Button btnDelete;
     private Button btnSave;
-    private ComboBox<TipoBusquedaEnum> cbTipoBusqueda;
+    //private ComboBox<TipoBusquedaEnum> cbTipoBusqueda;
     private final Empresa empresa;
     private Grid<PventaDTO> gridPro;
     private VerticalLayout gridProLayout;
@@ -97,25 +95,6 @@ public class PventaView extends VerticalLayout {
         add(divLayout);
     }
 
-    private void search() {
-
-        if(cbTipoBusqueda.getValue().equals(TipoBusquedaEnum.CODIGO)) {
-            //Busqueda por Codigo de Barras
-            selectedItem(ventaService.findByBarCode(filter.getValue(), empresa));
-        } else {
-            //Busqueda por Nombre
-            List<PventaDTO> listResult = ventaService.findByName(filter.getValue(), empresa, 0, 10);
-            gridPro.setItems(listResult);
-            if(!listResult.isEmpty()) {
-                //Ocultar Tabla principal
-                gridProLayout.setVisible(true);
-                //MOstrar tabla de busqueda
-                grid.setVisible(false);
-            }
-
-        }
-    }
-
     private void configureTopBar() {
 
         VerticalLayout topBarLayout = new VerticalLayout();
@@ -127,32 +106,15 @@ public class PventaView extends VerticalLayout {
         topFormLayout.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         filter = new TextField();
-        filter.setPlaceholder("Buscar por Código de Barras");
+        filter.setPlaceholder("Código de Barras o Nombre");
         filter.setPrefixComponent(new Icon(VaadinIcon.BARCODE));
         filter.setValueChangeMode(ValueChangeMode.LAZY);
         filter.setClearButtonVisible(true);
         filter.setAutoselect(true);
         filter.addFocusShortcut(Key.F3);
-        filter.setMaxWidth("70%");
+        filter.getElement().setAttribute("title","F3");
+        //filter.setMaxWidth("70%");
         filter.addKeyPressListener(Key.ENTER, evt -> search());
-
-        cbTipoBusqueda = new ComboBox<>();
-        cbTipoBusqueda.setItems(TipoBusquedaEnum.values());
-        cbTipoBusqueda.setValue(TipoBusquedaEnum.CODIGO);
-        cbTipoBusqueda.setAllowCustomValue(false);
-        cbTipoBusqueda.setMaxWidth("160px");
-        cbTipoBusqueda.addValueChangeListener(evt -> {
-           if(evt.getValue().name().equalsIgnoreCase(TipoBusquedaEnum.CODIGO.name())){
-               filter.setPrefixComponent(new Icon(VaadinIcon.BARCODE));
-               filter.setPlaceholder("Buscar Por Código de Barras");
-               filter.focus();
-           }
-           if(evt.getValue().name().equalsIgnoreCase(TipoBusquedaEnum.NOMBRE.name())){
-               filter.setPrefixComponent(new Icon(VaadinIcon.BOOK));
-               filter.setPlaceholder("Buscar Por Nombre del producto");
-               filter.focus();
-           }
-        });
 
         Button btnSearch = new Button("", new Icon(VaadinIcon.SEARCH));
         btnSearch.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -161,11 +123,7 @@ public class PventaView extends VerticalLayout {
         btnSearch.addClickListener(click -> search());
         btnSearch.setMaxWidth("60px");
 
-//        HorizontalLayout hLayout = new HorizontalLayout(filter, cbTipoBusqueda, btnSearch);
-//        hLayout.setSizeFull();
-//        hLayout.expand(filter);
-        //topFormLayout.add(hLayout);
-        topFormLayout.add(filter, cbTipoBusqueda, btnSearch);
+        topFormLayout.add(filter, btnSearch);
 
 
         filter.focus();
@@ -187,6 +145,23 @@ public class PventaView extends VerticalLayout {
         topBarLayout.add(topFormLayout);
         topBarLayout.add(new HorizontalLayout(btnSave, btnDelete, btnCancel));
         this.add(topBarLayout);
+    }
+
+    private void search() {
+
+        List<PventaDTO> listResult = ventaService.findByBarCodeAndName(filter.getValue(), empresa, 0, 10);
+
+        if(!listResult.isEmpty()) {
+            if(listResult.size() == 1) {
+                selectedItem(listResult.get(0));
+            }
+            //Ocultar Tabla principal
+            gridProLayout.setVisible(true);
+            //MOstrar tabla de busqueda
+            gridPro.setItems(listResult);
+            grid.setVisible(false);
+            grid.getSelectionModel().select(listResult.get(0));
+        }
     }
 
     private void configureSearchGrid() {
@@ -427,7 +402,6 @@ public class PventaView extends VerticalLayout {
         lblTotal.setText(String.format("TOTAL: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
         lblImpuesto.setText(String.format("Impuestos: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
         filter.setValue("");
-        cbTipoBusqueda.setValue(TipoBusquedaEnum.CODIGO);
         filter.focus();
     }
 

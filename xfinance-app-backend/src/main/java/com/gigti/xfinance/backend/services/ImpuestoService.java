@@ -20,4 +20,6 @@ public interface ImpuestoService {
     public Impuesto findById(String id);
 
     public List<Impuesto> findByNombreOrDescripcion(String filter, Empresa empresa, int page, int size);
+
+    boolean deleteAllByEmpresa(Empresa emp);
 }

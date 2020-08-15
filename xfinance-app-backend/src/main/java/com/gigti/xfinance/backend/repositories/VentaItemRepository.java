@@ -6,10 +6,22 @@
 
 package com.gigti.xfinance.backend.repositories;
 
+import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.VentaItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface VentaItemRepository extends JpaRepository<VentaItem, String> {
+
+//    @Modifying
+//    @Query("DELETE FROM VentaItem  v " +
+//            "WHERE v.precioCosto IN :productoList")
+    Integer deleteAllByProductoIn(List<Producto> productoList);
+
+    Integer deleteAllByProducto(Producto producto);
+
+    List<VentaItem> findAllByProductoIn(List<Producto> productoList);
 }

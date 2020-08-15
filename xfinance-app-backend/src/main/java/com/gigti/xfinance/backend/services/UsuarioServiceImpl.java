@@ -9,22 +9,25 @@ import com.gigti.xfinance.backend.mapper.ConvertUsuario;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
 
-    private static final Logger logger = Logger.getLogger(UsuarioServiceImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioServiceImpl.class);
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -39,18 +42,18 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario login(String codigoEmpresa, String nombreUsuario, String password) {
-        logger.log(Level.INFO,"login: "+codigoEmpresa+ " - "+nombreUsuario);
+        logger.info("login: "+codigoEmpresa+ " - "+nombreUsuario);
         try{
             Empresa empresa = empresaRepository.findByCodigoEmpresa(codigoEmpresa);
             if(empresa != null) {
-                logger.log(Level.INFO,"Empresa existe: "+empresa.getNombreEmpresa());
+                logger.info("Empresa existe: "+empresa.getNombreEmpresa());
                 Usuario usuario = usuarioRepository.findByNombreUsuarioAndEmpresa(nombreUsuario, empresa);
                 if (usuario != null) {
-                    logger.log(Level.INFO,"Usuario existe: "+usuario.getNombreUsuario());
+                    logger.info("Usuario existe: "+usuario.getNombreUsuario());
                     //TODO
                     //if(passwordEncoder.encode(password).equals(passwordEncoder.encode(usuario.getPasswordUsuario()))){
                     if (password.equals(usuario.getPasswordUsuario())) {
-                        logger.log(Level.INFO,"Concuerda Password");
+                        logger.info("Concuerda Password");
                         //Ejecutar parches de initBackend - De Compañia
                         //logger.debug("Iniciando App Backend");
                         //logger.debug("Finalizando App Backend");
@@ -61,7 +64,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 }
             }
         } catch(Exception e){
-            logger.log(Level.SEVERE, "Error al hacer Login: "+e.getMessage(), e);
+            logger.error("Error al hacer Login: "+e.getMessage(), e);
         }
         return null;
     }
@@ -73,24 +76,24 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Response saveUsuario(UsuarioDTO usuarioDTO) {
-        logger.log(Level.INFO, "saveUsuario");
+        logger.info("--> saveUsuario");
         Response response = new Response();
         try{
             Optional<Empresa> empresa = empresaRepository.findById(usuarioDTO.getEmpresa().getId());
             if(empresa.isPresent()){
-                logger.log(Level.INFO, "isPresent Empresa");
+                logger.info("isPresent Empresa");
                 usuarioDTO.setEmpresa(empresa.get());
             }else{
                 response.setSuccess(false);
                 response.setMessage("no existe Empresa. Contacte al administrador");
-                logger.log(Level.INFO, "NOT Present Empresa");
+                logger.info("NOT Present Empresa");
                 return response;
             }
             Usuario usuario = ConvertUsuario.convertDtoToEntity(usuarioDTO);
             Persona persona = personaRepository.findByIdentificacion(usuario.getPersona().getIdentificacion());
 
             if(persona != null) {
-                logger.log(Level.INFO, "persona found");
+                logger.info("persona found");
                 if(usuario.getPersona().getId() == null) {
                     response.setSuccess(false);
                     response.setMessage("Identificación Ya se encuentra Registrada en Otro usuario");
@@ -118,12 +121,14 @@ public class UsuarioServiceImpl implements UsuarioService {
             response.setMessage("Usuario Guardado Correctamente");
             return response;
         }catch(Exception e){
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            logger.error("Error al Guardar usuario: "+e.getMessage(), e);
             response.setSuccess(false);
             response.setMessage("Error al Guardar Usuario");
             return response;
         }
     }
+
+
 
     private boolean validarEmailUsuario(Usuario usuario, Response response) {
         Usuario u = usuarioRepository.findByEmail(usuario.getEmail());
@@ -139,6 +144,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Response deleteUsuario(String id) {
+        logger.info("--> deleteUsuario");
         Response response = new Response();
         try {
             Usuario usuario = usuarioRepository.findById(id).orElse(null);
@@ -157,10 +163,11 @@ public class UsuarioServiceImpl implements UsuarioService {
                 response.setMessage("Usuario No encontrado para eliminar");
             }
         } catch(Exception e) {
-            logger.log(Level.SEVERE,"Error: "+e.getMessage(),e);
+            logger.error("Error: "+e.getMessage(),e);
             response.setSuccess(false);
             response.setMessage("Error al Eliminar Usuario");
         }
+        logger.info("<-- deleteUsuario ");
         return response;
     }
 
@@ -188,7 +195,23 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
+    public List<UsuarioDTO> findAll(String filter, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
+        logger.info("--> findAll");
+        List<UsuarioDTO> result = new ArrayList<>();
+        List<Usuario> usuarios;
+        if(filter == null || filter.isEmpty()) {
+            usuarios = usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
+        } else  {
+            usuarios = usuarioRepository.search(filter, empresa, offsetBasedPageRequest);
+        }
+        usuarios.forEach(e -> result.add(ConvertUsuario.convertEntityToDTO(e)));
+        logger.info("<-- findAll: "+result.size());
+        return result;
+    }
+
+    @Override
     public Response changePassword(String id, String value, String value1, String value2) {
+        logger.info("--> changePassword");
         Response response = new Response();
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if(usuario != null) {
@@ -197,7 +220,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 value1 = UtilsBackend.encrytPass(value1);
                 value2 = UtilsBackend.encrytPass(value2);
             } catch (NoSuchAlgorithmException e) {
-                logger.log(Level.SEVERE, "Error al Encriptar Password: "+e.getMessage(), e);
+                logger.error("Error al Encriptar Password: "+e.getMessage(), e);
             }
             if(value1.equals(value2)) {
                 if(usuario.getPasswordUsuario().equals(value)){
@@ -213,7 +236,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                             response.setMessage("Error al cambiar Password");
                         }
                     } catch (Exception e) {
-                        logger.log(Level.SEVERE, "Error al cambiar Password: "+e.getMessage(), e);
+                        logger.error("Error al cambiar Password: "+e.getMessage(), e);
                         response.setSuccess(false);
                         response.setMessage("Error al cambiar Password");
                     }
@@ -229,6 +252,47 @@ public class UsuarioServiceImpl implements UsuarioService {
             response.setSuccess(false);
             response.setMessage("Usuario No encontrado");
         }
+        logger.info("<-- changePassword");
         return response;
+    }
+
+    @Override
+    public Usuario findByName(String userName) {
+        return usuarioRepository.findByNombreUsuario(userName);
+    }
+
+    @Override
+    public int count(String filter, Empresa empresa) {
+        logger.info("--> Count");
+        int count;
+        if(filter == null || filter.isEmpty()) {
+            count = usuarioRepository.countByEmpresa(empresa);
+        } else  {
+            count = usuarioRepository.countByEmpresaAndFilter(empresa, filter);
+        }
+        logger.info("<-- Count");
+        return count;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllUsuariosByEmpresa(Empresa empresa) {
+        logger.info("--> deleteAllUsuariosByEmpresa");
+        try{
+            logger.info("Usuarios Delete: "+usuarioRepository.deleteAllByEmpresa(empresa));
+            logger.info("Personas Delete: "+personaRepository.deleteAllByEmpresa(empresa));
+            usuarioRepository.flush();
+            personaRepository.flush();
+            logger.info("<-- deleteAllUsuariosByEmpresa");
+            return true;
+        } catch(Exception e){
+            logger.error("Error: "+e.getMessage(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public Usuario saveUsuario(Usuario usuario) {
+        return usuarioRepository.save(usuario);
     }
 }

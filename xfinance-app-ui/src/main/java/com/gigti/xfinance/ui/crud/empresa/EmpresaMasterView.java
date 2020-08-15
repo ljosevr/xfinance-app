@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.EmpresaService;
+import com.gigti.xfinance.backend.services.TipoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.html.H3;
@@ -18,12 +19,12 @@ import com.vaadin.flow.router.Route;
 public class EmpresaMasterView extends VerticalLayout {
 
     private EmpresaMasterGrid grid;
-    private EmpresaMasterForm form;
-    private TextField filter;
-    private EmpresaService empresaService;
+    private final EmpresaMasterForm form;
+    private final TextField filter;
+    private final EmpresaService empresaService;
     private SearchFilterComponent component;
 
-    public EmpresaMasterView(EmpresaService iService) {
+    public EmpresaMasterView(EmpresaService iService, TipoService tipoService) {
         this.empresaService = iService;
 
         setSizeFull();
@@ -31,7 +32,7 @@ public class EmpresaMasterView extends VerticalLayout {
 
         configureGrid();
 
-        form = new EmpresaMasterForm();
+        form = new EmpresaMasterForm(tipoService.getTiposIdentificacion());
         form.addListener(EmpresaMasterForm.SaveEvent.class, this::saveEmpresa);
         form.addListener(EmpresaMasterForm.DeleteEvent.class, this::deleteEmpresa);
         form.addListener(EmpresaMasterForm.CloseEvent.class, e -> closeEditor());

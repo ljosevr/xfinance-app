@@ -9,6 +9,7 @@ package com.gigti.xfinance.ui.crud.usuario;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
+import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -37,10 +38,23 @@ public class UsuarioForm extends Dialog {
 
     private static final Logger logger = Logger.getLogger(UsuarioForm.class.getName());
     private final TextField tfUsuario;
+    private final H2 titleForm;
+    private final Button btnDelete;
+    private final EmailField tfEmail;
+    private final Checkbox chkActivo;
+    private final ComboBox<Rol> cbRoles;
+    private final ComboBox<TipoIde> cbTipoIdePersona;
+    private final TextField tfTelefono;
+    private final TextField tfIdentificacionPersona;
+    private final TextField tfprimerNombreUsuario;
+    private final TextField tfSegundoNombreUsuario;
+    private final TextField tfPrimerApellidoUsuario;
+    private final TextField tfSegundoApellidoUsuario;
+    private final TextField tfDireccion;
     private Button btnSave;
+    private final Binder<UsuarioDTO> binderUsuario;
 
-    private Binder<UsuarioDTO> binderUsuario;
-    public UsuarioForm(List<Rol> listRoles) {
+    public UsuarioForm(List<Rol> listRoles, List<TipoIde> tipoIdes) {
         binderUsuario = new BeanValidationBinder<>(UsuarioDTO.class);
         this.setDraggable(true);
         this.setModal(true);
@@ -49,8 +63,8 @@ public class UsuarioForm extends Dialog {
         content.setClassName("formLayout");
         content.setResponsiveSteps(MyResponsiveStep.getMyList());
 
-        H2 title = new H2("Crear o Editar Usuario");
-        title.addClassName("titleView");
+        titleForm = new H2();
+        titleForm.addClassName("titleView");
 
 
         tfUsuario = new TextField("Nombre Usuario");
@@ -58,53 +72,53 @@ public class UsuarioForm extends Dialog {
         tfUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfUsuario.focus();
 
-        ComboBox<Rol> cbRoles = new ComboBox<>();
+        cbRoles = new ComboBox<>();
         cbRoles.setLabel("Rol Usuario");
         cbRoles.setItems(listRoles);
         cbRoles.setItemLabelGenerator(Rol::getNombre);
         cbRoles.setRequired(true);
         cbRoles.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
-        ComboBox<TipoIde> cbTipoIdePersona = new ComboBox<>();
+        cbTipoIdePersona = new ComboBox<>();
         cbTipoIdePersona.setLabel("Tipo Identificación");
-        cbTipoIdePersona.setItems(TipoIde.getListTipos());
+        cbTipoIdePersona.setItems(tipoIdes);
         cbTipoIdePersona.setRequired(true);
         cbTipoIdePersona.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
-        TextField tfIdentificacionPersona = new TextField("N° Identificación");
+        tfIdentificacionPersona = new TextField("N° Identificación");
         tfIdentificacionPersona.setRequired(true);
         tfIdentificacionPersona.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfprimerNombreUsuario = new TextField("Primer Nombre");
+        tfprimerNombreUsuario = new TextField("Primer Nombre");
         tfprimerNombreUsuario.setRequired(true);
         tfprimerNombreUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfSegundoNombreUsuario = new TextField("Segundo Nombre");
+        tfSegundoNombreUsuario = new TextField("Segundo Nombre");
         tfSegundoNombreUsuario.setRequired(false);
         tfSegundoNombreUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfPrimerApellidoUsuario = new TextField("Primer Apellido");
+        tfPrimerApellidoUsuario = new TextField("Primer Apellido");
         tfPrimerApellidoUsuario.setRequired(true);
         tfPrimerApellidoUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfSegundoApellidoUsuario = new TextField("Segundo Apellido");
+        tfSegundoApellidoUsuario = new TextField("Segundo Apellido");
         tfSegundoApellidoUsuario.setRequired(false);
         tfSegundoApellidoUsuario.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfDireccion = new TextField("Dirección Residencia");
+        tfDireccion = new TextField("Dirección Residencia");
         tfDireccion.setRequired(false);
         tfDireccion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfTelefono = new TextField("Telefono");
+        tfTelefono = new TextField("Telefono");
         tfTelefono.setRequired(false);
         tfTelefono.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        EmailField tfEmail = new EmailField("Email");
+        tfEmail = new EmailField("Email");
         tfEmail.setClearButtonVisible(true);
         tfEmail.setErrorMessage("Agregue un Email Valido");
         tfEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        Checkbox chkActivo = new Checkbox("Activo");
+        chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
         chkActivo.setRequiredIndicatorVisible(true);
 
@@ -137,25 +151,45 @@ public class UsuarioForm extends Dialog {
         btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
         btnClose.addClickShortcut(Key.ESCAPE);
 
-        Button btnDelete = new Button("Eliminar");
+        btnDelete = new Button("Eliminar");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binderUsuario.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
 
-        content.add(title, tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
+        content.add(titleForm, tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
                 tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
-        content.setColspan(title, content.getResponsiveSteps().size());
+        content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
 
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);
         this.add(content);
     }
 
-    public void setUser(UsuarioDTO usuario) {
+    public void setUser(UsuarioDTO usuario, String title, String type) {
+        titleForm.setText(title);
+        btnDelete.setEnabled(!ICrudView.OPTION_ADD.equals(type));
+        setReadOnlyByDelete(type.equals(ICrudView.OPTION_DELETE));
         tfUsuario.focus();
         binderUsuario.setBean(usuario);
+    }
+
+    private void setReadOnlyByDelete(boolean readOnly) {
+        btnSave.setVisible(!readOnly);
+        btnDelete.setText(readOnly ? "Sí, Eliminar" : "Eliminar");
+        tfUsuario.setReadOnly(readOnly);
+        tfDireccion.setReadOnly(readOnly);
+        tfEmail.setReadOnly(readOnly);
+        tfIdentificacionPersona.setReadOnly(readOnly);
+        tfPrimerApellidoUsuario.setReadOnly(readOnly);
+        tfprimerNombreUsuario.setReadOnly(readOnly);
+        tfSegundoApellidoUsuario.setReadOnly(readOnly);
+        tfSegundoNombreUsuario.setReadOnly(readOnly);
+        tfTelefono.setReadOnly(readOnly);
+        cbRoles.setReadOnly(readOnly);
+        cbTipoIdePersona.setReadOnly(readOnly);
+        chkActivo.setReadOnly(readOnly);
     }
 
     private void validateAndSave() {

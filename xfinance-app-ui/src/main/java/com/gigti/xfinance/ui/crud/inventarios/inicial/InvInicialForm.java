@@ -8,6 +8,8 @@ package com.gigti.xfinance.ui.crud.inventarios.inicial;
 
 import com.gigti.xfinance.backend.data.Impuesto;
 import com.gigti.xfinance.backend.data.InventarioInicial;
+import com.gigti.xfinance.ui.util.ICrudView;
+import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -16,10 +18,12 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -33,19 +37,26 @@ import java.util.List;
 /**
  * A form for editing a single Usuario Admin.
  */
-public class InvInicialForm extends FormLayout {
+public class InvInicialForm extends Dialog {
 
     private final NumberField tfCantidad;
+    private final H2 titleForm;
     private Button btnSave;
-    private Binder<InventarioInicial> binder;
+    private final Binder<InventarioInicial> binder;
+    private final List<Impuesto> listImpuestos;
 
     public InvInicialForm(List<Impuesto> listImpuestos) {
+        this.listImpuestos = listImpuestos;
         binder = new BeanValidationBinder<>(InventarioInicial.class);
-        this.addClassName("form-inv");
+        this.setDraggable(true);
+        this.setModal(true);
+        this.setResizable(true);
+        FormLayout content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(MyResponsiveStep.getMyListForm3Columns());
 
-        H2 title = new H2("Crear Inventario Inicial");
-        title.addClassName("titleView");
-        this.add(title,3);
+        titleForm = new H2("");
+        titleForm.addClassName("titleView");
 
         TextField tfProducto = new TextField("Producto");
         tfProducto.setRequired(true);
@@ -57,28 +68,31 @@ public class InvInicialForm extends FormLayout {
         tfCantidad.setAutoselect(true);
         tfCantidad.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        Checkbox chkInfinite = new Checkbox("Stock Infinito");
+        Checkbox chkInfinite = new Checkbox("Controlar Stock(Inventario)");
         chkInfinite.setValue(false);
         chkInfinite.setRequiredIndicatorVisible(true);
 
-        chkInfinite.addValueChangeListener(event -> {
-           if(event.getValue()){
-               tfCantidad.setValue(0d);
-               tfCantidad.setEnabled(false);
-           } else {
-               tfCantidad.setEnabled(true);
-           }
-        });
-
-        NumberField tfPrecioCosto = new NumberField("Precio de Costo");
+        BigDecimalField tfPrecioCosto = new BigDecimalField("Precio de Costo");
         tfPrecioCosto.setPrefixComponent(new Span("$"));
         tfPrecioCosto.setAutoselect(true);
         tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        NumberField tfPrecioVenta = new NumberField("Precio de Venta");
+        BigDecimalField tfPrecioVenta = new BigDecimalField("Precio de Venta");
         tfPrecioVenta.setPrefixComponent(new Span("$"));
         tfPrecioVenta.setAutoselect(true);
         tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+
+        chkInfinite.addValueChangeListener(event -> {
+            if(event.getValue()){
+                tfCantidad.setEnabled(true);
+                tfCantidad.focus();
+            } else {
+                tfCantidad.setValue(0d);
+                tfCantidad.setEnabled(false);
+                tfPrecioCosto.focus();
+
+            }
+        });
 
         ComboBox<Impuesto> cbImpuesto = new ComboBox<>();
         cbImpuesto.setLabel("Impuesto");
@@ -93,24 +107,18 @@ public class InvInicialForm extends FormLayout {
                 .bind(inv -> inv.getCantidad().doubleValue()
                         , (inv, data) -> inv.setCantidad(BigDecimal.valueOf(data)));
         binder.forField(tfPrecioCosto).asRequired("Digite Precio de Costo")
-                .bind(inv -> inv.getPrecioCosto().doubleValue()
-                , (inv, data) -> {
-                    inv.setPrecioCosto(BigDecimal.valueOf(data));
-                });
+                .bind(InventarioInicial::getPrecioCosto
+                , InventarioInicial::setPrecioCosto);
         binder.forField(tfPrecioVenta).asRequired("Digite Precio de Venta")
-                .bind(inv -> inv.getPrecioVenta().doubleValue()
-                , (inv, data) -> {
-                    inv.setPrecioVenta(BigDecimal.valueOf(data));
-                });
+                .bind(InventarioInicial::getPrecioVenta
+                , InventarioInicial::setPrecioVenta);
 
         binder.forField(chkInfinite).bind("infinite");
         binder.forField(cbImpuesto)
                 .asRequired("Seleccione un Impuesto")
                 .bind(InventarioInicial::getImpuesto, InventarioInicial::setImpuesto);
 
-        binder.addStatusChangeListener(event -> {
-             btnSave.setEnabled(binder.isValid());
-        });
+        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         btnSave = new Button("Guardar");
         btnSave.setWidth("100%");
@@ -127,11 +135,22 @@ public class InvInicialForm extends FormLayout {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnClose);
 
-        this.add(tfProducto, tfCantidad, chkInfinite, tfPrecioCosto, tfPrecioVenta, cbImpuesto, actionsLayout);
+        content.add(titleForm, tfProducto, chkInfinite, tfCantidad, tfPrecioCosto, tfPrecioVenta, cbImpuesto, actionsLayout);
+        content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
+        content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
-    public void setInventario(InventarioInicial inventarioInicial) {
-        binder.setBean(inventarioInicial);
+    public void setInventario(InventarioInicial inventarioInicial, String title, String type) {
+        if(inventarioInicial != null) {
+            if(type.equals(ICrudView.OPTION_EDIT)) {
+                inventarioInicial.setImpuesto(listImpuestos.get(0));
+            }
+            binder.setBean(inventarioInicial);
+        }
+        titleForm.setText(title);
         tfCantidad.focus();
     }
 
@@ -145,7 +164,7 @@ public class InvInicialForm extends FormLayout {
 
     // Events
     public static abstract class InventarioFormEvent extends ComponentEvent<InvInicialForm> {
-        private InventarioInicial inventario;
+        private final InventarioInicial inventario;
 
         protected InventarioFormEvent(InvInicialForm source, InventarioInicial inventario) {
             super(source, false);

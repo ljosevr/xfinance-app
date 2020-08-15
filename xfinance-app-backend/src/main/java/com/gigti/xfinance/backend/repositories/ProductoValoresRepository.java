@@ -16,7 +16,9 @@ import java.util.List;
 @Repository
 public interface ProductoValoresRepository extends JpaRepository<ProductoValorVenta, String> {
 
-    public ProductoValorVenta findByProductoAndActivoIsTrue(Producto producto);
+    ProductoValorVenta findByProductoAndActivoIsTrue(Producto producto);
 
-    public List<ProductoValorVenta> findByActivoIsFalse();
+    List<ProductoValorVenta> findByActivoIsFalse();
+
+    Integer deleteAllByProductoIn(List<Producto> productosList);
 }

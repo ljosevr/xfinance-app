@@ -5,14 +5,15 @@ import com.gigti.xfinance.backend.data.Proveedor;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ProveedorService;
+import com.gigti.xfinance.backend.services.TipoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
@@ -21,143 +22,127 @@ import com.vaadin.flow.router.Route;
 import org.jsoup.internal.StringUtil;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
+import java.util.Objects;
+
 @Route(value = Constantes.VIEW_R_ADMIN_PROVEEDOR, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_ADMIN_PROVEEDOR +" | "+Constantes.VIEW_MAIN)
-public class ProveedorView extends VerticalLayout implements ICrudView {
+public class ProveedorView extends VerticalLayout implements ICrudView<Proveedor> {
 
-    private ProveedorGrid grid;
+    private final Empresa empresa;
+    private final ProveedorService proveedorService;
+    private final ProveedorGrid grid;
     private ProveedorForm form;
     private TextField filter;
-    private final ProveedorService proveedorService;
-    private final Empresa empresa;
     private SearchFilterComponent searchLayout;
+    private DataProvider<Proveedor, Void> dataProvider;
 
-    public ProveedorView(ProveedorService service) {
+    public ProveedorView(ProveedorService service, TipoService tipoService) {
         this.proveedorService = service;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
+
+        detailLayout(this);
 
         H1 title = new H1(Constantes.VIEW_ADMIN_PROVEEDOR.toUpperCase());
         title.addClassName("titleView2");
 
-        addClassName("view");
-        setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        configureSearchLayout();
 
         configureProvider();
 
-        configureSearchLayout();
-        filter = searchLayout.getFilter();
-
-        configureGrid();
-
-        form = new ProveedorForm();
-
+        configureGrid(grid = new ProveedorGrid());
+        form = new ProveedorForm(tipoService.getTiposIdentificacion());
         configureForm();
 
-        FlexLayout flexLayout = new FlexLayout(grid, form);
-        flexLayout.addClassName("content");
-        flexLayout.setSizeFull();
-        flexLayout.setFlexGrow(3, grid);
-        flexLayout.setFlexGrow(1, form);
+        this.add(title, searchLayout, grid);
 
-        add(title, searchLayout, flexLayout);
-
-        updateList();
+        updateList(grid, dataProvider);
         closeEditor();
     }
 
-    @Override
     public void closeEditor() {
-        form.setProveedor(null, "");
-        form.setVisible(false);
+        form.setProveedor(null, "", "");
         grid.deselectAll();
-        removeClassName("editing");
+        showForm(false, form, this, filter);
     }
 
-    @Override
-    public void updateList() {
-        grid.setDataProvider(
-                DataProvider.fromCallbacks(
-                        query -> proveedorService.find(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
-                        query -> (int) proveedorService.countSearch(filter.getValue(), empresa)
-        ));
-    }
-
-    @Override
-    public void configureProvider() {
-
-    }
-
-    @Override
-    public void configureGrid() {
-        grid = new ProveedorGrid();
-        grid.addClassName("grid");
-        grid.setSizeFull();
-        grid.asSingleSelect().addValueChangeListener(evt -> edit(evt.getValue()));
-    }
-
-    @Override
-    public void configureSearchLayout() {
-        searchLayout = new SearchFilterComponent("", "", "Filtro por Nombre o Identificación", false, true);
-        searchLayout.getFilter().addValueChangeListener(event -> updateList());
-        searchLayout.getFilter().focus();
-        searchLayout.getBtnAdd().addClickListener(click -> addItem());
-    }
-
-    @Override
     public void configureForm() {
         form.addListener(ProveedorForm.SaveEvent.class, this::save);
         form.addListener(ProveedorForm.DeleteEvent.class, this::delete);
         form.addListener(ProveedorForm.CloseEvent.class, e -> closeEditor());
     }
 
-    @Override
-    public void edit(Object proveedor) {
+    public void configureProvider() {
+        dataProvider = DataProvider.fromCallbacks(
+                query -> proveedorService.find(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
+                query -> proveedorService.countSearch(filter.getValue(), empresa));
+    }
+
+    public void configureSearchLayout() {
+
+        searchLayout = new SearchFilterComponent("", true,
+                "", "Filtro Nombre Proveedor",
+                "", true,
+                "", true,
+                "", true);
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
+        searchLayout.getFilter().focus();
+        searchLayout.getBtnAdd().addClickListener(click -> {
+            Proveedor p = new Proveedor();
+            p.setActivo(true);
+            addItem(grid, p);
+        });
+        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
+        searchLayout.getBtnDelete().addClickListener(click -> deleteItem(grid.asSingleSelect().getValue()));
+        filter = searchLayout.getFilter();
+    }
+
+    public void editItem(Object proveedor) {
         if (proveedor == null) {
             closeEditor();
         } else {
             if(StringUtil.isBlank(((Proveedor) proveedor).getId())){
-                form.setProveedor((Proveedor) proveedor, Constantes.CREATE_PROVEEDOR);
+                form.setProveedor((Proveedor) proveedor, Constantes.CREATE_PRODUCT, ICrudView.OPTION_ADD);
             } else {
-                form.setProveedor((Proveedor) proveedor, Constantes.EDIT_PROVEEDOR);
+                form.setProveedor((Proveedor) proveedor, Constantes.EDIT_PRODUCT, ICrudView.OPTION_EDIT);
             }
-            form.setVisible(true);
-            addClassName("editing");
+            showForm(true, form, this, filter);
         }
     }
 
     @Override
-    public void save(ComponentEvent event) {
-        Proveedor proveedor = ((ProveedorForm.SaveEvent) event).getProveedor();
+    public void deleteItem(Object obj) {
+        if (obj == null) {
+            closeEditor();
+        } else {
+            form.setProveedor((Proveedor) obj, Constantes.DELETE_PRODUCTO, ICrudView.OPTION_DELETE);
+
+            showForm(true, form, this, filter);
+        }
+    }
+
+    public void save(ComponentEvent evt) {
+        Proveedor proveedor = ((ProveedorForm.SaveEvent) evt).getProveedor();
         proveedor.setEmpresa(empresa);
         Response response = proveedorService.save(proveedor, CurrentUser.get());
-        if(response.isSuccess()){
+        if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
+            updateList(grid, dataProvider);
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
         }
     }
 
-    @Override
-    public void delete(ComponentEvent event) {
-        Proveedor proveedor = ((ProveedorForm.DeleteEvent) event).getProveedor();
+    public void delete(ComponentEvent evt) {
+        Proveedor proveedor = ((ProveedorForm.DeleteEvent) evt).getProveedor();
         Response response = proveedorService.delete(proveedor, CurrentUser.get());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList();
+            updateList(grid, dataProvider);
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
         }
-    }
-
-    @Override
-    public void addItem() {
-        grid.asSingleSelect().clear();
-        Proveedor p = new Proveedor();
-        p.setActivo(true);
-        edit(p);
     }
 }

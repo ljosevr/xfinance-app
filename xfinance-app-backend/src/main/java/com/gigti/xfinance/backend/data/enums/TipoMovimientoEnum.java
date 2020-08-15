@@ -6,5 +6,7 @@ public enum TipoMovimientoEnum {
     VENTA,
     INV_INICIAL,
     TRASLADO,
-    CREACION;
+    CREACION,
+    AUMENTO_EDITAR_COMPRA,
+    DISMINUCION_EDITAR_COMPRA;
 }

@@ -3,30 +3,31 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
-import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @Service
 public class InitBackServiceImpl implements InitBackService {
 
-    private static final java.util.logging.Logger logger = Logger.getLogger(InitBackServiceImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
 
     @Autowired
     private EmpresaRepository empresaRepository;
@@ -37,40 +38,53 @@ public class InitBackServiceImpl implements InitBackService {
     @Autowired
     private RolRepository rolRepository;
     @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
     private ParcheRepository parcheRepository;
     @Autowired
     private VistaRepository vistaRepository;
-
-    @Autowired
-    private EmpresaService empresaService;
-
-    @Autowired
-    private ProductoRepository productoRepository;
-
-    @Autowired
-    private InventarioActualRepository inventarioActualRepository;
-
-    @Autowired
-    private InventarioActualCostoRepository inventarioActualCostoRepository;
-
-    @Autowired
-    private ProductoValoresRepository productoValoresRepository;
-
-    @Autowired
-    private CategoriaProductoService categoriaProductoService;
-
     @Autowired
     private ImpuestoRepository impuestoRepository;
+    @Autowired
+    private TipoMedidaRepository tipoMedidaRepository;
 
     @Autowired
+    private UsuarioService usuarioService;
+    @Autowired
+    private EmpresaService empresaService;
+    @Autowired
+    private ProductoService productoService;
+    @Autowired
+    private CategoriaProductoService categoriaProductoService;
+    @Autowired
+    private VentaService ventaService;
+    @Autowired
+    private CompraService compraService;
+    @Autowired
+    private TipoService tipoService;
+    @Autowired
     private InventarioService inventarioService;
+    @Autowired
+    private ImpuestoService impuestoService;
+    @Autowired
+    private MovimientoService movimientoService;
+    @Autowired
+    private ProductoValorVentaService productoValorVentaService;
+    @Autowired
+    private ClienteService clienteService;
+    @Autowired
+    private ProveedorService proveedorService;
+    @Autowired
+    private RolService rolService;
 
-    // Tipos de Datos
     @Transactional
     @Override
-    public void initBackTipos() {
+    public void initParches() {
+        initBackTipos();
+        initBackObjetos();
+        initBackTiposMedidas();
+    }
+
+    // Tipos de Datos
+    private void initBackTipos() {
         logger.info("--> initBackTipos");
         try {
             Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT1, null);
@@ -227,13 +241,11 @@ public class InitBackServiceImpl implements InitBackService {
                 logger.info("<-- initBackTipos");
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error al Crear InitBackend - Tipos: " + e.getMessage(), e);
+            logger.error("Error al Crear InitBackend - Tipos: " + e.getMessage(), e);
         }
     }
 
-    @Transactional
-    @Override
-    public void initBackObjetos() {
+    private void initBackObjetos() {
         logger.info("--> initBackObjetos");
         try{
             Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT2, null);
@@ -283,7 +295,7 @@ public class InitBackServiceImpl implements InitBackService {
                         "ljosevr@gmail.com"
                 );
 
-                usuarioRepository.save(userRoot);
+                usuarioService.saveUsuario(userRoot);
                 logger.info("Usuario Root Creado");
 
                 parche = new Parche(Constantes.INIT2,java.sql.Date.valueOf(LocalDate.now()),true, null);
@@ -292,133 +304,244 @@ public class InitBackServiceImpl implements InitBackService {
             }
             logger.info("<-- initBackObjetos");
         }catch(Exception e){
-            logger.log(Level.SEVERE, "Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
-            e.printStackTrace();
+            logger.error("Error al Crear InitBackend - Objetos: "+e.getMessage(), e);
         }
     }
 
-    @Transactional
+    // Tipos de Medidas
+    private void initBackTiposMedidas() {
+        logger.info("--> initBackTipos");
+        try {
+
+            TipoMedida tm1 = new TipoMedida("UNIDAD", "Unid","",true, false,null,"");
+            tipoMedidaRepository.save(tm1);
+
+            TipoMedida tm2 = new TipoMedida("PAQUETE", "Pq","",true, false,null,"");
+            tipoMedidaRepository.save(tm2);
+
+            TipoMedida tm3 = new TipoMedida("CAJA", "Cja","",true, false,null,"");
+            tipoMedidaRepository.save(tm3);
+
+            TipoMedida tm4 = new TipoMedida("KILO", "kg","",true, false,null,"");
+            tipoMedidaRepository.save(tm4);
+
+            TipoMedida tm5 = new TipoMedida("LIBRA", "lb","",true, false,null,"");
+            tipoMedidaRepository.save(tm5);
+
+            TipoMedida tm6 = new TipoMedida("GRAMOS", "gr","",true, false,null,"");
+            tipoMedidaRepository.save(tm6);
+
+            TipoMedida tm7 = new TipoMedida("LITRO", "l","",true, false,null,"");
+            tipoMedidaRepository.save(tm7);
+
+            TipoMedida tm8 = new TipoMedida("MILI LITRO", "ml","",true, false,null,"");
+            tipoMedidaRepository.save(tm8);
+
+            TipoMedida tm9 = new TipoMedida("METRO", "m","",true, false,null,"");
+            tipoMedidaRepository.save(tm9);
+
+            TipoMedida tm10 = new TipoMedida("CENTIMETRO", "cm" ,"",true, false,null,"");
+            tipoMedidaRepository.save(tm10);
+
+            TipoMedida tm11 = new TipoMedida("GALÓN", "Gl" ,"",true, false,null,"");
+            tipoMedidaRepository.save(tm11);
+
+        } catch (Exception e) {
+            logger.error("Error al Crear InitBackend - Tipos Medidas: " + e.getMessage(), e);
+        }
+    }
+
     @Override
+    @Transactional
     public void initBackDemo() {
         logger.info("--> initBackDemo");
         try{
             Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT5, null);
-            if (parche == null) {
-
-                EmpresaDTO empresa = new EmpresaDTO();
-                empresa.setCodigoEmpresa("DEMO");
-                empresa.setEmailPersona("ljosevr3@gmail.com");
-                empresa.setTelefonoPersona("3006600000");
-                empresa.setDireccionPersona("Calle Espectacular");
-                empresa.setSegundoApellidoPersona("Rogers");
-                empresa.setPrimerApellidoPersona("Stark");
-                empresa.setPrimerNombrePersona("Tony");
-                empresa.setSegundoNombrePersona("Steve");
-                empresa.setIdentificacionPersona("0011223344");
-                empresa.setTipoIdePersona(TipoIde.CEDULA);
-                empresa.setActivo(true);
-                empresa.setUsuarioNombre("demo");
-                empresa.setNombreEmpresa("Demo S.A.S");
-                empresa.setEliminado(false);
-                empresa.setTipoEmpresa(TipoEmpresaEnum.DEMO);
-                empresa.setDireccion("Wakanda");
-                empresa.setIdentificacion("800900700600");
-                empresa = empresaService.saveEmpresa(empresa);
-
-                if(empresa != null){
-                    logger.info("Empresa DEMO Creada");
-
-                    //Crear Productos
-                    //Consultar Empresa byId
-                    Empresa emp = empresaRepository.findById(empresa.getEmpresaId()).orElse(null);
-                    //Consultar Impuestos
-                    Pageable pageable = PageRequest.of(0, 5);
-                    List<Impuesto> impuestos = impuestoRepository.findByEmpresaAndEliminadoIsFalse(emp, pageable);
-
-                    //Consultar Categorias
-                    CategoriaProducto categoria = categoriaProductoService.findByNombreOrDescripcion("Normal", emp, 0, 10).get(0);
-                    //Tipos de Medidas
-                    TipoMedidaEnum[] tipos =  TipoMedidaEnum.values();
-                    if(emp != null) {
-                        for(int i = 0; i < 50 ; i++) {
-                            int item = i + 1;
-                            Producto producto = new Producto();
-                            producto.setActivo(true);
-                            producto.setCategoria(categoria);
-                            producto.setCodigoBarra(StringUtils.leftPad((item + 1) + "", 10, "0"));
-                            producto.setDescripcion("Producto Demo " + (item + 1));
-                            producto.setEmpresa(emp);
-                            Double aleatorio = Math.floor(Math.random()*5);
-                            producto.setImpuesto(impuestos.get(aleatorio.intValue()));
-                            producto.setNombreProducto("Producto # " + (item + 1));
-                            aleatorio = Math.floor(Math.random()*8);
-                            producto.setTipoMedida(tipos[aleatorio.intValue()]);
-
-                            producto = productoRepository.save(producto);
-
-                            //Inventario Inicial
-
-                            Usuario usuarioRoot = usuarioRepository.findByNombreUsuario("demo");
-
-                            InventarioInicial inventarioInicial = new InventarioInicial();
-                            inventarioInicial.setProducto(producto);
-                            inventarioInicial.setPrecioCosto(BigDecimal.valueOf(item * 100 * 2));
-                            inventarioInicial.setPrecioVenta(BigDecimal.valueOf((item * 100 * 2) * 1.20 ));
-                            inventarioInicial.setCantidad(BigDecimal.valueOf((item + 1) * 2));
-                            inventarioInicial.setImpuesto(producto.getImpuesto());
-                            inventarioInicial.setFechaActualizacion(new Date());
-                            inventarioInicial.setInfinite(false);
-                            inventarioService.saveInventarioInicial(inventarioInicial, usuarioRoot);
-
-                            //Inventario Actual
-//                            InventarioActual actual = new InventarioActual();
-//                            actual.setInfinite(false);
-//                            actual.setFechaActualizacion(new Date());
-//                            actual.setCantidad(BigDecimal.valueOf((item + 1) * 2));
-//                            actual.setProducto(producto);
-//                            actual.setEmpresa(emp);
-//
-//                            inventarioActualRepository.save(actual);
-//
-//                            //Inventario Actual Costo
-//                            InventarioActualCosto invACtualCosto = new InventarioActualCosto();
-//                            invACtualCosto.setCantidad(BigDecimal.valueOf((item + 1) * 2));
-//                            invACtualCosto.setFechaCreacion(new Date());
-//                            invACtualCosto.setFechaActualizacion(new Date());
-//                            invACtualCosto.setActivo(true);
-//                            invACtualCosto.setInfinite(false);
-//                            invACtualCosto.setEmpresa(emp);
-//                            invACtualCosto.setProducto(producto);
-//                            invACtualCosto.setPrecioCosto(BigDecimal.valueOf(item * 100 * 2));
-//
-//                            inventarioActualCostoRepository.save(invACtualCosto);
-//
-//                            //Valor Venta
-//                            ProductoValorVenta valorVenta = new ProductoValorVenta();
-//                            valorVenta.setProducto(producto);
-//                            valorVenta.setActivo(true);
-//                            valorVenta.setValorVenta(BigDecimal.valueOf((item * 100 * 2) * 1.20 ));
-//                            valorVenta.setFechaActualizacion(new Date());
-//
-//                            productoValoresRepository.save(valorVenta);
-                        }
-
-                        parche = new Parche(Constantes.INIT5,java.sql.Date.valueOf(LocalDate.now()),true, null);
-                        logger.info("Parche Demo Creado");
-                        parcheRepository.save(parche);
-
-                    } else {
-                        logger.info("Error al Buscar Empresa");
-                    }
-                } else {
-                    logger.info("Error al crear Empresa DEMO");
-                }
-
-            }
+            //Eliminar Datos Demo
+            boolean ejecutar = deleteDemo(parche);
+            //Crear Datos Demo
+            createDemo(ejecutar);
             logger.info("<-- initBackDemo");
         }catch(Exception e){
-            logger.log(Level.SEVERE, "Error al Crear InitBackDemo: "+e.getMessage(), e);
+            logger.error("Error al Crear InitBackDemo: "+e.getMessage(), e);
             e.printStackTrace();
         }
+    }
+
+    private void createDemo(boolean ejecutar) {
+        logger.info("--> createDemo");
+        Usuario usuarioDemo;
+        Parche parche;
+        if (ejecutar) {
+
+            EmpresaDTO empresa = new EmpresaDTO();
+            empresa.setCodigoEmpresa("DEMO");
+            empresa.setEmailPersona("ljosevr3@gmail.com");
+            empresa.setTelefonoPersona("3006600000");
+            empresa.setDireccionPersona("Calle Espectacular");
+            empresa.setSegundoApellidoPersona("Rogers");
+            empresa.setPrimerApellidoPersona("Stark");
+            empresa.setPrimerNombrePersona("Tony");
+            empresa.setSegundoNombrePersona("Steve");
+            empresa.setIdentificacionPersona("0011223344");
+            empresa.setTipoIdePersona(TipoIde.CEDULA);
+            empresa.setActivo(true);
+            empresa.setUsuarioNombre("demo");
+            empresa.setNombreEmpresa("Demo S.A.S");
+            empresa.setEliminado(false);
+            empresa.setTipoEmpresa(TipoEmpresaEnum.DEMO);
+            empresa.setDireccion("Wakanda");
+            empresa.setIdentificacion("800900700600");
+            empresa = empresaService.saveEmpresa(empresa);
+
+            if(empresa != null){
+                logger.info("Empresa DEMO Creada");
+                usuarioDemo = usuarioService.findByName("demo");
+                //Crear Productos
+                //Consultar Empresa byId
+                Empresa emp = empresaRepository.findById(empresa.getEmpresaId()).orElse(null);
+                //Consultar Impuestos
+                Pageable pageable = PageRequest.of(0, 5);
+                List<Impuesto> impuestos = impuestoRepository.findByEmpresaAndEliminadoIsFalse(emp, pageable);
+
+                //Consultar Categorias
+                CategoriaProducto categoria = categoriaProductoService.findByNombreOrDescripcion("Normal", emp, 0, 10).get(0);
+                //Tipos de Medidas
+                List<TipoMedida> tipos =  tipoService.findAllTiposMedidas(emp);
+                if(emp != null) {
+                    for(int i = 0; i < 200 ; i++) {
+                        int item = i + 1;
+                        Producto producto = new Producto();
+                        producto.setActivo(true);
+                        producto.setCategoria(categoria);
+                        producto.setCodigoBarra(StringUtils.leftPad((item + 1) + "", 10, "0"));
+                        producto.setDescripcion("Producto Demo " + (item + 1));
+                        producto.setEmpresa(emp);
+                        Double aleatorio = Math.floor(Math.random()*5);
+                        producto.setImpuesto(impuestos.get(aleatorio.intValue()));
+                        producto.setNombreProducto("Producto # " + (item + 1));
+                        aleatorio = Math.floor(Math.random()*11);
+                        producto.setTipoMedida(tipos.get(aleatorio.intValue()));
+                        producto.setControlarStock(item % 4 == 0);
+                        producto.setPrecioVenta(BigDecimal.valueOf((item * 100 * 2) * 1.20 ));
+                        producto.setPrecioCosto(BigDecimal.valueOf(item * 100 * 2));
+                        producto.setCantidadInicial(BigDecimal.valueOf((item + 1) * 2));
+
+                        productoService.saveProduct(producto, usuarioDemo);
+
+                    }
+
+                    Date fechaEjecucion = java.sql.Date.valueOf(LocalDate.now());
+                    parche = new Parche(Constantes.INIT5,fechaEjecucion,true, null);
+                    logger.info("Parche Demo Creado");
+                    parcheRepository.save(parche);
+
+                } else {
+                    logger.info("Error al Buscar Empresa");
+                }
+            } else {
+                logger.info("Error al crear Empresa DEMO");
+            }
+
+        }
+        logger.info("<-- createDemo");
+    }
+
+    private boolean deleteDemo(Parche parche) {
+        logger.info("--> deleteDemo");
+        boolean ejecutar;
+        if(parche != null) {
+            logger.info("Fecha Ejecucion Parche: " + parche.getFechaEjecucion());
+            LocalDate fechaParche;
+            fechaParche = parche.getFechaEjecucion().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            logger.info("Fecha Ejecucion Parche: " + fechaParche);
+            LocalDate fecha5DaysBack = LocalDate.now().minusDays(5);
+            logger.info("Fecha 5 Days Back: " + fecha5DaysBack);
+            if (fechaParche.isBefore(fecha5DaysBack)) {
+                ejecutar = true;
+                //Eliminar Informacion Anterior
+                Empresa emp = empresaService.findEmpresaDemo();
+                //usuarioDemo = usuarioService.findByName("demo");
+                //Productos
+                List<Producto> productosList = productoService.findAllByEmpresa(emp);
+                //Ventas
+                if (ventaService.deleteAllVentas(emp, productosList)) {
+                    //Compras
+                    if (compraService.deleteAllCompras(emp, productosList)) {
+                        //Inventarios
+                        if (inventarioService.deleteAllInventarios(emp, productosList)) {
+                            //Tipos
+                            if (tipoService.deleteAllTipos(emp)) {
+                                //Movimientos
+                                if (movimientoService.deleteAllByProductos(productosList)) {
+                                    //Producto Valor Venta
+                                    if (productoValorVentaService.deleteAllByProductos(productosList)) {
+                                        //productos
+                                        if (productoService.deleteAllByEmpresa(emp)) {
+                                            //Categorias
+                                            if (categoriaProductoService.deleteAllByEmpresa(emp)) {
+                                                //Impuestos
+                                                if (impuestoService.deleteAllByEmpresa(emp)) {
+                                                    //Clientes
+                                                    if (clienteService.deleteAllByEmpresa(emp)) {
+                                                        //Proveedores
+                                                        if (proveedorService.deleteAllByEmpresa(emp)) {
+                                                            //Usuario
+                                                            if (usuarioService.deleteAllUsuariosByEmpresa(emp)) {
+                                                                //Roles
+                                                                if (rolService.deleteAllByEmpresa(emp)) {
+                                                                    //empresa
+                                                                    if (!empresaService.deleteAllEmpresa(emp)) {
+                                                                        ejecutar = false;
+                                                                    }
+                                                                } else {
+                                                                    ejecutar = false;
+                                                                }
+                                                            } else {
+                                                                ejecutar = false;
+                                                            }
+                                                        } else {
+                                                            ejecutar = false;
+                                                        }
+                                                    } else {
+                                                        ejecutar = false;
+                                                    }
+                                                } else {
+                                                    ejecutar = false;
+                                                }
+                                            } else {
+                                                ejecutar = false;
+                                            }
+                                        } else {
+                                            ejecutar = false;
+                                        }
+                                    } else {
+                                        ejecutar = false;
+                                    }
+                                } else {
+                                    ejecutar = false;
+                                }
+                            } else {
+                                ejecutar = false;
+                            }
+                        } else {
+                            ejecutar = false;
+                        }
+                    } else {
+                        ejecutar = false;
+                    }
+                } else {
+                    ejecutar = false;
+                }
+            } else {
+                ejecutar = false;
+            }
+        } else {
+            ejecutar = true;
+        }
+        logger.info("<-- deleteDemo");
+        return ejecutar;
     }
 }

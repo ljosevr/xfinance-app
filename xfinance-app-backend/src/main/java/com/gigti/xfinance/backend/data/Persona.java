@@ -67,22 +67,6 @@ public class Persona extends AbstractEntity {
         this.empresa = empresa;
     }
 
-//    public static Persona dummy(double number){
-//        Persona persona = new Persona(TipoIde.CEDULA,
-//                        "100"+number,
-//                        "Luis",
-//                "José",
-//                "Villarreal",
-//                "Rincón",
-//                 new Date(),
-//                "ljosevr"+number+"@gmail.com",
-//                "3006520012",
-//                "Laplace",
-//                );
-//
-//        return persona;
-//    }
-
     public String getNombreCompleto(){
         return String.format("%s %s %s %s", primerNombre, segundoNombre != null ? segundoNombre : "", primerApellido, segundoApellido != null ? segundoApellido : "");
     }

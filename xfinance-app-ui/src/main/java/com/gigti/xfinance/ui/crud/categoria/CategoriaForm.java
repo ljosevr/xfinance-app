@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.categoria;
 
 import com.gigti.xfinance.backend.data.CategoriaProducto;
+import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -19,19 +21,26 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.shared.Registration;
 
-public class CategoriaForm extends FormLayout {
-    private H2 titleForm;
-    private TextField tfCatNombre;
+public class CategoriaForm extends Dialog {
+    private final TextField tfCatDescripcion;
+    private final Checkbox chkCatActivo;
+    private final Button btnDelete;
+    private final H2 titleForm;
+    private final TextField tfCatNombre;
     private Button btnSave;
-    private Binder<CategoriaProducto> binder;
+    private final Binder<CategoriaProducto> binder;
 
     public CategoriaForm() {
 
-        this.addClassName("form");
-        this.setResponsiveSteps(MyResponsiveStep.getMyList());
+        this.setDraggable(true);
+        this.setModal(true);
+        this.setResizable(true);
+        FormLayout content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(MyResponsiveStep.getMyList());
+
         titleForm = new H2("");
         titleForm.addClassName("titleView");
-        this.add(titleForm,this.getResponsiveSteps().size());
 
         tfCatNombre = new TextField("Nombre Categoria");
         tfCatNombre.setRequired(true);
@@ -40,13 +49,13 @@ public class CategoriaForm extends FormLayout {
         tfCatNombre.setClearButtonVisible(true);
         tfCatNombre.focus();
 
-        TextField tfCatDescripcion = new TextField("Descripción Categoria");
+        tfCatDescripcion = new TextField("Descripción Categoria");
         tfCatDescripcion.setRequired(false);
         tfCatDescripcion.setValueChangeMode(ValueChangeMode.EAGER);
         tfCatDescripcion.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
         tfCatDescripcion.setClearButtonVisible(true);
 
-        Checkbox chkCatActivo = new Checkbox("Activo");
+        chkCatActivo = new Checkbox("Activo");
         chkCatActivo.setValue(true);
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
@@ -71,23 +80,36 @@ public class CategoriaForm extends FormLayout {
         btnClose.addClickListener(event -> fireEvent(new CloseEvent(this)));
         btnClose.addClickShortcut(Key.ESCAPE);
 
-        Button btnDelete = new Button("Eliminar");
+        btnDelete = new Button("Eliminar");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR,ButtonVariant.LUMO_SMALL);
         btnDelete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
 
-        this.add(titleForm,tfCatNombre,tfCatDescripcion,chkCatActivo, actionsLayout);
-        this.setColspan(actionsLayout, this.getResponsiveSteps().size());
+        content.add(titleForm,tfCatNombre,tfCatDescripcion,chkCatActivo, actionsLayout);
+        content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
+        content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
 
-        //this.getElement().setAttribute("flex-wrap", "wrap");
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
-    public void setCategoria(CategoriaProducto categoria, String title) {
+    public void setCategoria(CategoriaProducto categoria, String title, String type) {
         binder.setBean(categoria);
+        setReadOnlyByDelete(type.equals(ICrudView.OPTION_DELETE));
+        btnDelete.setEnabled(!ICrudView.OPTION_ADD.equals(type));
         titleForm.setText(title);
         tfCatNombre.focus();
+    }
+
+    private void setReadOnlyByDelete(boolean readOnly) {
+        btnSave.setVisible(!readOnly);
+        btnDelete.setText(readOnly ? "Sí, Eliminar" : "Eliminar");
+        tfCatNombre.setReadOnly(readOnly);
+        tfCatDescripcion.setReadOnly(readOnly);
+        chkCatActivo.setReadOnly(readOnly);
     }
 
     private void validateAndSave() {

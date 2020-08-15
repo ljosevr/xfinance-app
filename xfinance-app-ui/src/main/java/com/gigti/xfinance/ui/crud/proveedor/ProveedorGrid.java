@@ -11,7 +11,7 @@ public class ProveedorGrid extends Grid<Proveedor> {
 
     public ProveedorGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT);
 
         addColumn(Proveedor::getTipoIde)
                 .setHeader("Tipo Identificacón")

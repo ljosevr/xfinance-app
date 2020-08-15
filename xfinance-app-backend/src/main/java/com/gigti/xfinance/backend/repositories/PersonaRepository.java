@@ -7,6 +7,7 @@
 package com.gigti.xfinance.backend.repositories;
 
 
+import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.TipoIde;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,4 +28,5 @@ public interface PersonaRepository extends JpaRepository<Persona, String> {
 
     boolean existsByIdentificacionAndTipoIdeAndIdIsNot(String identificacion, TipoIde tipoIde, String id);
 
+    Integer deleteAllByEmpresa(Empresa empresa);
 }

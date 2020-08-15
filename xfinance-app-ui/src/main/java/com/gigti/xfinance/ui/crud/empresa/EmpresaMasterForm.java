@@ -22,12 +22,14 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.shared.Registration;
 
+import java.util.List;
+
 public class EmpresaMasterForm extends Dialog {
 
     private Button btnSave;
     private Binder<EmpresaDTO> binder;
 
-    public EmpresaMasterForm() {
+    public EmpresaMasterForm(List<TipoIde> tipoIdeList) {
 
         binder = new BeanValidationBinder<>(EmpresaDTO.class);
 
@@ -50,7 +52,7 @@ public class EmpresaMasterForm extends Dialog {
 
         ComboBox<TipoIde> cbTipoIde = new ComboBox<>();
         cbTipoIde.setLabel("Tipo Ide");
-        cbTipoIde.setItems(TipoIde.getListTipos());
+        cbTipoIde.setItems(tipoIdeList);
         cbTipoIde.setRequired(true);
         cbTipoIde.getElement().setAttribute("theme", "small");
 
@@ -77,7 +79,7 @@ public class EmpresaMasterForm extends Dialog {
 
         ComboBox<TipoIde> cbTipoIdePersona = new ComboBox<>();
         cbTipoIdePersona.setLabel("Tipo Ide Usuario");
-        cbTipoIdePersona.setItems(TipoIde.getListTipos());
+        cbTipoIdePersona.setItems(tipoIdeList);
         cbTipoIdePersona.setRequired(true);
         //cbTipoIdePersona.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
         cbTipoIdePersona.getElement().setAttribute("theme", "small");

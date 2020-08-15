@@ -17,20 +17,22 @@ import java.util.List;
 @Repository
 public interface RolRepository extends JpaRepository<Rol, String> {
 
-    public Rol findByNombreAndEmpresaAndEliminado(String nombre, Empresa empresa, boolean eliminado);
+    Rol findByNombreAndEmpresaAndEliminado(String nombre, Empresa empresa, boolean eliminado);
 
     @Query("SELECT r FROM Rol  r " +
             "WHERE r.empresa =:empresa AND " +
             "r.eliminado =:eliminado AND "+
             "UPPER(r.nombre) <> 'ROOT'")
-    public List<Rol> findAllByEmpresaAndEliminado(Empresa empresa, boolean eliminado);
+    List<Rol> findAllByEmpresaAndEliminado(Empresa empresa, boolean eliminado);
 
-    public Rol findAllByIdAndEmpresaAndEliminado(String id, Empresa empresa, boolean eliminado);
+    Rol findAllByIdAndEmpresaAndEliminado(String id, Empresa empresa, boolean eliminado);
 
 //    @Query("SELECT r FROM Rol  r " +
 //            "WHERE r.empresa =:empresa AND " +
 //            "r.eliminado = false AND "+
 //            "r.porDefecto =: porDefecto AND "+
 //            "r.nombre != " + "ROOT" );
-    public List<Rol> findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(Empresa empresa, boolean porDefecto, String nombreNot);
+    List<Rol> findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(Empresa empresa, boolean porDefecto, String nombreNot);
+
+    Integer deleteAllByEmpresa(Empresa empresa);
 }

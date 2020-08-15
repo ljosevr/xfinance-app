@@ -109,6 +109,7 @@ public class Constantes {
     //Subtitles
     public static final String CREATE_PRODUCT = "Crear Producto";
     public static final String EDIT_PRODUCT = "Editar Producto";
+    public static final String DELETE_PRODUCTO = "Eliminar Producto";
     public static final String CREATE_CATEGORY = "Crear Categoría";
     public static final String EDIT_CATEGORY = "Editar Categoría";
     public static final String CREATE_BUY = "Registrar Compra";
@@ -117,4 +118,10 @@ public class Constantes {
     public static final String EDIT_PROVEEDOR = "Editar Proveedor";
     public static final String EDIT_CLIENT = "Editar Cliente";
     public static final String CREATE_CLIENT = "Crear Cliente";
+    public static final String EDIT_USER = "Editar Usuario";
+    public static final String CREATE_USER = "Crear Usuario";
+    public static final String DELETE_USER = "Eliminar Usuario";
+    public static final String DELETE_CATEGORIA = "Eliminar Categoria";
+    public static final String CREATE_INV_INICIAL = "Crear Inventario Inicial";
+    public static final String EDIT_INV_INICIAL = "Editar Inventario Inicial";
 }

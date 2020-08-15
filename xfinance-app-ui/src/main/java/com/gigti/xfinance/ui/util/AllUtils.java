@@ -24,27 +24,27 @@ public class AllUtils {
         return "$ "+decimalFormat.format(value);
     }
 
-    public static String formatUnidadMedida(String medida){
-        switch (medida) {
-            case "UNIDAD":
-                return "ud";
-            case "PAQUETE":
-                return "PQ";
-            case "KILO":
-                return "kg";
-            case "LIBRA":
-                return "lb";
-            case "GRAMO":
-                return "g";
-            case "LITRO":
-                return "l";
-            case "MILILITRO":
-                return "ml";
-            case "CENTIMETRO":
-                return "cm";
-        }
-        return "N/A";
-    }
+//    public static String formatUnidadMedida(String medida){
+//        switch (medida) {
+//            case "UNIDAD":
+//                return "ud";
+//            case "PAQUETE":
+//                return "PQ";
+//            case "KILO":
+//                return "kg";
+//            case "LIBRA":
+//                return "lb";
+//            case "GRAMO":
+//                return "g";
+//            case "LITRO":
+//                return "l";
+//            case "MILILITRO":
+//                return "ml";
+//            case "CENTIMETRO":
+//                return "cm";
+//        }
+//        return "N/A";
+//    }
 
     public static String formatDate(Date fecha){
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy");

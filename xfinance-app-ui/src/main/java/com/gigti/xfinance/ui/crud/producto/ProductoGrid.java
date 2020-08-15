@@ -7,33 +7,28 @@
 package com.gigti.xfinance.ui.crud.producto;
 
 import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
-import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.util.Comparator;
 
-public class ProductoGrid extends PaginatedGrid<Producto> {
+public class ProductoGrid extends Grid<Producto> {
 
     public ProductoGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT);
 
         addColumn(Producto::getNombreProducto)
                 .setHeader("Nombre")
-                .setFlexGrow(20)
                 .setSortable(true);
 
-        addColumn(producto -> AllUtils.formatUnidadMedida(producto.getTipoMedida().name()))
+        addColumn(producto -> producto.getTipoMedida().getSimbolo())
                 .setHeader("Medida")
-                .setSortable(true)
-                .setFlexGrow(5);
+                .setSortable(true);
 
         addColumn(Producto::getCodigoBarra)
                 .setHeader("Codigo Barras")
-                .setFlexGrow(15)
                 .setSortable(true);
 
         final String availabilityTemplate = "<iron-icon icon=\"vaadin:circle\" class-name=\"[[item.activoS]]\"></iron-icon> [[item.activoS]]";
@@ -41,41 +36,17 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
                 .withProperty("activoS", Producto::getActivoS))
                 .setHeader("Activo")
                 .setComparator(Comparator.comparing(Producto::getActivoS))
-                .setSortable(true)
-                .setFlexGrow(3);
+                .setSortable(true);
 
-//        addColumn(item -> {
-//            Icon icon;
-//            if(item.isActivo()){
-//                icon = VaadinIcon.CHECK_CIRCLE.create();
-//                icon.setColor("green");
-//            } else {
-//                icon = VaadinIcon.CLOSE_CIRCLE.create();
-//                icon.setColor("red");
-//            }
-//            return icon;
-//        })      .setHeader("Activo")
-//                .setComparator(Comparator.comparing(Producto::isActivo))
-//                .setSortable(true)
-//                .setFlexGrow(5);
-
-        // Show all categories the product is in, separated by commas
         addColumn(this::formatCategories)
                 .setHeader("Categoria")
-                .setSortable(true)
-                .setFlexGrow(8);
+                .setSortable(true);
 
         addColumn(producto -> producto.getImpuesto().getNombre())
                 .setHeader("Impuesto")
                 .setSortable(true);
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
-    }
-
-    public void refresh(Producto product) {
-        getDataCommunicator().refresh(product);
     }
 
     private String formatCategories(Producto producto) {
@@ -86,8 +57,4 @@ public class ProductoGrid extends PaginatedGrid<Producto> {
         return producto.getCategoria().getNombre();
     }
 
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
-    }
 }

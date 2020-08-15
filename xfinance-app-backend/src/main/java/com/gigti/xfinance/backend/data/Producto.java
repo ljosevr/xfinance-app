@@ -6,12 +6,12 @@
 
 package com.gigti.xfinance.backend.data;
 
-import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import lombok.Data;
 import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Data
 @Entity
@@ -30,32 +30,52 @@ public class Producto extends AbstractEntity {
     @NotNull
     private boolean eliminado;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private TipoMedidaEnum tipoMedida = TipoMedidaEnum.UNIDAD;
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private TipoMedida tipoMedida;
 
     @Transient
     private String activoS;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Empresa empresa;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private CategoriaProducto categoria;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private InventarioActualCosto inventario;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Impuesto impuesto;
 
+    @Transient
+    private BigDecimal cantidadInicial;
+
+    @Transient
+    private BigDecimal precioCosto;
+
+    @Transient
+    private BigDecimal precioVenta;
+
+    @Transient
+    private boolean controlarStock;
+
+    @Transient
+    private boolean manageInitialStock;
+
     public Producto(){}
 
-    public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa, TipoMedidaEnum tipoMedida) {
+    public Producto(String nombreProducto, String codigoBarra, String descripcion, boolean activo, Empresa empresa, TipoMedida tipoMedida) {
         this.nombreProducto = nombreProducto;
         this.codigoBarra = codigoBarra;
         this.descripcion = descripcion;
@@ -69,19 +89,19 @@ public class Producto extends AbstractEntity {
         return isActivo() ? "SI" : "NO";
     }
 
-    @Override
-    public String toString() {
-        return "Producto{" +
-                "nombreProducto='" + nombreProducto + '\'' +
-                ", codigoBarra='" + codigoBarra + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", activo=" + activo +
-                ", eliminado=" + eliminado +
-                ", tipoMedida=" + tipoMedida +
-                ", activoS='" + activoS + '\'' +
-                  ", empresa=" + empresa.getNombreEmpresa() +
-                ", categoria=" + categoria.getNombre() +
-                 '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Producto{" +
+//                "nombreProducto='"  + nombreProducto + '\'' +
+//                ", codigoBarra='"   + codigoBarra + '\'' +
+//                ", descripcion='"   + descripcion + '\'' +
+//                ", activo="         + activo + '\'' +
+//                ", eliminado="      + eliminado + '\'' +
+//                ", tipoMedida="     + tipoMedida.getSimbolo() + '\'' +
+//                ", activoS='"       + activoS + '\'' +
+//                ", empresa="        + empresa.getNombreEmpresa() + '\'' +
+//                ", categoria="      + categoria.getNombre() +
+//                 '}';
+//    }
 
 }

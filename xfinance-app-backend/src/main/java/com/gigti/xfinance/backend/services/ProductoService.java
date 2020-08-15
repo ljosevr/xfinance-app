@@ -9,22 +9,28 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.data.enums.TipoMedidaEnum;
 import com.gigti.xfinance.backend.others.Response;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.util.List;
 
 public interface ProductoService {
 
-    Producto saveProduct(Producto producto, Usuario usuario);
+    Response saveProduct(Producto producto, Usuario usuario);
     Response delete(String id);
     List<Producto> findByNombreProducto(Empresa empresa, String productName);
     List<Producto> findAll(String filterText, Empresa empresa, int page, int size);
-    List<Producto> findAll(Empresa empresa);
+    List<Producto> findAll(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
+    List<Producto> findAllByEmpresaAndEliminadoIsFalse(Empresa empresa);
     Producto findByBarCode(Empresa empresa, String barCode);
     List<Producto> findByNameOrBarCode(Empresa empresa, String anything);
     Producto findById(String id);
-    List<TipoMedidaEnum> getAllTipoMedidaEnum();
     int count(String filterText, Empresa empresa);
     Response getPriceVenta(Producto producto);
+
+    boolean deleteAllByEmpresa(Empresa emp);
+
+    List<Producto> findAllByEmpresa(Empresa empresa);
+
+    List<Producto> findAllByEmpresaAndNotInfinite(Empresa empresa);
 }

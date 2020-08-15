@@ -47,9 +47,8 @@ public class LoginView extends VerticalLayout {
 
     public LoginView(InitBackService init, UsuarioService iusuario) {
         this.usuarioService = iusuario;
-        init.initBackTipos();
-        init.initBackObjetos();
-        init.initBackDemo();
+        init.initParches();
+        //init.initBackDemo();
 
         accessControl = AccessControlFactory.getInstance().createAccessControl();
         buildUI();

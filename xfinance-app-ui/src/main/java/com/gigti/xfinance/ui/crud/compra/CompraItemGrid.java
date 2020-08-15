@@ -26,7 +26,7 @@ public class CompraItemGrid extends PaginatedGrid<CompraItem> {
                 .setKey("name");
                 //.setFlexGrow(10);
 
-        addColumn(ci -> ci.getProducto().getTipoMedida())
+        addColumn(ci -> ci.getProducto().getTipoMedida().getSimbolo())
                 .setHeader("Medida")
                 .setKey("med");
 

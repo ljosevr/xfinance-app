@@ -7,23 +7,25 @@ import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class InventarioServiceImpl implements InventarioService {
 
-    private static final Logger logger = Logger.getLogger(InventarioServiceImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(InventarioServiceImpl.class);
 
     @Autowired
     private InventarioInicialRepository inventarioInicialRepository;
@@ -55,7 +57,7 @@ public class InventarioServiceImpl implements InventarioService {
         final List<InventarioInicial> result = new ArrayList<>();
         List<Producto> listaProductos;
         if(filterText == null || filterText.isEmpty()) {
-            listaProductos = productoRepository.findByEmpresa(empresa, pageable);
+            listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
         } else  {
             listaProductos = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
         }
@@ -72,20 +74,41 @@ public class InventarioServiceImpl implements InventarioService {
 
             }
             result.add(invInicial);
-
-//            else {
-//                ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(p);
-//                invInicial.setImpuesto(p.getImpuesto());
-//                invInicial.setPrecioVenta(productoValorVenta.getValorVenta());
-//                InventarioActualCosto inv = inventarioActualCostoRepository.findByProductoInicial(p);
-//                invInicial.setPrecioCosto(inv.getPrecioCosto());
-//                result.add(invInicial);
-//
-//            }
         });
         result.sort((InventarioInicial o1, InventarioInicial o2) ->
                 o1.getProducto().getNombreProducto().compareTo(o2.getProducto().getNombreProducto()));
         logger.info("<-- "+methodName);
+        return result;
+    }
+
+    @Override
+    public List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
+        String methodName = "findAllInvInicial";
+        logger.info("--> "+methodName);
+        final List<InventarioInicial> result = new ArrayList<>();
+        List<Producto> listaProductos;
+        if(filterText == null || filterText.isEmpty()) {
+            listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
+        } else  {
+            listaProductos = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
+        }
+
+        listaProductos.forEach(p -> {
+            InventarioInicial invInicial = inventarioInicialRepository.findByProducto(p);
+            if(invInicial == null) {
+                invInicial = new InventarioInicial();
+                invInicial.setProducto(p);
+                invInicial.setImpuesto(new Impuesto());
+                invInicial.setPrecioCosto(BigDecimal.ZERO);
+                invInicial.setPrecioVenta(BigDecimal.ZERO);
+                invInicial.setCantidad(BigDecimal.ZERO);
+
+            }
+            result.add(invInicial);
+        });
+        result.sort((InventarioInicial o1, InventarioInicial o2) ->
+                o1.getProducto().getNombreProducto().compareTo(o2.getProducto().getNombreProducto()));
+        logger.info("<-- "+methodName + ": "+result.size());
         return result;
     }
 
@@ -141,7 +164,7 @@ public class InventarioServiceImpl implements InventarioService {
                 result.setMessage("Usuario Null");
             }
         }catch(Exception e){
-            logger.log(Level.SEVERE, methodName  + ": "+e.getMessage(), e);
+            logger.error(methodName  + ": "+e.getMessage(), e);
             result.setSuccess(false);
             result.setMessage("Error al Procesar");
         }
@@ -162,6 +185,21 @@ public class InventarioServiceImpl implements InventarioService {
         }
 
         logger.info("<-- "+methodName);
+        return listResult;
+    }
+
+    @Override
+    public List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
+        String methodName = "findInvActual";
+        logger.info("--> "+methodName);
+        List<InventarioActualCosto> listResult;
+        if(filterText == null || filterText.isEmpty()) {
+            listResult = inventarioActualCostoRepository.findAllByEmpresa(empresa, offsetBasedPageRequest);
+        } else  {
+            listResult = inventarioActualCostoRepository.search(empresa, filterText, offsetBasedPageRequest);
+        }
+
+        logger.info("<-- "+methodName + " - "+listResult.size());
         return listResult;
     }
 
@@ -236,11 +274,16 @@ public class InventarioServiceImpl implements InventarioService {
             movimientoRepository.save(movimiento);
 
         }catch(Exception e){
-            logger.log(Level.SEVERE, methodName  + ": "+e.getMessage(), e);
+            logger.error(methodName  + ": "+e.getMessage(), e);
             return false;
         }
         logger.info("<-- "+methodName);
         return true;
+    }
+
+    @Override
+    public InventarioInicial findByProducto(Producto producto) {
+        return inventarioInicialRepository.findByProducto(producto);
     }
 
     private void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean infinite, Date fecha, TipoMovimientoEnum tipoMovimiento) {
@@ -366,5 +409,24 @@ public class InventarioServiceImpl implements InventarioService {
 
     }
 
-}
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllInventarios(Empresa emp, List<Producto> productosList) {
+        logger.info("--> deleteAllInventarios");
+        try{
 
+            logger.info("Inventario Inicial Delete: "+inventarioInicialRepository.deleteAllByProductoIn(productosList));
+            inventarioInicialRepository.flush();
+            logger.info("Inventario Costo Delete: "+inventarioActualCostoRepository.deleteAllByProductoIn(productosList));
+            inventarioActualCostoRepository.flush();
+            logger.info("Inventario Actual Delete: "+inventarioActualRepository.deleteAllByProductoIn(productosList));
+            inventarioActualRepository.flush();
+
+            logger.info("<-- deleteAllInventarios");
+            return true;
+        } catch(Exception e) {
+            logger.error("Error: "+e.getMessage(), e);
+            return false;
+        }
+    }
+}

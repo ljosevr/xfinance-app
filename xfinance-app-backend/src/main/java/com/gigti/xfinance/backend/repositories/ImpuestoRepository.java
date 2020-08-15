@@ -32,4 +32,6 @@ public interface ImpuestoRepository extends JpaRepository<Impuesto, String> {
     List<Impuesto> findByNombreOrDescripcion(@Param("filter") String filter, @Param("empresa") Empresa empresa, Pageable pageable);
 
     List<Impuesto> findAllByEmpresaAndEliminadoIsFalse(Empresa empresa);
+
+    Integer deleteAllByEmpresa(Empresa empresa);
 }

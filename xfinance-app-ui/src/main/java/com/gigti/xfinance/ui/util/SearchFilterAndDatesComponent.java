@@ -13,21 +13,19 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 
 public class SearchFilterAndDatesComponent extends FormLayout {
 
-    private TextField filter;
-    private DatePicker dateStart;
-    private DatePicker dateEnd;
+    private final TextField filter;
+    private final DatePicker dateStart;
+    private final DatePicker dateEnd;
 
-    private Button btnSearch;
-    private Button btnAdd;
+    private final Button btnSearch;
+    private final Button btnAdd;
+    private Button btnEdit;
+    private Button btnDelete;
 
     public SearchFilterAndDatesComponent(String labelAddBtn, String labelFilter, String placeHolderFilter, boolean visibleSearchBtn, boolean visibleAddBtn, String labelDateStart, String labelDateEnd) {
         this.addClassName("searchBar");
 
-        this.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("300Px", 1),
-                new FormLayout.ResponsiveStep("450px", 3),
-                new FormLayout.ResponsiveStep("800px", 4),
-                new FormLayout.ResponsiveStep("1000px", 5));
+        this.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         filter = new TextField(labelFilter);
         filter.setPlaceholder(placeHolderFilter);
@@ -61,20 +59,82 @@ public class SearchFilterAndDatesComponent extends FormLayout {
         add(filter,dateStart, dateEnd, btnSearch, btnAdd);
     }
 
-    public TextField getFilter() {
-        return filter;
+    public SearchFilterAndDatesComponent(String labelAddBtn, boolean visibleAddBtn, String labelFilter, String placeHolderFilter, String labelSearchBtn, boolean visibleSearchBtn,
+                                         String labelBtnEdit, boolean visibleBtnEdit,String labelBtnDelete, boolean visibleBtnDelete, String labelDateStart, String labelDateEnd) {
+        this.addClassName("searchBar");
+        this.setResponsiveSteps(MyResponsiveStep.getMyList());
+
+        filter = new TextField(labelFilter);
+        filter.setPlaceholder(placeHolderFilter);
+        filter.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        filter.setValueChangeMode(ValueChangeMode.LAZY);
+        filter.setClearButtonVisible(true);
+        filter.setAutoselect(true);
+        filter.getElement().setAttribute("title", placeHolderFilter);
+        filter.setMinWidth("300px");
+
+        btnAdd = new Button(labelAddBtn);
+        btnAdd.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
+        btnAdd.setIcon(VaadinIcon.PLUS_CIRCLE.create());
+        btnAdd.getElement().setAttribute("title", "Agregar - F4");
+        btnAdd.addClickShortcut(Key.F4);
+        btnAdd.setVisible(visibleAddBtn);
+        btnAdd.setMaxWidth("35px");
+
+        btnEdit = new Button(labelBtnEdit, new Icon(VaadinIcon.EDIT));
+        btnEdit.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_SUCCESS);
+        btnEdit.getElement().setAttribute("title", "Editar - F7");
+        btnEdit.addClickShortcut(Key.F7);
+        btnEdit.setVisible(visibleBtnEdit);
+        btnEdit.setMaxWidth("35px");
+
+        btnDelete = new Button(labelBtnDelete, new Icon(VaadinIcon.TRASH));
+        btnDelete.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_ERROR);
+        btnDelete.getElement().setAttribute("title", "Eliminar - F8");
+        btnDelete.addClickShortcut(Key.F8);
+        btnDelete.setVisible(visibleBtnDelete);
+        btnDelete.setMaxWidth("35px");
+
+        btnSearch = new Button(labelSearchBtn, new Icon(VaadinIcon.SEARCH));
+        btnSearch.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_TERTIARY);
+        btnSearch.getElement().setAttribute("title", "Buscar - F9");
+        btnSearch.setVisible(visibleSearchBtn);
+        btnSearch.addClickShortcut(Key.F9);
+        btnSearch.setMaxWidth("35px");
+
+        dateStart = new DatePicker();
+        dateStart.setPlaceholder(labelDateStart);
+        dateStart.getElement().setAttribute("theme", "align-center");
+        dateStart.getElement().setAttribute("theme", "small");
+        dateStart.setMaxWidth("190px");
+
+        dateEnd = new DatePicker();
+        dateEnd.setPlaceholder(labelDateEnd);
+        dateEnd.getElement().setAttribute("theme", "align-center");
+        dateEnd.getElement().setAttribute("theme", "small");
+        dateEnd.setMaxWidth("190px");
+
+        add(btnAdd, btnEdit, btnDelete, filter,dateStart, dateEnd, btnSearch);
     }
 
-    public Button getBtnSearch() {
-        return btnSearch;
+    public TextField getFilter() {
+        return filter;
     }
 
     public Button getBtnAdd() {
         return btnAdd;
     }
 
-    public void setBtnAdd(Button btnAdd) {
-        this.btnAdd = btnAdd;
+    public Button getBtnSearch() {
+        return btnSearch;
+    }
+
+    public Button getBtnEdit() {
+        return btnEdit;
+    }
+
+    public Button getBtnDelete() {
+        return btnDelete;
     }
 
     public DatePicker getDateStart() {

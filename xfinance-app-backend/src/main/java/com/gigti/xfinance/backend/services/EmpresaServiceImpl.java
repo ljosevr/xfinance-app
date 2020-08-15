@@ -9,21 +9,22 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class EmpresaServiceImpl implements EmpresaService {
 
-    private static final Logger logger = Logger.getLogger(EmpresaServiceImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(EmpresaServiceImpl.class);
     @Autowired
     private EmpresaRepository empresaRepository;
 
@@ -42,6 +43,12 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Autowired
     private ImpuestoRepository impuestoRepository;
 
+    @Autowired
+    private TipoMedidaRepository tipoMedidaRepository;
+
+    @Autowired
+    private TipoService tipoService;
+
     @Override
     public List<EmpresaDTO> findAll(String filter, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -59,7 +66,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
     private EmpresaDTO getData(Empresa emp) {
         if(emp != null){
-            Usuario admin = usuarioRepository.findByEmpresaAndTipoUsuario(emp, TipoUsuarioEnum.ADMIN.name(), true);
+            Usuario admin = usuarioRepository.findByEmpresaAndTipoUsuario(emp, TipoUsuarioEnum.ADMIN, true);
             EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(emp, admin);
 
             return empresaDTO;
@@ -75,7 +82,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         List<EmpresaDTO> listResult = new ArrayList<>();
         for(Empresa empresa : listTemp){
             if(empresa != null){
-                Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN.name(), true);
+                Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN, true);
                 EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
                 listResult.add(empresaDTO);
             }
@@ -88,7 +95,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         EmpresaDTO empresaDTO = new EmpresaDTO();
         Empresa empresa = empresaRepository.findById(id).orElse(null);
         if(empresa != null){
-            Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN.name(), true);
+            Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN, true);
             empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
         }
         return empresaDTO;
@@ -100,12 +107,17 @@ public class EmpresaServiceImpl implements EmpresaService {
         List<EmpresaDTO> listResult = new ArrayList<>();
 
         listTemp.forEach(empresa -> {
-            Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN.name(), true);
+            Usuario user = usuarioRepository.findByEmpresaAndTipoUsuario(empresa, TipoUsuarioEnum.ADMIN, true);
             EmpresaDTO empresaDTO = ConvertEmpresa.convertEntityToDTOComplete(empresa, user);
             listResult.add(empresaDTO);
         });
 
         return listResult;
+    }
+
+    @Override
+    public Empresa findEmpresaDemo() {
+        return empresaRepository.findByTipoEmpresa(TipoEmpresaEnum.DEMO);
     }
 
     @Transactional
@@ -133,7 +145,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             }
 
         } catch(Exception e) {
-            logger.log(Level.SEVERE,"Error: "+e.getMessage(),e);
+            logger.error("Error: "+e.getMessage(),e);
             response.setSuccess(false);
             response.setMessage("Error al Eliminar Empresa");
         }
@@ -144,7 +156,7 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     public EmpresaDTO saveEmpresa(EmpresaDTO empresa) {
         final String methodName = "saveEmpresa";
-        logger.log(Level.INFO, "--> "+methodName);
+        logger.info("--> "+methodName);
         try{
             Empresa empresaEnt;
             boolean isNew = false;
@@ -174,7 +186,7 @@ public class EmpresaServiceImpl implements EmpresaService {
                     empresaEnt.setTipoIde(TipoIde.NIT);
                 }
             }
-            logger.log(Level.INFO, empresaEnt.toString());
+            logger.info(empresaEnt.toString());
             empresaEnt = empresaRepository.save(empresaEnt);
 
             empresa.setEmpresaId(empresaEnt.getId());
@@ -285,13 +297,41 @@ public class EmpresaServiceImpl implements EmpresaService {
 
                 impuestoRepository.saveAll(listImpuestos);
 
+                //Tipos de Medidas
+                List<TipoMedida> tipoMedidasDefault = tipoService.findAllTiposMedidas(null);
+                Empresa finalEmpresaEnt1 = empresaEnt;
+                tipoMedidasDefault.forEach(t -> {
+                    TipoMedida tm = new TipoMedida();
+                    tm.setEmpresa(finalEmpresaEnt1);
+                    tm.setSimbolo(t.getSimbolo());
+                    tm.setNombre(t.getNombre());
+                    tm.setEliminado(t.isEliminado());
+                    tm.setActivo(t.isActivo());
+                    tm.setDescripcion(t.getDescripcion());
+                    tipoMedidaRepository.save(tm);
+                });
             }
-            logger.log(Level.INFO, "<-- "+methodName);
+            logger.info("<-- "+methodName);
             return empresa;
 
         }catch(Exception e){
-            logger.log(Level.SEVERE,"saveEmpresa: "+e.getMessage(), e);
+            logger.error("saveEmpresa: "+e.getMessage(), e);
             return null;
+        }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllEmpresa(Empresa emp) {
+        logger.info("--> deleteAllEmpresa");
+        try {
+            empresaRepository.delete(emp);
+            empresaRepository.flush();
+            logger.info("<-- deleteAllEmpresa");
+            return true;
+        }catch(Exception e) {
+            logger.error("Error: "+e.getMessage(), e);
+            return false;
         }
     }
 }

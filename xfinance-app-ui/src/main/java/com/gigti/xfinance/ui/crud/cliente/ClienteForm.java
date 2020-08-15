@@ -10,6 +10,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -21,24 +22,29 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.shared.Registration;
 
-public class ClienteForm extends FormLayout {
+import java.util.List;
+
+public class ClienteForm extends Dialog {
     private final H2 titleForm;
     private final ComboBox<TipoIde> cbTipoIde;
     private Button btnSave;
-    private Binder<Cliente> binder;
+    private final Binder<Cliente> binder;
 
-    public ClienteForm() {
+    public ClienteForm(List<TipoIde> tipoIdeList) {
 
-        setResponsiveSteps(MyResponsiveStep.getMyList());
-        addClassName("form");
+        this.setDraggable(true);
+        this.setModal(true);
+        this.setResizable(true);
+        FormLayout content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         titleForm = new H2("");
         titleForm.addClassName("titleView");
-        this.add(titleForm,this.getResponsiveSteps().size());
 
         cbTipoIde = new ComboBox<>();
         cbTipoIde.setLabel("Tipo Identificación");
-        cbTipoIde.setItems(TipoIde.getListTipos());
+        cbTipoIde.setItems(tipoIdeList);
         cbTipoIde.setRequired(true);
         cbTipoIde.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
@@ -108,10 +114,13 @@ public class ClienteForm extends FormLayout {
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete,btnClose);
-        this.setColspan(actionsLayout, this.getResponsiveSteps().size());
 
-        this.add(cbTipoIde,tfIdentificacion,tfPrimerNombre,tfSegundoNombre,tfPrimerApellido, tfSegundoApellido, tfDireccion,tfTelefono, tfEmail, actionsLayout);
-
+        content.add(titleForm,cbTipoIde,tfIdentificacion,tfPrimerNombre,tfSegundoNombre,tfPrimerApellido, tfSegundoApellido, tfDireccion,tfTelefono, tfEmail, actionsLayout);
+        content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
+        content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
     private void validateAndSave() {

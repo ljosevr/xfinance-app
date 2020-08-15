@@ -3,6 +3,7 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.Response;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.List;
 public interface InventarioService {
 
     List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, int page, int size);
+    List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
+
     int getCount(String filterText, Empresa empresa);
     Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
 
@@ -22,6 +25,7 @@ public interface InventarioService {
      * @return
      */
     List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, int page, int size);
+    List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
     int countInvActual(String filterText, Empresa empresa);
 
     /**
@@ -40,4 +44,8 @@ public interface InventarioService {
      * @return -> Retorna Verdadero o Falso
      */
     boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre);
+
+    InventarioInicial findByProducto(Producto producto);
+
+    boolean deleteAllInventarios(Empresa emp, List<Producto> productosList);
 }

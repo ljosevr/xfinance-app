@@ -7,41 +7,40 @@
 package com.gigti.xfinance.ui.crud.inventarios.inicial;
 
 import com.gigti.xfinance.backend.data.InventarioInicial;
-import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import org.apache.commons.lang3.StringUtils;
-import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.Currency;
 import java.util.Locale;
 
-public class InvInicialGrid extends PaginatedGrid<InventarioInicial> {
+public class InvInicialGrid extends Grid<InventarioInicial> {
 
     public InvInicialGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT);
 
         addColumn(producto -> producto.getProducto().getNombreProducto())
                 .setHeader("Nombre Producto")
                 .setSortable(true);
 
-        addColumn(producto -> AllUtils.formatUnidadMedida(producto.getProducto().getTipoMedida().name()))
+        addColumn(producto -> producto.getProducto().getTipoMedida().getSimbolo())
                 .setHeader("Medida")
-                .setFlexGrow(2)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
         addColumn(InventarioInicial::getCantidad)
                 .setHeader("Cantidad")
+                .setTextAlign(ColumnTextAlign.CENTER)
                 .setKey("cantidad");
 
         addColumn(inv -> inv.isInfinite() ? "SI" : "NO")
             .setHeader("Infinito")
             .setKey("infinite")
-        .setSortable(true);
+            .setTextAlign(ColumnTextAlign.CENTER)
+            .setSortable(true);
 
         addColumn(inventario -> {
             final DecimalFormat decimalFormat = new DecimalFormat();
@@ -51,7 +50,8 @@ public class InvInicialGrid extends PaginatedGrid<InventarioInicial> {
 
             return "$ "+decimalFormat.format(inventario.getPrecioCosto() != null ? inventario.getPrecioCosto() : BigDecimal.ZERO);
         }).setHeader("Precio Costo")
-        .setKey("pcosto");
+                .setTextAlign(ColumnTextAlign.END)
+                .setKey("pcosto");
 
         addColumn(inventario -> {
             final DecimalFormat decimalFormat = new DecimalFormat();
@@ -61,23 +61,15 @@ public class InvInicialGrid extends PaginatedGrid<InventarioInicial> {
 
             return "$ "+decimalFormat.format(inventario.getPrecioVenta());
         }).setHeader("Precio Venta")
-        .setKey("pventa");
+                .setTextAlign(ColumnTextAlign.END)
+                .setKey("pventa");
 
         addColumn(inv -> StringUtils.isBlank(inv.getId()) ? "NO" : "SI")
                 .setHeader("Definitivo")
+                .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(InventarioInicial product) {
-        getDataCommunicator().refresh(product);
-    }
-
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
-    }
 }

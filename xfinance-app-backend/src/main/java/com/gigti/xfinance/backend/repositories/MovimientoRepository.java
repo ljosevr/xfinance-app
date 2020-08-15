@@ -11,4 +11,6 @@ import java.util.List;
 public interface MovimientoRepository extends JpaRepository<Movimiento, String> {
 
     List<Movimiento> findAllByProducto(Producto producto);
+
+    Integer deleteAllByProductoIn(List<Producto> productoList);
 }

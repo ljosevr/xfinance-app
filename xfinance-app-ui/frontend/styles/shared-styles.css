@@ -114,10 +114,6 @@ html {
         max-width: 350px;
     }
 
-    .ProductoView.form {
-        max-width: 450px;
-    }
-
     .CompraDetailFormView .comboProd {
         margin: 10px;
         padding: var(--lumo-space-m);

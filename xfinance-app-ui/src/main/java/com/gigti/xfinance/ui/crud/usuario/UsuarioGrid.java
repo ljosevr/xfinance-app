@@ -7,22 +7,20 @@
 package com.gigti.xfinance.ui.crud.usuario;
 
 import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
-import com.gigti.xfinance.backend.others.Constantes;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.renderer.TemplateRenderer;
-import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.util.Comparator;
 
-public class UsuarioGrid extends PaginatedGrid<UsuarioDTO> {
+public class UsuarioGrid extends Grid<UsuarioDTO> {
 
     public UsuarioGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COMPACT);
 
         addColumn(UsuarioDTO::getNombreUsuario)
                 .setHeader("Usuario")
-                .setFlexGrow(20)
                 .setSortable(true);
 
         addColumn(UsuarioDTO::getTipoIde)
@@ -61,17 +59,8 @@ public class UsuarioGrid extends PaginatedGrid<UsuarioDTO> {
             usuario.getRol().getNombre()
         ).setHeader("Rol").setSortable(true);
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
+        setPageSize(50);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    public void refresh(UsuarioDTO usuario) {
-        getDataCommunicator().refresh(usuario);
-    }
-
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
-    }
 }

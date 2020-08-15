@@ -2,6 +2,7 @@ package com.gigti.xfinance.ui.crud.proveedor;
 
 import com.gigti.xfinance.backend.data.Proveedor;
 import com.gigti.xfinance.backend.data.TipoIde;
+import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
@@ -11,6 +12,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -22,49 +24,61 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.shared.Registration;
 
-public class ProveedorForm extends FormLayout {
+import java.util.List;
+
+public class ProveedorForm extends Dialog {
 
     private final H2 titleForm;
     private final ComboBox<TipoIde> cbTipoIde;
+    private final Checkbox chkActivo;
+    private final EmailField tfEmail;
+    private final TextField tfIdentificacion;
+    private final TextField tfNombreProveedor;
+    private final TextField tfDireccion;
+    private final TextField tfTelefono;
+    private final Button btnDelete;
     private Button btnSave;
     private Binder<Proveedor> binder;
 
-    public ProveedorForm() {
-        setResponsiveSteps(MyResponsiveStep.getMyList());
-        addClassName("form");
+    public ProveedorForm(List<TipoIde> tipoIdeList) {
+        this.setDraggable(true);
+        this.setModal(true);
+        this.setResizable(true);
+        FormLayout content = new FormLayout();
+        content.setClassName("formLayout");
+        content.setResponsiveSteps(MyResponsiveStep.getMyList());
 
         titleForm = new H2("");
         titleForm.addClassName("titleView");
-        this.add(titleForm,this.getResponsiveSteps().size());
 
         cbTipoIde = new ComboBox<>();
         cbTipoIde.setLabel("Tipo Identificación");
-        cbTipoIde.setItems(TipoIde.getListTipos());
+        cbTipoIde.setItems(tipoIdeList);
         cbTipoIde.setRequired(true);
         cbTipoIde.getElement().setAttribute("theme", String.valueOf(TextFieldVariant.LUMO_SMALL));
 
-        TextField tfIdentificacion = new TextField("N° Identificación");
+        tfIdentificacion = new TextField("N° Identificación");
         tfIdentificacion.setRequired(true);
         tfIdentificacion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfNombreProveedor = new TextField("Nombre Proveedor");
+        tfNombreProveedor = new TextField("Nombre Proveedor");
         tfNombreProveedor.setRequired(true);
         tfNombreProveedor.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfDireccion = new TextField("Dirección");
+        tfDireccion = new TextField("Dirección");
         tfDireccion.setRequired(false);
         tfDireccion.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        TextField tfTelefono = new TextField("Telefono");
+        tfTelefono = new TextField("Telefono");
         tfTelefono.setRequired(false);
         tfTelefono.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        EmailField tfEmail = new EmailField("Email");
+        tfEmail = new EmailField("Email");
         tfEmail.setClearButtonVisible(true);
         tfEmail.setErrorMessage("Agregue un Email Valido");
         tfEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        Checkbox chkActivo = new Checkbox("Activo");
+        chkActivo = new Checkbox("Activo");
         chkActivo.setValue(true);
         chkActivo.setRequiredIndicatorVisible(true);
 
@@ -92,15 +106,19 @@ public class ProveedorForm extends FormLayout {
         btnClose.addClickListener(event -> fireEvent(new ProveedorForm.CloseEvent(this)));
         btnClose.addClickShortcut(Key.ESCAPE);
 
-        Button btnDelete = new Button("Eliminar");
+        btnDelete = new Button("Eliminar");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         btnDelete.addClickListener(event -> fireEvent(new ProveedorForm.DeleteEvent(this, binder.getBean())));
 
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete,btnClose);
-        this.setColspan(actionsLayout, this.getResponsiveSteps().size());
 
-        this.add(cbTipoIde,tfIdentificacion,tfNombreProveedor, tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
+        content.add(titleForm, cbTipoIde,tfIdentificacion,tfNombreProveedor, tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
+        content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
+        content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
+        this.setCloseOnEsc(true);
+        this.setCloseOnOutsideClick(false);
+        this.add(content);
     }
 
     private void validateAndSave() {
@@ -111,10 +129,24 @@ public class ProveedorForm extends FormLayout {
         }
     }
 
-    public void setProveedor(Proveedor proveedor, String title) {
+    public void setProveedor(Proveedor proveedor, String title, String type) {
         binder.setBean(proveedor);
+        setReadOnlyByDelete(type.equals(ICrudView.OPTION_DELETE));
+        btnDelete.setEnabled(!ICrudView.OPTION_ADD.equals(type));
         titleForm.setText(title);
         cbTipoIde.focus();
+    }
+
+    private void setReadOnlyByDelete(boolean readOnly) {
+        btnSave.setVisible(!readOnly);
+        btnDelete.setText(readOnly ? "Sí, Eliminar" : "Eliminar");
+        tfDireccion.setReadOnly(readOnly);
+        tfEmail.setReadOnly(readOnly);
+        tfIdentificacion.setReadOnly(readOnly);
+        tfNombreProveedor.setReadOnly(readOnly);
+        tfTelefono.setReadOnly(readOnly);
+        chkActivo.setReadOnly(readOnly);
+        cbTipoIde.setReadOnly(readOnly);
     }
 
     // Events

@@ -7,49 +7,36 @@
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
 import com.gigti.xfinance.backend.data.InventarioActualCosto;
-import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import org.vaadin.klaudeta.PaginatedGrid;
 
-public class InvActualGrid extends PaginatedGrid<InventarioActualCosto> {
+public class InvActualGrid extends Grid<InventarioActualCosto> {
 
     public InvActualGrid() {
         setSizeFull();
-        addThemeVariants(GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+        addThemeVariants(GridVariant.LUMO_COMPACT, GridVariant.LUMO_ROW_STRIPES);
 
         addColumn(invActual -> invActual.getProducto().getNombreProducto())
                 .setHeader("Nombre Producto")
-                .setFlexGrow(15)
                 .setSortable(true);
 
-        addColumn(producto -> AllUtils.formatUnidadMedida(producto.getProducto().getTipoMedida().name()))
+        addColumn(producto -> producto.getProducto().getTipoMedida().getSimbolo())
                 .setHeader("Medida")
-                .setFlexGrow(3)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
         addColumn(InventarioActualCosto::getCantidad)
-                .setFlexGrow(5)
                 .setHeader("Cantidad");
 
         addColumn(inv -> inv.isInfinite() ? "SI" : "NO")
                 .setHeader("Infinito")
-                .setFlexGrow(5)
                 .setSortable(true);
 
         addColumn(inv -> AllUtils.formatDate(inv.getFechaActualizacion()))
                 .setHeader("Actualización")
-                .setFlexGrow(7)
                 .setTextAlign(ColumnTextAlign.CENTER);
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
-    }
-
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
     }
 }

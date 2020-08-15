@@ -22,8 +22,8 @@ spring:
   # JPA properties
   jpa:
     hibernate:
-     ddl-auto: update
-#     ddl-auto: create-drop
+      ddl-auto: update
+      #ddl-auto: create-drop
     show-sql: false
     generate-ddl: false
     properties:
@@ -36,6 +36,7 @@ spring:
     restart:
       poll-interval: 2s
       quiet-period: 1s
+      additional-exclude: META-INF/VAADIN/config/**
 
   # enable H2 web console and set url for web console
   # http://localhost:8080/console

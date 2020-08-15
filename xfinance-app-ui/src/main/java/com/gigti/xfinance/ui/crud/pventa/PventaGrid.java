@@ -22,7 +22,7 @@ public class PventaGrid extends Grid<PventaDTO> {
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.START);
 
-        addColumn(pv -> AllUtils.formatUnidadMedida(pv.getUnidadMedida()))
+        addColumn(PventaDTO::getUnidadMedida)
                 .setHeader("Medida")
                 .setFlexGrow(2)
                 .setTextAlign(ColumnTextAlign.CENTER);

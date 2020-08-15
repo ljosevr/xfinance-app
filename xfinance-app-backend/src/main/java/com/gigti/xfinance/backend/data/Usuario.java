@@ -16,10 +16,10 @@ import javax.validation.constraints.Size;
 
 @Data
 @Entity
-@Table(name = "usuarios", uniqueConstraints={@UniqueConstraint(columnNames={"nombre_usuario"})})
+@Table(name = "usuarios")
 public class Usuario extends AbstractEntity {
 
-    @Column(name="nombre_usuario", unique = true)
+    @Column(name="nombre_usuario")
     @Size(min = 4, max = 25)
     @NotNull
     private String nombreUsuario;

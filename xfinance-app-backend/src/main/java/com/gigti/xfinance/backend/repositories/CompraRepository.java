@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.Compra;
 import com.gigti.xfinance.backend.data.Empresa;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -34,4 +35,9 @@ public interface CompraRepository extends JpaRepository<Compra,String> {
             "c.fechaCompra BETWEEN :dateStart AND :dateEnd AND " +
             "UPPER(c.numeroFactura) LIKE CONCAT('%', UPPER(:filterText),'%') ")
     List<Compra> search(Empresa empresa, String filterText, Date dateStart, Date dateEnd, Pageable pageable);
+
+    @Modifying
+    @Query("DELETE FROM Compra c " +
+            "WHERE c.empresa =:empresa")
+    Integer deleteAllByEmpresa(Empresa empresa);
 }

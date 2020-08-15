@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.Cliente;
 import com.gigti.xfinance.backend.data.Empresa;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -40,5 +41,9 @@ public interface ClienteRepository extends JpaRepository<Cliente, String> {
 
 
     Cliente findByEmail(String email);
+
+    @Modifying
+    @Query("DELETE FROM Cliente c WHERE c.persona IN (SELECT p FROM Persona p WHERE p.empresa =:empresa)")
+    Integer deleteAllByEmpresa(Empresa empresa);
 
 }

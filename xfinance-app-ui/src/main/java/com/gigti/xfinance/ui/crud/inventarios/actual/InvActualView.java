@@ -15,98 +15,74 @@ import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import java.util.List;
+import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_INVENTARIO_ACTUAL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_ACTUAL +" | "+ Constantes.VIEW_MAIN)
-public class InvActualView extends VerticalLayout  implements ICrudView {
+public class InvActualView extends VerticalLayout  implements ICrudView<InventarioActualCosto> {
 
-    private Empresa empresa;
-    private InvActualGrid grid;
+    private final Empresa empresa;
+    private final InvActualGrid grid;
     private TextField filter;
-    private InventarioService inventarioService;
+    private final InventarioService inventarioService;
     private SearchFilterComponent searchLayout;
     private DataProvider<InventarioActualCosto, Void> dataProvider;
 
     public InvActualView(InventarioService inventarioService) {
         this.inventarioService = inventarioService;
-        empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
+        empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
 
-        configureProvider();
+        detailLayout(this);
 
-        addClassName("InvActualView");
-        setSizeFull();
-        setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
         H1 title = new H1(Constantes.VIEW_INVENTARIO_ACTUAL.toUpperCase());
         title.addClassName("titleView2");
 
         configureSearchLayout();
-        filter = searchLayout.getFilter();
 
-        configureGrid();
+        configureProvider();
 
-        VerticalLayout gridLayout = new VerticalLayout(grid);
-        gridLayout.addClassName("grid");
+        configureGrid(grid = new InvActualGrid());
 
-        FlexLayout flexLayout = new FlexLayout(gridLayout);
-        flexLayout.addClassName("content");
-        flexLayout.setSizeFull();
-        //flexLayout.setFlexGrow(3, gridLayout);
+        add(title, searchLayout, grid);
 
-        add(title, searchLayout, flexLayout);
-
-        updateList();
+        updateList(grid, dataProvider);
         closeEditor();
     }
 
     public void closeEditor() {
     }
 
-    public void configureGrid() {
-        grid = new InvActualGrid();
-        grid.setSizeFull();
-        grid.asSingleSelect().addValueChangeListener(evt -> edit(evt.getValue()));
-        grid.addPageChangeListener(evt -> grid.setPage(evt.getNewPage()));
-    }
-
-    public void updateList() {
-        grid.setDataProvider(dataProvider);
-    }
-
     @Override
     public void configureProvider() {
         dataProvider = DataProvider.fromCallbacks(
-                // First callback fetches items based on a query
-                query -> {
-                    List<InventarioActualCosto> listResult = inventarioService.
-                            findInvActual(filter.getValue(), empresa, grid.getPage(), grid.getPageSize());
-
-                    return listResult.stream();
-                },
-                // Second callback fetches the number of items
-                // for a query
-                query -> inventarioService.countInvActual(filter.getValue(), empresa)
-        );
+                query -> inventarioService.findInvActual(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
+                query -> inventarioService.countInvActual(filter.getValue(), empresa));
     }
 
     @Override
-    public void edit(Object inventario) {
+    public void editItem(Object inventario) {
     }
 
     @Override
     public void configureSearchLayout() {
-        searchLayout = new SearchFilterComponent("", "", "Filtro por Nombre Producto", false, false);
-        searchLayout.getFilter().addValueChangeListener(event -> updateList());
+        searchLayout = new SearchFilterComponent("", true,
+                "", "Filtro Nombre Producto",
+                "", true,
+                "", false,
+                "", false);
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
         searchLayout.getFilter().focus();
+        filter = searchLayout.getFilter();
     }
 
     @Override
@@ -123,7 +99,8 @@ public class InvActualView extends VerticalLayout  implements ICrudView {
     }
 
     @Override
-    public void addItem() {
+    public void deleteItem(Object obj) {
+
     }
 
 }

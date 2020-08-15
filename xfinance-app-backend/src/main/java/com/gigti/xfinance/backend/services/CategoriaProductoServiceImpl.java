@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,7 +22,7 @@ import java.util.Optional;
 @Service
 public class CategoriaProductoServiceImpl implements CategoriaProductoService {
 
-    Logger logger = LoggerFactory.getLogger(InitBackServiceImpl.class);
+    Logger logger = LoggerFactory.getLogger(CategoriaProductoServiceImpl.class);
 
     @Autowired
     private CategoriaProductoRepository categoriaProductoRepository;
@@ -50,6 +52,20 @@ public class CategoriaProductoServiceImpl implements CategoriaProductoService {
         }
 
         logger.info("<-- findAll Categorias ");
+        return listResult;
+    }
+
+    @Override
+    public List<CategoriaProducto> findAll(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
+        logger.info("--> findAll Categorias: ");
+        List<CategoriaProducto> listResult;
+        if(filterText == null || filterText.isEmpty()) {
+            listResult = categoriaProductoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
+        } else  {
+            listResult = categoriaProductoRepository.search(filterText, empresa, offsetBasedPageRequest);
+        }
+
+        logger.info("<-- findAll Categorias "+listResult.size());
         return listResult;
     }
 
@@ -85,21 +101,30 @@ public class CategoriaProductoServiceImpl implements CategoriaProductoService {
 
     @Transactional
     @Override
-    public CategoriaProducto saveCategoria(CategoriaProducto categoria) {
+    public Response saveCategoria(CategoriaProducto categoria) {
         logger.info("--> saveCategoria");
+        Response response = new Response();
         try{
             Optional<Empresa> empresa = empresaRepository.findById(categoria.getEmpresa().getId());
             if(empresa.isPresent()){
                 categoria.setEmpresa(empresa.get());
             }else{
+                response.setSuccess(false);
+                response.setMessage("Error: Empresa No encontrada");
                 return null;
             }
-            logger.info("<-- saveCategoria");
-            return categoriaProductoRepository.save(categoria);
+
+            response.setObject(categoriaProductoRepository.save(categoria));
+            response.setSuccess(true);
+            response.setMessage("Categoria Guardada Exitosamente");
         }catch(Exception e){
             logger.error(e.getMessage(), e);
-            return null;
+            response.setSuccess(false);
+            response.setMessage("Error al Guardar Categoria");
+            response.setObject(null);
         }
+        logger.info("<-- saveCategoria");
+        return response;
     }
 
     @Override
@@ -123,5 +148,20 @@ public class CategoriaProductoServiceImpl implements CategoriaProductoService {
         }
 
         return count;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllByEmpresa(Empresa empresa) {
+        logger.info("--> deleteAllByEmpresa");
+        try{
+            logger.info("Categorias Delete: "+categoriaProductoRepository.deleteAllByEmpresa(empresa));
+            categoriaProductoRepository.flush();
+            logger.info("<-- deleteAllByEmpresa");
+            return true;
+        }catch(Exception e) {
+            logger.error("Error: "+e.getMessage(), e);
+            return false;
+        }
     }
 }

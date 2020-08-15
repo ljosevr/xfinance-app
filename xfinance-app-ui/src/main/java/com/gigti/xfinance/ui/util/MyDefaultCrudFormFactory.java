@@ -11,6 +11,7 @@ public class MyDefaultCrudFormFactory extends DefaultCrudFormFactory {
 
     public MyDefaultCrudFormFactory(Class domainType) {
         super(domainType);
+
     }
 
     @Override
@@ -36,6 +37,13 @@ public class MyDefaultCrudFormFactory extends DefaultCrudFormFactory {
 
         return op;
 
+    }
+
+    public void inSpanish() {
+        this.setCancelButtonCaption("Cancelar");
+        this.setButtonCaption(CrudOperation.ADD, "Guardar");
+        this.setButtonCaption(CrudOperation.UPDATE, "Guardar");
+        this.setButtonCaption(CrudOperation.DELETE, "Sí, Eliminar");
     }
 }
 

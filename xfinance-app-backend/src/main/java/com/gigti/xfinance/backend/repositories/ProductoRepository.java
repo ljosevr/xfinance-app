@@ -20,7 +20,7 @@ import java.util.Optional;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, String> {
 
-    public Optional<Producto> findById(String id);
+    Optional<Producto> findById(String id);
 
     int countByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa);
 
@@ -36,12 +36,12 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
             "WHERE  p.empresa =:empresa AND " +
             "p.eliminado = FALSE " +
             "ORDER BY p.nombreProducto")
-    List<Producto> findByEmpresa(@Param("empresa") Empresa empresa, Pageable pageable);
+    List<Producto> findByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa, Pageable pageable);
 
     @Query("SELECT p FROM Producto p " +
             "WHERE  p.empresa =:empresa AND " +
             "p.eliminado = FALSE")
-    List<Producto> findByEmpresa(@Param("empresa") Empresa empresa);
+    List<Producto> findByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa);
 
     @Query("SELECT p FROM Producto p " +
             "WHERE UPPER(p.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') " +
@@ -65,4 +65,14 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
             "p.codigoBarra =:filter AND " +
             "p.eliminado = false")
     Producto findByBarCode(String filter, Empresa empresa);
+
+    Integer deleteAllByEmpresa(Empresa emp);
+
+    List<Producto> findAllByEmpresa(Empresa empresa);
+
+    @Query("SELECT p FROM Producto p, InventarioActual i " +
+            "WHERE p.empresa =:empresa AND " +
+            "p.eliminado = FALSE AND "+
+            "i.producto = p AND i.infinite = FALSE")
+    List<Producto> findByEmpresaAndNotInfiniteStock(@Param("empresa") Empresa empresa);
 }

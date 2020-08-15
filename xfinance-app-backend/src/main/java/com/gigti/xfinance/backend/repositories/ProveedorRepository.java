@@ -36,4 +36,6 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, String> {
             "p.eliminado = false")
     int countAllByEmpresa(Empresa empresa);
 
+    Integer deleteAllByEmpresa(Empresa empresa);
+
 }

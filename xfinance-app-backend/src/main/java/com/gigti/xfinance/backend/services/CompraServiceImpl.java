@@ -6,24 +6,26 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.repositories.CompraItemRepository;
 import com.gigti.xfinance.backend.repositories.CompraRepository;
 import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Service
 public class CompraServiceImpl implements CompraService {
 
-    private static final Logger logger = Logger.getLogger(CompraServiceImpl.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(CompraServiceImpl.class);
 
     @Autowired
     private CompraRepository compraRepository;
@@ -78,24 +80,62 @@ public class CompraServiceImpl implements CompraService {
                         pageable);
             }
 
-            logger.log(Level.INFO, "Cantidad de Registros: " + listResult.size());
+            logger.info("Cantidad de Registros: " + listResult.size());
 
             for(Compra c : listResult) {
                 BigDecimal total = BigDecimal.ZERO;
-                logger.log(Level.INFO, "Compra: " + c.getNumeroFactura());
-                logger.log(Level.INFO, "Compra Items: " + c.getItems().size());
+                logger.info("Compra: " + c.getNumeroFactura());
+                logger.info( "Compra Items: " + c.getItems().size());
                 for(CompraItem item : c.getItems()) {
-                    logger.log(Level.INFO, "Item: " + item.getProducto().getNombreProducto());
+                    logger.info("Item: " + item.getProducto().getNombreProducto());
                     total = total.add(item.getPrecioCosto());
                 }
                 c.setTotalFactura(total);
             }
 
-//            listResult.stream()
-//                    .peek(c -> System.out.println(c.getItems().size()))
-//                    .forEach(c -> c.setTotalFactura(BigDecimal.valueOf(c.getItems().stream().mapToDouble(i -> i.getPrecioCosto().doubleValue()).sum())));
         } catch(Exception e) {
-            logger.log(Level.SEVERE, "Error al Obtener Registros: ");
+            logger.error("Error al Obtener Registros: ");
+            listResult = new ArrayList<>();
+        }
+        return listResult;
+    }
+
+    @Override
+    public List<Compra> findAll(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd, OffsetBasedPageRequest offsetBasedPageRequest) {
+        String methodName = "findAll-Compra";
+        logger.info("--> "+methodName);
+        dateStart = dateStart == null ? LocalDate.of(2020,1,1) : dateStart;
+        dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
+        List<Compra> listResult;
+        try {
+            if (filterText == null || filterText.isEmpty()) {
+                listResult = compraRepository.findAllByEmpresa(empresa,
+                        java.sql.Date.valueOf(dateStart),
+                        java.sql.Date.valueOf(dateEnd),
+                        offsetBasedPageRequest);
+            } else {
+                listResult = compraRepository.search(empresa,
+                        filterText,
+                        java.sql.Date.valueOf(dateStart),
+                        java.sql.Date.valueOf(dateEnd),
+                        offsetBasedPageRequest);
+            }
+
+            logger.info("Cantidad de Registros: " + listResult.size());
+
+            for(Compra c : listResult) {
+                BigDecimal total = BigDecimal.ZERO;
+                logger.info("Compra: " + c.getNumeroFactura());
+                logger.info("Compra Items: " + c.getItems().size());
+                for(CompraItem item : c.getItems()) {
+                    logger.info("Item: " + item.getProducto().getNombreProducto());
+                    total = total.add(item.getPrecioCosto());
+                }
+                c.setTotalFactura(total);
+            }
+
+        } catch(Exception e) {
+            logger.error("Error al Obtener Registros: ");
             listResult = new ArrayList<>();
         }
         return listResult;
@@ -152,7 +192,7 @@ public class CompraServiceImpl implements CompraService {
                 result.setMessage("No fue posible guardar la Compra");
             }
         }catch(Exception e) {
-            logger.log(Level.SEVERE, "[Exception]: "+e.getMessage(), e);
+            logger.error("[Exception]: "+e.getMessage(), e);
             result.setSuccess(false);
             result.setMessage("Error al guardar Compra");
         }
@@ -187,5 +227,23 @@ public class CompraServiceImpl implements CompraService {
 //            response.setMessage("Error al Eliminar Compra");
 //        }
 //        return response;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public boolean deleteAllCompras(Empresa emp, List<Producto> productosList) {
+        logger.info("--> deleteAllCompras");
+        try {
+            logger.info("CompraItems Delete: "+compraItemRepository.deleteAllByProductoIn(productosList));
+            logger.info("Compra Delete: "+compraRepository.deleteAllByEmpresa(emp));
+            compraItemRepository.flush();
+            compraRepository.flush();
+
+            logger.info("<-- deleteAllCompras");
+            return true;
+        }catch(Exception e) {
+            logger.error("Error al eliminar Compras: "+e.getMessage(), e);
+            return false;
+        }
     }
 }
