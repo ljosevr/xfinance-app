@@ -10,7 +10,6 @@ import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -122,7 +121,7 @@ public class UserChangePasswordView extends VerticalLayout {
                     if (response.isSuccess()) {
                         NotificacionesUtil.showSuccess(response.getMessage());
                         CurrentUser.set((Usuario) response.getObject());
-                        UI.getCurrent().navigate(MainLayout.class);
+                        cleanForm();
                     } else {
                         NotificacionesUtil.showError(response.getMessage());
                     }
@@ -132,8 +131,8 @@ public class UserChangePasswordView extends VerticalLayout {
     }
 
     private void cleanForm() {
-        pfOldPassword.clear();
-        pfNewPassword1.clear();
-        pfNewPassword2.clear();
+        pfOldPassword.setValue("");
+        pfNewPassword1.setValue("");
+        pfNewPassword2.setValue("");
     }
 }
