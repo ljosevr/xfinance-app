@@ -41,7 +41,6 @@ import java.util.Objects;
 @PreserveOnRefresh
 public class CompraView extends VerticalLayout implements ICrudView<Compra> {
 
-    //private final VerticalLayout gridLayout;
     private CompraGrid grid;
     private final CompraDetailForm form;
     private TextField filter;

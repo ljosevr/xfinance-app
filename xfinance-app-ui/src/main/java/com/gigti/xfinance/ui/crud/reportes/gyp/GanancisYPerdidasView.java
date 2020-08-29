@@ -1,4 +1,4 @@
-package com.gigti.xfinance.ui.crud.reportes;
+package com.gigti.xfinance.ui.crud.reportes.gyp;
 
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.MainLayout;

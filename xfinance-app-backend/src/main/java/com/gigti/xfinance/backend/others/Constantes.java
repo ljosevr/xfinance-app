@@ -10,24 +10,24 @@ public class Constantes {
     public static final String INIT5 = "PI Back - 5 - DEMO";
 
     //VIEWS-CLASS-NAME
-    public static final String VIEW_C_MAIN = "com.gigti.xfinance.ui.MainLayout";
     public static final String VIEW_C_ROOT = "";
-    public static final String VIEW_C_VENTA = "com.gigti.xfinance.ui.crud.pventa.PventaView";
-    public static final String VIEW_C_PRODUCTO = "com.gigti.xfinance.ui.crud.producto.ProductoView";
-    public static final String VIEW_C_CATEGORIA = "com.gigti.xfinance.ui.crud.categoria.CategoriaView";
-    public static final String VIEW_C_COMPRAS = "com.gigti.xfinance.ui.crud.compra.CompraView";
-    public static final String VIEW_C_INVENTARIO_INICIAL = "com.gigti.xfinance.ui.crud.inventarios.inicial.InvInicialView";
-    public static final String VIEW_C_INVENTARIO_ACTUAL = "com.gigti.xfinance.ui.crud.inventarios.actual.InvActualView";
-    public static final String VIEW_C_USUARIOS = "com.gigti.xfinance.ui.crud.usuario.UsuarioView";
-    public static final String VIEW_C_ROL = "com.gigti.xfinance.ui.crud.usuario.rol.RolView";
-    public static final String VIEW_C_VENTAS = "com.gigti.xfinance.ui.crud.reportes.VentasView";
-    public static final String VIEW_C_GANANCIAS_Y_PERDIDAS = "com.gigti.xfinance.ui.crud.reportes.GanancisYPerdidasView";
-    public static final String VIEW_C_EMPRESA_MASTER = "com.gigti.xfinance.ui.crud.empresa.EmpresaMasterView";
-    public static final String VIEW_C_CONFIG_PASSWORD = "com.gigti.xfinance.ui.crud.configuracion.UserChangePasswordView";
-    public static final String VIEW_C_CONFIG_PERFIL = "com.gigti.xfinance.ui.crud.configuracion.PerfilView";
-    public static final String VIEW_C_CONFIG_EMPRESA = "com.gigti.xfinance.ui.crud.configuracion.DatosEmpresaView";
-    public static final String VIEW_C_ADMIN_CLIENTE = "com.gigti.xfinance.ui.crud.cliente.ClienteView";
-    public static final String VIEW_C_ADMIN_PROVEEDOR = "com.gigti.xfinance.ui.crud.proveedor.ProveedorView";
+    public static final String VIEW_C_MAIN                  = "com.gigti.xfinance.ui.MainLayout";
+    public static final String VIEW_C_VENTA                 = "com.gigti.xfinance.ui.crud.pventa.PventaView";
+    public static final String VIEW_C_PRODUCTO              = "com.gigti.xfinance.ui.crud.producto.ProductoView";
+    public static final String VIEW_C_CATEGORIA             = "com.gigti.xfinance.ui.crud.categoria.CategoriaView";
+    public static final String VIEW_C_COMPRAS               = "com.gigti.xfinance.ui.crud.compra.CompraView";
+    public static final String VIEW_C_INVENTARIO_INICIAL    = "com.gigti.xfinance.ui.crud.inventarios.inicial.InvInicialView";
+    public static final String VIEW_C_INVENTARIO_ACTUAL     = "com.gigti.xfinance.ui.crud.inventarios.actual.InvActualView";
+    public static final String VIEW_C_USUARIOS              = "com.gigti.xfinance.ui.crud.usuario.UsuarioView";
+    public static final String VIEW_C_ROL                   = "com.gigti.xfinance.ui.crud.usuario.rol.RolView";
+    public static final String VIEW_C_VENTAS                = "com.gigti.xfinance.ui.crud.reportes.ventas.VentasView";
+    public static final String VIEW_C_GANANCIAS_Y_PERDIDAS  = "com.gigti.xfinance.ui.crud.reportes.gyp.GanancisYPerdidasView";
+    public static final String VIEW_C_EMPRESA_MASTER        = "com.gigti.xfinance.ui.crud.empresa.EmpresaMasterView";
+    public static final String VIEW_C_CONFIG_PASSWORD       = "com.gigti.xfinance.ui.crud.configuracion.UserChangePasswordView";
+    public static final String VIEW_C_CONFIG_PERFIL         = "com.gigti.xfinance.ui.crud.configuracion.PerfilView";
+    public static final String VIEW_C_CONFIG_EMPRESA        = "com.gigti.xfinance.ui.crud.configuracion.DatosEmpresaView";
+    public static final String VIEW_C_ADMIN_CLIENTE         = "com.gigti.xfinance.ui.crud.cliente.ClienteView";
+    public static final String VIEW_C_ADMIN_PROVEEDOR       = "com.gigti.xfinance.ui.crud.proveedor.ProveedorView";
     //public static final String VIEW_C_USUARIOADMIN = "usuarioAdmin";
 
     //VIEWS-ROUTE
