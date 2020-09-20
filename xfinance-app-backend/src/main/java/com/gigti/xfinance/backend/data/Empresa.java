@@ -30,15 +30,14 @@ public class Empresa extends AbstractEntity {
 
     @NotNull
     @Size(min= 4)
-    @Column(unique = true)
+    @Column
     private String identificacion;
 
-    @Size(min= 3, max = 6)
+    @Size(min= 3)
     @Column(name = "codigo_empresa", unique = true, nullable = false)
     private String codigoEmpresa;
 
     @NotNull
-    @Size(min= 4)
     @Column(name = "nombre_empresa", unique = true)
     private String nombreEmpresa;
 

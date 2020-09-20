@@ -18,6 +18,7 @@ import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -42,17 +43,21 @@ public class CompraServiceImpl implements CompraService {
     @Override
     public int count(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd) {
         int count;
-        dateStart = dateStart == null ? LocalDate.of(2020,1,1) : dateStart;
+        dateStart = dateStart == null ? LocalDate.now() : dateStart;
+        LocalDateTime dateStartTime = dateStart.atTime(0,0,0);
         dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
+        LocalDateTime dateEndTime = dateEnd.atTime(23,59,59);
+        logger.info("Fecha Inicio: "+java.sql.Timestamp.valueOf(dateStartTime));
+        logger.info("Fecha Fin: "+java.sql.Timestamp.valueOf(dateEndTime));
         if(filterText == null || filterText.isEmpty()) {
             count = compraRepository.countAllByEmpresa(empresa,
-                    java.sql.Date.valueOf(dateStart),
-                    java.sql.Date.valueOf(dateEnd));
+                    java.sql.Timestamp.valueOf(dateStartTime),
+                    java.sql.Timestamp.valueOf(dateEndTime));
         } else  {
             count = compraRepository.countAllByEmpresaAndNumeroFactura(empresa,
                     filterText,
-                    java.sql.Date.valueOf(dateStart),
-                    java.sql.Date.valueOf(dateEnd));
+                    java.sql.Timestamp.valueOf(dateStartTime),
+                    java.sql.Timestamp.valueOf(dateEndTime));
         }
 
         return count;
@@ -63,20 +68,24 @@ public class CompraServiceImpl implements CompraService {
         String methodName = "findAll-Compra";
         logger.info("--> "+methodName);
         Pageable pageable = PageRequest.of(page, size);
-        dateStart = dateStart == null ? LocalDate.of(2020,1,1) : dateStart;
+        dateStart = dateStart == null ? LocalDate.now() : dateStart;
+        LocalDateTime dateStartTime = dateStart.atTime(0,0,0);
         dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
+        LocalDateTime dateEndTime = dateEnd.atTime(23,59,59);
+        logger.info("Fecha Inicio: "+String.valueOf(dateStartTime));
+        logger.info("Fecha Fin: "+String.valueOf(dateEndTime));
         List<Compra> listResult;
         try {
             if (filterText == null || filterText.isEmpty()) {
                 listResult = compraRepository.findAllByEmpresa(empresa,
-                        java.sql.Date.valueOf(dateStart),
-                        java.sql.Date.valueOf(dateEnd),
+                        java.sql.Timestamp.valueOf(dateStartTime),
+                        java.sql.Timestamp.valueOf(dateEndTime),
                         pageable);
             } else {
                 listResult = compraRepository.search(empresa,
                         filterText,
-                        java.sql.Date.valueOf(dateStart),
-                        java.sql.Date.valueOf(dateEnd),
+                        java.sql.Timestamp.valueOf(dateStartTime),
+                        java.sql.Timestamp.valueOf(dateEndTime),
                         pageable);
             }
 
@@ -104,20 +113,24 @@ public class CompraServiceImpl implements CompraService {
     public List<Compra> findAll(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd, OffsetBasedPageRequest offsetBasedPageRequest) {
         String methodName = "findAll-Compra";
         logger.info("--> "+methodName);
-        dateStart = dateStart == null ? LocalDate.of(2020,1,1) : dateStart;
+        dateStart = dateStart == null ? LocalDate.now() : dateStart;
+        LocalDateTime dateStartTime = dateStart.atTime(0,0,0);
         dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
+        LocalDateTime dateEndTime = dateEnd.atTime(23,59,59);
+        logger.info("Fecha Inicio: "+java.sql.Timestamp.valueOf(dateStartTime));
+        logger.info("Fecha Fin: "+java.sql.Timestamp.valueOf(dateEndTime));
         List<Compra> listResult;
         try {
             if (filterText == null || filterText.isEmpty()) {
                 listResult = compraRepository.findAllByEmpresa(empresa,
-                        java.sql.Date.valueOf(dateStart),
-                        java.sql.Date.valueOf(dateEnd),
+                        java.sql.Timestamp.valueOf(dateStartTime),
+                        java.sql.Timestamp.valueOf(dateEndTime),
                         offsetBasedPageRequest);
             } else {
                 listResult = compraRepository.search(empresa,
                         filterText,
-                        java.sql.Date.valueOf(dateStart),
-                        java.sql.Date.valueOf(dateEnd),
+                        java.sql.Timestamp.valueOf(dateStartTime),
+                        java.sql.Timestamp.valueOf(dateEndTime),
                         offsetBasedPageRequest);
             }
 

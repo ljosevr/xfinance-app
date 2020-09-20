@@ -12,8 +12,8 @@ spring:
   # Uncomment if using PostgreSQL
   # Database
   datasource:
-    url: jdbc:postgresql://localhost:5432/tupuntodeventa
-    username: luisjose
+    url: jdbc:postgresql://localhost:5432/tu_inventario_seguro
+    username: tis
     password: 123456
     driver-class-name: org.postgresql.Driver
   hikari:
@@ -23,7 +23,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      #ddl-auto: create-drop
+#      ddl-auto: create-drop
     show-sql: false
     generate-ddl: false
     properties:
@@ -37,7 +37,8 @@ spring:
       poll-interval: 2s
       quiet-period: 1s
       additional-exclude: META-INF/VAADIN/config/**
-
+  main:
+    lazy-initialization: true
   # enable H2 web console and set url for web console
   # http://localhost:8080/console
 

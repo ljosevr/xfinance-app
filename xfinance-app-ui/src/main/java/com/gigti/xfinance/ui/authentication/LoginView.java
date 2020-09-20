@@ -12,6 +12,7 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InitBackService;
 import com.gigti.xfinance.backend.services.UsuarioService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.crud.empresa.RegistroEmpresaView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -107,9 +108,18 @@ public class LoginView extends VerticalLayout {
         btnDemo.addClickListener(evt -> openDialogDemo());
         btnDemo.getElement().setAttribute("align-self","flex-end");
 
+        Button btnRegistro = new Button("Registrar");
+        btnRegistro.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        btnRegistro.addClickListener(evt -> goToRegistroEmpresa());
+        btnRegistro.getElement().setAttribute("align-self","flex-end");
+
         subLayout.add(logo, loginLayout);
-        this.add(subLayout, btnDemo);
+        this.add(subLayout, btnRegistro);
         tfCodigoEmpresa.focus();
+    }
+
+    private void goToRegistroEmpresa() {
+        UI.getCurrent().navigate(RegistroEmpresaView.class);
     }
 
     private void openDialogDemo() {

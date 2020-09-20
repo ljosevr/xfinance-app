@@ -17,10 +17,11 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="compras")
+@Table(name="compras",
+        uniqueConstraints={@UniqueConstraint(columnNames = {"numero_factura" , "empresa_id"})})
 public class Compra extends AbstractEntity {
     @NotEmpty
-    @Column(name="numero_factura", unique = true)
+    @Column(name="numero_factura")
     private String numeroFactura;
 
     private String descripcion;

@@ -29,12 +29,43 @@ public class ProveedorServiceImpl implements ProveedorService {
     public Response save(Proveedor proveedor, Usuario usuario) {
         logger.info("--> save Proveedor: "+proveedor.toString());
         Response response = new Response();
+        boolean passValidations = true;
         try {
 
-            proveedor.setEmpresa(usuario.getPersona().getEmpresa());
-            response.setObject(proveedorRepository.save(proveedor));
-            response.setMessage("Proveedor Guardado Exitosamente");
-            response.setSuccess(true);
+            //Validar Identificacion
+            Proveedor proveedorTemp = proveedorRepository.findAllByIdentificacionAndEmpresa(proveedor.getIdentificacion(),usuario.getPersona().getEmpresa());
+
+            if(proveedorTemp != null && proveedorTemp.getId() != proveedor.getId()) {
+                response.setMessage("Identificación Ya Existe en Otro Proveedor ("+proveedorTemp.getNombre()+")");
+                response.setSuccess(false);
+                passValidations = false;
+            } else {
+                //Validar Nombre
+                proveedorTemp = proveedorRepository.findAllByNombreAndEmpresa(proveedor.getNombre(),usuario.getPersona().getEmpresa());
+
+                if(proveedorTemp != null && proveedorTemp.getId() != proveedor.getId()) {
+                    response.setMessage("Nombre Ya Existe en Otro Proveedor");
+                    response.setSuccess(false);
+                    passValidations = false;
+                } else {
+                    //Validar Email
+                    proveedorTemp = proveedorRepository.findAllByEmailAndEmpresa(proveedor.getEmail(),usuario.getPersona().getEmpresa());
+
+                    if(proveedorTemp != null && proveedorTemp.getId() != proveedor.getId()) {
+                        response.setMessage("Email Ya Existe en Otro Proveedor ("+proveedorTemp.getNombre()+")");
+                        response.setSuccess(false);
+                        passValidations = false;
+                    }
+                }
+            }
+
+            if(passValidations) {
+                proveedor.setEmpresa(usuario.getPersona().getEmpresa());
+                response.setObject(proveedorRepository.save(proveedor));
+                response.setMessage("Proveedor Guardado Exitosamente");
+                response.setSuccess(true);
+            }
+
         }catch(Exception e){
             logger.error(" Error: "+e.getMessage(), e);
             response.setSuccess(false);

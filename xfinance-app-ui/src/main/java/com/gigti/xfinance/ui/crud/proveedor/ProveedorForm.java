@@ -94,8 +94,6 @@ public class ProveedorForm extends Dialog {
                 .asRequired("Digite Email")
                 .bind(Proveedor::getEmail, Proveedor::setEmail);
 
-        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
-
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSave.addClickListener(event -> validateAndSave());

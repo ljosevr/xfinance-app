@@ -35,6 +35,9 @@ public class VentaGrid extends Grid<Venta> {
         addColumn(venta -> venta.getDescuentoFactura() != null ? AllUtils.numberFormat(venta.getDescuentoFactura()) : BigDecimal.ZERO)
                 .setHeader("Descuento");
 
+        addColumn(venta -> venta.getTotalCosto() != null ? AllUtils.numberFormat(venta.getTotalCosto()) : BigDecimal.ZERO)
+                .setHeader("Total Costo");
+
         addColumn(venta -> venta.getTotalVenta() != null ? AllUtils.numberFormat(venta.getTotalVenta()) : BigDecimal.ZERO)
                 .setHeader("Total Venta");
 

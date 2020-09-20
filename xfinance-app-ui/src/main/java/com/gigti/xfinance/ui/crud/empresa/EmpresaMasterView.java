@@ -6,6 +6,7 @@ import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.EmpresaService;
 import com.gigti.xfinance.backend.services.TipoService;
 import com.gigti.xfinance.ui.MainLayout;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
@@ -104,9 +105,14 @@ public class EmpresaMasterView extends VerticalLayout {
     private void saveEmpresa(EmpresaMasterForm.SaveEvent evt) {
         EmpresaDTO empresaDTO = evt.getEmpresaDTO();
 
-        empresaService.saveEmpresa(empresaDTO);
-        updateList();
-        closeEditor();
+        Response response = empresaService.saveEmpresa(empresaDTO);
+        if (response.isSuccess()) {
+            NotificacionesUtil.showSuccess(response.getMessage());
+            updateList();
+            closeEditor();
+        } else {
+            NotificacionesUtil.showError(response.getMessage());
+        }
     }
 
     private void deleteEmpresa(EmpresaMasterForm.DeleteEvent evt) {

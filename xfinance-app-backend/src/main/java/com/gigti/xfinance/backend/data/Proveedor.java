@@ -12,7 +12,10 @@ import java.util.Date;
 
 @Entity
 @Data
-@Table(name = "proveedores")
+@Table(name = "proveedores",
+        uniqueConstraints={@UniqueConstraint(columnNames = {"identificacion" , "empresa_id"}),
+                           @UniqueConstraint(columnNames = {"nombre_proveedor" , "empresa_id"}),
+                           @UniqueConstraint(columnNames = {"email" , "empresa_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
 public class Proveedor extends AbstractEntity {
@@ -24,12 +27,11 @@ public class Proveedor extends AbstractEntity {
 
     @NotNull(message = "No puede estar Vacio")
     @Size(min= 4)
-    @Column(unique = true)
     private String identificacion;
 
     @NotNull(message = "No puede estar Vacio")
     @Size(min= 4, message = "Longitud Minima de 4")
-    @Column(name = "nombre_proveedor", unique = true)
+    @Column(name = "nombre_proveedor")
     private String nombre;
 
     private String direccion;
@@ -52,7 +54,6 @@ public class Proveedor extends AbstractEntity {
     private String activoS;
 
     @NotNull(message = "No puede estar Vacio")
-    @Column(unique = true)
     @Email
     private String email;
 

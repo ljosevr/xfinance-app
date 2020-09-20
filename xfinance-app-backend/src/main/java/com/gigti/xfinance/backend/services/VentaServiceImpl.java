@@ -13,8 +13,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,7 +95,8 @@ public class VentaServiceImpl implements VentaService {
             venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
             venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));
             venta.setTotalVenta(BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
-            //venta.setD
+            venta.setEmpresa(usuario.getPersona().getEmpresa());
+
             ventaRepository.save(venta);
             List<VentaItem> listItems = new ArrayList<>();
 
@@ -112,7 +116,7 @@ public class VentaServiceImpl implements VentaService {
                     invActualCosto = null;
                 }
                 BigDecimal cantidad = pv.getCantidadVenta();
-                if(invActualCosto != null && !invActualCosto.isInfinite() && invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                if(invActualCosto != null && !invActualCosto.isInfinite() && invActualCosto.getCantidad().compareTo(cantidad) > 0) {
                     while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
                         VentaItem item = new VentaItem();
                         if(invActualCosto.getCantidad().compareTo(cantidad) < 0) {
@@ -262,6 +266,85 @@ public class VentaServiceImpl implements VentaService {
             logger.error("Error al eliminar ventas: "+e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    public int count(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd) {
+        String methodName = "count-Ventas";
+        logger.info("--> "+methodName);
+
+        int count;
+        dateStart = dateStart == null ? LocalDate.now() : dateStart;
+        LocalDateTime dateStartTime = dateStart.atTime(0,0,0);
+        dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
+        LocalDateTime dateEndTime = dateEnd.atTime(23,59,59);
+        logger.info("Fecha Inicio: "+java.sql.Timestamp.valueOf(dateStartTime));
+        logger.info("Fecha Fin: "+java.sql.Timestamp.valueOf(dateEndTime));
+        if(filterText == null || filterText.isEmpty()) {
+            count = ventaRepository.countAllByEmpresa(empresa,
+                    java.sql.Timestamp.valueOf(dateStartTime),
+                    java.sql.Timestamp.valueOf(dateEndTime));
+        } else  {
+            count = ventaRepository.countAllByEmpresaAndNumeroFactura(empresa,
+                    filterText,
+                    java.sql.Timestamp.valueOf(dateStartTime),
+                    java.sql.Timestamp.valueOf(dateEndTime));
+        }
+        logger.info("<-- "+methodName+" - "+count);
+        return count;
+    }
+
+    @Override
+    public List<Venta> findAll(String filterText, Empresa empresa, LocalDate dateStart, LocalDate dateEnd,
+                               OffsetBasedPageRequest offsetBasedPageRequest) {
+        String methodName = "findAll-Ventas";
+        logger.info("--> "+methodName);
+        dateStart = dateStart == null ? LocalDate.now() : dateStart;
+        LocalDateTime dateStartTime = dateStart.atTime(0,0,0);
+        dateEnd = dateEnd == null ? LocalDate.now() : dateEnd;
+        LocalDateTime dateEndTime = dateEnd.atTime(23,59,59);
+        logger.info("Fecha Inicio: "+java.sql.Timestamp.valueOf(dateStartTime));
+        logger.info("Fecha Fin: "+java.sql.Timestamp.valueOf(dateEndTime));
+        List<Venta> listResult;
+        try {
+            if (filterText == null || filterText.isEmpty()) {
+                listResult = ventaRepository.findAllByEmpresa(empresa,
+                        java.sql.Timestamp.valueOf(dateStartTime),
+                        java.sql.Timestamp.valueOf(dateEndTime),
+                        offsetBasedPageRequest);
+            } else {
+                listResult = ventaRepository.search(empresa,
+                        filterText,
+                        java.sql.Timestamp.valueOf(dateStartTime),
+                        java.sql.Timestamp.valueOf(dateEndTime),
+                        offsetBasedPageRequest);
+            }
+
+            logger.info("Cantidad de Registros: " + listResult.size());
+
+            for(Venta venta : listResult) {
+                BigDecimal total = BigDecimal.ZERO;
+                BigDecimal costo = BigDecimal.ZERO;
+                logger.info("Venta: " + venta.getNumeroFactura());
+                List<VentaItem> items = ventaItemRepository.findAllByVenta(venta);
+                logger.info( "Venta Items: " + items.size());
+                for(VentaItem item : items) {
+                    logger.info("Item: " + item.getProducto().getNombreProducto());
+                    total = total.add(item.getPrecioVenta().multiply(item.getCantidad()));
+                    costo = costo.add(item.getPrecioCosto().multiply(item.getCantidad()));
+                    item.setPrecioTotalCosto(item.getPrecioCosto().multiply(item.getCantidad()));
+                    item.setPrecioTotalVenta(item.getPrecioVenta().multiply(item.getCantidad()));
+                }
+                venta.setTotalVenta(total);
+                venta.setTotalCosto(costo);
+            }
+
+        } catch(Exception e) {
+            logger.error("Error al Obtener Registros: ");
+            listResult = new ArrayList<>();
+        }
+        logger.info("<-- "+methodName + " - "+listResult.size());
+        return listResult;
     }
 
 }

@@ -38,4 +38,10 @@ public interface ProveedorRepository extends JpaRepository<Proveedor, String> {
 
     Integer deleteAllByEmpresa(Empresa empresa);
 
+    Proveedor findAllByIdentificacionAndEmpresa(String identificacion, Empresa empresa);
+
+    Proveedor findAllByNombreAndEmpresa(String nombre, Empresa empresa);
+
+    Proveedor findAllByEmailAndEmpresa(String email, Empresa empresa);
+
 }

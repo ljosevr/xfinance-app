@@ -7,59 +7,57 @@
 package com.gigti.xfinance.ui.crud.reportes.ventas;
 
 import com.gigti.xfinance.backend.data.CompraItem;
+import com.gigti.xfinance.backend.data.VentaItem;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import org.vaadin.klaudeta.PaginatedGrid;
 
 import java.math.BigDecimal;
 
-public class CompraItemGrid extends PaginatedGrid<CompraItem> {
+public class VentaItemGrid extends PaginatedGrid<VentaItem> {
 
-    public CompraItemGrid() {
+    public VentaItemGrid() {
         setSizeFull();
         addThemeVariants(GridVariant.LUMO_ROW_STRIPES, GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_WRAP_CELL_CONTENT);
 
         addColumn(ci -> ci.getProducto().getNombreProducto())
                 .setHeader("Producto")
                 .setKey("name");
-                //.setFlexGrow(10);
 
         addColumn(ci -> ci.getProducto().getTipoMedida().getSimbolo())
                 .setHeader("Medida")
                 .setKey("med");
 
-        addColumn(CompraItem::getCantidad)
+        addColumn(VentaItem::getCantidad)
                 .setHeader("Cantidad")
                 .setKey("cantidad").setTextAlign(ColumnTextAlign.CENTER);
                 //.setFlexGrow(10);
 
         addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioTotalCosto()) : BigDecimal.ZERO)
-        //addColumn(CompraItem::getPrecioTotalCosto)
                 .setHeader("P. Costo Total")
                 .setKey("costoT")
                 .setTextAlign(ColumnTextAlign.END);
-                //.setFlexGrow(8);
 
         addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioCosto()) : BigDecimal.ZERO)
-        //addColumn(CompraItem::getPrecioCosto)
                 .setHeader("P. Costo Un")
                 .setKey("costoU")
                 .setTextAlign(ColumnTextAlign.END);
 
         addColumn(ci -> ci.getPrecioVenta() != null ? AllUtils.numberFormat(ci.getPrecioVenta()) : BigDecimal.ZERO)
-        //addColumn(CompraItem::getPrecioVenta)
                 .setHeader("P. Venta Un")
                 .setKey("ventaU").setTextAlign(ColumnTextAlign.END);
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
+        addColumn(ci -> ci.getPrecioTotalVenta() != null ? AllUtils.numberFormat(ci.getPrecioTotalVenta()) : BigDecimal.ZERO)
+                .setHeader("P. Venta Total")
+                .setKey("ventaT").setTextAlign(ColumnTextAlign.END);
+
+        this.setColumnReorderingAllowed(true);
+        this.setPageSize(Constantes.PAGE_SIZE_10);
+        this.setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
-    }
 }

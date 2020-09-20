@@ -51,12 +51,17 @@ public class BasicAccessControl implements AccessControl {
         Usuario usuario = usuarioService.login(codigoEmpresa, username, pass);
 
         if(usuario != null){
-            if(usuario.isActivo()){
-                response.setSuccess(true);
-                CurrentUser.set(usuario);
+            if(usuario.getPersona().getEmpresa().isActivo()) {
+                if (usuario.isActivo()) {
+                    response.setSuccess(true);
+                    CurrentUser.set(usuario);
+                } else {
+                    response.setSuccess(false);
+                    response.setMessage("Usuario " + usuario.getNombreUsuario() + " NO ACTIVO");
+                }
             } else {
                 response.setSuccess(false);
-                response.setMessage("Usuario "+ usuario.getNombreUsuario() +" NO ACTIVO");
+                response.setMessage("Empresa: " + usuario.getPersona().getEmpresa().getNombreEmpresa() + " NO ACTIVA");
             }
         } else {
             response.setSuccess(false);

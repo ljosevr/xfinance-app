@@ -14,7 +14,7 @@ public interface EmpresaService {
 
     Response deleteEmpresa(String id);
 
-    EmpresaDTO saveEmpresa(EmpresaDTO empresa);
+    Response saveEmpresa(EmpresaDTO empresa);
 
     EmpresaDTO findById(String id);
 

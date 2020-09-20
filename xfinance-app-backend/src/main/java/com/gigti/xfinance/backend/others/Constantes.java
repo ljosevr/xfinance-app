@@ -60,7 +60,7 @@ public class Constantes {
     public static final String VIEW_R_CONFIG_PERFIL = "perfil";
     public static final String VIEW_R_CONFIG_EMPRESA = "dataEmpresa";
     public static final String VIEW_R_CONFIG_PASSWORD = "changePass";
-
+    public static final String VIEW_R_REGISTRO = "registro";
 
     //VIEW-NAME
     public static final String VIEW_MAIN = "Tu Inventario Seguro";
@@ -101,6 +101,8 @@ public class Constantes {
 
     public static final String VIEW_RECOVER_PASS = "Recuperar Password";
 
+    public static final String VIEW_REGISTRO_EMPRESA = "Registrar Empresa";
+
     //Paginador
     public static final int PAGE_SIZE_10 = 10;
     public static final int PAGE_SIZE_20 = 20;
@@ -124,4 +126,5 @@ public class Constantes {
     public static final String DELETE_CATEGORIA = "Eliminar Categoria";
     public static final String CREATE_INV_INICIAL = "Crear Inventario Inicial";
     public static final String EDIT_INV_INICIAL = "Editar Inventario Inicial";
+    public static final String VIEW_VENTA = "Detalle Venta";
 }

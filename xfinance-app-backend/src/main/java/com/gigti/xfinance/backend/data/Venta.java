@@ -9,6 +9,7 @@ package com.gigti.xfinance.backend.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -21,14 +22,15 @@ import java.util.List;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="ventas")
+@Table(name="ventas",
+        uniqueConstraints={@UniqueConstraint(columnNames = {"numero_factura" , "empresa_id"})})
 public class Venta extends AbstractEntity {
 
     @NotEmpty
-    @Column(name="numero_factura",unique = true)
+    @Column(name="numero_factura")
     private String numeroFactura;
 
-    @Column(name="numero_factura_interno", unique = true, updatable = false, nullable = false)
+    @Column(name="numero_factura_interno",  updatable = false, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long numeroFacturaInterno;
 
@@ -50,7 +52,15 @@ public class Venta extends AbstractEntity {
     @Transient
     private BigDecimal totalVenta;
 
+    @Transient
+    private BigDecimal totalCosto;
+
     private BigDecimal descuentoFactura;
+
+    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Empresa empresa;
 
     public Venta(String numeroFactura, long numeroFacturaInterno, String descripcion, Date fechaCreacion, Usuario usuario) {
         this.numeroFactura = numeroFactura;

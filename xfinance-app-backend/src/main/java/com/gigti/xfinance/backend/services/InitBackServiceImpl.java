@@ -5,6 +5,7 @@ import com.gigti.xfinance.backend.data.dto.EmpresaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoEmpresaEnum;
 import com.gigti.xfinance.backend.data.enums.TipoUsuarioEnum;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.apache.commons.lang3.StringUtils;
@@ -392,9 +393,11 @@ public class InitBackServiceImpl implements InitBackService {
             empresa.setTipoEmpresa(TipoEmpresaEnum.DEMO);
             empresa.setDireccion("Wakanda");
             empresa.setIdentificacion("800900700600");
-            empresa = empresaService.saveEmpresa(empresa);
 
-            if(empresa != null){
+            Response responseEmpresa = empresaService.saveEmpresa(empresa);
+
+            if(responseEmpresa.isSuccess()){
+                empresa = (EmpresaDTO) responseEmpresa.getObject();
                 logger.info("Empresa DEMO Creada");
                 usuarioDemo = usuarioService.findByName("demo");
                 //Crear Productos
