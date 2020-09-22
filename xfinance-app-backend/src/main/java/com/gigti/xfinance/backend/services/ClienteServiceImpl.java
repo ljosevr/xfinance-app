@@ -7,6 +7,7 @@ import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.repositories.ClienteRepository;
 import com.gigti.xfinance.backend.repositories.PersonaRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,17 +37,21 @@ public class ClienteServiceImpl implements ClienteService{
         try{
             cliente.getPersona().setEmpresa(cliente.getPersona().getEmpresa());
 
-            Persona persona = personaRepository.findByIdentificacion(cliente.getPersona().getIdentificacion());
+            Persona persona = personaRepository.findByIdentificacionAndEmpresa(cliente.getPersona().getIdentificacion(), cliente.getPersona().getEmpresa());
 
             if(persona != null) {
                 logger.info("Persona found");
-
-                //Validar Email
-                if (validarEmailCliente(cliente, response)) {
+                if(persona.getId().equals(cliente.getPersona().getId())) {
+                    //Validar Email
+                    if (validarEmailCliente(cliente, response)) {
+                       return response;
+                    }
+                    cliente.getPersona().setId(persona.getId());
+                } else {
+                    response.setSuccess(false);
+                    response.setMessage("Identificación del Cliente Ya existe");
                     return response;
                 }
-
-                cliente.getPersona().setId(persona.getId());
             } else {
                 //Validar Email
                 if (validarEmailCliente(cliente, response)) {
@@ -72,12 +77,14 @@ public class ClienteServiceImpl implements ClienteService{
     }
 
     private boolean validarEmailCliente(Cliente cliente, Response response) {
-        Cliente c = clienteRepository.findByEmail(cliente.getEmail());
-        if (c != null) {
-            if(!c.getPersona().getIdentificacion().equalsIgnoreCase(cliente.getPersona().getIdentificacion())) {
-                response.setSuccess(false);
-                response.setMessage("Email Ya se encuentra Registrado en Otro Cliente");
-                return true;
+        if(StringUtils.isNoneBlank(cliente.getEmail())) {
+            Cliente c = clienteRepository.findByEmailAndEmpresa(cliente.getEmail(), cliente.getPersona().getEmpresa());
+            if (c != null) {
+                if (!c.getPersona().getIdentificacion().equalsIgnoreCase(cliente.getPersona().getIdentificacion())) {
+                    response.setSuccess(false);
+                    response.setMessage("Email Ya se encuentra Registrado en Otro Cliente");
+                    return true;
+                }
             }
         }
         return false;

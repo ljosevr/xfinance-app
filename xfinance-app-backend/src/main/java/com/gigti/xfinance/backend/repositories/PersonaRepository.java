@@ -22,7 +22,7 @@ public interface PersonaRepository extends JpaRepository<Persona, String> {
 
     List<Persona> findByPrimerNombreContaining(String lastName);
 
-    Persona findByIdentificacion(String identification);
+    Persona findByIdentificacionAndEmpresa(String identification, Empresa empresa);
 
     boolean existsByIdentificacionAndTipoIde(String identificacion, TipoIde tipoIde);
 

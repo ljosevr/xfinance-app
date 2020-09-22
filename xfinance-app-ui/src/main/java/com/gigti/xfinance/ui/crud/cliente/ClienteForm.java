@@ -21,12 +21,14 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.shared.Registration;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 public class ClienteForm extends Dialog {
     private final H2 titleForm;
     private final ComboBox<TipoIde> cbTipoIde;
+    private final Button btnDelete;
     private Button btnSave;
     private final Binder<Cliente> binder;
 
@@ -77,7 +79,7 @@ public class ClienteForm extends Dialog {
         tfTelefono.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
         EmailField tfEmail = new EmailField("Email");
-        tfEmail.setClearButtonVisible(true);
+        tfEmail.setClearButtonVisible(false);
         tfEmail.setErrorMessage("Agregue un Email Valido");
         tfEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
@@ -92,11 +94,8 @@ public class ClienteForm extends Dialog {
         binder.bind(tfDireccion, "persona.direccion");
         binder.bind(tfTelefono, "persona.telefono");
         binder.forField(tfEmail)
-                .withValidator(new EmailValidator("Ingresa un Email Valido"))
-                .asRequired("Digite Email")
+                //.withValidator(email -> StringUtils.isNoneBlank(email) ? new EmailValidator("Ingresa un Email Valido") : true)
                 .bind(Cliente::getEmail, Cliente::setEmail);
-
-        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -108,7 +107,7 @@ public class ClienteForm extends Dialog {
         btnClose.addClickListener(event -> fireEvent(new ClienteForm.CloseEvent(this)));
         btnClose.addClickShortcut(Key.ESCAPE);
 
-        Button btnDelete = new Button("Eliminar");
+        btnDelete = new Button("Eliminar");
         btnDelete.addThemeVariants(ButtonVariant.LUMO_ERROR);
         btnDelete.addClickListener(event -> fireEvent(new ClienteForm.DeleteEvent(this, binder.getBean())));
 
@@ -139,6 +138,8 @@ public class ClienteForm extends Dialog {
         binder.setBean(cliente);
         titleForm.setText(title);
         cbTipoIde.focus();
+        if(cliente != null)
+            btnDelete.setEnabled(cliente.getId() != null);
     }
 
     // Events

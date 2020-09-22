@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Repository
@@ -40,7 +41,10 @@ public interface ClienteRepository extends JpaRepository<Cliente, String> {
     int countAllByEmpresa(Empresa empresa);
 
 
-    Cliente findByEmail(String email);
+    @Query("SELECT c FROM Cliente c " +
+            "WHERE c.persona.empresa =:empresa AND " +
+            "c.email =:email")
+    Cliente findByEmailAndEmpresa(String email, Empresa empresa);
 
     @Modifying
     @Query("DELETE FROM Cliente c WHERE c.persona IN (SELECT p FROM Persona p WHERE p.empresa =:empresa)")

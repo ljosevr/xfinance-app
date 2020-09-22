@@ -90,7 +90,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 return response;
             }
             Usuario usuario = ConvertUsuario.convertDtoToEntity(usuarioDTO);
-            Persona persona = personaRepository.findByIdentificacion(usuario.getPersona().getIdentificacion());
+            Persona persona = personaRepository.findByIdentificacionAndEmpresa(usuario.getPersona().getIdentificacion(), usuarioDTO.getEmpresa());
 
             if(persona != null) {
                 logger.info("persona found");

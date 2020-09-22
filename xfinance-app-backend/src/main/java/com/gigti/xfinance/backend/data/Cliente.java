@@ -20,8 +20,6 @@ public class Cliente extends AbstractEntity {
     @JoinColumn
     private Persona persona;
 
-    @NotNull(message = "No puede estar Vacio")
-    @Column(unique = true)
     @Email
     private String email;
 
