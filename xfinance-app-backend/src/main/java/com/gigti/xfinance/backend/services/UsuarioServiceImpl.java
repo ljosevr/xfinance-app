@@ -50,13 +50,8 @@ public class UsuarioServiceImpl implements UsuarioService {
                 Usuario usuario = usuarioRepository.findByNombreUsuarioAndEmpresa(nombreUsuario, empresa);
                 if (usuario != null) {
                     logger.info("Usuario existe: "+usuario.getNombreUsuario());
-                    //TODO
-                    //if(passwordEncoder.encode(password).equals(passwordEncoder.encode(usuario.getPasswordUsuario()))){
                     if (password.equals(usuario.getPasswordUsuario())) {
                         logger.info("Concuerda Password");
-                        //Ejecutar parches de initBackend - De Compañia
-                        //logger.debug("Iniciando App Backend");
-                        //logger.debug("Finalizando App Backend");
                         return usuario;
                     } else {
                         return null;

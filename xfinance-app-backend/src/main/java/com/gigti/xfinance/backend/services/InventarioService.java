@@ -18,7 +18,7 @@ public interface InventarioService {
     Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
 
     /**
-     * Metodo para buscar todo el Inventario Actual de los productos
+     * Metodo para buscar el Inventario Actual de los productos
      * @param filterText
      * @param empresa
      * @param page
