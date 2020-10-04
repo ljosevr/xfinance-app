@@ -9,9 +9,9 @@ vaadin:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
-    username: ${RDS_USERNAME}
-    password: ${RDS_PASSWORD}
+    url: jdbc:postgresql://tisdbinstance.caagrb8qixzc.us-east-2.rds.amazonaws.com:5432/ebdb
+    username: ljosevr
+    password: tis12020
     driver-class-name: org.postgresql.Driver
 #  hikari:
 #    connectionTimeout: 20000
