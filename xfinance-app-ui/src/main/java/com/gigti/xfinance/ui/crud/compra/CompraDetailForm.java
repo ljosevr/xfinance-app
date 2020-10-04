@@ -38,6 +38,7 @@ import com.vaadin.flow.shared.Registration;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 @PreserveOnRefresh
@@ -436,7 +437,7 @@ public class CompraDetailForm extends VerticalLayout {
                 tfCostoTotal.getValue().compareTo(BigDecimal.ZERO) > 0 &&
                 tfCantidad.getValue().compareTo(BigDecimal.ZERO) > 0) {
 
-            tfCostoU.setValue(tfCostoTotal.getValue().divide(tfCantidad.getValue()).setScale(2));
+            tfCostoU.setValue(tfCostoTotal.getValue().divide(tfCantidad.getValue(), 2, RoundingMode.HALF_UP));
         }
     }
 

@@ -149,7 +149,8 @@ public class ProductoForm extends Dialog {
         chkManageInitialStock.addValueChangeListener(event -> {
             if(event.getValue()) {
                 contentSub.setVisible(true);
-                chkControlarStock.focus();
+                chkControlarStock.setValue(true);
+                tfCantidadInicial.focus();
             } else {
                 contentSub.setVisible(false);
                 btnSave.focus();
@@ -187,8 +188,6 @@ public class ProductoForm extends Dialog {
         },"Digita precio de Venta Inicial").bind(Producto::getPrecioVenta, Producto::setPrecioVenta);
         binder.forField(chkControlarStock).bind(Producto::isControlarStock, Producto::setControlarStock);
         binder.forField(chkManageInitialStock).bind(Producto::isManageInitialStock, Producto::setManageInitialStock);
-
-        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -263,8 +262,6 @@ public class ProductoForm extends Dialog {
     private void validateAndSave() {
         if (binder.validate().isOk()) {
             fireEvent(new SaveEvent(this, binder.getBean()));
-        } else {
-            NotificacionesUtil.showError("Validar Producto: "+binder.validate().getValidationErrors());
         }
     }
 

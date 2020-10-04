@@ -2,6 +2,7 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
+import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
@@ -230,8 +231,9 @@ public class InventarioServiceImpl implements InventarioService {
      * @param impuestoNombre -> Nombre del Impuesto a aplicar
      * @return -> Retorna Verdadero o Falso
      */
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre) {
+    public boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre) throws HandledException {
         String methodName = "saveProcessInventarioActualAndPrecios";
         logger.info("--> "+methodName);
         try {
@@ -273,9 +275,9 @@ public class InventarioServiceImpl implements InventarioService {
 
             movimientoRepository.save(movimiento);
 
-        }catch(Exception e){
+        }catch(HandledException e){
             logger.error(methodName  + ": "+e.getMessage(), e);
-            return false;
+            throw e;
         }
         logger.info("<-- "+methodName);
         return true;
@@ -286,7 +288,7 @@ public class InventarioServiceImpl implements InventarioService {
         return inventarioInicialRepository.findByProducto(producto);
     }
 
-    private void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean infinite, Date fecha, TipoMovimientoEnum tipoMovimiento) {
+    private void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean infinite, Date fecha, TipoMovimientoEnum tipoMovimiento) throws HandledException {
         //Inventario Actual Costo
         List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
         List<InventarioActualCosto> result = new ArrayList<>();
@@ -308,6 +310,7 @@ public class InventarioServiceImpl implements InventarioService {
         inventarioActualCostoRepository.saveAll(result);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     private void setInvActualVenta(Producto producto, boolean aumentarStock, BigDecimal cantidad, boolean infinite, Date fecha) {
         InventarioActual invActualVenta = inventarioActualRepository.findByProducto(producto);
         if(invActualVenta != null){
@@ -371,32 +374,36 @@ public class InventarioServiceImpl implements InventarioService {
         }
     }
 
-    private void setInvCosto_Venta(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean infinite, Date fecha){
+    private void setInvCosto_Venta(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean infinite, Date fecha) throws HandledException {
         InventarioActualCosto invActualCosto;
         //Ventas
         if(!infinite) {
             invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
-            if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
-                while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
-                    if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
-                        cantidad = cantidad.subtract(invActualCosto.getCantidad());
-                        invActualCosto.setCantidad(BigDecimal.ZERO);
+            if(invActualCosto != null) {
+                if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                    while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
+                        if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                            cantidad = cantidad.subtract(invActualCosto.getCantidad());
+                            invActualCosto.setCantidad(BigDecimal.ZERO);
+                            invActualCosto.setActivo(false);
+                            invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
+                        } else {
+                            invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
+                            cantidad = BigDecimal.ZERO;
+                        }
+                        invActualCosto.setFechaActualizacion(fecha);
+                        result.add(invActualCosto);
+                    }
+                } else {
+                    invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
+                    if (invActualCosto.getCantidad().compareTo(BigDecimal.ZERO) == 0) {
                         invActualCosto.setActivo(false);
-                        invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
-                    } else {
-                        invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
-                        cantidad = BigDecimal.ZERO;
                     }
                     invActualCosto.setFechaActualizacion(fecha);
                     result.add(invActualCosto);
                 }
             } else {
-                invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
-                if (invActualCosto.getCantidad().compareTo(BigDecimal.ZERO) == 0) {
-                    invActualCosto.setActivo(false);
-                }
-                invActualCosto.setFechaActualizacion(fecha);
-                result.add(invActualCosto);
+                throw new HandledException("1", "Error al encontrar Inventario");
             }
         }
     }

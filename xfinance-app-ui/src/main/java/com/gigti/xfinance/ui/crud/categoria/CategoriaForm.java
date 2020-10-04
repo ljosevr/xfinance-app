@@ -67,9 +67,6 @@ public class CategoriaForm extends Dialog {
                 CategoriaProducto::setActivo);
         binder.bindInstanceFields(this);
 
-        // enable/disable save button while editing
-        binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
-
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         btnSave.addClickListener(event -> validateAndSave());
@@ -115,8 +112,6 @@ public class CategoriaForm extends Dialog {
     private void validateAndSave() {
         if (binder.validate().isOk()) {
             fireEvent(new SaveEvent(this, binder.getBean()));
-        } else {
-            NotificacionesUtil.showError("Validar Categoria: "+binder.validate().getValidationErrors());
         }
     }
 

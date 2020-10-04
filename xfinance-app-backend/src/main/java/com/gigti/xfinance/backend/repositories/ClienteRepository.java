@@ -50,4 +50,9 @@ public interface ClienteRepository extends JpaRepository<Cliente, String> {
     @Query("DELETE FROM Cliente c WHERE c.persona IN (SELECT p FROM Persona p WHERE p.empresa =:empresa)")
     Integer deleteAllByEmpresa(Empresa empresa);
 
+    @Query("SELECT c FROM Cliente c " +
+            "WHERE c.persona.empresa =:empresa AND " +
+            "c.persona.identificacion =:identificacion")
+    Cliente findByIdentificacionAndEmpresa(String identificacion, Empresa empresa);
+
 }

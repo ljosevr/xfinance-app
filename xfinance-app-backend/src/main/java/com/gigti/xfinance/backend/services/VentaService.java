@@ -1,10 +1,8 @@
 package com.gigti.xfinance.backend.services;
 
-import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Producto;
-import com.gigti.xfinance.backend.data.Usuario;
-import com.gigti.xfinance.backend.data.Venta;
+import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
+import com.gigti.xfinance.backend.others.HandledException;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.time.LocalDate;
@@ -21,7 +19,7 @@ public interface VentaService {
 
     int count(Empresa empresa);
 
-    Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta);
+    Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente) throws HandledException;
 
     boolean deleteAllVentas(Empresa emp, List<Producto> productoList);
 

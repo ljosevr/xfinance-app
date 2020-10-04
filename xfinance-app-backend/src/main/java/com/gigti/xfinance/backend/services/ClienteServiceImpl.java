@@ -150,4 +150,9 @@ public class ClienteServiceImpl implements ClienteService{
             return false;
         }
     }
+
+    @Override
+    public Cliente findByIdentificaction(String identification, Empresa empresa) {
+        return clienteRepository.findByIdentificacionAndEmpresa(identification, empresa);
+    }
 }

@@ -11,6 +11,8 @@ import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 
+import java.math.BigDecimal;
+
 public class CompraGrid extends Grid<Compra> {
 
     public CompraGrid() {
@@ -29,7 +31,7 @@ public class CompraGrid extends Grid<Compra> {
         addColumn(compra -> AllUtils.formatDate(compra.getFechaCreacion()))
                 .setHeader("Fecha Creación");
 
-        addColumn(compra -> AllUtils.numberFormat(compra.getTotalFactura()))
+        addColumn(compra -> AllUtils.numberFormat(compra.getTotalFactura() != null ? compra.getTotalFactura() : BigDecimal.ZERO))
                 .setHeader("Total Factura");
 
         getColumns().forEach(column -> column.setAutoWidth(true));

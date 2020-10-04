@@ -31,7 +31,9 @@ public class VentaDetailForm extends Dialog {
     private final BigDecimalField bdFDescuento;
     private final BigDecimalField bdfVentaTotal;
     private final VentaItemGrid itemsGrid;
-    private final BigDecimalField bdfCostoTotal;
+    private final TextField tfClienteIdentificacion;
+    private final TextField tfClienteNombre;
+    //private final BigDecimalField bdfCostoTotal;
 
     public VentaDetailForm() {
         this.setDraggable(true);
@@ -55,11 +57,17 @@ public class VentaDetailForm extends Dialog {
         bdFDescuento = new BigDecimalField("Descuento");
         bdFDescuento.setReadOnly(true);
 
-        bdfCostoTotal = new BigDecimalField("Costo Total");
-        bdfCostoTotal.setReadOnly(true);
+//        bdfCostoTotal = new BigDecimalField("Costo Total");
+//        bdfCostoTotal.setReadOnly(true);
 
         bdfVentaTotal = new BigDecimalField("Venta Total");
         bdfVentaTotal.setReadOnly(true);
+
+        tfClienteIdentificacion = new TextField("Cliente Identificación");
+        tfClienteIdentificacion.setReadOnly(true);
+
+        tfClienteNombre = new TextField("Cliente Nombre");
+        tfClienteNombre.setReadOnly(true);
 
         VerticalLayout vlGrid = new VerticalLayout();
         itemsGrid = new VentaItemGrid();
@@ -74,7 +82,7 @@ public class VentaDetailForm extends Dialog {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnClose);
 
-        content.add(titleForm, tfFactura, dpFecha, bdFDescuento, bdfCostoTotal, bdfVentaTotal, vlGrid, actionsLayout);
+        content.add(titleForm, tfFactura, dpFecha, bdFDescuento, bdfVentaTotal, tfClienteIdentificacion, tfClienteNombre, vlGrid, actionsLayout);
 
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
         content.setColspan(vlGrid, content.getResponsiveSteps().size()+1);
@@ -100,9 +108,17 @@ public class VentaDetailForm extends Dialog {
                     .toLocalDate());
 
             bdFDescuento.setValue(venta.getDescuentoFactura());
-            bdfCostoTotal.setValue(venta.getTotalCosto());
             bdfVentaTotal.setValue(venta.getTotalVenta());
 
+            if(venta.getCliente() != null){
+                tfClienteIdentificacion.setValue(
+                        venta.getCliente().getPersona().getTipoIde().getNombre()
+                        + " - "+venta.getCliente().getPersona().getIdentificacion());
+                tfClienteNombre.setValue(venta.getCliente().getPersona().getNombreCompleto());
+            } else {
+                tfClienteNombre.setVisible(false);
+                tfClienteIdentificacion.setVisible(false);
+            }
         }
     }
 

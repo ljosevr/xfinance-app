@@ -3,8 +3,10 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
+import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,68 +82,58 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
-    @Transactional
-    public Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente) throws HandledException {
         logger.info("--> Registrar Venta");
         logger.info("--> Items Venta: "+listVenta.size());
-        try {
-            Venta venta = new Venta();
-            venta.setUsuario(usuario);
-            venta.setFechaCreacion(new Date());
-            //TODO Luego cambiar por # Factura de Dian
-            // TODO Agregar luego iniciar factura en Numero XXX definido por los usuarios
-            long cantidadFacturasxEmpresa = ventaRepository.countByUsuarioEmpresa(usuario.getPersona().getEmpresa());
-            cantidadFacturasxEmpresa++;
-            venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
-            venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));
-            venta.setTotalVenta(BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
-            venta.setEmpresa(usuario.getPersona().getEmpresa());
+        if(cliente != null)
+            logger.info("--> Cliente: "+cliente.getId() +" - "+ cliente.getPersona().getIdentificacion());
 
-            ventaRepository.save(venta);
-            List<VentaItem> listItems = new ArrayList<>();
+        Venta venta = new Venta();
+        venta.setUsuario(usuario);
+        venta.setFechaCreacion(new Date());
+        venta.setCliente(cliente);
+        //TODO Luego cambiar por # Factura de Dian
+        // TODO Agregar luego iniciar factura en Numero XXX definido por los usuarios
+        long cantidadFacturasxEmpresa = ventaRepository.countByUsuarioEmpresa(usuario.getPersona().getEmpresa());
+        cantidadFacturasxEmpresa++;
+        venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
+        venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));
+        venta.setTotalVenta(BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
+        venta.setEmpresa(usuario.getPersona().getEmpresa());
 
-            //Items Factura
-            listVenta.forEach(pv -> {
-                logger.info("Item Venta: "+pv.toString());
-                Producto producto = productoRepository.findById(pv.getIdProducto()).orElse(null);
-                List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
-                logger.info("Inventarios de Venta: "+listInvActualCosto.toString());
-                InventarioActualCosto invActualCosto;
+        ventaRepository.save(venta);
+        List<VentaItem> listItems = new ArrayList<>();
 
-                if(listInvActualCosto.size() > 1) {
-                    invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
-                } else if(listInvActualCosto.size() == 1) {
-                    invActualCosto = listInvActualCosto.get(0);
-                } else {
-                    invActualCosto = null;
-                }
-                BigDecimal cantidad = pv.getCantidadVenta();
-                if(invActualCosto != null && !invActualCosto.isInfinite() && invActualCosto.getCantidad().compareTo(cantidad) > 0) {
-                    while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
-                        VentaItem item = new VentaItem();
-                        if(invActualCosto.getCantidad().compareTo(cantidad) < 0) {
-                            cantidad = cantidad.subtract(invActualCosto.getCantidad());
-                            invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
-                        } else {
-                            item.setCantidad(cantidad);
-                            cantidad = BigDecimal.ZERO;
-                        }
+        //Items Factura
+        listVenta.forEach(pv -> {
+            logger.info("Item Venta: " + pv.toString());
+            Producto producto = productoRepository.findById(pv.getIdProducto()).orElse(null);
+            List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
+            logger.info("Inventarios de Venta: " + listInvActualCosto.toString());
+            InventarioActualCosto invActualCosto;
 
-                        item.setVenta(venta);
-                        item.setProducto(producto);
-                        item.setPrecioCosto(invActualCosto.getPrecioCosto());
-                        item.setPrecioVenta(pv.getPrecioVentaActual());
-                        //item.setDescuentoArticulo(pv.getDescuento());
-                        item.setImpuestoArticulo(pv.getImpuestoValor());
-                        item.setImpuestoNombre(pv.getImpuestoNombre());
-
-                        listItems.add(item);
-                    }
-                } else if(invActualCosto != null && invActualCosto.isInfinite()){
+            if (listInvActualCosto.size() > 1) {
+                invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
+            } else if (listInvActualCosto.size() == 1) {
+                invActualCosto = listInvActualCosto.get(0);
+            } else {
+                invActualCosto = null;
+            }
+            BigDecimal cantidad = pv.getCantidadVenta();
+            if (invActualCosto != null && !invActualCosto.isInfinite() && invActualCosto.getCantidad().compareTo(cantidad) >= 0) {
+                while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
                     VentaItem item = new VentaItem();
+                    if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                        cantidad = cantidad.subtract(invActualCosto.getCantidad());
+                        invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
+                    } else {
+                        item.setCantidad(cantidad);
+                        cantidad = BigDecimal.ZERO;
+                    }
+
                     item.setVenta(venta);
                     item.setProducto(producto);
-                    item.setCantidad(pv.getCantidadVenta());
                     item.setPrecioCosto(invActualCosto.getPrecioCosto());
                     item.setPrecioVenta(pv.getPrecioVentaActual());
                     //item.setDescuentoArticulo(pv.getDescuento());
@@ -150,26 +142,44 @@ public class VentaServiceImpl implements VentaService {
 
                     listItems.add(item);
                 }
+            } else if (invActualCosto != null && invActualCosto.isInfinite()) {
+                logger.info("Venta productos inventario infinito");
+                VentaItem item = new VentaItem();
+                item.setVenta(venta);
+                item.setProducto(producto);
+                item.setCantidad(pv.getCantidadVenta());
+                item.setPrecioCosto(invActualCosto.getPrecioCosto());
+                item.setPrecioVenta(pv.getPrecioVentaActual());
+                //item.setDescuentoArticulo(pv.getDescuento());
+                item.setImpuestoArticulo(pv.getImpuestoValor());
+                item.setImpuestoNombre(pv.getImpuestoNombre());
 
+                listItems.add(item);
+            }
+
+            try {
                 inventarioService.saveProcessInventarioActualAndPrecios(producto,
-                        false,
-                        pv.getCantidadVenta(),
-                        pv.getPrecioVentaActual(),
-                        BigDecimal.ZERO,
-                        TipoMovimientoEnum.VENTA,
-                        false,
-                        pv.isInfinite(),
-                        pv.getImpuestoValor(),
-                        pv.getImpuestoNombre());
-            });
+                            false,
+                            pv.getCantidadVenta(),
+                            pv.getPrecioVentaActual(),
+                            BigDecimal.ZERO,
+                            TipoMovimientoEnum.VENTA,
+                            false,
+                            pv.isInfinite(),
+                            pv.getImpuestoValor(),
+                            pv.getImpuestoNombre());
+            } catch (HandledException e) {
+                logger.error("Error al Procesar inventario y actualizar");
+            }
+        });
 
+        if(listItems.size() > 0) {
             ventaItemRepository.saveAll(listItems);
-            logger.info("<-- Registrar Venta");
-            return venta;
-        }catch(Exception e){
-            logger.error("Error: al generar Factura: "+e.getMessage(), e);
-            return null;
+        } else {
+            throw new HandledException("0" , "Error al registrar venta");
         }
+        logger.info("<-- Registrar Venta");
+        return venta;
     }
 
     private List<PventaDTO> getListPventaDTO(String filter, Empresa empresa, Pageable pageable){

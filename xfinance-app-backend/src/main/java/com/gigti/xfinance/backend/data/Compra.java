@@ -48,7 +48,6 @@ public class Compra extends AbstractEntity {
     @JoinColumn
     private Empresa empresa;
 
-    @Transient
     private BigDecimal totalFactura;
 
     private BigDecimal descuentoFactura;

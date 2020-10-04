@@ -22,9 +22,8 @@ public class VentaGrid extends Grid<Venta> {
         addColumn(Venta::getNumeroFactura)
                 .setHeader("#Numero");
 
-        //TODO Cliente
-//        addColumn(Venta::getDescuentoFactura)
-//                .setHeader("Descuento");
+        addColumn(venta -> venta.getCliente() != null ? venta.getCliente().getPersona().getIdentificacion() : "")
+                .setHeader("Cliente");
 
         addColumn(venta -> AllUtils.formatDate(venta.getFechaCreacion()))
                 .setHeader("Fecha");
@@ -34,9 +33,6 @@ public class VentaGrid extends Grid<Venta> {
 
         addColumn(venta -> venta.getDescuentoFactura() != null ? AllUtils.numberFormat(venta.getDescuentoFactura()) : BigDecimal.ZERO)
                 .setHeader("Descuento");
-
-        addColumn(venta -> venta.getTotalCosto() != null ? AllUtils.numberFormat(venta.getTotalCosto()) : BigDecimal.ZERO)
-                .setHeader("Total Costo");
 
         addColumn(venta -> venta.getTotalVenta() != null ? AllUtils.numberFormat(venta.getTotalVenta()) : BigDecimal.ZERO)
                 .setHeader("Total Venta");

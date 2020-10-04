@@ -3,6 +3,7 @@ package com.gigti.xfinance.backend.data;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "inventario_actual_costo")
+@ToString
 public class InventarioActualCosto extends AbstractEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
@@ -33,10 +35,11 @@ public class InventarioActualCosto extends AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActualizacion;
 
+    @ToString.Exclude
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Empresa empresa;
 
+    @ToString.Exclude
     private boolean activo;
-
 }

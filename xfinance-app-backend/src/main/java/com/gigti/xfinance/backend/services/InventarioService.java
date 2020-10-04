@@ -2,6 +2,7 @@ package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
+import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.Response;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
@@ -43,7 +44,7 @@ public interface InventarioService {
      * @param impuestoNombre -> Nombre del Impuesto a aplicar
      * @return -> Retorna Verdadero o Falso
      */
-    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre);
+    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre) throws HandledException;
 
     InventarioInicial findByProducto(Producto producto);
 

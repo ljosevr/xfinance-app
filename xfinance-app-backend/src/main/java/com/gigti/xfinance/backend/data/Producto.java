@@ -22,11 +22,14 @@ public class Producto extends AbstractEntity {
     @NotNull
     @Column(name = "nombre_producto")
     private String nombreProducto;
+    @ToString.Exclude
     @Column(name = "codigo_barra")
     private String codigoBarra;
+    @ToString.Exclude
     private String descripcion;
     @NotNull
     private boolean activo;
+    @ToString.Exclude
     @NotNull
     private boolean eliminado;
 
@@ -35,6 +38,7 @@ public class Producto extends AbstractEntity {
     @JoinColumn
     private TipoMedida tipoMedida;
 
+    @ToString.Exclude
     @Transient
     private String activoS;
 
@@ -58,18 +62,23 @@ public class Producto extends AbstractEntity {
     @JoinColumn
     private Impuesto impuesto;
 
+    @ToString.Exclude
     @Transient
     private BigDecimal cantidadInicial;
 
+    @ToString.Exclude
     @Transient
     private BigDecimal precioCosto;
 
+    @ToString.Exclude
     @Transient
     private BigDecimal precioVenta;
 
+    @ToString.Exclude
     @Transient
     private boolean controlarStock;
 
+    @ToString.Exclude
     @Transient
     private boolean manageInitialStock;
 
@@ -88,20 +97,5 @@ public class Producto extends AbstractEntity {
     public String getActivoS() {
         return isActivo() ? "SI" : "NO";
     }
-
-//    @Override
-//    public String toString() {
-//        return "Producto{" +
-//                "nombreProducto='"  + nombreProducto + '\'' +
-//                ", codigoBarra='"   + codigoBarra + '\'' +
-//                ", descripcion='"   + descripcion + '\'' +
-//                ", activo="         + activo + '\'' +
-//                ", eliminado="      + eliminado + '\'' +
-//                ", tipoMedida="     + tipoMedida.getSimbolo() + '\'' +
-//                ", activoS='"       + activoS + '\'' +
-//                ", empresa="        + empresa.getNombreEmpresa() + '\'' +
-//                ", categoria="      + categoria.getNombre() +
-//                 '}';
-//    }
 
 }

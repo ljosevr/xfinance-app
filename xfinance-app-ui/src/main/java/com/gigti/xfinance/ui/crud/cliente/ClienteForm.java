@@ -123,14 +123,11 @@ public class ClienteForm extends Dialog {
     }
 
     private void validateAndSave() {
-        binder.validate();
-        if (binder.isValid()) {
+        if (binder.validate().isOk()) {
             System.out.println("Persona: "+binder.getBean().toString());
             Cliente cliente = binder.getBean();
             System.out.println("Cliente: "+cliente.toString());
             fireEvent(new ClienteForm.SaveEvent(this, cliente));
-        } else {
-            NotificacionesUtil.showError("Validar Cliente: "+binder.validate().getValidationErrors());
         }
     }
 

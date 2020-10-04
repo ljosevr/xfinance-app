@@ -1,18 +1,27 @@
 package com.gigti.xfinance.ui.crud.pventa;
 
+import com.gigti.xfinance.backend.data.Cliente;
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.Venta;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.HandledException;
+import com.gigti.xfinance.backend.others.Response;
+import com.gigti.xfinance.backend.services.ClienteService;
+import com.gigti.xfinance.backend.services.TipoService;
 import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
+import com.gigti.xfinance.ui.crud.cliente.ClienteForm;
 import com.gigti.xfinance.ui.util.AllUtils;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
+import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.*;
@@ -20,6 +29,8 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.progressbar.ProgressBar;
+import com.vaadin.flow.component.progressbar.ProgressBarVariant;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
@@ -27,6 +38,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
+import org.jsoup.internal.StringUtil;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -49,13 +61,16 @@ public class PventaView extends VerticalLayout {
     private TextField filter;
     private Button btnDelete;
     private Button btnSave;
-    //private ComboBox<TipoBusquedaEnum> cbTipoBusqueda;
     private final Empresa empresa;
     private Grid<PventaDTO> gridPro;
     private VerticalLayout gridProLayout;
+    private Cliente cliente;
+    private ClienteService clienteService;
+    private final ClienteForm clienteForm;
 
-    public PventaView(VentaService ventaService) {
+    public PventaView(VentaService ventaService, ClienteService clienteService, TipoService tipoService) {
         this.ventaService = ventaService;
+        this.clienteService = clienteService;
         empresa = CurrentUser.get() != null ? CurrentUser.get().getPersona().getEmpresa() : null;
         addClassName("PventaView");
         setSizeFull();
@@ -67,6 +82,10 @@ public class PventaView extends VerticalLayout {
         H1 title = new H1(Constantes.VIEW_REGISTRAR.toUpperCase());
         title.addClassName("titleView2");
         this.add(title);
+
+        clienteForm = new ClienteForm(tipoService.getTiposIdentificacion());
+        clienteForm.addListener(ClienteForm.SaveEvent.class, this::saveClient);
+        clienteForm.addListener(ClienteForm.CloseEvent.class, e -> closeEditorClient());
 
         configureTopBar();
         configureDataLayout();
@@ -95,6 +114,28 @@ public class PventaView extends VerticalLayout {
         add(divLayout);
     }
 
+    public void saveClient(ComponentEvent event) {
+        Cliente clienteTemp = ((ClienteForm.SaveEvent) event).getCliente();
+        clienteTemp.getPersona().setEmpresa(empresa);
+        Response response = clienteService.save(clienteTemp, CurrentUser.get());
+        if(response.isSuccess()){
+            cliente = (Cliente) response.getObject();
+            NotificacionesUtil.showSuccess(response.getMessage());
+            closeEditorClient();
+            if(!mapItemsventa.isEmpty()) {
+                saveSell(mapItemsventa.values(), false);
+            }
+        } else {
+            NotificacionesUtil.showError(response.getMessage());
+        }
+    }
+
+    public void closeEditorClient() {
+        clienteForm.setCliente(null, "");
+        clienteForm.close();
+        btnSave.focus();
+    }
+
     private void configureTopBar() {
 
         VerticalLayout topBarLayout = new VerticalLayout();
@@ -120,17 +161,25 @@ public class PventaView extends VerticalLayout {
         btnSearch.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnSearch.setVisible(true);
         btnSearch.addClickShortcut(Key.F4);
+        btnSearch.getElement().setAttribute("title","Agregar Cliente - F4");
         btnSearch.addClickListener(click -> search());
         btnSearch.setMaxWidth("60px");
 
-        topFormLayout.add(filter, btnSearch);
+        Button btnClient = new Button("Cliente", new Icon(VaadinIcon.USER));
+        btnClient.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
+        btnClient.setVisible(true);
+        btnClient.addClickShortcut(Key.F7);
+        btnClient.getElement().setAttribute("title","Agregar Cliente - F7");
+        btnClient.addClickListener(click -> dialogCliente(null, true));
+        btnClient.setMaxWidth("120px");
 
+        topFormLayout.add(filter, btnSearch, btnClient);
 
         filter.focus();
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
-        btnSave.addClickListener(listener -> saveSell(mapItemsventa.values()));
+        btnSave.addClickListener(listener -> validateSave(mapItemsventa.values(), false));
         btnSave.setEnabled(false);
 
         btnDelete = new Button("Borrar Item");
@@ -146,6 +195,8 @@ public class PventaView extends VerticalLayout {
         topBarLayout.add(new HorizontalLayout(btnSave, btnDelete, btnCancel));
         this.add(topBarLayout);
     }
+
+
 
     private void search() {
 
@@ -256,15 +307,130 @@ public class PventaView extends VerticalLayout {
     }
 
 
-    private void saveSell(Collection<PventaDTO> items) {
-        Venta venta = ventaService.registrarVenta(CurrentUser.get(), new ArrayList<>(items));
-        if (venta == null) {
-            NotificacionesUtil.showError("Error al generar factura");
+    private void validateSave(Collection<PventaDTO> items, boolean sourceClient) {
+        if(cliente == null) {
+            dialogCliente(items, sourceClient);
         } else {
-            NotificacionesUtil.showSuccess("Factura Generada: " + venta.getNumeroFactura());
-            clearAll();
+            saveSell(mapItemsventa.values(),false);
         }
     }
+
+    private void dialogCliente(Collection<PventaDTO> items, boolean sourceClient) {
+
+        //Preguntar Cliente
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.addThemeVariants(ProgressBarVariant.LUMO_SUCCESS);
+        progressBar.setVisible(false);
+        Dialog dialogProgress = new Dialog();
+        TextField tfCliente = new TextField("Buscar Cliente");
+        dialogProgress.add(tfCliente);
+        tfCliente.focus();
+
+        Button btnSi = new Button("SI");
+        btnSi.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+        //btnSi.addClickShortcut(Key.ENTER);
+        btnSi.focus();
+
+        Button btnNO = new Button("NO");
+        btnNO.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+        btnNO.addClickShortcut(Key.ESCAPE);
+        dialogProgress.add(new HorizontalLayout(btnSi, btnNO));
+        dialogProgress.add(progressBar);
+        dialogProgress.setCloseOnEsc(true);
+        dialogProgress.setCloseOnOutsideClick(true);
+        dialogProgress.open();
+
+        //Vender sin cliente
+        btnNO.addClickListener(buttonClickEvent -> {
+            dialogProgress.close();
+            if(items != null && !items.isEmpty()) {
+                saveSell(items, sourceClient);
+            }
+        });
+
+        //Vender CON cliente
+        btnSi.addClickListener(buttonClickEvent -> {
+            if(tfCliente.getValue().isBlank()) {
+                NotificacionesUtil.showError("Digite Identificación del Cliente");
+            } else {
+                progressBar.setVisible(true);
+                cliente = clienteService.findByIdentificaction(tfCliente.getValue(), empresa);
+                progressBar.setVisible(false);
+                btnSi.setVisible(false);
+                btnNO.setVisible(false);
+
+                Button btnSi2 = new Button("SI");
+                btnSi2.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+                btnSi2.focus();
+
+                Button btnNO2 = new Button("NO");
+                btnNO2.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+                //btnNO2.addClickShortcut(Key.ESCAPE);
+
+                if(cliente != null) {
+                    tfCliente.setVisible(false);
+                    VerticalLayout vlData = new VerticalLayout();
+                    vlData.add(new Label(cliente.getPersona().getTipoIde().getNombre()+": "+cliente.getPersona().getIdentificacion()));
+                    vlData.add(new Label(cliente.getPersona().getNombreCompleto()));
+                    vlData.add("---------");
+                    vlData.add(new Label("Cliente Encontrado, ¿Desea Continuar con la venta?"));
+                    vlData.add(new HorizontalLayout(btnSi2, btnNO2));
+                    dialogProgress.add(vlData);
+                    btnSi2.addClickListener(buttonClickEvent1 -> {
+                        dialogProgress.close();
+                        saveSell(items, sourceClient);
+                    });
+                    btnNO2.addClickListener(buttonClickEvent1 -> {
+                        cliente = null; dialogProgress.close();
+                    });
+                } else {
+                    tfCliente.setVisible(false);
+                    VerticalLayout vlData = new VerticalLayout();
+                    vlData.add(new Label("¿Cliente no Existe, Desea Crearlo?"));
+
+                    btnSi2.addClickListener(buttonClickEvent1 -> {
+                        dialogProgress.close();
+                        showClientForm(tfCliente.getValue());
+                    });
+                    btnNO2.addClickListener(buttonClickEvent1 -> dialogProgress.close());
+
+                    vlData.add(new HorizontalLayout(btnSi2, btnNO2));
+                    dialogProgress.add(vlData);
+                }
+            }
+
+        });
+    }
+
+    private void showClientForm(String identificacion) {
+
+        Cliente c = new Cliente();
+        c.setPersona(new Persona());
+        c.getPersona().setIdentificacion(identificacion);
+        if(cliente == null){
+             clienteForm.setCliente(c, Constantes.CREATE_CLIENT);
+        }
+        clienteForm.setVisible(true);
+        clienteForm.open();
+    }
+
+    private void saveSell(Collection<PventaDTO> items, boolean sourceCliente) {
+        if(!sourceCliente) {
+            try {
+                Venta venta = ventaService.registrarVenta(CurrentUser.get(), new ArrayList<>(items), cliente);
+                if (venta == null) {
+                    NotificacionesUtil.showError("Error al generar factura");
+                } else {
+                    NotificacionesUtil.showSuccess("Factura Generada: " + venta.getNumeroFactura());
+                    clearAll();
+                }
+            } catch(HandledException e) {
+                NotificacionesUtil.showError(e.getCode() + " - "+e.getMessage());
+            }
+        }
+    }
+
 
     private void deleteItemFromGrid() {
         Set<PventaDTO> selected = grid.getSelectionModel().getSelectedItems();
@@ -403,6 +569,7 @@ public class PventaView extends VerticalLayout {
         lblImpuesto.setText(String.format("Impuestos: %s", AllUtils.numberFormat(BigDecimal.ZERO)));
         filter.setValue("");
         filter.focus();
+        cliente = null;
     }
 
     private void clearFormData(){

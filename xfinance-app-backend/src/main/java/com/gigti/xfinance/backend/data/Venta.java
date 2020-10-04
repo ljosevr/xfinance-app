@@ -62,6 +62,10 @@ public class Venta extends AbstractEntity {
     @JoinColumn
     private Empresa empresa;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn
+    private Cliente cliente;
+
     public Venta(String numeroFactura, long numeroFacturaInterno, String descripcion, Date fechaCreacion, Usuario usuario) {
         this.numeroFactura = numeroFactura;
         this.numeroFacturaInterno = numeroFacturaInterno;

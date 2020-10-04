@@ -36,21 +36,11 @@ public class VentaItemGrid extends PaginatedGrid<VentaItem> {
                 .setKey("cantidad").setTextAlign(ColumnTextAlign.CENTER);
                 //.setFlexGrow(10);
 
-        addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioTotalCosto()) : BigDecimal.ZERO)
-                .setHeader("P. Costo Total")
-                .setKey("costoT")
-                .setTextAlign(ColumnTextAlign.END);
-
-        addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioCosto()) : BigDecimal.ZERO)
-                .setHeader("P. Costo Un")
-                .setKey("costoU")
-                .setTextAlign(ColumnTextAlign.END);
-
         addColumn(ci -> ci.getPrecioVenta() != null ? AllUtils.numberFormat(ci.getPrecioVenta()) : BigDecimal.ZERO)
                 .setHeader("P. Venta Un")
                 .setKey("ventaU").setTextAlign(ColumnTextAlign.END);
 
-        addColumn(ci -> ci.getPrecioTotalVenta() != null ? AllUtils.numberFormat(ci.getPrecioTotalVenta()) : BigDecimal.ZERO)
+        addColumn(ci -> ci.getPrecioVenta() != null ? AllUtils.numberFormat(ci.getPrecioVenta().multiply(ci.getCantidad())) : BigDecimal.ZERO)
                 .setHeader("P. Venta Total")
                 .setKey("ventaT").setTextAlign(ColumnTextAlign.END);
 

@@ -6,6 +6,7 @@
 
 package com.gigti.xfinance.backend.data;
 
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.GeneratedValue;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @MappedSuperclass
+@ToString
 public abstract class AbstractEntity implements Serializable {
 
 	@Id

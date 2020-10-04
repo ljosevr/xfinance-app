@@ -122,8 +122,6 @@ public class ProveedorForm extends Dialog {
     private void validateAndSave() {
         if (binder.validate().isOk()) {
             fireEvent(new ProveedorForm.SaveEvent(this, binder.getBean()));
-        } else {
-            NotificacionesUtil.showError("Validar Proveedor: "+binder.validate().getValidationErrors());
         }
     }
 
