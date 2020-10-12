@@ -32,7 +32,14 @@ public interface RolRepository extends JpaRepository<Rol, String> {
 //            "r.eliminado = false AND "+
 //            "r.porDefecto =: porDefecto AND "+
 //            "r.nombre != " + "ROOT" );
-    List<Rol> findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(Empresa empresa, boolean porDefecto, String nombreNot);
+    List<Rol> findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(Empresa empresa, boolean porDefecto, String nombre);
+
+        @Query("SELECT r FROM Rol  r " +
+            "WHERE r.empresa IS NULL AND " +
+            "r.eliminado = false AND "+
+            "r.porDefecto = TRUE AND "+
+            "r.nombre <>:nombre")
+    List<Rol> findAllRolByDefault(String nombre);
 
     Integer deleteAllByEmpresa(Empresa empresa);
 }

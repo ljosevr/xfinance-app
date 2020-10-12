@@ -34,7 +34,14 @@ public class TipoServiceImpl implements  TipoService{
 
     @Override
     public List<TipoMedida> findAllTiposMedidas(Empresa empresa) {
-        return tipoMedidaRepository.findAllByEmpresa(empresa);
+        logger.info("--> findAllTiposMedidas");
+        logger.info("Empresa: "+ (empresa != null ? empresa.getNombreEmpresa() : "Empresa Default"));
+
+        List<TipoMedida> result = tipoMedidaRepository.findAllByEmpresa(empresa);
+        logger.info("cantidad retorno: "+result.size());
+
+        logger.info("<-- findAllTiposMedidas");
+        return result;
     }
 
     @Override

@@ -11,7 +11,8 @@ import javax.validation.constraints.Size;
 
 @Data
 @Entity
-@Table(name = "tipos_medidas")
+@Table(name = "tipos_medidas",
+        uniqueConstraints={@UniqueConstraint(columnNames = {"nombre" , "simbolo", "eliminado", "empresa_id"})})
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString

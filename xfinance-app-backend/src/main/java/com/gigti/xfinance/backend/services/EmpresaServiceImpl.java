@@ -154,191 +154,6 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Transactional
-    public Response saveEmpresa2(EmpresaDTO empresa) {
-        final String methodName = "saveEmpresa";
-        logger.info("--> "+methodName);
-        Response result = new Response();
-        try{
-            Empresa empresaEnt;
-            boolean isNew = false;
-            if(StringUtils.isNotBlank(empresa.getEmpresaId())) {
-                Optional<Empresa> optionalEmpresa = empresaRepository.findById(empresa.getEmpresaId());
-
-                if(optionalEmpresa.isPresent()) {
-                    empresaEnt = ConvertEmpresa.convertDtoToEntity(empresa);
-                } else {
-                    empresaEnt = new Empresa();
-                    isNew = true;
-                }
-            } else {
-                empresaEnt = new Empresa();
-                isNew = true;
-            }
-
-            if(isNew) {
-                empresaEnt = ConvertEmpresa.convertDtoToEntity(empresa);
-                if (empresaEnt.getFechaActivacion() == null) {
-                    empresaEnt.setFechaActivacion(new Date());
-                }
-                if (empresaEnt.getTipoEmpresa() == null) {
-                    empresaEnt.setTipoEmpresa(TipoEmpresaEnum.NORMAL);
-                }
-                if (empresaEnt.getTipoIde() == null) {
-                    empresaEnt.setTipoIde(TipoIde.NIT);
-                }
-            }
-            logger.info(empresaEnt.toString());
-            Empresa empresaTemp = empresaRepository.findByNombreEmpresa(empresaEnt.getNombreEmpresa());
-            if((empresaTemp == null && isNew) || (empresaTemp != null && !isNew)) {
-                empresaTemp = empresaRepository.findByCodigoEmpresa(empresaEnt.getCodigoEmpresa());
-                if(empresaTemp == null) {
-                    empresaEnt = empresaRepository.save(empresaEnt);
-
-                    empresa.setEmpresaId(empresaEnt.getId());
-                    empresa.setFechaActivacion(empresaEnt.getFechaActivacion());
-
-                    //Copiar Roles a Empresa
-                    if (isNew) {
-                        List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(null, true, "ROOT");
-
-                        List<Rol> listaRolesDestino = new ArrayList<>();
-                        Empresa finalEmpresaEnt = empresaEnt;
-                        listaRolesOrigen.forEach(r -> {
-                            Rol rol = new Rol();
-                            rol.setFechaActivacion(new Date());
-                            rol.setEmpresa(finalEmpresaEnt);
-                            rol.setPorDefecto(r.isPorDefecto());
-                            rol.setEliminado(r.isEliminado());
-                            rol.setDescripcion(r.getDescripcion());
-                            rol.setNombre(r.getNombre());
-                            Set<Vista> newVistas = new HashSet<>(r.getVistas());
-                            rol.setVistas(newVistas);
-
-                            listaRolesDestino.add(rol);
-                        });
-
-                        rolRepository.saveAll(listaRolesDestino);
-                    }
-
-                    Usuario usuarioAdmin;
-                    if (StringUtils.isNotBlank(empresa.getUsuarioId())) {
-                        Optional<Usuario> optionalUsuario = usuarioRepository.findById(empresa.getUsuarioId());
-                        if (optionalUsuario.isPresent()) {
-                            usuarioAdmin = optionalUsuario.get();
-                        } else {
-                            isNew = true;
-                            usuarioAdmin = new Usuario();
-                        }
-                    } else {
-                        isNew = true;
-                        usuarioAdmin = new Usuario();
-                    }
-                    if (isNew) {
-                        //TODO crear metodo crear Password Aleatorio y Encriptar y Luego enviar por Email
-                        usuarioAdmin.setPasswordUsuario(UtilsBackend.encrytPass("123456"));
-                        usuarioAdmin.setAdminDefecto(true);
-
-                        Rol rolAdmin = rolRepository.findByNombreAndEmpresaAndEliminado(Rol.ADMIN.getNombre(), empresaEnt, false);
-                        usuarioAdmin.setRol(rolAdmin);
-                        usuarioAdmin.setTipoUsuario(TipoUsuarioEnum.ADMIN);
-                        usuarioAdmin.setActivo(empresa.isActivo());
-                    }
-
-                    usuarioAdmin.setActivo(empresa.isActivo());
-                    usuarioAdmin.setNombreUsuario(empresa.getUsuarioNombre());
-
-                    Persona persona;
-                    //TODO Falta setear PersonaId
-                    if (StringUtils.isNotBlank(empresa.getPersonaId())) {
-                        Optional<Persona> optionalPersona = personaRepository.findById(empresa.getPersonaId());
-                        if (optionalPersona.isPresent()) {
-                            persona = optionalPersona.get();
-                        } else {
-                            isNew = true;
-                            persona = new Persona();
-                        }
-                    } else {
-                        isNew = true;
-                        persona = new Persona();
-                    }
-
-                    persona.setTipoIde(empresa.getTipoIdePersona());
-                    persona.setIdentificacion(empresa.getIdentificacionPersona());
-                    persona.setPrimerNombre(empresa.getPrimerNombrePersona());
-                    persona.setSegundoNombre(empresa.getSegundoNombrePersona());
-                    persona.setPrimerApellido(empresa.getPrimerApellidoPersona());
-                    persona.setSegundoApellido(empresa.getSegundoApellidoPersona());
-                    persona.setEmpresa(empresaEnt);
-                    persona.setTelefono(empresa.getTelefonoPersona());
-                    persona.setDireccion(empresa.getDireccionPersona());
-
-                    persona = personaRepository.save(persona);
-
-                    usuarioAdmin.setPersona(persona);
-                    usuarioAdmin.setEmail(empresa.getEmailPersona());
-
-                    usuarioAdmin = usuarioRepository.save(usuarioAdmin);
-
-                    empresa.setUsuarioId(usuarioAdmin.getId());
-
-                    if (isNew) {
-                        //Categoria de Productos
-                        CategoriaProducto categoria = new CategoriaProducto();
-                        categoria.setActivo(true);
-                        categoria.setDescripcion("Categoria x Defecto");
-                        categoria.setEliminado(false);
-                        categoria.setEmpresa(empresaEnt);
-                        categoria.setNombre("Normal");
-
-                        categoriaProductoRepository.save(categoria);
-
-                        //Impuestos
-                        List<Impuesto> listImpuestos = new ArrayList<>();
-                        listImpuestos.add(new Impuesto("No Aplica", BigDecimal.valueOf(0), "No Aplica Impuesto", true, false, empresaEnt, "SI"));
-                        listImpuestos.add(new Impuesto("5%", BigDecimal.valueOf(5), "Impuesto del 5%", true, false, empresaEnt, "SI"));
-                        listImpuestos.add(new Impuesto("19%", BigDecimal.valueOf(19), "Impuesto del 19%", true, false, empresaEnt, "SI"));
-                        listImpuestos.add(new Impuesto("Excluido", BigDecimal.ZERO, "Excluido de impuesto", true, false, empresaEnt, "SI"));
-                        listImpuestos.add(new Impuesto("Exento", BigDecimal.ZERO, "Exento de impuesto", true, false, empresaEnt, "SI"));
-
-                        impuestoRepository.saveAll(listImpuestos);
-
-                        //Tipos de Medidas
-                        List<TipoMedida> tipoMedidasDefault = tipoService.findAllTiposMedidas(null);
-                        Empresa finalEmpresaEnt1 = empresaEnt;
-                        tipoMedidasDefault.forEach(t -> {
-                            TipoMedida tm = new TipoMedida();
-                            tm.setEmpresa(finalEmpresaEnt1);
-                            tm.setSimbolo(t.getSimbolo());
-                            tm.setNombre(t.getNombre());
-                            tm.setEliminado(t.isEliminado());
-                            tm.setActivo(t.isActivo());
-                            tm.setDescripcion(t.getDescripcion());
-                            tipoMedidaRepository.save(tm);
-                        });
-                    }
-                    result.setObject(empresa);
-                    result.setMessage("Empresa Guardada Correctamente");
-                    result.setSuccess(true);
-                } else {
-                    result.setSuccess(false);
-                    result.setMessage("Codigo de Emnpresa ya existe");
-                }
-            } else {
-                result.setSuccess(false);
-                result.setMessage("Nombre de Emnpresa ya existe");
-            }
-            logger.info("<-- "+methodName);
-            return result;
-
-        }catch(Exception e){
-            logger.error("saveEmpresa: "+e.getMessage(), e);
-            result.setSuccess(false);
-            result.setMessage("Error al Crear Empresa");
-            return result;
-        }
-    }
-
-    @Transactional
     @Override
     public Response saveEmpresa(EmpresaDTO empresaDTO) {
         final String methodName = "saveEmpresa";
@@ -410,17 +225,16 @@ public class EmpresaServiceImpl implements EmpresaService {
 
                         //Tipos de Medidas
                         List<TipoMedida> tipoMedidasDefault = tipoService.findAllTiposMedidas(null);
-                        Empresa finalEmpresaEnt1 = empresaEnt;
-                        tipoMedidasDefault.forEach(t -> {
+                        for(TipoMedida t : tipoMedidasDefault) {
                             TipoMedida tm = new TipoMedida();
-                            tm.setEmpresa(finalEmpresaEnt1);
+                            tm.setEmpresa(empresaEnt);
                             tm.setSimbolo(t.getSimbolo());
                             tm.setNombre(t.getNombre());
                             tm.setEliminado(t.isEliminado());
                             tm.setActivo(t.isActivo());
                             tm.setDescripcion(t.getDescripcion());
                             tipoMedidaRepository.save(tm);
-                        });
+                        }
                     }
                     result.setObject(empresaDTO);
                     result.setMessage("Empresa Guardada Correctamente");
@@ -462,24 +276,21 @@ public class EmpresaServiceImpl implements EmpresaService {
     private Usuario setRolesPersonaAndUsuario(EmpresaDTO empresaDTO, Empresa empresaEnt, boolean isNew) throws NoSuchAlgorithmException {
         //Copiar Roles a Empresa
         if (isNew) {
-            List<Rol> listaRolesOrigen = rolRepository.findAllByEmpresaAndPorDefectoAndNombreIsNotAndEliminadoFalse(null, true, "ROOT");
+            List<Rol> listaRolesOrigen = rolRepository.findAllRolByDefault(Rol.ROOT.getNombre());
 
             List<Rol> listaRolesDestino = new ArrayList<>();
-            Empresa finalEmpresaEnt = empresaEnt;
-            listaRolesOrigen.forEach(r -> {
+            for(Rol r : listaRolesOrigen) {
                 Rol rol = new Rol();
                 rol.setFechaActivacion(new Date());
-                rol.setEmpresa(finalEmpresaEnt);
+                rol.setEmpresa(empresaEnt);
                 rol.setPorDefecto(r.isPorDefecto());
                 rol.setEliminado(r.isEliminado());
                 rol.setDescripcion(r.getDescripcion());
                 rol.setNombre(r.getNombre());
                 Set<Vista> newVistas = new HashSet<>(r.getVistas());
                 rol.setVistas(newVistas);
-
                 listaRolesDestino.add(rol);
-            });
-
+            }
             rolRepository.saveAll(listaRolesDestino);
         }
 

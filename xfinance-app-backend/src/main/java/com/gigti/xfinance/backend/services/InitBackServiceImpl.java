@@ -81,7 +81,7 @@ public class InitBackServiceImpl implements InitBackService {
     public void initParches() {
         initBackTipos();
         initBackObjetos();
-        initBackTiposMedidas();
+
     }
 
     // Tipos de Datos
@@ -236,11 +236,14 @@ public class InitBackServiceImpl implements InitBackService {
                 rolRepository.save(Rol.AUXILIAR);
                 logger.info("Rol Auxiliar");
 
+                //TIPOS DE MEDIDAS
+                initBackTiposMedidas();
+
                 parche = new Parche(Constantes.INIT1,java.sql.Date.valueOf(LocalDate.now()),true, null);
                 parcheRepository.save(parche);
                 logger.info("Parche creado");
-                logger.info("<-- initBackTipos");
             }
+            logger.info("<-- initBackTipos");
         } catch (Exception e) {
             logger.error("Error al Crear InitBackend - Tipos: " + e.getMessage(), e);
         }
