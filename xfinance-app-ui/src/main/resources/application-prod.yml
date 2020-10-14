@@ -22,10 +22,10 @@ spring:
   # JPA properties
   jpa:
     hibernate:
-      ddl-auto: update
-#      ddl-auto: create
-    show-sql: false
-    generate-ddl: false
+#      ddl-auto: update
+      ddl-auto: none
+    show-sql: true
+    generate-ddl: true
     properties:
       hibernate:
         temp:
