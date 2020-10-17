@@ -22,7 +22,7 @@ spring:
   # JPA properties
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
 #      ddl-auto: create-drop
     show-sql: false
     generate-ddl: false
