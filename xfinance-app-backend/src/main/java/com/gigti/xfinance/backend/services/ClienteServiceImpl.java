@@ -34,38 +34,62 @@ public class ClienteServiceImpl implements ClienteService{
     public Response save(Cliente cliente, Usuario usuario) {
         logger.info("--> save Cliente: "+cliente.toString());
         Response response = new Response();
+        boolean passValidations = false;
         try{
             cliente.getPersona().setEmpresa(cliente.getPersona().getEmpresa());
-
-            Persona persona = personaRepository.findByIdentificacionAndEmpresa(cliente.getPersona().getIdentificacion(), cliente.getPersona().getEmpresa());
-
-            if(persona != null) {
-                logger.info("Persona found");
-                if(persona.getId().equals(cliente.getPersona().getId())) {
-                    //Validar Email
-                    if (validarEmailCliente(cliente, response)) {
-                       return response;
+            if(cliente.getPersona().getId() == null) {
+                logger.info("Cliente New");
+                Persona persona = personaRepository.findByIdentificacionAndEmpresa(cliente.getPersona().getIdentificacion(), cliente.getPersona().getEmpresa());
+                if (persona != null) {
+                    logger.info("Persona found");
+                    //Validar que no esta como cliente
+                    Cliente clienteTemp = clienteRepository.findByPersonaAndEmpresa(persona, cliente.getPersona().getEmpresa());
+                    if (clienteTemp != null) {
+                        response.setSuccess(false);
+                        response.setMessage("Identificación Ya esta asignada en otro Cliente");
+                    } else {
+                        //Validar Email
+                        passValidations = isValidEmailCliente(cliente, response);
+                        cliente.getPersona().setId(persona.getId());
+                        cliente.setEliminado(false);
                     }
-                    cliente.getPersona().setId(persona.getId());
                 } else {
-                    response.setSuccess(false);
-                    response.setMessage("Identificación del Cliente Ya existe");
-                    return response;
+                    //Validar Email
+                    passValidations = isValidEmailCliente(cliente, response);
+                    cliente.setEliminado(false);
                 }
             } else {
-                //Validar Email
-                if (validarEmailCliente(cliente, response)) {
-                    return response;
+                logger.info("Edit Cliente");
+                //Validar Identificación
+
+                Persona persona = personaRepository.findByIdentificacionAndEmpresa(cliente.getPersona().getIdentificacion(), cliente.getPersona().getEmpresa());
+                if (persona != null) {
+                    logger.info("Persona found");
+                    //Validar que no esta como cliente
+                    Cliente clienteTemp = clienteRepository.findByPersonaAndEmpresa(persona, cliente.getPersona().getEmpresa());
+                    if (clienteTemp != null && !clienteTemp.getId().equals(cliente.getId())) {
+                        response.setSuccess(false);
+                        response.setMessage("Identificación Ya esta asignada en otro Cliente");
+                        passValidations = false;
+                    } else {
+                        //Validar Email
+                        passValidations = isValidEmailCliente(cliente, response);
+                        cliente.setEliminado(false);
+                    }
+                } else {
+                    //Validar Email
+                    passValidations = isValidEmailCliente(cliente, response);
+                    cliente.setEliminado(false);
                 }
-
-                cliente.setEliminado(false);
             }
-            cliente.setPersona(personaRepository.save(cliente.getPersona()));
-            cliente = clienteRepository.save(cliente);
-            response.setObject(cliente);
-            response.setSuccess(true);
-            response.setMessage("Cliente Guardado Correctamente");
-
+            if(passValidations) {
+                logger.info("Cliente Paso Validaciones");
+                cliente.setPersona(personaRepository.save(cliente.getPersona()));
+                cliente = clienteRepository.save(cliente);
+                response.setObject(cliente);
+                response.setSuccess(true);
+                response.setMessage("Cliente Guardado Correctamente");
+            }
         }catch(Exception e){
             logger.error(e.getMessage(), e);
             response.setSuccess(false);
@@ -76,18 +100,18 @@ public class ClienteServiceImpl implements ClienteService{
         return response;
     }
 
-    private boolean validarEmailCliente(Cliente cliente, Response response) {
+    private boolean isValidEmailCliente(Cliente cliente, Response response) {
         if(StringUtils.isNoneBlank(cliente.getEmail())) {
             Cliente c = clienteRepository.findByEmailAndEmpresa(cliente.getEmail(), cliente.getPersona().getEmpresa());
             if (c != null) {
-                if (!c.getPersona().getIdentificacion().equalsIgnoreCase(cliente.getPersona().getIdentificacion())) {
+                if (!c.getPersona().getId().equalsIgnoreCase(cliente.getPersona().getId())) {
                     response.setSuccess(false);
                     response.setMessage("Email Ya se encuentra Registrado en Otro Cliente");
-                    return true;
+                    return false;
                 }
             }
         }
-        return false;
+        return true;
     }
 
     @Override

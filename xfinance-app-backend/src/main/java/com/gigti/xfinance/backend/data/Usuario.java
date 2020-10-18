@@ -51,7 +51,7 @@ public class Usuario extends AbstractEntity {
     private TipoUsuarioEnum tipoUsuario;
 
     @NotNull(message = "No puede estar Vacio")
-    @Column(unique = true)
+    @Column()
     @Email
     private String email;
 

@@ -2,6 +2,7 @@ package com.gigti.xfinance.backend.repositories;
 
 import com.gigti.xfinance.backend.data.Cliente;
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Persona;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -54,5 +55,10 @@ public interface ClienteRepository extends JpaRepository<Cliente, String> {
             "WHERE c.persona.empresa =:empresa AND " +
             "c.persona.identificacion =:identificacion")
     Cliente findByIdentificacionAndEmpresa(String identificacion, Empresa empresa);
+
+    @Query("SELECT c FROM Cliente c " +
+            "WHERE c.persona.empresa =:empresa AND " +
+            "c.persona =:persona")
+    Cliente findByPersonaAndEmpresa(Persona persona, Empresa empresa);
 
 }
