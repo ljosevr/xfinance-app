@@ -29,11 +29,6 @@ public class CategoriaGrid extends Grid<CategoriaProducto> {
                 .setComparator(Comparator.comparing(CategoriaProducto::getActivoS))
                 .setSortable(true);
 
-        addColumn(categoria -> {
-            Empresa empresa = categoria.getEmpresa();
-            return empresa == null ? "-" : empresa.getNombreEmpresa();
-        }).setHeader("Empresa");
-
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
