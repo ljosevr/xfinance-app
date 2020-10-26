@@ -77,7 +77,7 @@ public class CategoriaProductoServiceImpl implements CategoriaProductoService {
     @Transactional
     @Override
     public Response delete(String id) {
-        logger.info("--> delete ");
+        logger.info("--> delete Categoria");
         Response response = new Response();
         try {
             CategoriaProducto categoria = categoriaProductoRepository.findById(id).orElse(null);
@@ -95,7 +95,7 @@ public class CategoriaProductoServiceImpl implements CategoriaProductoService {
             response.setSuccess(false);
             response.setMessage("Error al Eliminar Categoria: "+e.getMessage());
         }
-        logger.info("<-- delete");
+        logger.info("<-- delete Categoria");
         return response;
     }
 

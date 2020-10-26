@@ -127,4 +127,7 @@ public class Constantes {
     public static final String CREATE_INV_INICIAL = "Crear Inventario Inicial";
     public static final String EDIT_INV_INICIAL = "Editar Inventario Inicial";
     public static final String VIEW_VENTA = "Detalle Venta";
+    public static final String CREATE_ROL = "Crear Rol";
+    public static final String EDIT_ROL = "Editar Rol";
+    public static final String DELETE_ROL = "Eliminar Rol";
 }

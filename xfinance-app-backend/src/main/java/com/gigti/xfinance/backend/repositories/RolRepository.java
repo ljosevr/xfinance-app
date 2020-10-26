@@ -8,9 +8,12 @@ package com.gigti.xfinance.backend.repositories;
 
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Rol;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.util.List;
 
@@ -42,4 +45,23 @@ public interface RolRepository extends JpaRepository<Rol, String> {
     List<Rol> findAllRolByDefault(String nombre);
 
     Integer deleteAllByEmpresa(Empresa empresa);
+
+    @Query("SELECT r FROM Rol  r " +
+            "WHERE r.empresa =:empresa AND " +
+            "r.eliminado = False")
+    List<Rol> findByEmpresaAndEliminadoIsFalse(Empresa empresa, Pageable pageable);
+
+    @Query("SELECT r FROM Rol r " +
+            "WHERE r.empresa =:empresa AND " +
+            "lower(r.nombre) like lower(concat('%', :filterText, '%')) AND " +
+            "r.eliminado = false")
+    List<Rol> search(String filterText, Empresa empresa, Pageable pageable);
+
+    int countByEmpresaAndEliminadoIsFalse(@Param("empresa") Empresa empresa);
+
+    @Query("SELECT COUNT(r) FROM Rol r " +
+            "WHERE UPPER(r.nombre) LIKE CONCAT('%', UPPER(:rolName),'%') " +
+            "AND r.empresa =:empresa AND " +
+            "r.eliminado = FALSE")
+    int countByEmpresaAndNombre(Empresa empresa, String rolName);
 }

@@ -9,6 +9,7 @@ package com.gigti.xfinance.backend.data;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -36,15 +37,21 @@ public class Rol extends AbstractEntity implements Serializable {
 
     private boolean eliminado;
 
+    @NotNull
+    private boolean activo;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActivacion;
 
-    @OneToMany(mappedBy = "rol",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "rol", fetch = FetchType.LAZY)
     private List<Usuario> usuarios;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     @JoinTable(name="rolesvistas", joinColumns={@JoinColumn(name="roles_id")}, inverseJoinColumns={@JoinColumn(name="vistas_id")})
     private Set<Vista> vistas;
+
+    @Transient
+    private String activoS;
 
     public Rol() {
     }
@@ -92,5 +99,9 @@ public class Rol extends AbstractEntity implements Serializable {
     @Override
     public String toString() {
         return nombre;
+    }
+
+    public String getActivoS() {
+        return isActivo() ? "SI" : "NO";
     }
 }

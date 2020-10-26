@@ -25,8 +25,8 @@ public class Usuario extends AbstractEntity {
     private String nombreUsuario;
 
     @Column(name="password_usuario")
-    @NotNull
-    @Size(min = 4, max = 512)
+//    @NotNull
+    @Size(max = 512)
     private String passwordUsuario;
 
     private boolean activo;

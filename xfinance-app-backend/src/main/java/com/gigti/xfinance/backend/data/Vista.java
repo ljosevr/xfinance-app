@@ -20,22 +20,28 @@ public class Vista extends AbstractEntity {
 
     @Column(unique = true)
     private String nombreVista;
+
     @Column(unique = true)
 
     private String routeVista;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
     private Vista vistaPadre;
 
     private int orderVista;
 
     private String iconMenu;
 
-    @OneToMany(mappedBy="vistaPadre",cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy="vistaPadre",cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private List<Vista> subVistas;
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.LAZY, mappedBy ="vistas")
+    @ManyToMany(cascade = {CascadeType.DETACH}, fetch = FetchType.LAZY, mappedBy ="vistas")
     private Set<Rol> roles;
+
+    @Transient
+    private String routeName;
+
+    private boolean viewRoot;
 
     public Vista() {
     }
@@ -70,6 +76,6 @@ public class Vista extends AbstractEntity {
 
     @Override
     public String toString() {
-        return nombreVista;
+        return routeName;
     }
 }
