@@ -188,11 +188,12 @@ public class EmpresaServiceImpl implements EmpresaService {
                     empresaEnt.setTipoIde(TipoIde.NIT);
                 }
             }
-            logger.info(empresaEnt.toString());
+            logger.info("-- Data Empresa"+empresaEnt.toString());
             Empresa empresaTemp = empresaRepository.findByNombreEmpresa(empresaEnt.getNombreEmpresa());
             if((empresaTemp == null && isNew) || (empresaTemp != null && !isNew)) {
                 empresaTemp = empresaRepository.findByCodigoEmpresa(empresaEnt.getCodigoEmpresa());
                 if(empresaTemp == null) {
+                    logger.info("-- Guardando Empresa");
                     empresaEnt = empresaRepository.save(empresaEnt);
 
                     empresaDTO.setEmpresaId(empresaEnt.getId());
@@ -273,7 +274,16 @@ public class EmpresaServiceImpl implements EmpresaService {
         }
     }
 
+    /**
+     * Metodo para hacer Set de los Roles x Defecto de Una empresa
+     * @param empresaDTO
+     * @param empresaEnt
+     * @param isNew
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
     private Usuario setRolesPersonaAndUsuario(EmpresaDTO empresaDTO, Empresa empresaEnt, boolean isNew) throws NoSuchAlgorithmException {
+        logger.info("--> setRolesPersonaAndUsuario");
         //Copiar Roles a Empresa
         if (isNew) {
             List<Rol> listaRolesOrigen = rolRepository.findAllRolByDefault(Rol.ROOT.getNombre());
@@ -291,6 +301,8 @@ public class EmpresaServiceImpl implements EmpresaService {
                 rol.setVistas(newVistas);
                 listaRolesDestino.add(rol);
             }
+            logger.info("Roles:  "+listaRolesDestino);
+
             rolRepository.saveAll(listaRolesDestino);
         }
 
@@ -313,7 +325,7 @@ public class EmpresaServiceImpl implements EmpresaService {
         }
 
         usuarioAdmin.setActivo(empresaDTO.isActivo());
-        usuarioAdmin.setNombreUsuario(empresaDTO.getUsuarioNombre());
+        usuarioAdmin.setNombreUsuario(empresaDTO.getUsuarioNombre().trim());
 
         Persona persona;
         //TODO Falta setear PersonaId
@@ -341,6 +353,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 
         usuarioAdmin = usuarioRepository.save(usuarioAdmin);
 
+        logger.info("<-- setRolesPersonaAndUsuario");
         return usuarioAdmin;
     }
 
@@ -358,5 +371,43 @@ public class EmpresaServiceImpl implements EmpresaService {
             logger.error("Error: "+e.getMessage(), e);
             return false;
         }
+    }
+
+    @Transactional
+    @Override
+    public Response registerNewEmpresa(EmpresaDTO empresa) {
+
+        final String methodName = "registerNewEmpresa";
+        logger.info("--> "+methodName);
+        Response result = new Response();
+        try {
+            Empresa empresaTemp = empresaRepository.findByNombreEmpresa(empresa.getNombreEmpresa());
+
+            if (empresaTemp == null) {
+                //Pasa validación
+                empresaTemp = null;
+                empresaTemp = empresaRepository.findByIdentificacion(empresa.getIdentificacion());
+                if(empresaTemp == null) {
+                    //Pasa Validación
+                    result = saveEmpresa(empresa);
+                } else {
+                    //No Pasa Validación
+                    result.setSuccess(false);
+                    result.setMessage("Identificación de Empresa Ya Existe");
+                }
+
+            } else {
+                //No Pasa Validación
+                result.setSuccess(false);
+                result.setMessage("Nombre de Empresa Ya Existe");
+            }
+
+        }catch(Exception e){
+            logger.error("Error al Registrar Empresa: "+e.getMessage(), e);
+            result.setSuccess(false);
+            result.setMessage("Error al registrar Empresa: "+e.getMessage());
+        }
+        logger.info("<-- "+methodName);
+        return result;
     }
 }

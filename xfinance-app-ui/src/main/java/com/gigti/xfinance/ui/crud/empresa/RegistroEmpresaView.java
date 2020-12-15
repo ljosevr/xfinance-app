@@ -216,7 +216,7 @@ public class RegistroEmpresaView extends VerticalLayout {
             binder.getBean().setActivoUsuario(false);
             binder.getBean().setEliminado(false);
 
-            Response response = empresaService.saveEmpresa(binder.getBean());
+            Response response = empresaService.registerNewEmpresa(binder.getBean());
             if (response.isSuccess()) {
                 NotificacionesUtil.showSuccess(response.getMessage());
                 goToLogin();

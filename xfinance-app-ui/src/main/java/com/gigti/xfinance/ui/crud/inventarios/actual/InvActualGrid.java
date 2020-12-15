@@ -29,8 +29,8 @@ public class InvActualGrid extends Grid<InventarioActualCosto> {
         addColumn(InventarioActualCosto::getCantidad)
                 .setHeader("Cantidad");
 
-        addColumn(inv -> inv.isInfinite() ? "SI" : "NO")
-                .setHeader("Infinito")
+        addColumn(inv -> inv.isManageStock() ? "SI" : "NO")
+                .setHeader("Controla Stock")
                 .setSortable(true);
 
         addColumn(inv -> AllUtils.formatDate(inv.getFechaActualizacion()))

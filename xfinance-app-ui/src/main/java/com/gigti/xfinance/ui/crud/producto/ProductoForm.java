@@ -52,6 +52,7 @@ public class ProductoForm extends Dialog {
     private final Checkbox chkActivo;
     private final ComboBox<CategoriaProducto> cbCategorias;
     private final Checkbox chkManageInitialStock;
+    private final Checkbox chkInventarioFinal;
     private final FormLayout contentSub;
     private final TextField   tfProdNombre;
     private final ComboBox<TipoMedida> cbTipoMedida;
@@ -91,6 +92,9 @@ public class ProductoForm extends Dialog {
         cbTipoMedida.setItems(listaTipoMedida);
         cbTipoMedida.setLabel("Tipo Medida");
         cbTipoMedida.setRequired(true);
+        cbTipoMedida.setAllowCustomValue(false);
+        cbTipoMedida.setAutoOpen(true);
+        cbTipoMedida.setClearButtonVisible(true);
         cbTipoMedida.setItemLabelGenerator(TipoMedida::getNombre);
         cbTipoMedida.getElement().setAttribute("title", "Campo para determinar que medida usa el Producto");
         //Tooltips.getCurrent().setTooltip(cbTipoMedida, "Campo para determinar que medida usa el Producto");
@@ -101,6 +105,9 @@ public class ProductoForm extends Dialog {
         cbCategorias.setLabel("Categoria");
         cbCategorias.setItems(listCategoria);
         cbCategorias.setRequired(true);
+        cbCategorias.setAllowCustomValue(false);
+        cbCategorias.setAutoOpen(true);
+        cbCategorias.setClearButtonVisible(true);
         cbCategorias.setItemLabelGenerator(CategoriaProducto::getNombre);
         cbCategorias.getElement().setAttribute("title", "Puedes Agrupar en Grupos los Productos\nLas categorias se pueden crear");
         //Tooltips.getCurrent().setTooltip(cbCategorias, "Puedes Agrupar en Grupos los Productos\nLas categorias se pueden crear");
@@ -109,6 +116,9 @@ public class ProductoForm extends Dialog {
         cbImpuesto.setLabel("Impuesto");
         cbImpuesto.setItems(listImpuestos);
         cbImpuesto.setRequired(true);
+        cbImpuesto.setAllowCustomValue(false);
+        cbImpuesto.setAutoOpen(true);
+        cbImpuesto.setClearButtonVisible(true);
         cbImpuesto.setItemLabelGenerator(Impuesto::getNombre);
 
         chkManageInitialStock = new Checkbox("Editar Inventario Inicial");
@@ -124,7 +134,6 @@ public class ProductoForm extends Dialog {
         chkControlarStock.setRequiredIndicatorVisible(true);
         chkControlarStock.getElement().setAttribute("title","Si esta marcado, vas a manejar Inventario con este Producto\nSi no esta marcado no vas a manejar Inventario");
 
-
         tfPrecioCosto = new BigDecimalField("Precio Costo Inicial");
         tfPrecioCosto.setPrefixComponent(new Span("$"));
         tfPrecioCosto.setAutoselect(true);
@@ -135,6 +144,16 @@ public class ProductoForm extends Dialog {
         tfPrecioVenta.setAutoselect(true);
         tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
+        chkInventarioFinal = new Checkbox("Inventario Definitivo");
+        chkInventarioFinal.setValue(false);
+        chkInventarioFinal.setRequiredIndicatorVisible(true);
+        chkInventarioFinal.getElement().setAttribute("title","Si esta marcado, el inventario Inicial No se podrá cambiar");
+
+        chkInventarioFinal.addValueChangeListener(event -> {
+           if(chkInventarioFinal.getValue()){
+               NotificacionesUtil.showWarn("Al Estar Marcado Inventario Definitivo, El inventario Inicial No se podrá Cambiar más");
+           }
+        });
         chkControlarStock.addValueChangeListener(event -> {
             if(event.getValue()){
                 tfCantidadInicial.setReadOnly(false);
@@ -186,8 +205,9 @@ public class ProductoForm extends Dialog {
                 return true;
             }
         },"Digita precio de Venta Inicial").bind(Producto::getPrecioVenta, Producto::setPrecioVenta);
-        binder.forField(chkControlarStock).bind(Producto::isControlarStock, Producto::setControlarStock);
+        binder.forField(chkControlarStock).bind(Producto::isManageStock, Producto::setManageStock);
         binder.forField(chkManageInitialStock).bind(Producto::isManageInitialStock, Producto::setManageInitialStock);
+        binder.forField(chkInventarioFinal).bind(Producto::isInventarioDefinitivo, Producto::setInventarioDefinitivo);
 
         btnSave = new Button("Guardar");
         btnSave.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
@@ -207,7 +227,7 @@ public class ProductoForm extends Dialog {
         actionsLayout.add(btnSave, btnDelete,btnClose);
 
         contentSub.add(subTitleData, chkControlarStock,
-                tfCantidadInicial, tfPrecioCosto, tfPrecioVenta);
+                tfCantidadInicial, tfPrecioCosto, tfPrecioVenta, chkInventarioFinal);
         content.setColspan(subTitleData, contentSub.getResponsiveSteps().size()+1);
 
         content.add(titleForm, tfProdNombre,tfProdCodigoB,

@@ -22,6 +22,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.BigDecimalField;
 import com.vaadin.flow.component.textfield.NumberField;
@@ -39,11 +41,15 @@ import java.util.List;
  */
 public class InvInicialForm extends Dialog {
 
-    private final NumberField tfCantidad;
+    private final BigDecimalField tfCantidad;
     private final H2 titleForm;
+    private final ComboBox<Impuesto> cbImpuesto;
     private Button btnSave;
     private final Binder<InventarioInicial> binder;
     private final List<Impuesto> listImpuestos;
+    private final Checkbox chkDefinitivo;
+    private final Checkbox chkInfinite;
+    private final BigDecimalField tfPrecioCosto;
 
     public InvInicialForm(List<Impuesto> listImpuestos) {
         this.listImpuestos = listImpuestos;
@@ -63,49 +69,55 @@ public class InvInicialForm extends Dialog {
         tfProducto.setReadOnly(true);
         tfProducto.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        tfCantidad = new NumberField("Cantidad");
+        tfCantidad = new BigDecimalField("Cantidad");
         tfCantidad.focus();
         tfCantidad.setAutoselect(true);
         tfCantidad.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        Checkbox chkInfinite = new Checkbox("Controlar Stock(Inventario)");
-        chkInfinite.setValue(false);
+        chkInfinite = new Checkbox("Controlar Stock(Inventario)");
         chkInfinite.setRequiredIndicatorVisible(true);
 
-        BigDecimalField tfPrecioCosto = new BigDecimalField("Precio de Costo");
+        tfPrecioCosto = new BigDecimalField("Precio de Costo");
         tfPrecioCosto.setPrefixComponent(new Span("$"));
         tfPrecioCosto.setAutoselect(true);
         tfPrecioCosto.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        tfPrecioCosto.setPrefixComponent(new Icon(VaadinIcon.DOLLAR));
 
         BigDecimalField tfPrecioVenta = new BigDecimalField("Precio de Venta");
         tfPrecioVenta.setPrefixComponent(new Span("$"));
         tfPrecioVenta.setAutoselect(true);
         tfPrecioVenta.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        tfPrecioVenta.setPrefixComponent(new Icon(VaadinIcon.DOLLAR));
 
         chkInfinite.addValueChangeListener(event -> {
             if(event.getValue()){
                 tfCantidad.setEnabled(true);
                 tfCantidad.focus();
+
             } else {
-                tfCantidad.setValue(0d);
+
+                tfCantidad.setValue(BigDecimal.ZERO);
                 tfCantidad.setEnabled(false);
                 tfPrecioCosto.focus();
-
             }
         });
 
-        ComboBox<Impuesto> cbImpuesto = new ComboBox<>();
+        cbImpuesto = new ComboBox<>();
         cbImpuesto.setLabel("Impuesto");
         cbImpuesto.setItems(listImpuestos);
         cbImpuesto.setRequired(true);
         cbImpuesto.setItemLabelGenerator(Impuesto::getNombre);
 
+        chkDefinitivo = new Checkbox("Es Definitivo");
+        chkDefinitivo.setValue(false);
+        chkDefinitivo.setRequiredIndicatorVisible(true);
+
         binder.forField(tfProducto)
                 .bind(inv -> inv.getProducto().getNombreProducto()
                 , (inv, data) -> inv.setProducto(binder.getBean().getProducto()));
-        binder.forField(tfCantidad).asRequired("Digite Cantidad")
-                .bind(inv -> inv.getCantidad().doubleValue()
-                        , (inv, data) -> inv.setCantidad(BigDecimal.valueOf(data)));
+
+        binder.forField(tfCantidad).asRequired("Digite Cantidad").bind(InventarioInicial::getCantidad, InventarioInicial::setCantidad);
+
         binder.forField(tfPrecioCosto).asRequired("Digite Precio de Costo")
                 .bind(InventarioInicial::getPrecioCosto
                 , InventarioInicial::setPrecioCosto);
@@ -113,10 +125,11 @@ public class InvInicialForm extends Dialog {
                 .bind(InventarioInicial::getPrecioVenta
                 , InventarioInicial::setPrecioVenta);
 
-        binder.forField(chkInfinite).bind("infinite");
+        binder.forField(chkInfinite).bind(InventarioInicial::isManageStock,InventarioInicial::setManageStock);
         binder.forField(cbImpuesto)
                 .asRequired("Seleccione un Impuesto")
                 .bind(InventarioInicial::getImpuesto, InventarioInicial::setImpuesto);
+        binder.forField(chkDefinitivo).bind(InventarioInicial::isDefinitivo,InventarioInicial::setDefinitivo);
 
         binder.addStatusChangeListener(event -> btnSave.setEnabled(binder.isValid()));
 
@@ -135,9 +148,11 @@ public class InvInicialForm extends Dialog {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnClose);
 
-        content.add(titleForm, tfProducto, chkInfinite, tfCantidad, tfPrecioCosto, tfPrecioVenta, cbImpuesto, actionsLayout);
+        content.add(titleForm, tfProducto, chkInfinite, tfCantidad, tfPrecioCosto,
+                tfPrecioVenta, cbImpuesto, chkDefinitivo, actionsLayout);
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
         content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
+
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);
         this.add(content);
@@ -145,13 +160,29 @@ public class InvInicialForm extends Dialog {
 
     public void setInventario(InventarioInicial inventarioInicial, String title, String type) {
         if(inventarioInicial != null) {
-            if(type.equals(ICrudView.OPTION_EDIT)) {
+            if(type.equals(ICrudView.OPTION_ADD)) {
                 inventarioInicial.setImpuesto(listImpuestos.get(0));
             }
             binder.setBean(inventarioInicial);
+            if(inventarioInicial.isManageStock()) {
+                chkInfinite.setValue(true);
+                tfCantidad.setEnabled(true);
+                tfCantidad.focus();
+
+            } else {
+                chkInfinite.setValue(false);
+                tfCantidad.setEnabled(false);
+                tfPrecioCosto.focus();
+            }
+        } else {
+            chkInfinite.setValue(false);
+            chkDefinitivo.setValue(false);
+            tfCantidad.setValue(BigDecimal.ZERO);
+            tfPrecioCosto.setValue(BigDecimal.ZERO);
+
         }
         titleForm.setText(title);
-        tfCantidad.focus();
+
     }
 
     private void validateAndSave() {

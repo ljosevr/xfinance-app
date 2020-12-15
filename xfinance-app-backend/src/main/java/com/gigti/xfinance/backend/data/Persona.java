@@ -23,7 +23,7 @@ public class Persona extends AbstractEntity {
     private TipoIde tipoIde;
 
     @NotNull(message = "No puede estar Vacio")
-    @Column(unique = true)
+    @Column()
     private String identificacion;
 
     @NotNull(message = "No puede estar Vacio")

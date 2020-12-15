@@ -30,7 +30,7 @@ public class InventarioInicial extends AbstractEntity {
 
     private BigDecimal cantidad;
 
-    private boolean infinite;
+    private boolean manageStock;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActualizacion;
@@ -46,4 +46,6 @@ public class InventarioInicial extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Impuesto impuesto;
+
+    private boolean definitivo;
 }

@@ -8,6 +8,7 @@ public class Constantes {
     public static final String INIT3 = "PI Back - 3 - TipoEmpresa";
     public static final String INIT4 = "PI Back - 4 - Roles";
     public static final String INIT5 = "PI Back - 5 - DEMO";
+    public static final String INIT_MENU_GASTO = "PI Back - 6 - GASTO";
 
     //VIEWS-CLASS-NAME
     public static final String VIEW_C_ROOT = "";
@@ -28,6 +29,8 @@ public class Constantes {
     public static final String VIEW_C_CONFIG_EMPRESA        = "com.gigti.xfinance.ui.crud.configuracion.DatosEmpresaView";
     public static final String VIEW_C_ADMIN_CLIENTE         = "com.gigti.xfinance.ui.crud.cliente.ClienteView";
     public static final String VIEW_C_ADMIN_PROVEEDOR       = "com.gigti.xfinance.ui.crud.proveedor.ProveedorView";
+    public static final String VIEW_C_GASTO                 = "com.gigti.xfinance.ui.crud.gasto.GastoView";
+
     //public static final String VIEW_C_USUARIOADMIN = "usuarioAdmin";
 
     //VIEWS-ROUTE
@@ -61,6 +64,7 @@ public class Constantes {
     public static final String VIEW_R_CONFIG_EMPRESA = "dataEmpresa";
     public static final String VIEW_R_CONFIG_PASSWORD = "changePass";
     public static final String VIEW_R_REGISTRO = "registro";
+    public static final String VIEW_R_GASTO = "gasto";
 
     //VIEW-NAME
     public static final String VIEW_MAIN = "Tu Inventario Seguro";
@@ -102,6 +106,7 @@ public class Constantes {
     public static final String VIEW_RECOVER_PASS = "Recuperar Password";
 
     public static final String VIEW_REGISTRO_EMPRESA = "Registrar Empresa";
+    public static final String VIEW_GASTO = "Registrar Gasto";
 
     //Paginador
     public static final int PAGE_SIZE_10 = 10;
@@ -130,4 +135,8 @@ public class Constantes {
     public static final String CREATE_ROL = "Crear Rol";
     public static final String EDIT_ROL = "Editar Rol";
     public static final String DELETE_ROL = "Eliminar Rol";
+    public static final String CREATE_GASTO = "Crear Gasto";
+    public static final String EDIT_GASTO = "Editar Gasto";
+    public static final String DELETE_GASTO = "Eliminar Gasto";
+
 }

@@ -71,7 +71,7 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
     List<Producto> findAllByEmpresa(Empresa empresa);
 
     @Query("SELECT p FROM Producto p " +
-            "LEFT JOIN InventarioActual i ON p = i.producto AND i.infinite = FALSE " +
+            "LEFT JOIN InventarioActual i ON p = i.producto AND i.manageStock = FALSE " +
             "WHERE p.empresa =:empresa AND " +
             "p.eliminado = FALSE " )
     List<Producto> findByEmpresaAndNotInfiniteStock(@Param("empresa") Empresa empresa);

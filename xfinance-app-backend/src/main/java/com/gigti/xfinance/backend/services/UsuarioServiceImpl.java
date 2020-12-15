@@ -110,6 +110,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 usuario.setPasswordUsuario(pass);
             }
             usuario.setPersona(personaRepository.save(usuario.getPersona()));
+            usuario.setNombreUsuario(usuario.getNombreUsuario().trim());
             usuario = usuarioRepository.save(usuario);
             response.setObject(ConvertUsuario.convertEntityToDTO(usuario));
             response.setSuccess(true);

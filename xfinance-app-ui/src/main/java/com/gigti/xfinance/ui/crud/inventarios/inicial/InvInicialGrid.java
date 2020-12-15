@@ -36,8 +36,8 @@ public class InvInicialGrid extends Grid<InventarioInicial> {
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setKey("cantidad");
 
-        addColumn(inv -> inv.isInfinite() ? "SI" : "NO")
-            .setHeader("Infinito")
+        addColumn(inv -> inv.isManageStock() ? "SI" : "NO")
+            .setHeader("Controla Stock")
             .setKey("infinite")
             .setTextAlign(ColumnTextAlign.CENTER)
             .setSortable(true);
@@ -64,7 +64,7 @@ public class InvInicialGrid extends Grid<InventarioInicial> {
                 .setTextAlign(ColumnTextAlign.END)
                 .setKey("pventa");
 
-        addColumn(inv -> StringUtils.isBlank(inv.getId()) ? "NO" : "SI")
+        addColumn(inv -> inv.isDefinitivo() ? "SI" : "NO")
                 .setHeader("Definitivo")
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setSortable(true);

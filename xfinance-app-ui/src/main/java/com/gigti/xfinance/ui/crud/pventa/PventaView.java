@@ -38,7 +38,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import org.jsoup.internal.StringUtil;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -456,7 +455,7 @@ public class PventaView extends VerticalLayout {
         if (pventaDTO != null) {
             if (value.compareTo(BigDecimal.ZERO) > 0) {
                 BigDecimal accumulatedQ = accumulatedQuantity(pventaDTO);
-                if ((value.add(accumulatedQ)).compareTo(pventaDTO.getInStock()) <= 0 || pventaDTO.isInfinite()) {
+                if ((value.add(accumulatedQ)).compareTo(pventaDTO.getInStock()) <= 0 || pventaDTO.isManageStock()) {
                     if (isModified) {
                         isModified = false;
                         if (pventaDTO == null) {

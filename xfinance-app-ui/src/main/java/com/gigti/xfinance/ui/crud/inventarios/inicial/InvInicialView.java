@@ -85,10 +85,16 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
             closeEditor();
         } else {
             if(StringUtils.isBlank(((InventarioInicial)inventario).getId())) {
-                form.setInventario(((InventarioInicial)inventario), Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_EDIT);
+                form.setInventario(((InventarioInicial)inventario), Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_ADD);
                 showForm(true, form, this, filter);
             } else {
-                NotificacionesUtil.showError("Este Inventario No se puede modificar, ya fue actualizado");
+                InventarioInicial invInicial = (InventarioInicial)inventario;
+                if(invInicial.isDefinitivo()) {
+                    NotificacionesUtil.showError("Este Inventario No se puede modificar, ya fue marcado como Definitivo");
+                } else {
+                    form.setInventario((invInicial), Constantes.EDIT_INV_INICIAL, ICrudView.OPTION_EDIT);
+                    showForm(true, form, this, filter);
+                }
             }
         }
     }

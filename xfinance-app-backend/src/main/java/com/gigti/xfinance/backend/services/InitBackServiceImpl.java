@@ -81,7 +81,31 @@ public class InitBackServiceImpl implements InitBackService {
     public void initParches() {
         initBackTipos();
         initBackObjetos();
+        initBackMenuGasto();
+    }
 
+    private void initBackMenuGasto() {
+        logger.info("--> initBackMenuGasto");
+        try {
+            Parche parche = parcheRepository.findByNombreAndEmpresa(Constantes.INIT_MENU_GASTO, null);
+            if (parche == null) {
+
+                Vista vista_gasto = vistaRepository.save(new Vista(Constantes.VIEW_GASTO,Constantes.VIEW_C_GASTO, null, 511, "COIN_PILES"));//CASH
+
+                List<Rol> listaDeRoles = rolRepository.findAllRolByDefaultAndNombre(Rol.ADMIN.getNombre(), Rol.ROOT.getNombre());
+                logger.info("Roles a Actualizar: "+listaDeRoles.size());
+                for(Rol r : listaDeRoles) {
+                    r.getVistas().add(vista_gasto);
+                    rolRepository.save(r);
+                }
+                parche = new Parche(Constantes.INIT_MENU_GASTO,java.sql.Date.valueOf(LocalDate.now()),true, null);
+                parcheRepository.save(parche);
+                logger.info("Parche Gasto creado");
+            }
+            logger.info("<-- initBackMenuGasto");
+        } catch (Exception e) {
+            logger.error("Error al Crear InitBackend - Gasto: " + e.getMessage(), e);
+        }
     }
 
     // Tipos de Datos
@@ -428,7 +452,7 @@ public class InitBackServiceImpl implements InitBackService {
                         producto.setNombreProducto("Producto # " + (item + 1));
                         aleatorio = Math.floor(Math.random()*11);
                         producto.setTipoMedida(tipos.get(aleatorio.intValue()));
-                        producto.setControlarStock(item % 4 == 0);
+                        producto.setManageStock(item % 4 == 0);
                         producto.setPrecioVenta(BigDecimal.valueOf((item * 100 * 2) * 1.20 ));
                         producto.setPrecioCosto(BigDecimal.valueOf(item * 100 * 2));
                         producto.setCantidadInicial(BigDecimal.valueOf((item + 1) * 2));

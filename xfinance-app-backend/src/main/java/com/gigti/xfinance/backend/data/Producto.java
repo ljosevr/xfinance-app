@@ -77,11 +77,15 @@ public class Producto extends AbstractEntity {
 
     @ToString.Exclude
     @Transient
-    private boolean controlarStock;
+    private boolean manageStock ;
 
     @ToString.Exclude
     @Transient
     private boolean manageInitialStock;
+
+    @ToString.Exclude
+    @Transient
+    private boolean inventarioDefinitivo;
 
     public Producto(){}
 

@@ -23,4 +23,6 @@ public interface EmpresaService {
     Empresa findEmpresaDemo();
 
     boolean deleteAllEmpresa(Empresa emp);
+
+    Response registerNewEmpresa(EmpresaDTO empresa);
 }

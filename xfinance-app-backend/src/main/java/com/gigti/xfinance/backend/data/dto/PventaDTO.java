@@ -23,7 +23,7 @@ public class PventaDTO implements Serializable {
     private String impuestoId;
     private BigDecimal impuestoValor;
     private String impuestoNombre;
-    private boolean infinite;
+    private boolean manageStock;
     private BigDecimal descuento;
     private BigDecimal descuentoTotal;
 

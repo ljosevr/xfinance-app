@@ -60,14 +60,15 @@ public class ProductoServiceImpl implements ProductoService {
                 inventarioInicial.setCantidad(producto.getCantidadInicial());
                 inventarioInicial.setImpuesto(producto.getImpuesto());
                 inventarioInicial.setFechaActualizacion(new Date());
-                inventarioInicial.setInfinite(!producto.isControlarStock());
+                inventarioInicial.setManageStock(producto.isManageStock());
+                inventarioInicial.setDefinitivo(producto.isInventarioDefinitivo());
                 Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
                 if(response1.isSuccess()) {
                     inventarioInicial = (InventarioInicial) response1.getObject();
                     newProducto.setCantidadInicial(inventarioInicial.getCantidad());
                     newProducto.setPrecioCosto(inventarioInicial.getPrecioCosto());
                     newProducto.setPrecioVenta(inventarioInicial.getPrecioVenta());
-                    newProducto.setControlarStock(inventarioInicial.isInfinite());
+                    newProducto.setManageStock(inventarioInicial.isManageStock());
                 }
             }
 
@@ -153,17 +154,19 @@ public class ProductoServiceImpl implements ProductoService {
             venta           =  BigDecimal.ZERO;
             controlarStock  = false;
             p.setManageInitialStock(false);
+            p.setInventarioDefinitivo(false);
         } else {
             cantidad        =  invInicial.getCantidad();
             costo           =  invInicial.getPrecioCosto();
             venta           =  invInicial.getPrecioVenta();
-            controlarStock  = !invInicial.isInfinite();
+            controlarStock  =  invInicial.isManageStock();
+            p.setInventarioDefinitivo(invInicial.isDefinitivo());
             p.setManageInitialStock(true);
         }
         p.setCantidadInicial(cantidad);
         p.setPrecioCosto(costo);
         p.setPrecioVenta(venta);
-        p.setControlarStock(controlarStock);
+        p.setManageStock(controlarStock);
     }
 
     public List<Producto> findAllByEmpresaAndEliminadoIsFalse(Empresa empresa) {

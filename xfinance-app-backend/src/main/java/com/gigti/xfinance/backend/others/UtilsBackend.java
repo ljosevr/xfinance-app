@@ -41,7 +41,7 @@ public class UtilsBackend {
     public static InventarioActualCosto extractInvActCostByInfiniteAndCostPrice(List<InventarioActualCosto> listInvActualCosto, BigDecimal precioCosto) {
         return listInvActualCosto.stream()
                 .sorted(Comparator.comparing(InventarioActualCosto::getFechaCreacion))
-                .filter(InventarioActualCosto::isInfinite)
+                .filter(InventarioActualCosto::isManageStock)
                 .filter(InventarioActualCosto::isActivo)
                 .filter(inv -> inv.getPrecioCosto().compareTo(precioCosto) == 0)
                 .findFirst()

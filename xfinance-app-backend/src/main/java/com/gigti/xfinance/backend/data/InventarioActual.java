@@ -21,7 +21,7 @@ public class InventarioActual extends AbstractEntity {
 
     private BigDecimal cantidad;
 
-    private boolean infinite;
+    private boolean manageStock;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaActualizacion;

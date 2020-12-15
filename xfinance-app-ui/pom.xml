@@ -22,7 +22,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>xfinance-app-backend</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>

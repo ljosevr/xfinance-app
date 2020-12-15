@@ -27,7 +27,7 @@ public class InventarioActualCosto extends AbstractEntity {
     @NotNull
     private BigDecimal precioCosto;
 
-    private boolean infinite;
+    private boolean manageStock;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaCreacion;

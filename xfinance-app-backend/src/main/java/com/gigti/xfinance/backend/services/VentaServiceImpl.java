@@ -6,7 +6,6 @@ import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,7 +120,7 @@ public class VentaServiceImpl implements VentaService {
                 invActualCosto = null;
             }
             BigDecimal cantidad = pv.getCantidadVenta();
-            if (invActualCosto != null && !invActualCosto.isInfinite() && invActualCosto.getCantidad().compareTo(cantidad) >= 0) {
+            if (invActualCosto != null && invActualCosto.isManageStock() && invActualCosto.getCantidad().compareTo(cantidad) >= 0) {
                 while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
                     VentaItem item = new VentaItem();
                     if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
@@ -136,13 +135,12 @@ public class VentaServiceImpl implements VentaService {
                     item.setProducto(producto);
                     item.setPrecioCosto(invActualCosto.getPrecioCosto());
                     item.setPrecioVenta(pv.getPrecioVentaActual());
-                    //item.setDescuentoArticulo(pv.getDescuento());
                     item.setImpuestoArticulo(pv.getImpuestoValor());
                     item.setImpuestoNombre(pv.getImpuestoNombre());
 
                     listItems.add(item);
                 }
-            } else if (invActualCosto != null && invActualCosto.isInfinite()) {
+            } else if (invActualCosto != null && !invActualCosto.isManageStock()) {
                 logger.info("Venta productos inventario infinito");
                 VentaItem item = new VentaItem();
                 item.setVenta(venta);
@@ -150,7 +148,6 @@ public class VentaServiceImpl implements VentaService {
                 item.setCantidad(pv.getCantidadVenta());
                 item.setPrecioCosto(invActualCosto.getPrecioCosto());
                 item.setPrecioVenta(pv.getPrecioVentaActual());
-                //item.setDescuentoArticulo(pv.getDescuento());
                 item.setImpuestoArticulo(pv.getImpuestoValor());
                 item.setImpuestoNombre(pv.getImpuestoNombre());
 
@@ -165,7 +162,7 @@ public class VentaServiceImpl implements VentaService {
                             BigDecimal.ZERO,
                             TipoMovimientoEnum.VENTA,
                             false,
-                            pv.isInfinite(),
+                            pv.isManageStock(),
                             pv.getImpuestoValor(),
                             pv.getImpuestoNombre());
             } catch (HandledException e) {
@@ -195,18 +192,18 @@ public class VentaServiceImpl implements VentaService {
 
         listProductos.forEach(p -> {
             BigDecimal inStock = BigDecimal.ZERO;
-            boolean infinite = false;
+            boolean manageStock = false;
             InventarioActual actual = inventarioActualRepository.findByProducto(p);
             if(actual != null) {
                 inStock = actual.getCantidad().compareTo(BigDecimal.ZERO) > 0 ? actual.getCantidad() : BigDecimal.ZERO;
-                infinite = actual.isInfinite();
+                manageStock = actual.isManageStock();
             }
-            if(inStock.compareTo(BigDecimal.ZERO) > 0 || infinite) {
+            if(inStock.compareTo(BigDecimal.ZERO) > 0 || manageStock) {
                 ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(p);
                 if (productoValorVenta != null) {
-                    result.add(convertProductoToPventaDTO(p, productoValorVenta.getValorVenta(), inStock, infinite));
+                    result.add(convertProductoToPventaDTO(p, productoValorVenta.getValorVenta(), inStock, manageStock));
                 } else {
-                    result.add(convertProductoToPventaDTO(p, BigDecimal.ZERO, inStock, infinite));
+                    result.add(convertProductoToPventaDTO(p, BigDecimal.ZERO, inStock, manageStock));
                 }
             }
         });
@@ -223,18 +220,18 @@ public class VentaServiceImpl implements VentaService {
         if(producto != null) {
 
             BigDecimal inStock = BigDecimal.ZERO;
-            boolean infinite = false;
+            boolean manageStock = false;
             InventarioActual actual = inventarioActualRepository.findByProducto(producto);
             if (actual != null) {
                 inStock = actual.getCantidad().compareTo(BigDecimal.ZERO) > 0 ? actual.getCantidad() : BigDecimal.ZERO;
-                infinite = actual.isInfinite();
+                manageStock = actual.isManageStock();
             }
-            if (inStock.compareTo(BigDecimal.ZERO) > 0 || infinite) {
+            if (inStock.compareTo(BigDecimal.ZERO) > 0 || manageStock) {
                 ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
                 if (productoValorVenta != null) {
-                    result = convertProductoToPventaDTO(producto, productoValorVenta.getValorVenta(), inStock, infinite);
+                    result = convertProductoToPventaDTO(producto, productoValorVenta.getValorVenta(), inStock, manageStock);
                 } else {
-                    result = convertProductoToPventaDTO(producto, BigDecimal.ZERO, inStock, infinite);
+                    result = convertProductoToPventaDTO(producto, BigDecimal.ZERO, inStock, manageStock);
                 }
             }
         }
@@ -254,7 +251,7 @@ public class VentaServiceImpl implements VentaService {
         pv.setImpuestoId(p.getImpuesto().getId());
         pv.setImpuestoValor(p.getImpuesto().getValor());
         pv.setImpuestoNombre(p.getImpuesto().getNombre());
-        pv.setInfinite(infinite);
+        pv.setManageStock(infinite);
 
         return pv;
     }

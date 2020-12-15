@@ -51,7 +51,8 @@ public interface ICrudView<T> {
         }else{
             layout.removeClassName("editing");
             form.close();
-            filter.focus();
+            if(filter != null)
+                filter.focus();
         }
     }
 
