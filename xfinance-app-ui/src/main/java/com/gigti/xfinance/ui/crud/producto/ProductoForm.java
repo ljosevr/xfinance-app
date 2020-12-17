@@ -246,12 +246,13 @@ public class ProductoForm extends Dialog {
     public void setProducto(Producto producto, String title, String type) {
         binder.setBean(producto);
         setReadOnlyByDelete(type.equals(ICrudView.OPTION_DELETE));
-        if(type.equals(ICrudView.OPTION_EDIT)) {
+        if(type.equals(ICrudView.OPTION_EDIT) && (producto != null && producto.isInventarioDefinitivo())) {
            tfCantidadInicial.setReadOnly(true);
            tfPrecioCosto.setReadOnly(true);
            tfPrecioVenta.setReadOnly(true);
            chkControlarStock.setReadOnly(true);
            chkManageInitialStock.setVisible(false);
+           chkInventarioFinal.setReadOnly(true);
         }
         if(type.equals(ICrudView.OPTION_ADD)) {
             chkManageInitialStock.setVisible(true);
