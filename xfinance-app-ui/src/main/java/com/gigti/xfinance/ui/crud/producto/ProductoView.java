@@ -147,7 +147,7 @@ public class ProductoView extends VerticalLayout implements ICrudView<Producto> 
         Response response = productoService.saveProduct(producto, CurrentUser.get());
         if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList(grid, dataProvider);
+            dataProvider.refreshAll();
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());

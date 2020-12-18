@@ -50,32 +50,39 @@ public class ProductoServiceImpl implements ProductoService {
             if(StringUtils.isBlank(producto.getId())) {
                 isNewProduct = true;
             }
-            Producto newProducto = productoRepository.save(producto);
 
-            if(isNewProduct && producto.isManageInitialStock()) {
-                //Inventario Inicial
-                InventarioInicial inventarioInicial = new InventarioInicial();
-                inventarioInicial.setProducto(newProducto);
-                inventarioInicial.setPrecioCosto(producto.getPrecioCosto());
-                inventarioInicial.setPrecioVenta(producto.getPrecioVenta());
-                inventarioInicial.setCantidad(producto.getCantidadInicial());
-                inventarioInicial.setImpuesto(producto.getImpuesto());
-                inventarioInicial.setFechaActualizacion(new Date());
-                inventarioInicial.setManageStock(producto.isManageStock());
-                inventarioInicial.setDefinitivo(producto.isInventarioDefinitivo());
-                Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
-                if(response1.isSuccess()) {
-                    inventarioInicial = (InventarioInicial) response1.getObject();
-                    newProducto.setCantidadInicial(inventarioInicial.getCantidad());
-                    newProducto.setPrecioCosto(inventarioInicial.getPrecioCosto());
-                    newProducto.setPrecioVenta(inventarioInicial.getPrecioVenta());
-                    newProducto.setManageStock(inventarioInicial.isManageStock());
+            Producto productoTemp = productoRepository.findByEmpresaAndNombreProducto(producto.getEmpresa(), producto.getNombreProducto());
+            if(productoTemp == null) {
+                Producto newProducto = productoRepository.save(producto);
+
+                if (isNewProduct && producto.isManageInitialStock()) {
+                    //Inventario Inicial
+                    InventarioInicial inventarioInicial = new InventarioInicial();
+                    inventarioInicial.setProducto(newProducto);
+                    inventarioInicial.setPrecioCosto(producto.getPrecioCosto());
+                    inventarioInicial.setPrecioVenta(producto.getPrecioVenta());
+                    inventarioInicial.setCantidad(producto.getCantidadInicial());
+                    inventarioInicial.setImpuesto(producto.getImpuesto());
+                    inventarioInicial.setFechaActualizacion(new Date());
+                    inventarioInicial.setManageStock(producto.isManageStock());
+                    inventarioInicial.setDefinitivo(producto.isInventarioDefinitivo());
+                    Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
+                    if (response1.isSuccess()) {
+                        inventarioInicial = (InventarioInicial) response1.getObject();
+                        newProducto.setCantidadInicial(inventarioInicial.getCantidad());
+                        newProducto.setPrecioCosto(inventarioInicial.getPrecioCosto());
+                        newProducto.setPrecioVenta(inventarioInicial.getPrecioVenta());
+                        newProducto.setManageStock(inventarioInicial.isManageStock());
+                    }
                 }
-            }
 
-            response.setObject(producto);
-            response.setMessage("Producto Guardado Exitosamente");
-            response.setSuccess(true);
+                response.setObject(producto);
+                response.setMessage("Producto Guardado Exitosamente");
+                response.setSuccess(true);
+            } else {
+                response.setMessage("Producto con NOMBRE: "+producto.getNombreProducto() + " - Ya Existe");
+                response.setSuccess(false);
+            }
         }catch(Exception e){
             logger.error(" Error: "+e.getMessage(), e);
             response.setSuccess(false);
@@ -110,7 +117,7 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public List<Producto> findByNombreProducto(Empresa empresa, String productName) {
-        return productoRepository.findByEmpresaAndNombreProducto(empresa, productName);
+        return productoRepository.findAllByEmpresaAndNombreProducto(empresa, productName);
     }
 
     public List<Producto> findAll(String filterText, Empresa empresa, int page, int size) {

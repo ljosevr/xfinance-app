@@ -81,5 +81,12 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
             "AND p.empresa =:empresa AND " +
             "p.eliminado = FALSE " +
             "ORDER BY p.nombreProducto")
-    List<Producto> findByEmpresaAndNombreProducto(Empresa empresa, String productName);
+    List<Producto> findAllByEmpresaAndNombreProducto(Empresa empresa, String productName);
+
+    @Query("SELECT p FROM Producto p " +
+            "WHERE p.nombreProducto = :productName " +
+            "AND p.empresa =:empresa AND " +
+            "p.eliminado = FALSE " +
+            "ORDER BY p.nombreProducto")
+    Producto findByEmpresaAndNombreProducto(Empresa empresa, String productName);
 }

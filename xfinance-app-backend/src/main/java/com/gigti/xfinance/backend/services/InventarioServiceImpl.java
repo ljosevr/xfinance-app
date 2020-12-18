@@ -60,7 +60,7 @@ public class InventarioServiceImpl implements InventarioService {
         if(filterText == null || filterText.isEmpty()) {
             listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
         } else  {
-            listaProductos = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
+            listaProductos = productoRepository.findAllByEmpresaAndNombreProducto(empresa, filterText);
         }
 
         listaProductos.forEach(p -> {
@@ -92,7 +92,7 @@ public class InventarioServiceImpl implements InventarioService {
         if(filterText == null || filterText.isEmpty()) {
             listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
         } else  {
-            listaProductos = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
+            listaProductos = productoRepository.findAllByEmpresaAndNombreProducto(empresa, filterText);
         }
 
         listaProductos.forEach(p -> {
