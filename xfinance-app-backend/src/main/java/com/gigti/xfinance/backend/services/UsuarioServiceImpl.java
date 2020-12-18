@@ -180,7 +180,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public List<UsuarioDTO> findAll(String filter, Empresa empresa, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
         List<UsuarioDTO> result = new ArrayList<>();
-        List<Usuario> usuarios = new ArrayList<>();
+        List<Usuario> usuarios;
         if(filter == null || filter.isEmpty()) {
             usuarios = usuarioRepository.findByEmpresaAndEliminadoIsFalse(empresa, pageable);
         } else  {

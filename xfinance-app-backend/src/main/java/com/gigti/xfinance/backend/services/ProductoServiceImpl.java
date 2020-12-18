@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -122,7 +123,7 @@ public class ProductoServiceImpl implements ProductoService {
                 setInventarioInicial(p);
             });
         } else  {
-            listResult = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
+            listResult = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText, pageable);
         }
         return listResult;
     }
@@ -130,15 +131,22 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public List<Producto> findAll(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
         logger.info("--> findAll Productos "+offsetBasedPageRequest.getPageNumber() +" - "+offsetBasedPageRequest.getPageSize()+ " - "+offsetBasedPageRequest.getOffset());
-        List<Producto> listResult;
-        if(filterText == null || filterText.isEmpty()) {
-            listResult = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
-        } else  {
-            listResult = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText);
+        try {
+            List<Producto> listResult;
+            logger.info("-- Filter: "+ filterText);
+            if (filterText == null || filterText.isEmpty()) {
+                listResult = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
+            } else {
+                listResult = productoRepository.findByEmpresaAndNombreProducto(empresa, filterText, offsetBasedPageRequest);
+            }
+            listResult.forEach(p -> setInventarioInicial(p));
+            logger.info("<-- findAll Productos "+listResult.size());
+            return listResult;
+        }catch(Exception e) {
+            logger.error("Error al Obtener productos: "+e.getMessage(), e);
+            return new ArrayList<>();
         }
-        listResult.forEach(p -> setInventarioInicial(p));
-        logger.info("<-- findAll Productos "+listResult.size());
-        return listResult;
+
     }
 
     private void setInventarioInicial(Producto p) {
@@ -188,13 +196,15 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     public int count(String filterText, Empresa empresa) {
+        logger.info("--> count Productos");
         int count;
+        logger.info("-- Filter: "+ filterText);
         if(filterText == null || filterText.isEmpty()) {
             count = productoRepository.countByEmpresaAndEliminadoIsFalse(empresa);
         } else  {
             count = productoRepository.countByEmpresaAndNombreProducto(empresa, filterText);
         }
-
+        logger.info("<-- count Productos: "+count);
         return count;
     }
 

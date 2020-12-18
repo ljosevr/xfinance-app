@@ -74,12 +74,12 @@ public class ProductoView extends VerticalLayout implements ICrudView<Producto> 
 
         this.add(title, searchLayout, grid);
 
-        updateList(grid, dataProvider);
+        //updateList(grid, dataProvider);
+        grid.setDataProvider(dataProvider);
         closeEditor();
     }
 
     public void closeEditor() {
-        //form.setProducto(null, "", "");
         grid.deselectAll();
         showForm(false, form, this, filter);
     }
@@ -103,7 +103,7 @@ public class ProductoView extends VerticalLayout implements ICrudView<Producto> 
                 "", true,
                 "", true,
                 "", true);
-        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
         searchLayout.getFilter().focus();
         searchLayout.getBtnAdd().addClickListener(click -> {
             Producto p = new Producto();
@@ -111,7 +111,7 @@ public class ProductoView extends VerticalLayout implements ICrudView<Producto> 
             p.setCategoria(listCategoria.get(0));
             addItem(grid, p);
         });
-        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
         searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
         searchLayout.getBtnDelete().addClickListener(click -> deleteItem(grid.asSingleSelect().getValue()));
         filter = searchLayout.getFilter();

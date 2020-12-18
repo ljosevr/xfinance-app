@@ -89,14 +89,14 @@ public class CategoriaView extends VerticalLayout implements ICrudView<Categoria
                 "", true,
                 "", true,
                 "", true);
-        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
         searchLayout.getFilter().focus();
         searchLayout.getBtnAdd().addClickListener(click -> {
             CategoriaProducto c = new CategoriaProducto();
             c.setActivo(true);
             addItem(grid, c);
         });
-        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
         searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
         searchLayout.getBtnDelete().addClickListener(click -> deleteItem(grid.asSingleSelect().getValue()));
         filter = searchLayout.getFilter();

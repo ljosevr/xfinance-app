@@ -31,6 +31,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.validator.BigDecimalRangeValidator;
 import com.vaadin.flow.shared.Registration;
 
 import java.math.BigDecimal;
@@ -176,7 +177,9 @@ public class ProductoForm extends Dialog {
             }
         });
 
-        binder = new BeanValidationBinder<>(Producto.class);
+        //TODO READBEAN AND WRITEBEAN
+
+        binder = new Binder<>(Producto.class);
         binder.forField(tfProdNombre).asRequired("Digite Nombre").bind(Producto::getNombreProducto, Producto::setNombreProducto);
         binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
         binder.forField(tfProdCodigoB).bind(Producto::getCodigoBarra, Producto::setCodigoBarra);

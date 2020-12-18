@@ -65,8 +65,8 @@ public class SearchFilterComponent extends FormLayout {
         btnAdd = new Button(labelAddBtn);
         btnAdd.addThemeVariants(ButtonVariant.LUMO_SMALL, ButtonVariant.LUMO_PRIMARY);
         btnAdd.setIcon(VaadinIcon.PLUS_CIRCLE.create());
-        btnAdd.getElement().setAttribute("title", "Agregar - F4");
-        btnAdd.addClickShortcut(Key.F4);
+        btnAdd.getElement().setAttribute("title", "Agregar - F6");
+        btnAdd.addClickShortcut(Key.F6);
         btnAdd.setVisible(visibleAddBtn);
         btnAdd.setMaxWidth("35px");
 

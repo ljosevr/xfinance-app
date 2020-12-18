@@ -48,7 +48,7 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
             "AND p.empresa =:empresa AND " +
             "p.eliminado = FALSE " +
             "ORDER BY p.nombreProducto")
-    List<Producto> findByEmpresaAndNombreProducto(Empresa empresa, String productName);
+    List<Producto> findByEmpresaAndNombreProducto(Empresa empresa, String productName, Pageable pageable);
 
     Producto findByEmpresaAndCodigoBarra(Empresa empresa, String codigoBarra);
 
@@ -75,4 +75,11 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
             "WHERE p.empresa =:empresa AND " +
             "p.eliminado = FALSE " )
     List<Producto> findByEmpresaAndNotInfiniteStock(@Param("empresa") Empresa empresa);
+
+    @Query("SELECT p FROM Producto p " +
+            "WHERE UPPER(p.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') " +
+            "AND p.empresa =:empresa AND " +
+            "p.eliminado = FALSE " +
+            "ORDER BY p.nombreProducto")
+    List<Producto> findByEmpresaAndNombreProducto(Empresa empresa, String productName);
 }
