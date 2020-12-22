@@ -3,6 +3,7 @@ package com.gigti.xfinance.ui.crud.categoria;
 import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
+import com.gigti.xfinance.ui.util.MyToggleButton;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -19,14 +20,15 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.dom.ElementFactory;
 import com.vaadin.flow.shared.Registration;
 
 public class CategoriaForm extends Dialog {
     private final TextField tfCatDescripcion;
-    private final Checkbox chkCatActivo;
     private final Button btnDelete;
     private final H2 titleForm;
     private final TextField tfCatNombre;
+    private final MyToggleButton tActivo;
     private Button btnSave;
     private final Binder<CategoriaProducto> binder;
 
@@ -55,15 +57,25 @@ public class CategoriaForm extends Dialog {
         tfCatDescripcion.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
         tfCatDescripcion.setClearButtonVisible(true);
 
-        chkCatActivo = new Checkbox("Activo");
-        chkCatActivo.setValue(true);
+        tActivo = new MyToggleButton();
+        tActivo.setLabel("Inactivo");
+        tActivo.setValue(false);
+        tActivo.getElement().setAttribute("title", "Campo para Activar o Inactivar Categoría");
+
+        tActivo.addValueChangeListener(value -> {
+            if(value.getValue()){
+                tActivo.setLabel("Activo");
+            } else {
+                tActivo.setLabel("Inactivo");
+            }
+        });
 
         binder = new BeanValidationBinder<>(CategoriaProducto.class);
         binder.forField(tfCatNombre).asRequired("Digite Nombre de Categoria").bind(CategoriaProducto::getNombre,
                 CategoriaProducto::setNombre);
         binder.forField(tfCatDescripcion).bind(CategoriaProducto::getDescripcion,
                 CategoriaProducto::setDescripcion);
-        binder.forField(chkCatActivo).bind(CategoriaProducto::isActivo,
+        binder.forField(tActivo).bind(CategoriaProducto::isActivo,
                 CategoriaProducto::setActivo);
         binder.bindInstanceFields(this);
 
@@ -84,7 +96,8 @@ public class CategoriaForm extends Dialog {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete, btnClose);
 
-        content.add(titleForm,tfCatNombre,tfCatDescripcion,chkCatActivo, actionsLayout);
+        content.add(titleForm,tfCatNombre,tfCatDescripcion,tActivo);
+        content.add(actionsLayout);
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
         content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
 
@@ -106,7 +119,7 @@ public class CategoriaForm extends Dialog {
         btnDelete.setText(readOnly ? "Sí, Eliminar" : "Eliminar");
         tfCatNombre.setReadOnly(readOnly);
         tfCatDescripcion.setReadOnly(readOnly);
-        chkCatActivo.setReadOnly(readOnly);
+        tActivo.setReadOnly(readOnly);
     }
 
     private void validateAndSave() {

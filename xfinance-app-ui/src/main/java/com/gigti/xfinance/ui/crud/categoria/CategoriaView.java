@@ -62,7 +62,6 @@ public class CategoriaView extends VerticalLayout implements ICrudView<Categoria
 
     @Override
     public void closeEditor() {
-        form.setCategoria(null, "", "");
         grid.deselectAll();
         showForm(false, form, this, filter);
     }
@@ -133,7 +132,7 @@ public class CategoriaView extends VerticalLayout implements ICrudView<Categoria
         Response response = categoriaProductoService.saveCategoria(categoria);
         if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList(grid, dataProvider);
+            dataProvider.refreshAll();
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
@@ -146,7 +145,7 @@ public class CategoriaView extends VerticalLayout implements ICrudView<Categoria
         Response response = categoriaProductoService.delete(categoria.getId());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList(grid, dataProvider);
+            dataProvider.refreshAll();
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());

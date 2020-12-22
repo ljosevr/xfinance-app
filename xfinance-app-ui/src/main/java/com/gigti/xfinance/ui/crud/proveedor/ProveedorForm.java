@@ -4,6 +4,7 @@ import com.gigti.xfinance.backend.data.Proveedor;
 import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
+import com.gigti.xfinance.ui.util.MyToggleButton;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -30,13 +31,13 @@ public class ProveedorForm extends Dialog {
 
     private final H2 titleForm;
     private final ComboBox<TipoIde> cbTipoIde;
-    private final Checkbox chkActivo;
     private final EmailField tfEmail;
     private final TextField tfIdentificacion;
     private final TextField tfNombreProveedor;
     private final TextField tfDireccion;
     private final TextField tfTelefono;
     private final Button btnDelete;
+    private final MyToggleButton tActivo;
     private Button btnSave;
     private Binder<Proveedor> binder;
 
@@ -78,12 +79,21 @@ public class ProveedorForm extends Dialog {
         tfEmail.setErrorMessage("Agregue un Email Valido");
         tfEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        chkActivo = new Checkbox("Activo");
-        chkActivo.setValue(true);
-        chkActivo.setRequiredIndicatorVisible(true);
+        tActivo = new MyToggleButton();
+        tActivo.setLabel("Inactivo");
+        tActivo.setValue(false);
+        tActivo.getElement().setAttribute("title", "Campo para Activar o Inactivar Categoría");
+
+        tActivo.addValueChangeListener(value -> {
+            if(value.getValue()){
+                tActivo.setLabel("Activo");
+            } else {
+                tActivo.setLabel("Inactivo");
+            }
+        });
 
         binder = new BeanValidationBinder<>(Proveedor.class);
-        binder.forField(chkActivo).bind(Proveedor::isActivo, Proveedor::setActivo);
+        binder.forField(tActivo).bind(Proveedor::isActivo, Proveedor::setActivo);
         binder.forField(cbTipoIde).asRequired("Seleccione el Tipo de Identificación").bind(Proveedor::getTipoIde, Proveedor::setTipoIde);
         binder.forField(tfIdentificacion).asRequired("Digite Identificación").bind(Proveedor::getIdentificacion, Proveedor::setIdentificacion);
         binder.forField(tfNombreProveedor).asRequired("Digite Nombre").bind(Proveedor::getNombre, Proveedor::setNombre);
@@ -111,7 +121,8 @@ public class ProveedorForm extends Dialog {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnSave, btnDelete,btnClose);
 
-        content.add(titleForm, cbTipoIde,tfIdentificacion,tfNombreProveedor, tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
+        content.add(titleForm, cbTipoIde,tfIdentificacion,tfNombreProveedor, tfDireccion,tfTelefono,
+                tfEmail, tActivo, actionsLayout);
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
         content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
         this.setCloseOnEsc(true);
@@ -141,7 +152,7 @@ public class ProveedorForm extends Dialog {
         tfIdentificacion.setReadOnly(readOnly);
         tfNombreProveedor.setReadOnly(readOnly);
         tfTelefono.setReadOnly(readOnly);
-        chkActivo.setReadOnly(readOnly);
+        tActivo.setReadOnly(readOnly);
         cbTipoIde.setReadOnly(readOnly);
     }
 

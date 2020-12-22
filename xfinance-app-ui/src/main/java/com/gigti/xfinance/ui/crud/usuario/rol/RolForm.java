@@ -7,6 +7,7 @@ import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.ui.crud.categoria.CategoriaForm;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
+import com.gigti.xfinance.ui.util.MyToggleButton;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.github.appreciated.app.layout.component.menu.left.builder.LeftSubMenuBuilder;
 import com.github.appreciated.app.layout.component.menu.left.items.LeftNavigationItem;
@@ -43,9 +44,9 @@ import java.util.stream.Collectors;
 public class RolForm extends Dialog {
     private final TextField tfRolName;
     private final TextField tfRoldescription;
-    private final Checkbox chkRolActivo;
     private final Button btnDelete;
     private final H2 titleForm;
+    private final MyToggleButton tActivo;
     private Button btnSave;
     private final Binder<Rol> binder;
     private TwinColSelect<Vista> twinColGrid;
@@ -78,15 +79,25 @@ public class RolForm extends Dialog {
         tfRoldescription.addThemeVariants(TextFieldVariant.LUMO_SMALL, TextFieldVariant.MATERIAL_ALWAYS_FLOAT_LABEL);
         tfRoldescription.setClearButtonVisible(true);
 
-        chkRolActivo = new Checkbox("Activo");
-        chkRolActivo.setValue(true);
+        tActivo = new MyToggleButton();
+        tActivo.setLabel("Inactivo");
+        tActivo.setValue(false);
+        tActivo.getElement().setAttribute("title", "Campo para Activar o Inactivar Categoría");
+
+        tActivo.addValueChangeListener(value -> {
+            if(value.getValue()){
+                tActivo.setLabel("Activo");
+            } else {
+                tActivo.setLabel("Inactivo");
+            }
+        });
 
         binder = new BeanValidationBinder<>(Rol.class);
         binder.forField(tfRolName).asRequired("Digite Nombre del Rol").bind(Rol::getNombre,
                 Rol::setNombre);
         binder.forField(tfRoldescription).bind(Rol::getDescripcion,
                 Rol::setDescripcion);
-        binder.forField(chkRolActivo).bind(Rol::isActivo,
+        binder.forField(tActivo).bind(Rol::isActivo,
                 Rol::setActivo);
         binder.bindInstanceFields(this);
 
@@ -109,10 +120,8 @@ public class RolForm extends Dialog {
 
         VerticalLayout layoutTwinCol = buildGridVistas();
         layoutTwinCol.add(actionsLayout);
-        //content.add(titleForm,tfRolName,tfRoldescription,chkRolActivo, layoutTwinCol, actionsLayout);
-        content.add(titleForm,tfRolName,tfRoldescription,chkRolActivo, layoutTwinCol);
+        content.add(titleForm,tfRolName,tfRoldescription,tActivo, layoutTwinCol);
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
-        //content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
         content.setColspan(layoutTwinCol, content.getResponsiveSteps().size()+1);
 
         this.setCloseOnEsc(true);
@@ -219,7 +228,7 @@ public class RolForm extends Dialog {
         btnDelete.setText(readOnly ? "Sí, Eliminar" : "Eliminar");
         tfRolName.setReadOnly(readOnly);
         tfRoldescription.setReadOnly(readOnly);
-        chkRolActivo.setReadOnly(readOnly);
+        tActivo.setReadOnly(readOnly);
     }
 
     private void validateAndSave() {

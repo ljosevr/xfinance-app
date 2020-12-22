@@ -71,7 +71,6 @@ public class RolView extends VerticalLayout implements ICrudView<Rol> {
 
     @Override
     public void closeEditor() {
-        form.setRol(null, "", "", new ArrayList<>());
         grid.deselectAll();
         showForm(false, form, this, filter);
     }

@@ -92,7 +92,7 @@ public class InventarioServiceImpl implements InventarioService {
         if(filterText == null || filterText.isEmpty()) {
             listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
         } else  {
-            listaProductos = productoRepository.findAllByEmpresaAndNombreProducto(empresa, filterText);
+            listaProductos = productoRepository.findAllByEmpresaAndNombreProducto(empresa, filterText, offsetBasedPageRequest);
         }
 
         listaProductos.forEach(p -> {

@@ -11,6 +11,7 @@ import com.gigti.xfinance.backend.data.TipoIde;
 import com.gigti.xfinance.backend.data.dto.UsuarioDTO;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
+import com.gigti.xfinance.ui.util.MyToggleButton;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
@@ -41,7 +42,6 @@ public class UsuarioForm extends Dialog {
     private final H2 titleForm;
     private final Button btnDelete;
     private final EmailField tfEmail;
-    private final Checkbox chkActivo;
     private final ComboBox<Rol> cbRoles;
     private final ComboBox<TipoIde> cbTipoIdePersona;
     private final TextField tfTelefono;
@@ -51,6 +51,7 @@ public class UsuarioForm extends Dialog {
     private final TextField tfPrimerApellidoUsuario;
     private final TextField tfSegundoApellidoUsuario;
     private final TextField tfDireccion;
+    private final MyToggleButton tActivo;
     private Button btnSave;
     private final Binder<UsuarioDTO> binderUsuario;
 
@@ -118,12 +119,21 @@ public class UsuarioForm extends Dialog {
         tfEmail.setErrorMessage("Agregue un Email Valido");
         tfEmail.addThemeVariants(TextFieldVariant.LUMO_SMALL);
 
-        chkActivo = new Checkbox("Activo");
-        chkActivo.setValue(true);
-        chkActivo.setRequiredIndicatorVisible(true);
+        tActivo = new MyToggleButton();
+        tActivo.setLabel("Inactivo");
+        tActivo.setValue(false);
+        tActivo.getElement().setAttribute("title", "Campo para Activar o Inactivar Categoría");
+
+        tActivo.addValueChangeListener(value -> {
+            if(value.getValue()){
+                tActivo.setLabel("Activo");
+            } else {
+                tActivo.setLabel("Inactivo");
+            }
+        });
 
         binderUsuario.forField(tfUsuario).asRequired("Digite el Nombre del Usuario").bind(UsuarioDTO::getNombreUsuario, UsuarioDTO::setNombreUsuario);
-        binderUsuario.forField(chkActivo).bind(UsuarioDTO::isActivo, UsuarioDTO::setActivo);
+        binderUsuario.forField(tActivo).bind(UsuarioDTO::isActivo, UsuarioDTO::setActivo);
         binderUsuario.forField(cbRoles).asRequired("Selecciona Un Rol").bind(UsuarioDTO::getRol, UsuarioDTO::setRol);
 
         binderUsuario.forField(cbTipoIdePersona).asRequired("Seleccione el Tipo de Identificación").bind(UsuarioDTO::getTipoIde, UsuarioDTO::setTipoIde);
@@ -159,8 +169,9 @@ public class UsuarioForm extends Dialog {
         actionsLayout.add(btnSave, btnDelete, btnClose);
 
         content.add(titleForm, tfUsuario, cbRoles,cbTipoIdePersona,tfIdentificacionPersona,tfprimerNombreUsuario,tfSegundoNombreUsuario,
-                tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, chkActivo, actionsLayout);
+                tfPrimerApellidoUsuario,tfSegundoApellidoUsuario,tfDireccion,tfTelefono, tfEmail, tActivo, actionsLayout);
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
+        content.setColspan(actionsLayout, content.getResponsiveSteps().size()+1);
 
         this.setCloseOnEsc(true);
         this.setCloseOnOutsideClick(false);
@@ -189,7 +200,7 @@ public class UsuarioForm extends Dialog {
         tfTelefono.setReadOnly(readOnly);
         cbRoles.setReadOnly(readOnly);
         cbTipoIdePersona.setReadOnly(readOnly);
-        chkActivo.setReadOnly(readOnly);
+        tActivo.setReadOnly(readOnly);
     }
 
     private void validateAndSave() {

@@ -5,12 +5,12 @@
     <parent>
         <artifactId>xfinance-app</artifactId>
         <groupId>com.gigti.xfinance</groupId>
-        <version>1.0.4-SNAPSHOT</version>
+        <version>1.0.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>xfinance-app-backend</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
     <build>
         <plugins>
             <plugin>

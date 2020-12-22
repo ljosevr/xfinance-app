@@ -84,6 +84,13 @@ public interface ProductoRepository extends JpaRepository<Producto, String> {
     List<Producto> findAllByEmpresaAndNombreProducto(Empresa empresa, String productName);
 
     @Query("SELECT p FROM Producto p " +
+            "WHERE UPPER(p.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') " +
+            "AND p.empresa =:empresa AND " +
+            "p.eliminado = FALSE " +
+            "ORDER BY p.nombreProducto")
+    List<Producto> findAllByEmpresaAndNombreProducto(Empresa empresa, String productName, Pageable pageable);
+
+    @Query("SELECT p FROM Producto p " +
             "WHERE p.nombreProducto = :productName " +
             "AND p.empresa =:empresa AND " +
             "p.eliminado = FALSE " +

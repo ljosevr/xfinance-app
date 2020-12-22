@@ -78,7 +78,6 @@ public class UsuarioView extends VerticalLayout implements ICrudView<Usuario> {
     }
 
     public void closeEditor() {
-        form.setUser(null, "", "");
         grid.deselectAll();
         showForm(false);
     }
@@ -91,7 +90,6 @@ public class UsuarioView extends VerticalLayout implements ICrudView<Usuario> {
 
     public void updateList() {
         grid.setDataProvider(dataProvider);
-        //grid.setItems(usuarioService.findAll(filter.getValue(), empresa, grid.getPage(), grid.getPageSize()));
     }
 
     public void configureSearchLayout() {

@@ -60,7 +60,6 @@ public class ProveedorView extends VerticalLayout implements ICrudView<Proveedor
     }
 
     public void closeEditor() {
-        form.setProveedor(null, "", "");
         grid.deselectAll();
         showForm(false, form, this, filter);
     }
@@ -127,7 +126,7 @@ public class ProveedorView extends VerticalLayout implements ICrudView<Proveedor
         Response response = proveedorService.save(proveedor, CurrentUser.get());
         if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList(grid, dataProvider);
+            dataProvider.refreshAll();
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());
@@ -139,7 +138,7 @@ public class ProveedorView extends VerticalLayout implements ICrudView<Proveedor
         Response response = proveedorService.delete(proveedor, CurrentUser.get());
         if(response.isSuccess()){
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList(grid, dataProvider);
+            dataProvider.refreshAll();
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());

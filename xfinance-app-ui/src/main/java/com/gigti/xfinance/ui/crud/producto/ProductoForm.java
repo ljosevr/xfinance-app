@@ -12,6 +12,7 @@ import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.TipoMedida;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
+import com.gigti.xfinance.ui.util.MyToggleButton;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -31,6 +32,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.converter.StringToBigDecimalConverter;
 import com.vaadin.flow.data.validator.BigDecimalRangeValidator;
 import com.vaadin.flow.shared.Registration;
 
@@ -50,7 +52,7 @@ public class ProductoForm extends Dialog {
     private final ComboBox<Impuesto> cbImpuesto;
     private final TextField tfProdCodigoB;
     private final TextField tfProdDescripcion;
-    private final Checkbox chkActivo;
+    private final MyToggleButton tActivo;
     private final ComboBox<CategoriaProducto> cbCategorias;
     private final Checkbox chkManageInitialStock;
     private final Checkbox chkInventarioFinal;
@@ -60,9 +62,12 @@ public class ProductoForm extends Dialog {
     private Button btnSave;
     private final Binder<Producto> binder;
     private final BigDecimalField tfCantidadInicial;
+    private List<TipoMedida> listaTipoMedida;
+    private List<Impuesto> listImpuestos;
 
     public ProductoForm(List<CategoriaProducto> listCategoria, List<TipoMedida> listaTipoMedida, List<Impuesto> listImpuestos) {
-
+        this.listaTipoMedida = listaTipoMedida;
+        this.listImpuestos = listImpuestos;
         this.setDraggable(true);
         this.setModal(true);
         this.setResizable(true);
@@ -100,7 +105,21 @@ public class ProductoForm extends Dialog {
         cbTipoMedida.getElement().setAttribute("title", "Campo para determinar que medida usa el Producto");
         //Tooltips.getCurrent().setTooltip(cbTipoMedida, "Campo para determinar que medida usa el Producto");
 
-        chkActivo = new Checkbox("Activo");
+        tActivo = new MyToggleButton();
+        tActivo.setLabel("Inactivo");
+        tActivo.setValue(false);
+        //tActivo.setHelperText("probando");
+
+        tActivo.getElement().setAttribute("title", "Campo para Activar o Inactivar Producto");
+
+        tActivo.addValueChangeListener(value -> {
+            if(value.getValue()){
+                tActivo.setLabel("Activo");
+            } else {
+                tActivo.setLabel("Inactivo");
+            }
+        });
+
 
         cbCategorias = new ComboBox<>();
         cbCategorias.setLabel("Categoria");
@@ -177,13 +196,11 @@ public class ProductoForm extends Dialog {
             }
         });
 
-        //TODO READBEAN AND WRITEBEAN
-
         binder = new Binder<>(Producto.class);
         binder.forField(tfProdNombre).asRequired("Digite Nombre").bind(Producto::getNombreProducto, Producto::setNombreProducto);
         binder.forField(tfProdDescripcion).bind(Producto::getDescripcion, Producto::setDescripcion);
         binder.forField(tfProdCodigoB).bind(Producto::getCodigoBarra, Producto::setCodigoBarra);
-        binder.forField(chkActivo).bind(Producto::isActivo, Producto::setActivo);
+        binder.forField(tActivo).bind(Producto::isActivo, Producto::setActivo);
         binder.forField(cbCategorias).asRequired("Seleccione una Categoria").bind(Producto::getCategoria, Producto::setCategoria);
         binder.forField(cbTipoMedida).asRequired("Seleccione una Unidad de Medida").bind(Producto::getTipoMedida, Producto::setTipoMedida);
         binder.forField(cbImpuesto).asRequired("Seleccione un Impuesto").bind(Producto::getImpuesto, Producto::setImpuesto);
@@ -207,7 +224,10 @@ public class ProductoForm extends Dialog {
             } else {
                 return true;
             }
-        },"Digita precio de Venta Inicial").bind(Producto::getPrecioVenta, Producto::setPrecioVenta);
+        },"Digita precio de Venta Inicial")
+                .bind(Producto::getPrecioVenta, Producto::setPrecioVenta);
+
+
         binder.forField(chkControlarStock).bind(Producto::isManageStock, Producto::setManageStock);
         binder.forField(chkManageInitialStock).bind(Producto::isManageInitialStock, Producto::setManageInitialStock);
         binder.forField(chkInventarioFinal).bind(Producto::isInventarioDefinitivo, Producto::setInventarioDefinitivo);
@@ -235,7 +255,7 @@ public class ProductoForm extends Dialog {
 
         content.add(titleForm, tfProdNombre,tfProdCodigoB,
                 tfProdDescripcion, cbTipoMedida,
-                cbCategorias, cbImpuesto, chkActivo, chkManageInitialStock, contentSub, actionsLayout);
+                cbCategorias, cbImpuesto, tActivo, chkManageInitialStock, contentSub, actionsLayout);
 
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
         content.setColspan(contentSub, content.getResponsiveSteps().size()+1);
@@ -259,6 +279,12 @@ public class ProductoForm extends Dialog {
         }
         if(type.equals(ICrudView.OPTION_ADD)) {
             chkManageInitialStock.setVisible(true);
+            if(!listaTipoMedida.isEmpty()){
+                cbTipoMedida.setValue(listaTipoMedida.get(0));
+            }
+            if(!listImpuestos.isEmpty()){
+                cbImpuesto.setValue(listImpuestos.get(0));
+            }
         }
         contentSub.setVisible((ICrudView.OPTION_ADD.equals(type) || producto != null) && producto.isManageInitialStock());
         btnDelete.setEnabled(!ICrudView.OPTION_ADD.equals(type));
@@ -276,7 +302,7 @@ public class ProductoForm extends Dialog {
         cbCategorias.setReadOnly(readOnly);
         cbImpuesto.setReadOnly(readOnly);
         cbTipoMedida.setReadOnly(readOnly);
-        chkActivo.setReadOnly(readOnly);
+        tActivo.setReadOnly(readOnly);
         tfCantidadInicial.setReadOnly(readOnly);
         tfPrecioCosto.setReadOnly(readOnly);
         tfPrecioVenta.setReadOnly(readOnly);
