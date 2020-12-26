@@ -75,12 +75,13 @@ public class InvActualView extends VerticalLayout  implements ICrudView<Inventar
 
     @Override
     public void configureSearchLayout() {
-        searchLayout = new SearchFilterComponent("", true,
+        searchLayout = new SearchFilterComponent("", false,
                 "", "Filtro Nombre Producto",
                 "", true,
                 "", false,
                 "", false);
-        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
+        searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
         searchLayout.getFilter().focus();
         filter = searchLayout.getFilter();
     }

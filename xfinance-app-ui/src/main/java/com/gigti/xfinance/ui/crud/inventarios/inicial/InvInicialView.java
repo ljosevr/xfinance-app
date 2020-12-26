@@ -105,10 +105,10 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
                 "", true,
                 "", true,
                 "", false);
-        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> updateList(grid, dataProvider));
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
         searchLayout.getFilter().focus();
         searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
-        searchLayout.getBtnSearch().addClickListener(click -> updateList(grid, dataProvider));
+        searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
         filter = searchLayout.getFilter();
     }
 

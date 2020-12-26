@@ -10,10 +10,12 @@ import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.data.renderer.NumberRenderer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.Locale;
 
@@ -42,27 +44,36 @@ public class InvInicialGrid extends Grid<InventarioInicial> {
             .setTextAlign(ColumnTextAlign.CENTER)
             .setSortable(true);
 
-        addColumn(inventario -> {
-            final DecimalFormat decimalFormat = new DecimalFormat();
-            decimalFormat.setCurrency(Currency.getInstance(Locale.US));
-            decimalFormat.setMaximumFractionDigits(2);
-            decimalFormat.setMinimumFractionDigits(0);
-
-            return "$ "+decimalFormat.format(inventario.getPrecioCosto() != null ? inventario.getPrecioCosto() : BigDecimal.ZERO);
-        }).setHeader("Precio Costo")
+        addColumn(new NumberRenderer<>(InventarioInicial::getPrecioCosto, NumberFormat.getCurrencyInstance(Locale.US)))
                 .setTextAlign(ColumnTextAlign.END)
-                .setKey("pcosto");
+                .setKey("pcosto")
+                .setHeader("Precio Costo");
 
-        addColumn(inventario -> {
-            final DecimalFormat decimalFormat = new DecimalFormat();
-            decimalFormat.setCurrency(Currency.getInstance(Locale.US));
-            decimalFormat.setMaximumFractionDigits(2);
-            decimalFormat.setMinimumFractionDigits(0);
-
-            return "$ "+decimalFormat.format(inventario.getPrecioVenta());
-        }).setHeader("Precio Venta")
+//        addColumn(inventario -> {
+//            final DecimalFormat decimalFormat = new DecimalFormat();
+//            decimalFormat.setCurrency(Currency.getInstance(Locale.US));
+//            decimalFormat.setMaximumFractionDigits(2);
+//            decimalFormat.setMinimumFractionDigits(0);
+//
+//            return "$ "+decimalFormat.format(inventario.getPrecioCosto() != null ? inventario.getPrecioCosto() : BigDecimal.ZERO);
+//        }).setHeader("Precio Costo")
+//                .setTextAlign(ColumnTextAlign.END)
+//                .setKey("pcosto");
+        addColumn(new NumberRenderer<>(InventarioInicial::getPrecioVenta, NumberFormat.getCurrencyInstance(Locale.US)))
                 .setTextAlign(ColumnTextAlign.END)
-                .setKey("pventa");
+                .setKey("pventa")
+                .setHeader("Precio Venta");
+
+//        addColumn(inventario -> {
+//            final DecimalFormat decimalFormat = new DecimalFormat();
+//            decimalFormat.setCurrency(Currency.getInstance(Locale.US));
+//            decimalFormat.setMaximumFractionDigits(2);
+//            decimalFormat.setMinimumFractionDigits(0);
+//
+//            return "$ "+decimalFormat.format(inventario.getPrecioVenta());
+//        }).setHeader("Precio Venta")
+//                .setTextAlign(ColumnTextAlign.END)
+//                .setKey("pventa");
 
         addColumn(inv -> inv.isDefinitivo() ? "SI" : "NO")
                 .setHeader("Definitivo")

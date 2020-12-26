@@ -11,6 +11,11 @@ import com.gigti.xfinance.ui.util.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.data.renderer.LocalDateRenderer;
+import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
+
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 
 public class InvActualGrid extends Grid<InventarioActualCosto> {
 
@@ -32,6 +37,11 @@ public class InvActualGrid extends Grid<InventarioActualCosto> {
         addColumn(inv -> inv.isManageStock() ? "SI" : "NO")
                 .setHeader("Controla Stock")
                 .setSortable(true);
+
+//        addColumn(new LocalDateRenderer<>(InventarioActualCosto::getFechaActualizacion,
+//                DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)))
+//                .setHeader("Actualización")
+//                .setTextAlign(ColumnTextAlign.CENTER);
 
         addColumn(inv -> AllUtils.formatDate(inv.getFechaActualizacion()))
                 .setHeader("Actualización")
