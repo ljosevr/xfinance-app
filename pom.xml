@@ -3,7 +3,7 @@
     <groupId>com.gigti.xfinance</groupId>
     <artifactId>xfinance-app</artifactId>
     <name>xfinance-app</name>
-    <version>1.0.6-SNAPSHOT</version>
+    <version>1.0.7-SNAPSHOT</version>
 
     <packaging>pom</packaging>
 

@@ -15,8 +15,7 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
-@Table(name = "productos",
-        uniqueConstraints={@UniqueConstraint(columnNames = {"nombre_producto" , "empresa_id"})})
+@Table(name = "productos")
 @ToString
 public class Producto extends AbstractEntity {
 

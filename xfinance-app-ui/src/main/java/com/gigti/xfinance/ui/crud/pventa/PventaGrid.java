@@ -1,7 +1,7 @@
 package com.gigti.xfinance.ui.crud.pventa;
 
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;

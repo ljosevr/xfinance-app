@@ -17,14 +17,29 @@ public interface InventarioActualRepository extends JpaRepository<InventarioActu
 
     @Query("SELECT a FROM InventarioActual a " +
             "WHERE a.producto.empresa =:empresa AND " +
-            "a.producto.eliminado = false")
+            "a.producto.eliminado = false " +
+            "ORDER BY a.producto.nombreProducto")
     List<InventarioActual> findAllByEmpresa(Empresa empresa, Pageable pageable);
 
-    @Query("SELECT a FROM InventarioActualCosto a " +
+    @Query("SELECT a FROM InventarioActual a " +
             "WHERE UPPER(a.producto.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') AND " +
             "a.producto.empresa =:empresa AND " +
-            "a.producto.eliminado = false")
+            "a.producto.eliminado = false " +
+            "ORDER BY a.producto.nombreProducto")
     List<InventarioActual> search(Empresa empresa, String productName, Pageable pageable);
+
+    @Query("SELECT a FROM InventarioActual a " +
+            "WHERE a.producto.empresa =:empresa AND " +
+            "a.producto.eliminado = false " +
+            "ORDER BY a.producto.nombreProducto")
+    List<InventarioActual> findAllByEmpresa(Empresa empresa);
+
+    @Query("SELECT a FROM InventarioActual a " +
+            "WHERE UPPER(a.producto.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') AND " +
+            "a.producto.empresa =:empresa AND " +
+            "a.producto.eliminado = false " +
+            "ORDER BY a.producto.nombreProducto")
+    List<InventarioActual> search(Empresa empresa, String productName);
 
     @Query("SELECT count(a) FROM InventarioActual a " +
             "WHERE a.producto.empresa =:empresa AND " +

@@ -100,8 +100,14 @@ public class ProductoServiceImpl implements ProductoService {
         try {
             Producto producto = productoRepository.findById(id).orElse(null);
             if (producto != null) {
-                producto.setEliminado(true);
-                productoRepository.save(producto);
+
+                InventarioInicial invInicial = inventarioService.findByProducto(producto);
+                if(invInicial != null) {
+                    producto.setEliminado(true);
+                    productoRepository.save(producto);
+                } else {
+                    productoRepository.delete(producto);
+                }
                 response.setMessage("Producto Eliminado");
                 response.setSuccess(true);
             } else {

@@ -21,10 +21,6 @@ import java.util.List;
 public interface InventarioInicialRepository extends JpaRepository<InventarioInicial, String> {
 
     @Query("SELECT p FROM InventarioInicial p " +
-            "WHERE p.producto.empresa =:empresa")
-    List<InventarioInicial> findByEmpresaAndInicialIsTrue(@Param("empresa") Empresa empresa, Pageable pageable);
-
-    @Query("SELECT p FROM InventarioInicial p " +
             "WHERE p.producto.empresa =:empresa AND " +
             "lower(p.producto.nombreProducto" +
             ") like lower(concat('%', :filter, '%')) ")

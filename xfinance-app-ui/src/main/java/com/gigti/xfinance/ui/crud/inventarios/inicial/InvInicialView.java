@@ -7,6 +7,7 @@
 package com.gigti.xfinance.ui.crud.inventarios.inicial;
 
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Impuesto;
 import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
@@ -19,15 +20,25 @@ import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamRegistration;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
+import com.vaadin.flow.server.WebBrowser;
 import org.apache.commons.lang3.StringUtils;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
+import org.vaadin.olli.FileDownloadWrapper;
 
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_INVENTARIO_INICIAL, layout = MainLayout.class)
@@ -67,7 +78,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
     }
 
     public void closeEditor() {
-        form.setInventario(null, Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_ADD);
+        //form.setInventario(null, Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_ADD);
         grid.deselectAll();
         showForm(false, form, this, filter);
     }
@@ -85,14 +96,14 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
             closeEditor();
         } else {
             if(StringUtils.isBlank(((InventarioInicial)inventario).getId())) {
-                form.setInventario(((InventarioInicial)inventario), Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_ADD);
+                form.setInventario((InventarioInicial)inventario, Constantes.CREATE_INV_INICIAL, ICrudView.OPTION_ADD);
                 showForm(true, form, this, filter);
             } else {
                 InventarioInicial invInicial = (InventarioInicial)inventario;
                 if(invInicial.isDefinitivo()) {
                     NotificacionesUtil.showError("Este Inventario No se puede modificar, ya fue marcado como Definitivo");
                 } else {
-                    form.setInventario((invInicial), Constantes.EDIT_INV_INICIAL, ICrudView.OPTION_EDIT);
+                    form.setInventario(invInicial, Constantes.EDIT_INV_INICIAL, ICrudView.OPTION_EDIT);
                     showForm(true, form, this, filter);
                 }
             }
@@ -104,12 +115,31 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
                 "", "Filtro Nombre Producto",
                 "", true,
                 "", true,
-                "", false);
+                "", false,
+                true);
         searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
         searchLayout.getFilter().focus();
         searchLayout.getBtnEdit().addClickListener(click -> editItem(grid.asSingleSelect().getValue()));
         searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
+        searchLayout.getBtnToPdf().addClickListener(click -> {
+            Response response = inventarioService.generateReportInvInicial(filter.getValue(),empresa,"pdf");
+            if(response.isSuccess()) {
+                StreamResource resource = new StreamResource("reporteInvInicial.pdf", () -> new ByteArrayInputStream((byte[]) response.getObject()));
+                resource.setContentType("application/pdf");
+                StreamRegistration registration = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
+                //UI.getCurrent().getPage().setLocation(registration.getResourceUri());
+                //UI.getCurrent().getPage().executeJs("window.open($0,\"_blank\",\"toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400\")",registration.getResourceUri().toString());
+                UI.getCurrent().getPage().executeJs("window.open($0,\"_blank\",\"toolbar=yes,scrollbars=yes,resizable=yes\")",registration.getResourceUri().toString());
+
+            } else {
+                NotificacionesUtil.showError(response.getMessage());
+            }
+        });
         filter = searchLayout.getFilter();
+    }
+
+    private void exportReport(SearchFilterComponent searchLayout) {
+
     }
 
     @Override

@@ -1,14 +1,11 @@
 package com.gigti.xfinance.ui.crud.gasto;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.backend.data.Gasto;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
 
 public class GastoGrid extends Grid<Gasto> {
 

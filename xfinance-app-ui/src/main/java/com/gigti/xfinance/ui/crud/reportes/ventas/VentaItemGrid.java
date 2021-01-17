@@ -6,12 +6,10 @@
 
 package com.gigti.xfinance.ui.crud.reportes.ventas;
 
-import com.gigti.xfinance.backend.data.CompraItem;
 import com.gigti.xfinance.backend.data.VentaItem;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import org.vaadin.klaudeta.PaginatedGrid;
 

@@ -8,7 +8,7 @@ package com.gigti.xfinance.ui.crud.compra;
 
 import com.gigti.xfinance.backend.data.CompraItem;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.GridVariant;
 import org.vaadin.klaudeta.PaginatedGrid;

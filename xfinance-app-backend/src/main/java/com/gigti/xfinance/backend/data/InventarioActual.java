@@ -29,4 +29,10 @@ public class InventarioActual extends AbstractEntity {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Empresa empresa;
+
+    @Transient
+    private String manageStockS = "NO";
+
+    @Transient
+    private String fechaS;
 }

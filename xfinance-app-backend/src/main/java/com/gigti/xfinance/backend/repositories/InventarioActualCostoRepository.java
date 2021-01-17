@@ -22,11 +22,24 @@ public interface InventarioActualCostoRepository extends JpaRepository<Inventari
     List<InventarioActualCosto> findAllByEmpresa(Empresa empresa, Pageable pageable);
 
     @Query("SELECT a FROM InventarioActualCosto a " +
+            "WHERE a.producto.empresa =:empresa AND " +
+            "a.producto.eliminado = false " +
+            "ORDER BY a.producto.nombreProducto")
+    List<InventarioActualCosto> findAllByEmpresa(Empresa empresa);
+
+    @Query("SELECT a FROM InventarioActualCosto a " +
             "WHERE UPPER(a.producto.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') AND " +
             "a.producto.empresa =:empresa AND " +
             "a.producto.eliminado = false " +
             "ORDER BY a.producto.nombreProducto")
     List<InventarioActualCosto> search(Empresa empresa, String productName, Pageable pageable);
+
+    @Query("SELECT a FROM InventarioActualCosto a " +
+            "WHERE UPPER(a.producto.nombreProducto) LIKE CONCAT('%', UPPER(:productName),'%') AND " +
+            "a.producto.empresa =:empresa AND " +
+            "a.producto.eliminado = false " +
+            "ORDER BY a.producto.nombreProducto")
+    List<InventarioActualCosto> search(Empresa empresa, String productName);
 
     @Query("SELECT count(DISTINCT a.producto) FROM InventarioActualCosto a " +
             "WHERE a.producto.empresa =:empresa AND " +

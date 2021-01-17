@@ -6,13 +6,13 @@
 
 package com.gigti.xfinance.backend.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.gigti.xfinance.backend.others.AllUtils;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Data
@@ -21,7 +21,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "inventario_inicial")
-
 public class InventarioInicial extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -48,4 +47,20 @@ public class InventarioInicial extends AbstractEntity {
     private Impuesto impuesto;
 
     private boolean definitivo;
+
+    @Transient
+    private String definitivoS = "NO";
+
+    @Transient
+    private String manageStockS = "NO";
+
+    @Transient
+    private String fechaS;
+
+    @Transient
+    private String precioCostoS;
+
+    @Transient
+    private String precioVentaS;
+
 }

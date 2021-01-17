@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Table(name = "impuestos")
 public class Impuesto extends AbstractEntity {
 
-    private String nombre;
+    private String nombre = "";
     private BigDecimal valor;
     private String descripcion;
 

@@ -6,18 +6,14 @@
 
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
+import com.gigti.xfinance.backend.data.InventarioActual;
 import com.gigti.xfinance.backend.data.InventarioActualCosto;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.data.renderer.LocalDateRenderer;
-import com.vaadin.flow.data.renderer.LocalDateTimeRenderer;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-
-public class InvActualGrid extends Grid<InventarioActualCosto> {
+public class InvActualGrid extends Grid<InventarioActual> {
 
     public InvActualGrid() {
         setSizeFull();
@@ -31,7 +27,7 @@ public class InvActualGrid extends Grid<InventarioActualCosto> {
                 .setHeader("Medida")
                 .setTextAlign(ColumnTextAlign.CENTER);
 
-        addColumn(InventarioActualCosto::getCantidad)
+        addColumn(InventarioActual::getCantidad)
                 .setHeader("Cantidad");
 
         addColumn(inv -> inv.isManageStock() ? "SI" : "NO")

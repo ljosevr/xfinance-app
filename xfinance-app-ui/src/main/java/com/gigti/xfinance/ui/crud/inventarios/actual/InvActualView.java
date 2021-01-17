@@ -7,35 +7,43 @@
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
 import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.InventarioActual;
 import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.others.Constantes;
+import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.InventarioService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
+import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamRegistration;
+import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.VaadinSession;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
+import java.io.ByteArrayInputStream;
 import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_INVENTARIO_ACTUAL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_ACTUAL +" | "+ Constantes.VIEW_MAIN)
-public class InvActualView extends VerticalLayout  implements ICrudView<InventarioActualCosto> {
+public class InvActualView extends VerticalLayout  implements ICrudView<InventarioActual> {
 
     private final Empresa empresa;
     private final InvActualGrid grid;
     private TextField filter;
     private final InventarioService inventarioService;
     private SearchFilterComponent searchLayout;
-    private DataProvider<InventarioActualCosto, Void> dataProvider;
+    private DataProvider<InventarioActual, Void> dataProvider;
 
     public InvActualView(InventarioService inventarioService) {
         this.inventarioService = inventarioService;
@@ -79,9 +87,22 @@ public class InvActualView extends VerticalLayout  implements ICrudView<Inventar
                 "", "Filtro Nombre Producto",
                 "", true,
                 "", false,
-                "", false);
+                "", false,
+                true);
         searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
         searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
+        searchLayout.getBtnToPdf().addClickListener(click -> {
+            Response response = inventarioService.generateReportInvActual(filter.getValue(),empresa,"pdf");
+            if(response.isSuccess()) {
+                StreamResource resource = new StreamResource("reporteInvActual.pdf", () -> new ByteArrayInputStream((byte[]) response.getObject()));
+                resource.setContentType("application/pdf");
+                StreamRegistration registration = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
+                UI.getCurrent().getPage().executeJs("window.open($0,\"_blank\",\"toolbar=yes,scrollbars=yes,resizable=yes\")",registration.getResourceUri().toString());
+
+            } else {
+                NotificacionesUtil.showError(response.getMessage());
+            }
+        });
         searchLayout.getFilter().focus();
         filter = searchLayout.getFilter();
     }

@@ -7,7 +7,7 @@
 package com.gigti.xfinance.ui.crud.reportes.ventas;
 
 import com.gigti.xfinance.backend.data.Venta;
-import com.gigti.xfinance.ui.util.AllUtils;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 

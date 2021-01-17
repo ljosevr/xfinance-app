@@ -11,22 +11,21 @@ import java.util.List;
 
 public interface InventarioService {
 
-    List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, int page, int size);
     List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
+
+    List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa);
 
     int getCount(String filterText, Empresa empresa);
     Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
 
-    /**
+     /**
      * Metodo para buscar el Inventario Actual de los productos
      * @param filterText
      * @param empresa
-     * @param page
-     * @param size
+     * @param offsetBasedPageRequest
      * @return
      */
-    List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, int page, int size);
-    List<InventarioActualCosto> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
+    List<InventarioActual> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
     int countInvActual(String filterText, Empresa empresa);
 
     /**
@@ -49,4 +48,8 @@ public interface InventarioService {
     InventarioInicial findByProducto(Producto producto);
 
     boolean deleteAllInventarios(Empresa emp, List<Producto> productosList);
+
+    Response generateReportInvInicial(String filterText, Empresa empresa, String formatType);
+
+    Response generateReportInvActual(String filterText, Empresa empresa, String formatType);
 }
