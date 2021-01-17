@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.*;
@@ -688,8 +690,8 @@ public class InventarioServiceImpl implements InventarioService {
         Response response = new Response();
         List<InventarioInicial> listInvInicial = findAllInvInicial(filterText,empresa);
         try {
-            File report = ResourceUtils.getFile("classpath:InventarioInicial.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(report.getPath());
+            JasperReport jasperReport = JasperCompileManager.compileReport(new ClassPathResource(
+                    "META-INF/resources/reports/InventarioInicial.jrxml").getInputStream());
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listInvInicial);
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("createdBy","TuInventarioSeguro.com");
@@ -703,10 +705,11 @@ public class InventarioServiceImpl implements InventarioService {
 //            if(formatType.equalsIgnoreCase("xls")){
 //                JasperExportManager.exportReportTo(jasperPrint);
 //            }
-        } catch (FileNotFoundException | JRException e) {
+        } catch (Exception e) {
             logger.error("Error al Generar Reporte: "+e.getMessage(), e);
             response.setSuccess(false);
             response.setMessage("Error al Generar Reporte");
+
         }
 
         return response;
@@ -717,8 +720,8 @@ public class InventarioServiceImpl implements InventarioService {
         Response response = new Response();
         List<InventarioActual> listInvActual = findInvActualWithoutPagination(filterText,empresa);
         try {
-            File report = ResourceUtils.getFile("classpath:InventarioActual.jrxml");
-            JasperReport jasperReport = JasperCompileManager.compileReport(report.getPath());
+            JasperReport jasperReport = JasperCompileManager.compileReport(new ClassPathResource(
+                    "META-INF/resources/reports/InventarioActual.jrxml").getInputStream());
             JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listInvActual);
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("createdBy","TuInventarioSeguro.com");
@@ -732,7 +735,7 @@ public class InventarioServiceImpl implements InventarioService {
 //            if(formatType.equalsIgnoreCase("xls")){
 //                JasperExportManager.exportReportTo(jasperPrint);
 //            }
-        } catch (FileNotFoundException | JRException e) {
+        } catch (Exception e) {
             logger.error("Error al Generar Reporte: "+e.getMessage(), e);
             response.setSuccess(false);
             response.setMessage("Error al Generar Reporte");
