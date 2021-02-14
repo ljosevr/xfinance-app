@@ -41,47 +41,102 @@ public class ProductoServiceImpl implements ProductoService {
     private InventarioService inventarioService;
 
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public Response saveProduct(Producto producto, Usuario usuario) {
         logger.info("--> save Producto: "+producto.toString());
         Response response = new Response();
         try {
-            boolean isNewProduct = false; 
+            boolean isNewProduct = false;
             if(StringUtils.isBlank(producto.getId())) {
                 isNewProduct = true;
             }
 
-            Producto productoTemp = productoRepository.findByEmpresaAndNombreProducto(producto.getEmpresa(), producto.getNombreProducto());
-            if(productoTemp == null) {
-                Producto newProducto = productoRepository.save(producto);
-
-                if (isNewProduct && producto.isManageInitialStock()) {
-                    //Inventario Inicial
+            if(isNewProduct) {
+                Producto productoTemp = productoRepository.findByEmpresaAndNombreProducto(producto.getEmpresa(), producto.getNombreProducto());
+                if (productoTemp == null) {
+                    Producto newProducto = productoRepository.save(producto);
                     InventarioInicial inventarioInicial = new InventarioInicial();
                     inventarioInicial.setProducto(newProducto);
-                    inventarioInicial.setPrecioCosto(producto.getPrecioCosto());
-                    inventarioInicial.setPrecioVenta(producto.getPrecioVenta());
-                    inventarioInicial.setCantidad(producto.getCantidadInicial());
-                    inventarioInicial.setImpuesto(producto.getImpuesto());
-                    inventarioInicial.setFechaActualizacion(new Date());
-                    inventarioInicial.setManageStock(producto.isManageStock());
-                    inventarioInicial.setDefinitivo(producto.isInventarioDefinitivo());
-                    Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
-                    if (response1.isSuccess()) {
-                        inventarioInicial = (InventarioInicial) response1.getObject();
-                        newProducto.setCantidadInicial(inventarioInicial.getCantidad());
-                        newProducto.setPrecioCosto(inventarioInicial.getPrecioCosto());
-                        newProducto.setPrecioVenta(inventarioInicial.getPrecioVenta());
-                        newProducto.setManageStock(inventarioInicial.isManageStock());
+                    if (isNewProduct) {
+                        if (producto.isManageInitialStock()) {
+                            //Inventario Inicial
+                            inventarioInicial.setPrecioCosto(producto.getPrecioCosto());
+                            inventarioInicial.setPrecioVenta(producto.getPrecioVenta());
+                            inventarioInicial.setCantidad(producto.getCantidadInicial());
+                            inventarioInicial.setImpuesto(producto.getImpuesto());
+                            inventarioInicial.setFechaActualizacion(new Date());
+                            inventarioInicial.setManageStock(producto.isManageStock());
+                            inventarioInicial.setDefinitivo(producto.isInventarioDefinitivo());
+
+                        } else {
+                            //Se crea Inventario Inicial con CERO
+                            //Inventario Inicial
+                            inventarioInicial.setPrecioCosto(BigDecimal.ZERO);
+                            inventarioInicial.setPrecioVenta(BigDecimal.ZERO);
+                            inventarioInicial.setCantidad(BigDecimal.ZERO);
+                            inventarioInicial.setImpuesto(producto.getImpuesto());
+                            inventarioInicial.setFechaActualizacion(new Date());
+                            inventarioInicial.setManageStock(true);
+                            inventarioInicial.setDefinitivo(false);
+                            inventarioInicial.setProducto(newProducto);
+                        }
+
+                        Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
+                        if (response1.isSuccess()) {
+                            inventarioInicial = (InventarioInicial) response1.getObject();
+                            newProducto.setCantidadInicial(inventarioInicial.getCantidad());
+                            newProducto.setPrecioCosto(inventarioInicial.getPrecioCosto());
+                            newProducto.setPrecioVenta(inventarioInicial.getPrecioVenta());
+                            newProducto.setManageStock(inventarioInicial.isManageStock());
+                        }
                     }
+                    response.setObject(producto);
+                    response.setMessage("Producto Creado Exitosamente");
+                    response.setSuccess(true);
+                } else {
+                    response.setMessage("Producto con Nombre: "+producto.getNombreProducto() + " Ya EXISTE");
+                    response.setSuccess(false);
                 }
 
+            } else { // No es Nuevo Producto
+                //Editar Producto
+                boolean manageInitialStock = producto.isManageInitialStock();
+                Producto productoTemp = producto;
+                producto = productoRepository.save(producto);
+                producto.setManageInitialStock(productoTemp.isManageInitialStock());
+                producto.setManageStock(productoTemp.isManageStock());
+                producto.setCantidadInicial(productoTemp.getCantidadInicial());
+                producto.setPrecioCosto(productoTemp.getPrecioCosto());
+                producto.setPrecioVenta(productoTemp.getPrecioVenta());
+                producto.setInventarioDefinitivo(productoTemp.isInventarioDefinitivo());
+                if(manageInitialStock) {
+                    InventarioInicial inventarioInicial = inventarioService.findByProducto(producto);
+                    if (!inventarioInicial.isDefinitivo()) {
+                        inventarioInicial.setCantidad(producto.getCantidadInicial());
+                        inventarioInicial.setFechaActualizacion(new Date());
+                        inventarioInicial.setManageStock(producto.isManageStock());
+                        inventarioInicial.setPrecioCosto(producto.getPrecioCosto());
+                        inventarioInicial.setPrecioVenta(producto.getPrecioVenta());
+                        inventarioInicial.setUsuario(usuario);
+                        inventarioInicial.setProducto(producto);
+                        inventarioInicial.setImpuesto(producto.getImpuesto());
+
+                        Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
+                        if (response1.isSuccess()) {
+                            //producto = productoRepository.save(producto);
+                            inventarioInicial = (InventarioInicial) response1.getObject();
+                            producto.setCantidadInicial(inventarioInicial.getCantidad());
+                            producto.setPrecioCosto(inventarioInicial.getPrecioCosto());
+                            producto.setPrecioVenta(inventarioInicial.getPrecioVenta());
+                            producto.setManageStock(inventarioInicial.isManageStock());
+                        }
+                    }
+                } //else {
+
+                //}
                 response.setObject(producto);
-                response.setMessage("Producto Guardado Exitosamente");
+                response.setMessage("Producto Actualizado Correctamente");
                 response.setSuccess(true);
-            } else {
-                response.setMessage("Producto con NOMBRE: "+producto.getNombreProducto() + " - Ya Existe");
-                response.setSuccess(false);
             }
         }catch(Exception e){
             logger.error(" Error: "+e.getMessage(), e);

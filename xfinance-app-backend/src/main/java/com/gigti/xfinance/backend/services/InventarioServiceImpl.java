@@ -152,27 +152,27 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    @Transactional
-    public Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Response saveInventarioInicial(InventarioInicial inventarioInicialNuevo, Usuario usuario) {
         String methodName = "saveInventarioInicial";
         logger.info("--> "+methodName);
         Response result = new Response();
         try {
             if(usuario != null ) {
 
-                if(StringUtils.isBlank(inventarioInicial.getId())) {
+                if(StringUtils.isBlank(inventarioInicialNuevo.getId())) {
                     //El inventario Inicial no existe se debe crear
                     logger.info("-- El inventario Inicial no existe se debe crear");
-                    createInvInicial(inventarioInicial, usuario, result);
+                    createInvInicial(inventarioInicialNuevo, usuario, result);
                 } else {
                     //El inventario Inicial Ya Existe. Se debe Actualizar
                     logger.info("-- El inventario Inicial Ya Existe. Se debe Actualizar");
 
                     //Consultar El Inventario Actual.
-                    InventarioInicial invInicialActual = inventarioInicialRepository.findById(inventarioInicial.getId()).get();
+                    InventarioActual invActualOld = inventarioActualRepository.findByProducto(inventarioInicialNuevo.getProducto());
 
-                    if(invInicialActual != null){
-                        updateInvInicial(inventarioInicial,invInicialActual,usuario,result);
+                    if(invActualOld != null){
+                        updateInvInicial(inventarioInicialNuevo,invActualOld,usuario,result);
                     } else {
                         result.setSuccess(false);
                         result.setMessage("Error al Obtener Inventario actual");
@@ -255,7 +255,7 @@ public class InventarioServiceImpl implements InventarioService {
      * @param result
      * @throws HandledException
      */
-    private void updateInvInicial(InventarioInicial invInicialNuevo, InventarioInicial invInicialActual, Usuario usuario, Response result) throws HandledException {
+    private void updateInvInicial(InventarioInicial invInicialNuevo, InventarioActual invActual, Usuario usuario, Response result) throws HandledException {
         logger.info("--> updateInvInicial");
         //Inventario Inicial
         invInicialNuevo.setUsuario(usuario);
@@ -267,7 +267,7 @@ public class InventarioServiceImpl implements InventarioService {
         if(!invInicialNuevo.isManageStock()) {
             logger.info("-- InvNuevo No maneja Stock");
             //No se maneja Inventario
-                if(!invInicialActual.isManageStock()) {
+                if(!invActual.isManageStock()) {
                     logger.info("-- InvActual No maneja Stock");
                     //Solo se debe actualizar Precios e Impuestos.
                     process = updateTaxAndPrice(invInicialNuevo, BigDecimal.ZERO, true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
@@ -281,7 +281,7 @@ public class InventarioServiceImpl implements InventarioService {
             logger.info("-- InvNuevo Si maneja Stock");
             //Inventario NUEVO Maneja STOCK
 
-            if (!invInicialActual.isManageStock()) {
+            if (!invActual.isManageStock()) {
                 logger.info("-- InvActual NO maneja Stock");
                 //Inventario Actual NO MANEJA STOCK - Ahora Es Controlado
 
@@ -290,16 +290,19 @@ public class InventarioServiceImpl implements InventarioService {
                 logger.info("-- InvActual SI maneja Stock");
                 //Inventario Actual MANEJA STOCK - Calcular Diferencia
 
-                BigDecimal cantidad = invInicialActual.getCantidad().subtract(invInicialNuevo.getCantidad());
-                logger.info("-- Diferencia de Stocks: "+cantidad);
-                if(cantidad.compareTo(BigDecimal.ZERO) > 0) {
+                int resultado = invActual.getCantidad().compareTo(invInicialNuevo.getCantidad());
+                logger.info("-- Diferencia de Stocks: "+resultado);
+                logger.info("-- (-1) (Primero Menor) - (0) (Iguales) - (1) (Primero Mayor): "+resultado);
+                if(resultado == -1) {
+                    //Sumar
+                    BigDecimal cantidad = invInicialNuevo.getCantidad().subtract(invActual.getCantidad());
+                    logger.info("-- Suma Inventario");
+                    process = updateTaxAndPrice(invInicialNuevo, cantidad, true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
+                } else if(resultado == 1) {
                     //restar
                     logger.info("-- Resta Inventario");
+                    BigDecimal cantidad = invActual.getCantidad().subtract(invInicialNuevo.getCantidad());
                     process = updateTaxAndPrice(invInicialNuevo, cantidad, false, TipoMovimientoEnum.INV_INICIAL_UPDATE_DEL);
-                } else if(cantidad.compareTo(BigDecimal.ZERO) < 0) {
-                    //Sumar
-                    logger.info("-- Suma Inventario");
-                    process = updateTaxAndPrice(invInicialNuevo, cantidad.abs(), true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
                 } else {
                     //No aumenta Ni resta
                     logger.info("-- No debe hacer Nada Inventario");

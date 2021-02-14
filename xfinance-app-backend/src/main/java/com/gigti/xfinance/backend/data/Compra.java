@@ -57,10 +57,8 @@ public class Compra extends AbstractEntity {
     @JoinColumn
     private Proveedor proveedor;
 
-    @NotNull
     private String imageId;
 
-    @NotNull
     private String imageUrl;
 
     //TODO

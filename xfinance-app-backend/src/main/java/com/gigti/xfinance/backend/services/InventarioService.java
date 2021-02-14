@@ -38,12 +38,12 @@ public interface InventarioService {
      * @param precioCosto -> precio de Costo Aplicado
      * @param tipoMovimiento -> Fuente de Modificación
      * @param updatePrices -> Sirve para saber si actualiza Precios o no
-     * @param infinite -> Si el producto tiene inventario infinite
+     * @param manageStock -> Si el producto tiene inventario infinite
      * @param impuestoValor -> Valor del impuesto a aplicar
      * @param impuestoNombre -> Nombre del Impuesto a aplicar
      * @return -> Retorna Verdadero o Falso
      */
-    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean infinite, BigDecimal impuestoValor, String impuestoNombre) throws HandledException;
+    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean manageStock, BigDecimal impuestoValor, String impuestoNombre) throws HandledException;
 
     InventarioInicial findByProducto(Producto producto);
 

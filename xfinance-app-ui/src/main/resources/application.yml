@@ -51,5 +51,5 @@ amazon:
     s3:
       bucket-name: tu-inventario-seguro-s3
       endpoint: http://tu-inventario-seguro-s3.s3.us-east-2.amazonaws.com/
-      access-key: AKIATEWH5AW53D7YNWGF
-      secret-key: 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
+      access-key:
+      secret-key:

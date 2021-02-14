@@ -46,3 +46,10 @@ logging:
   level:
     org:
       atmosphere : warn
+
+amazon:
+  s3:
+    bucket-name: tu-inventario-seguro-s3
+    endpoint: http://tu-inventario-seguro-s3.s3.us-east-2.amazonaws.com/
+    access-key:
+    secret-key:

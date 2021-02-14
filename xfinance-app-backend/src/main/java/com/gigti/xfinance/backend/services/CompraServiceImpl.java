@@ -200,7 +200,7 @@ public class CompraServiceImpl implements CompraService {
                             item.getPrecioCosto(),
                             TipoMovimientoEnum.COMPRA,
                             updatePrice,
-                            false,
+                            true,
                             item.getImpuestoArticulo() != null ? item.getImpuestoArticulo() : BigDecimal.ZERO,
                             "");
                 }

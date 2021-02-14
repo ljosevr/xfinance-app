@@ -52,7 +52,7 @@ public class CompraDetailForm extends VerticalLayout {
     private final ProductoService productoService;
     private ProveedorService proveedorService;
     private List<CompraItem> listaItems;
-    private Producto selectedProd;
+//    private Producto selectedProd;
     private BigDecimalField tfVenta;
     private BigDecimalField tfCantidad;
     private BigDecimalField tfCostoU;
@@ -179,16 +179,15 @@ public class CompraDetailForm extends VerticalLayout {
                         .contains(filterString.toLowerCase());
 
         cbProductos.setItems(filter, productoService.findAllByEmpresaAndNotInfinite(empresa));
-        selectedProd = new Producto();
+//        selectedProd = new Producto();
 
-        cbProductos.addValueChangeListener(evt -> {
-            selectedProd = evt.getValue();
-            if(selectedProd != null) {
-                btnAgregar.setEnabled(true);
-            } else {
-                clearData();
-            }
-        });
+//        cbProductos.addValueChangeListener(evt -> {
+//            if(evt.getValue() != null) {
+//                btnAgregar.setEnabled(true);
+//            } else {
+//                clearData();
+//            }
+//        });
 
         cbProductos.setAllowCustomValue(true);
         cbProductos.addCustomValueSetListener(evt -> {
@@ -201,8 +200,9 @@ public class CompraDetailForm extends VerticalLayout {
                 .withProperty("tipMedida", prod -> prod.getTipoMedida().getSimbolo().toLowerCase()));
 
         btnAgregar = MyButton.MyButton("Adicionar", new Icon(VaadinIcon.PLUS_CIRCLE),
-                "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, true, false);
+                "Agregar Producto a la compra", ButtonVariant.LUMO_PRIMARY, true, true);
         btnAgregar.addClickListener(evt -> {
+            Producto selectedProd = cbProductos.getValue();
             if(selectedProd != null) {
                 Response result = productoService.getPriceVenta(selectedProd);
                 if(result.isSuccess()) {
@@ -231,13 +231,15 @@ public class CompraDetailForm extends VerticalLayout {
         formProductos.setResponsiveSteps(MyResponsiveStep.getMyList());
         formProductos.setClassName("formLayout");
         formProductos.add(cbProductos, btnAgregar);
-        this.add(subTitleItems, formProductos);
+
 
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");
         gridLayout.setSizeFull();
+        formProductos.add(gridLayout);
 
-        this.add(gridLayout);
+        this.add(subTitleItems, formProductos);
+        //this.add(gridLayout);
     }
 
     private void configureActionButtons() {
@@ -422,6 +424,9 @@ public class CompraDetailForm extends VerticalLayout {
     }
 
     private void validateAndSave() {
+        if(itemsGrid.getEditor().isOpen()) {
+            itemsGrid.getEditor().save();
+        }
         if (binder.validate().isOk() && listaItems.size() > 0) {
             Compra compra = binder.getBean();
             compra.setItems(listaItems);
