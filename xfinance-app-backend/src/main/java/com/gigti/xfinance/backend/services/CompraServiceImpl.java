@@ -163,53 +163,61 @@ public class CompraServiceImpl implements CompraService {
         Response result = new Response();
         List<CompraItem> listItems = compra.getItems();
         try {
-            compra.setUsuario(usuario);
-            compra.setFechaCreacion(new Date());
-            compra.setItems(null);
 
-            BigDecimal totalFactura = BigDecimal.ZERO;
-            for(CompraItem item : listItems) {
-                totalFactura = totalFactura.add(item.getPrecioTotalCosto());
-            }
-            compra.setTotalFactura(totalFactura);
+            Compra compratemp = compraRepository.findByNumeroFacturaAndEmpresa(compra.getNumeroFactura(), empresa);
+            if(compratemp != null) {
+                result.setSuccess(false);
+                result.setMessage("# Numero de Factura: "+compra.getNumeroFactura() +" - Ya existe");
 
-            compra = compraRepository.save(compra);
-            if (compra != null) {
-                Compra finalCompra = compra;
-                listItems.forEach(item -> {
-                    item.setCompra(finalCompra);
-                    item.setPrecioCosto(item.getPrecioTotalCosto().divide(item.getCantidad(), 2, RoundingMode.HALF_UP));
-                });
-                compraItemRepository.saveAll(listItems);
+            } else {
+                compra.setUsuario(usuario);
+                compra.setFechaCreacion(new Date());
+                compra.setItems(null);
 
+                BigDecimal totalFactura = BigDecimal.ZERO;
                 for (CompraItem item : listItems) {
-                    boolean updatePrice = false;
-                    //Validar Valor Venta
-                    ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(item.getProducto());
-                    if (productoValorVenta != null) {
-                        if (productoValorVenta.getValorVenta().compareTo(item.getPrecioVenta()) != 0) {
+                    totalFactura = totalFactura.add(item.getPrecioTotalCosto());
+                }
+                compra.setTotalFactura(totalFactura);
+
+                compra = compraRepository.save(compra);
+                if (compra != null) {
+                    Compra finalCompra = compra;
+                    listItems.forEach(item -> {
+                        item.setCompra(finalCompra);
+                        item.setPrecioCosto(item.getPrecioTotalCosto().divide(item.getCantidad(), 2, RoundingMode.HALF_UP));
+                    });
+                    compraItemRepository.saveAll(listItems);
+
+                    for (CompraItem item : listItems) {
+                        boolean updatePrice = false;
+                        //Validar Valor Venta
+                        ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(item.getProducto());
+                        if (productoValorVenta != null) {
+                            if (productoValorVenta.getValorVenta().compareTo(item.getPrecioVenta()) != 0) {
+                                updatePrice = true;
+                            }
+                        } else {
                             updatePrice = true;
                         }
-                    } else {
-                        updatePrice = true;
+                        inventarioService.saveProcessInventarioActualAndPrecios(item.getProducto(),
+                                true,
+                                item.getCantidad(),
+                                item.getPrecioVenta(),
+                                item.getPrecioCosto(),
+                                TipoMovimientoEnum.COMPRA,
+                                updatePrice,
+                                true,
+                                item.getImpuestoArticulo() != null ? item.getImpuestoArticulo() : BigDecimal.ZERO,
+                                "");
                     }
-                    inventarioService.saveProcessInventarioActualAndPrecios(item.getProducto(),
-                            true,
-                            item.getCantidad(),
-                            item.getPrecioVenta(),
-                            item.getPrecioCosto(),
-                            TipoMovimientoEnum.COMPRA,
-                            updatePrice,
-                            true,
-                            item.getImpuestoArticulo() != null ? item.getImpuestoArticulo() : BigDecimal.ZERO,
-                            "");
-                }
 
-                result.setSuccess(true);
-                result.setMessage("Compra "+compra.getNumeroFactura() + " Guardada Exitosamente");
-            } else {
-                result.setSuccess(false);
-                result.setMessage("No fue posible guardar la Compra");
+                    result.setSuccess(true);
+                    result.setMessage("Compra " + compra.getNumeroFactura() + " Guardada Exitosamente");
+                } else {
+                    result.setSuccess(false);
+                    result.setMessage("No fue posible guardar la Compra");
+                }
             }
         }catch(HandledException e) {
             logger.error("[Exception]: "+e.getMessage(), e);

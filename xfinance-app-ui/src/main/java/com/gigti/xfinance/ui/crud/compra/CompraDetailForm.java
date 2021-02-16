@@ -174,11 +174,7 @@ public class CompraDetailForm extends VerticalLayout {
         cbProductos.getElement().setAttribute("align-self:","flex-start");
         //cbProductos.setMinWidth("350px");
 
-        ComboBox.ItemFilter<Producto> filter = (prod, filterString) ->
-                prod.getNombreProducto().toLowerCase()
-                        .contains(filterString.toLowerCase());
-
-        cbProductos.setItems(filter, productoService.findAllByEmpresaAndNotInfinite(empresa));
+        resetCbProductos();
 //        selectedProd = new Producto();
 
 //        cbProductos.addValueChangeListener(evt -> {
@@ -236,10 +232,19 @@ public class CompraDetailForm extends VerticalLayout {
         VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
         gridLayout.addClassName("grid");
         gridLayout.setSizeFull();
-        formProductos.add(gridLayout);
 
+        formProductos.add(gridLayout);
+        formProductos.setColspan(gridLayout,formProductos.getResponsiveSteps().size()+1);
         this.add(subTitleItems, formProductos);
         //this.add(gridLayout);
+    }
+
+    private void resetCbProductos() {
+        ComboBox.ItemFilter<Producto> filter = (prod, filterString) ->
+                prod.getNombreProducto().toLowerCase()
+                        .contains(filterString.toLowerCase());
+
+        cbProductos.setItems(filter, productoService.findAllByEmpresaAndNotInfinite(empresa));
     }
 
     private void configureActionButtons() {
@@ -279,7 +284,7 @@ public class CompraDetailForm extends VerticalLayout {
 
     private void clearData() {
         cbProductos.setValue(null);
-        btnAgregar.setEnabled(false);
+        resetCbProductos();
         productoValorVenta = null;
         cbProductos.focus();
     }

@@ -41,4 +41,6 @@ public interface CompraRepository extends JpaRepository<Compra,String> {
     @Query("DELETE FROM Compra c " +
             "WHERE c.empresa =:empresa")
     Integer deleteAllByEmpresa(Empresa empresa);
+
+    Compra findByNumeroFacturaAndEmpresa(String numeroFactura, Empresa empresa);
 }
