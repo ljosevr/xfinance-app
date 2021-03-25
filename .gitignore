@@ -268,3 +268,4 @@ xfinance-app-ui/webpack.config.js
 package-lock.json
 package.json
 webpack.config.js
+.vscode/launch.json
