@@ -6,13 +6,16 @@
 
 package com.gigti.xfinance.ui.crud.inventarios.inicial;
 
+import java.io.ByteArrayInputStream;
+import java.util.Objects;
+
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Impuesto;
 import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ImpuestoService;
 import com.gigti.xfinance.backend.services.InventarioService;
+import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
@@ -21,8 +24,6 @@ import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -32,14 +33,9 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
-import com.vaadin.flow.server.WebBrowser;
+
 import org.apache.commons.lang3.StringUtils;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
-import org.vaadin.olli.FileDownloadWrapper;
-
-import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_INVENTARIO_INICIAL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_INICIAL +" | "+ Constantes.VIEW_MAIN)
@@ -49,12 +45,14 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
     private InvInicialGrid grid;
     private TextField filter;
     private final InventarioService inventarioService;
+    private final ProductoService productoService;
     private final InvInicialForm form;
     private SearchFilterComponent searchLayout;
     private DataProvider<InventarioInicial, Void> dataProvider;
 
-    public InvInicialView(InventarioService inventarioService, ImpuestoService impuestoService) {
+    public InvInicialView(InventarioService inventarioService, ImpuestoService impuestoService, ProductoService productoService){
         this.inventarioService = inventarioService;
+        this.productoService = productoService;
         empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
 
         detailLayout(this);
@@ -87,7 +85,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
     public void configureProvider() {
         dataProvider = DataProvider.fromCallbacks(
                 query -> inventarioService.findAllInvInicial(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
-                query -> inventarioService.getCount(filter.getValue(), empresa)
+                query -> productoService.count(filter.getValue(), empresa)
         );
     }
 
@@ -160,7 +158,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
     public void save(ComponentEvent evt) {
         InventarioInicial inventario = ((InvInicialForm.SaveEvent) evt).getInventario();
 
-        Response response = inventarioService.saveInventarioInicial(inventario, CurrentUser.get());
+        Response response = inventarioService.processInventarioInicial(inventario, CurrentUser.get());
 
         if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());

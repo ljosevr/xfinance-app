@@ -20,6 +20,11 @@ import java.util.List;
 @Table(name="compras",
         uniqueConstraints={@UniqueConstraint(columnNames = {"numero_factura" , "empresa_id"})})
 public class Compra extends AbstractEntity {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @NotEmpty
     @Column(name="numero_factura")
     private String numeroFactura;

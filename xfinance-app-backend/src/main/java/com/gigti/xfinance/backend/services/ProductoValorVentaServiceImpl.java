@@ -1,6 +1,7 @@
 package com.gigti.xfinance.backend.services;
 
 import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.ProductoValorVenta;
 import com.gigti.xfinance.backend.repositories.ProductoValoresRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import java.util.List;
 @Service
 public class ProductoValorVentaServiceImpl implements ProductoValorVentaService{
     Logger logger = LoggerFactory.getLogger(ProductoValorVentaServiceImpl.class);
+    
     @Autowired
     private ProductoValoresRepository productoValoresRepository;
 
@@ -30,5 +32,20 @@ public class ProductoValorVentaServiceImpl implements ProductoValorVentaService{
             logger.error("Error al Eliminar Producto Valores: "+e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    //@Transactional(readOnly = true)
+    @Transactional
+    public ProductoValorVenta findByProductoAndActivoIsTrue(Producto producto) {
+        ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
+
+        return productoValorVenta;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+    public ProductoValorVenta saveProductoValor(ProductoValorVenta productoValorVenta) {
+        return productoValoresRepository.save(productoValorVenta);
     }
 }

@@ -81,7 +81,7 @@ public class ProductoServiceImpl implements ProductoService {
                             inventarioInicial.setProducto(newProducto);
                         }
 
-                        Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
+                        Response response1 = inventarioService.processInventarioInicial(inventarioInicial, usuario);
                         if (response1.isSuccess()) {
                             inventarioInicial = (InventarioInicial) response1.getObject();
                             newProducto.setCantidadInicial(inventarioInicial.getCantidad());
@@ -121,7 +121,7 @@ public class ProductoServiceImpl implements ProductoService {
                         inventarioInicial.setProducto(producto);
                         inventarioInicial.setImpuesto(producto.getImpuesto());
 
-                        Response response1 = inventarioService.saveInventarioInicial(inventarioInicial, usuario);
+                        Response response1 = inventarioService.processInventarioInicial(inventarioInicial, usuario);
                         if (response1.isSuccess()) {
                             //producto = productoRepository.save(producto);
                             inventarioInicial = (InventarioInicial) response1.getObject();

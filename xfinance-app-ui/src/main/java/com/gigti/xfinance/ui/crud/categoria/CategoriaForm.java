@@ -4,13 +4,11 @@ import com.gigti.xfinance.backend.data.CategoriaProducto;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.MyToggleButton;
-import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
@@ -20,11 +18,14 @@ import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.dom.ElementFactory;
 import com.vaadin.flow.shared.Registration;
 
 public class CategoriaForm extends Dialog {
-    private final TextField tfCatDescripcion;
+    /**
+	 *
+	 */
+	private static final long serialVersionUID = 1L;
+	private final TextField tfCatDescripcion;
     private final Button btnDelete;
     private final H2 titleForm;
     private final TextField tfCatNombre;
@@ -130,6 +131,10 @@ public class CategoriaForm extends Dialog {
 
     // Events
     public static abstract class CategoriaFormEvent extends ComponentEvent<CategoriaForm> {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
         private CategoriaProducto categoria;
 
         CategoriaFormEvent(CategoriaForm source, CategoriaProducto categoria) {
@@ -143,18 +148,33 @@ public class CategoriaForm extends Dialog {
     }
 
     public static class SaveEvent extends CategoriaForm.CategoriaFormEvent {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         SaveEvent(CategoriaForm source, CategoriaProducto producto) {
             super(source, producto);
         }
     }
 
     public static class DeleteEvent extends CategoriaForm.CategoriaFormEvent {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         DeleteEvent(CategoriaForm source, CategoriaProducto producto) {
             super(source, producto);
         }
     }
 
     public static class CloseEvent extends CategoriaForm.CategoriaFormEvent {
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         CloseEvent(CategoriaForm source) {
             super(source, null);
         }

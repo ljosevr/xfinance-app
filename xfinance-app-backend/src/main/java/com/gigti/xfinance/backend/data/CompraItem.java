@@ -14,6 +14,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Table(name = "compra_items")
 public class CompraItem extends AbstractEntity {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn
     private Compra compra;

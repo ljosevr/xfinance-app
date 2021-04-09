@@ -5,6 +5,11 @@ import org.vaadin.crudui.crud.CrudOperation;
 import org.vaadin.crudui.form.impl.form.factory.DefaultCrudFormFactory;
 
 public class MyDefaultCrudFormFactory extends DefaultCrudFormFactory {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     public MyDefaultCrudFormFactory(Class domainType, FormLayout.ResponsiveStep... responsiveSteps) {
         super(domainType, responsiveSteps);
     }

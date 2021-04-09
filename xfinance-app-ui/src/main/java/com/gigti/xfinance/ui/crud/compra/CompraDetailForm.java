@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.compra;
 
 import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.backend.services.ProveedorService;
@@ -52,7 +53,6 @@ public class CompraDetailForm extends VerticalLayout {
     private final ProductoService productoService;
     private ProveedorService proveedorService;
     private List<CompraItem> listaItems;
-//    private Producto selectedProd;
     private BigDecimalField tfVenta;
     private BigDecimalField tfCantidad;
     private BigDecimalField tfCostoU;
@@ -175,15 +175,6 @@ public class CompraDetailForm extends VerticalLayout {
         //cbProductos.setMinWidth("350px");
 
         resetCbProductos();
-//        selectedProd = new Producto();
-
-//        cbProductos.addValueChangeListener(evt -> {
-//            if(evt.getValue() != null) {
-//                btnAgregar.setEnabled(true);
-//            } else {
-//                clearData();
-//            }
-//        });
 
         cbProductos.setAllowCustomValue(true);
         cbProductos.addCustomValueSetListener(evt -> {
@@ -229,14 +220,13 @@ public class CompraDetailForm extends VerticalLayout {
         formProductos.add(cbProductos, btnAgregar);
 
 
-        VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
-        gridLayout.addClassName("grid");
-        gridLayout.setSizeFull();
+        // VerticalLayout gridLayout = new VerticalLayout(itemsGrid);
+        // gridLayout.addClassName("grid");
+        // gridLayout.setSizeFull();
 
-        formProductos.add(gridLayout);
-        formProductos.setColspan(gridLayout,formProductos.getResponsiveSteps().size()+1);
-        this.add(subTitleItems, formProductos);
-        //this.add(gridLayout);
+        // formProductos.add(itemsGrid);
+        // formProductos.setColspan(itemsGrid,formProductos.getResponsiveSteps().size()+1);
+        this.add(subTitleItems, formProductos, itemsGrid);
     }
 
     private void resetCbProductos() {
@@ -291,7 +281,9 @@ public class CompraDetailForm extends VerticalLayout {
 
     private void configureItemGrid() {
         itemsGrid = new CompraItemGrid();
+        itemsGrid.setPageSize(Constantes.PAGE_SIZE_50);
         itemsGrid.setItems(listaItems);
+        itemsGrid.addClassName("itemGrid");
         itemsGrid.addItemDoubleClickListener(evt -> {
             itemGridEditor.editItem(evt.getItem());
             tfCantidad.focus();

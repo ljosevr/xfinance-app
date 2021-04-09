@@ -15,6 +15,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class Cliente extends AbstractEntity {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn

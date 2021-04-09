@@ -5,6 +5,11 @@ import org.vaadin.crudui.crud.impl.GridCrud;
 
 public class MyGridCrud<T> extends GridCrud<T> {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     public MyGridCrud(Class<T> domainType) {
         super(domainType);
     }

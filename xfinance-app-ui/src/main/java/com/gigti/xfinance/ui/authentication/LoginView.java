@@ -42,6 +42,10 @@ import com.vaadin.flow.router.RouterLink;
 @CssImport("./styles/shared-styles.css")
 public class LoginView extends VerticalLayout {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private AccessControl accessControl;
     private UsuarioService usuarioService;
     private Binder<LoginDTO> binder;

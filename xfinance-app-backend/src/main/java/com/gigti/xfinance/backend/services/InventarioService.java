@@ -9,14 +9,15 @@ import org.vaadin.data.spring.OffsetBasedPageRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 public interface InventarioService {
 
     List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
 
     List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa);
 
-    int getCount(String filterText, Empresa empresa);
-    Response saveInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
+    Response processInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
 
      /**
      * Metodo para buscar el Inventario Actual de los productos
@@ -26,6 +27,7 @@ public interface InventarioService {
      * @return
      */
     List<InventarioActual> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
+    
     int countInvActual(String filterText, Empresa empresa);
 
     /**
@@ -42,8 +44,9 @@ public interface InventarioService {
      * @param impuestoValor -> Valor del impuesto a aplicar
      * @param impuestoNombre -> Nombre del Impuesto a aplicar
      * @return -> Retorna Verdadero o Falso
+     * @throws Exception
      */
-    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean manageStock, BigDecimal impuestoValor, String impuestoNombre) throws HandledException;
+    boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean manageStock, BigDecimal impuestoValor, String impuestoNombre) throws HandledException, Exception;
 
     InventarioInicial findByProducto(Producto producto);
 
@@ -52,4 +55,8 @@ public interface InventarioService {
     Response generateReportInvInicial(String filterText, Empresa empresa, String formatType);
 
     Response generateReportInvActual(String filterText, Empresa empresa, String formatType);
+
+    boolean validarDatosDeInventarios(Producto producto);
+
+    InventarioActual findInvActualByProducto(Producto producto);
 }

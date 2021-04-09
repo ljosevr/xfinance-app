@@ -120,6 +120,12 @@ html {
         min-width: 300px;
     }
 
+    .CompraDetailFormView .itemGrid {
+        margin: 10px;
+        padding: var(--lumo-space-m);
+        min-height: 200px;
+    }
+
     .panel-principal-login{
         /*margin: 150px 0px 0px;*/
         display: flex;

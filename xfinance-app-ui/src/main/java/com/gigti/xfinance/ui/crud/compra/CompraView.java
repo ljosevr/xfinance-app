@@ -9,7 +9,6 @@ package com.gigti.xfinance.ui.crud.compra;
 import com.gigti.xfinance.backend.data.Compra;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.CompraService;
 import com.gigti.xfinance.backend.services.ProductoService;
@@ -181,8 +180,13 @@ public class CompraView extends VerticalLayout implements ICrudView<Compra> {
             } else {
                 NotificacionesUtil.showError(response.getMessage());
             }
-        } catch (HandledException e) {
-            NotificacionesUtil.showError(response.getMessage());
+        } catch (Exception e) {
+            if(response != null) {
+                NotificacionesUtil.showError(response.getMessage());
+            } else {
+                NotificacionesUtil.showError(e.getMessage());
+            }
+            
         }
     }
 

@@ -82,7 +82,7 @@ public class NotificacionesUtil {
     }
 
     public static void showError(String msg){
-        Notification notification = Notification.show(msg, 4000, Notification.Position.MIDDLE);
+        Notification notification = Notification.show(msg, 5000, Notification.Position.MIDDLE);
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
 

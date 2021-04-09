@@ -1,36 +1,31 @@
 package com.gigti.xfinance.ui.crud.usuario.rol;
 
-import com.gigti.xfinance.backend.data.CategoriaProducto;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Rol;
 import com.gigti.xfinance.backend.data.Vista;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
-import com.gigti.xfinance.backend.services.CategoriaProductoService;
 import com.gigti.xfinance.backend.services.RolService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
-import com.gigti.xfinance.ui.crud.categoria.CategoriaForm;
-import com.gigti.xfinance.ui.crud.categoria.CategoriaGrid;
 import com.gigti.xfinance.ui.util.ICrudView;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.gigti.xfinance.ui.util.SearchFilterComponent;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import org.jsoup.internal.StringUtil;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
 
 @Route(value = Constantes.VIEW_R_ROL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_ROL +" | "+ Constantes.VIEW_MAIN)

@@ -6,16 +6,15 @@
 
 package com.gigti.xfinance.ui.crud.compra;
 
-import com.gigti.xfinance.backend.data.CompraItem;
-import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.others.AllUtils;
-import com.vaadin.flow.component.grid.ColumnTextAlign;
-import com.vaadin.flow.component.grid.GridVariant;
-import org.vaadin.klaudeta.PaginatedGrid;
-
 import java.math.BigDecimal;
 
-public class CompraItemGrid extends PaginatedGrid<CompraItem> {
+import com.gigti.xfinance.backend.data.CompraItem;
+import com.gigti.xfinance.backend.others.AllUtils;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+
+public class CompraItemGrid extends Grid<CompraItem> {
 
     public CompraItemGrid() {
         setSizeFull();
@@ -36,30 +35,22 @@ public class CompraItemGrid extends PaginatedGrid<CompraItem> {
                 //.setFlexGrow(10);
 
         addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioTotalCosto()) : BigDecimal.ZERO)
-        //addColumn(CompraItem::getPrecioTotalCosto)
                 .setHeader("P. Costo Total")
                 .setKey("costoT")
                 .setTextAlign(ColumnTextAlign.END);
                 //.setFlexGrow(8);
 
         addColumn(ci -> ci.getPrecioTotalCosto() != null ? AllUtils.numberFormat(ci.getPrecioCosto()) : BigDecimal.ZERO)
-        //addColumn(CompraItem::getPrecioCosto)
                 .setHeader("P. Costo Un")
                 .setKey("costoU")
                 .setTextAlign(ColumnTextAlign.END);
 
         addColumn(ci -> ci.getPrecioVenta() != null ? AllUtils.numberFormat(ci.getPrecioVenta()) : BigDecimal.ZERO)
-        //addColumn(CompraItem::getPrecioVenta)
                 .setHeader("P. Venta Un")
                 .setKey("ventaU").setTextAlign(ColumnTextAlign.END);
 
-        setPageSize(Constantes.PAGE_SIZE_10);
-        setPaginatorSize(Constantes.PAGINATOR_SIZE);
         getColumns().forEach(column -> column.setAutoWidth(true));
     }
 
-    @Override
-    public int getPage() {
-        return super.getPage()-1;
-    }
+
 }

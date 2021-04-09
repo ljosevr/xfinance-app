@@ -19,7 +19,7 @@ import java.util.Set;
 @Data // Aplica para Lombok para no tener que crear los Get y Set - Falla con Java 12
 @Entity
 @Table(name = "roles", uniqueConstraints={@UniqueConstraint(columnNames={"nombre","empresa_id"})})
-public class Rol extends AbstractEntity implements Serializable {
+public class Rol extends AbstractEntity {
 
     public static final Rol ROOT = new Rol("Root", "ROOT", true, null , false, null);
     public static final Rol ADMIN = new Rol("Administrador", "ADMIN", true, null , false, null);

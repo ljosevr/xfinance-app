@@ -13,6 +13,10 @@ import javax.validation.constraints.Size;
 @Table(name="categoria_producto")
 public class CategoriaProducto extends AbstractEntity{
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     @Size(min = 2, message = "Categoria debe tener minimo 2 Caracteres")
     @NotNull
     private String nombre;

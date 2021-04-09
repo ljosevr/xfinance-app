@@ -19,7 +19,7 @@ public interface VentaService {
 
     int count(Empresa empresa);
 
-    Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente) throws HandledException;
+    Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente) throws Exception;
 
     boolean deleteAllVentas(Empresa emp, List<Producto> productoList);
 

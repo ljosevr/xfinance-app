@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MyResponsiveStep extends FormLayout.ResponsiveStep {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     private MyResponsiveStep(String minWidth, int columns) {
         super(minWidth, columns);
     }

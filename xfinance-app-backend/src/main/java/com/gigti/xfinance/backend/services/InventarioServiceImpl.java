@@ -1,36 +1,52 @@
 package com.gigti.xfinance.backend.services;
 
-import com.gigti.xfinance.backend.data.*;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Impuesto;
+import com.gigti.xfinance.backend.data.InventarioActual;
+import com.gigti.xfinance.backend.data.InventarioActualCosto;
+import com.gigti.xfinance.backend.data.InventarioInicial;
+import com.gigti.xfinance.backend.data.Movimiento;
+import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.ProductoValorVenta;
+import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
 import com.gigti.xfinance.backend.others.AllUtils;
 import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
-import com.gigti.xfinance.backend.repositories.*;
-import net.sf.jasperreports.engine.*;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import com.gigti.xfinance.backend.repositories.InventarioActualCostoRepository;
+import com.gigti.xfinance.backend.repositories.InventarioActualRepository;
+import com.gigti.xfinance.backend.repositories.InventarioInicialRepository;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ResourceUtils;
 import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.*;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
+@Transactional
 public class InventarioServiceImpl implements InventarioService {
 
     private static final Logger logger = LoggerFactory.getLogger(InventarioServiceImpl.class);
@@ -45,16 +61,16 @@ public class InventarioServiceImpl implements InventarioService {
     private InventarioActualRepository inventarioActualRepository;
 
     @Autowired
-    private ProductoRepository productoRepository;
+    private ProductoService productoService;
 
     @Autowired
-    private ProductoValoresRepository productoValoresRepository;
+    private ProductoValorVentaService productoValorService;
 
     @Autowired
-    private ImpuestoRepository impuestoRepository;
+    private MovimientoService movimientoService;
 
     @Autowired
-    private MovimientoRepository movimientoRepository;
+    private InventarioService inventarioService;
 
     @Override
     public List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
@@ -62,11 +78,7 @@ public class InventarioServiceImpl implements InventarioService {
         logger.info("--> "+methodName);
         final List<InventarioInicial> result = new ArrayList<>();
         List<Producto> listaProductos;
-        if(filterText == null || filterText.isEmpty()) {
-            listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa, offsetBasedPageRequest);
-        } else  {
-            listaProductos = productoRepository.findAllByEmpresaAndNombreProducto(empresa, filterText, offsetBasedPageRequest);
-        }
+        listaProductos = productoService.findAll(filterText, empresa, offsetBasedPageRequest);
 
         listaProductos.forEach(p -> {
             InventarioInicial invInicial = inventarioInicialRepository.findByProducto(p);
@@ -94,9 +106,9 @@ public class InventarioServiceImpl implements InventarioService {
         final List<InventarioInicial> result = new ArrayList<>();
         List<Producto> listaProductos;
         if(filterText == null || filterText.isEmpty()) {
-            listaProductos = productoRepository.findByEmpresaAndEliminadoIsFalse(empresa);
+            listaProductos = productoService.findAllByEmpresaAndEliminadoIsFalse(empresa);
         } else  {
-            listaProductos = productoRepository.findAllByEmpresaAndNombreProducto(empresa, filterText);
+            listaProductos = productoService.findByNombreProducto(empresa, filterText);
         }
 
         listaProductos.forEach(p -> {
@@ -140,21 +152,9 @@ public class InventarioServiceImpl implements InventarioService {
     }
 
     @Override
-    public int getCount(String filterText, Empresa empresa) {
-        int count;
-        if(filterText == null || filterText.isEmpty()) {
-            count = productoRepository.countByEmpresaAndEliminadoIsFalse(empresa);
-        } else  {
-            count = productoRepository.countByEmpresaAndNombreProducto(empresa, filterText);
-        }
-
-        return count;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED)
-    public Response saveInventarioInicial(InventarioInicial inventarioInicialNuevo, Usuario usuario) {
-        String methodName = "saveInventarioInicial";
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Response processInventarioInicial(InventarioInicial inventarioInicialNuevo, Usuario usuario) {
+        String methodName = "processInventarioInicial";
         logger.info("--> "+methodName);
         Response result = new Response();
         try {
@@ -169,10 +169,22 @@ public class InventarioServiceImpl implements InventarioService {
                     logger.info("-- El inventario Inicial Ya Existe. Se debe Actualizar");
 
                     //Consultar El Inventario Actual.
-                    InventarioActual invActualOld = inventarioActualRepository.findByProducto(inventarioInicialNuevo.getProducto());
+                    
+                    InventarioActual invActualOld = findInvActualByProducto(inventarioInicialNuevo.getProducto());
 
                     if(invActualOld != null){
-                        updateInvInicial(inventarioInicialNuevo,invActualOld,usuario,result);
+                        //Impuesto
+                        Producto prod = inventarioInicialNuevo.getProducto();
+                        prod.setImpuesto(inventarioInicialNuevo.getImpuesto());
+
+                        //Actualizando Producto por Impuesto
+                        Response responseProduct = productoService.saveProduct(prod, usuario);
+                        if(responseProduct.isSuccess()){
+                            //Update Inventario Inicial    
+                            updateInvInicial(inventarioInicialNuevo,invActualOld,usuario,result);
+                        } else {
+                            throw new Exception(responseProduct.getMessage());
+                        }
                     } else {
                         result.setSuccess(false);
                         result.setMessage("Error al Obtener Inventario actual");
@@ -196,9 +208,10 @@ public class InventarioServiceImpl implements InventarioService {
      * @param inventarioInicial
      * @param usuario
      * @param result
-     * @throws HandledException
+     * @throws Exception
      */
-    private void createInvInicial(InventarioInicial inventarioInicial, Usuario usuario, Response result) throws HandledException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    private void createInvInicial(InventarioInicial inventarioInicial, Usuario usuario, Response result) throws Exception {
         logger.info("--> createInvInicial");
         //Inventario Inicial
         inventarioInicial.setUsuario(usuario);
@@ -224,19 +237,15 @@ public class InventarioServiceImpl implements InventarioService {
      * Actualizar Impuestos del producto y Precios.
      * @param inventarioInicial
      * @return
-     * @throws HandledException
+     * @throws Exception
      */
-    private boolean updateTaxAndPrice(InventarioInicial inventarioInicial, BigDecimal cantidad, boolean aumentarStock, TipoMovimientoEnum tipoMovimientoEnum) throws HandledException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    private boolean updateTaxAndPrice(InventarioInicial inventarioInicial, BigDecimal cantidad, boolean aumentarStock, TipoMovimientoEnum tipoMovimientoEnum) throws Exception {
         logger.info("--> updateTaxAndPrice");
         logger.info("-- INFO: InvInicial - "+inventarioInicial);
         logger.info("-- INFO: Cantidad - "+cantidad);
         logger.info("-- INFO: aumentarSotck - "+aumentarStock);
         logger.info("-- INFO: TipoMovimiento - "+tipoMovimientoEnum);
-        //Impuesto
-        Producto prod = inventarioInicial.getProducto();
-        prod.setImpuesto(inventarioInicial.getImpuesto());
-
-        productoRepository.save(prod);
 
         boolean process = saveProcessInventarioActualAndPrecios(inventarioInicial.getProducto(), aumentarStock,
                 cantidad, inventarioInicial.getPrecioVenta(),
@@ -253,9 +262,10 @@ public class InventarioServiceImpl implements InventarioService {
      * @param invInicialNuevo
      * @param usuario
      * @param result
-     * @throws HandledException
+     * @throws Exception
      */
-    private void updateInvInicial(InventarioInicial invInicialNuevo, InventarioActual invActual, Usuario usuario, Response result) throws HandledException {
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    private void updateInvInicial(InventarioInicial invInicialNuevo, InventarioActual invActual, Usuario usuario, Response result) throws Exception {
         logger.info("--> updateInvInicial");
         //Inventario Inicial
         invInicialNuevo.setUsuario(usuario);
@@ -318,13 +328,18 @@ public class InventarioServiceImpl implements InventarioService {
         } else {
 
             invInicialNuevo.setFechaActualizacion(new Date());
-            invInicialNuevo = inventarioInicialRepository.save(invInicialNuevo);
+            invInicialNuevo = this.saveInventarioInicial(invInicialNuevo);
 
             result.setSuccess(true);
             result.setMessage("Inventario Actualizado Exitosamente");
             result.setObject(invInicialNuevo);
         }
         logger.info("<-- updateInvInicial");
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    private InventarioInicial saveInventarioInicial(InventarioInicial inventarioInicial){
+        return inventarioInicialRepository.save(inventarioInicial);
     }
 
     @Override
@@ -391,28 +406,29 @@ public class InventarioServiceImpl implements InventarioService {
      * @param impuestoValor -> Valor del impuesto a aplicar
      * @param impuestoNombre -> Nombre del Impuesto a aplicar
      * @return -> Retorna Verdadero o Falso
+     * @throws Exception
      */
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.MANDATORY, rollbackFor = {Exception.class, RuntimeException.class})
     @Override
-    public boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean manageStock, BigDecimal impuestoValor, String impuestoNombre) throws HandledException {
+    public boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, 
+                    BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, 
+                    boolean manageStock, BigDecimal impuestoValor, String impuestoNombre) throws Exception {
         String methodName = "saveProcessInventarioActualAndPrecios";
         logger.info("--> "+methodName);
-        try {
             Date fecha = new Date();
-
             //Actualizar Inventario Costos
             setInvActualCosto(producto, cantidad, precioCosto, manageStock, fecha, tipoMovimiento);
-
+ 
             //Actualizar Inventario Agrupado
             setInvActualVenta(producto, aumentarStock, cantidad, manageStock, fecha);
 
             if(updatePrices) {
                 //Producto Valores
                 ProductoValorVenta productoValorVentaNew = new ProductoValorVenta();
-                ProductoValorVenta productoValorVenta = productoValoresRepository.findByProductoAndActivoIsTrue(producto);
+                ProductoValorVenta productoValorVenta = productoValorService.findByProductoAndActivoIsTrue(producto);
                 if (productoValorVenta != null) {
                     productoValorVenta.setActivo(false);
-                    productoValoresRepository.save(productoValorVenta);
+                    productoValorService.saveProductoValor(productoValorVenta);
                 }
                 //Nuevo ProductoValor
                 productoValorVentaNew.setActivo(true);
@@ -420,9 +436,9 @@ public class InventarioServiceImpl implements InventarioService {
                 productoValorVentaNew.setValorVenta(precioVenta);
                 productoValorVentaNew.setProducto(producto);
 
-                productoValoresRepository.save(productoValorVentaNew);
+                productoValorService.saveProductoValor(productoValorVentaNew);
             }
-
+            
             //Movimientos
             Movimiento movimiento = new Movimiento();
             movimiento.setProducto(producto);
@@ -434,14 +450,46 @@ public class InventarioServiceImpl implements InventarioService {
             movimiento.setImpuestoValor(impuestoValor);
             movimiento.setImpuestoNombre(impuestoNombre);
 
-            movimientoRepository.save(movimiento);
-
-        }catch(HandledException e){
-            logger.error(methodName  + ": "+e.getMessage(), e);
-            throw e;
-        }
+            movimientoService.saveMovimiento(movimiento);
+            
+            if(!inventarioService.validarDatosDeInventarios(producto)){
+                throw new Exception("Inventarios No Cuadran");
+            }
+  
         logger.info("<-- "+methodName);
         return true;
+    }
+
+    /**
+     * Metodo para validar la veracidad de los inventarios
+     * @param producto
+     * @throws Exception
+     */
+    public boolean validarDatosDeInventarios(Producto producto) {
+        logger.info("--> validarDatosDeInventarios");
+        //Consultar Inventario Actual del Producto
+        InventarioActual invActual = inventarioActualRepository.findByProducto(producto);
+
+        //Consultar Inventario Actual Costo
+        List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
+        BigDecimal cantidadInvActualCosto = BigDecimal.ZERO;
+        for(InventarioActualCosto costo : listInvActualCosto){
+            if(costo.isActivo() && costo.isManageStock()){
+                cantidadInvActualCosto = cantidadInvActualCosto.add(costo.getCantidad());  
+            } 
+        }
+        logger.info("Cantidad Inventario Actual: "+invActual.getCantidad());
+        logger.info("Cantidad Inventario Actual Costo: "+cantidadInvActualCosto);
+        //Comparar Inventarios
+        if(invActual.getCantidad().compareTo(cantidadInvActualCosto) == 0) {
+            logger.info("Inventarios OK ");
+            logger.info("<-- validarDatosDeInventarios");
+            return true;
+        } else {
+            logger.warn("Inventarios KO - Con Descuadre");
+            logger.info("<-- validarDatosDeInventarios");
+            return false;
+        }
     }
 
     @Override
@@ -449,9 +497,11 @@ public class InventarioServiceImpl implements InventarioService {
         return inventarioInicialRepository.findByProducto(producto);
     }
 
-    private void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean manageStock, Date fecha, TipoMovimientoEnum tipoMovimiento) throws HandledException {
+    //@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Transactional
+    protected void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean manageStock, Date fecha, TipoMovimientoEnum tipoMovimiento) throws HandledException {
         //Inventario Actual Costo
-        List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
+        List<InventarioActualCosto> listInvActualCosto = findByProductoOrderByFechaCreacionAsc(producto);
         List<InventarioActualCosto> result = new ArrayList<>();
 
         switch (tipoMovimiento) {
@@ -477,10 +527,17 @@ public class InventarioServiceImpl implements InventarioService {
         inventarioActualCostoRepository.saveAll(result);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    //@Transactional(readOnly = true, propagation = Propagation.REQUIRED)
+    @Transactional
+    private List<InventarioActualCosto> findByProductoOrderByFechaCreacionAsc(Producto producto){
+        return inventarioActualCostoRepository.findByProductoOrderByFechaCreacionAsc(producto);
+    }
+
+    //@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    @Transactional
     void setInvActualVenta(Producto producto, boolean aumentarStock, BigDecimal cantidad, boolean manageStock, Date fecha) {
         logger.info("--> setInvActualVenta");
-        InventarioActual invActual = inventarioActualRepository.findByProducto(producto);
+        InventarioActual invActual = this.findInvActualByProducto(producto);
         if(invActual != null){
             invActual.setManageStock(manageStock);
             if(manageStock) {
@@ -515,7 +572,6 @@ public class InventarioServiceImpl implements InventarioService {
         logger.info("--> setInvCosto_CompraOrInicial");
         InventarioActualCosto invActualCosto;
 
-        //if(listInvActualCosto == null && listInvActualCosto.isEmpty()) {
         if(listInvActualCosto.isEmpty()) {
             logger.info("-- No Existe Inventario Costo Actual");
             listInvActualCosto = new ArrayList<>();
@@ -596,17 +652,23 @@ public class InventarioServiceImpl implements InventarioService {
             if(invActualCosto != null) {
                 if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
                     while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
+                        boolean updateInvCostoObject = false;
                         if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
-                            cantidad = cantidad.subtract(invActualCosto.getCantidad());
+
+                            cantidad = cantidad.subtract(invActualCosto.getCantidad(), new MathContext(10, RoundingMode.HALF_UP));
                             invActualCosto.setCantidad(BigDecimal.ZERO);
                             invActualCosto.setActivo(false);
-                            invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
+                            updateInvCostoObject = true;
+
                         } else {
                             invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
                             cantidad = BigDecimal.ZERO;
                         }
                         invActualCosto.setFechaActualizacion(fecha);
                         result.add(invActualCosto);
+                        if(updateInvCostoObject) {
+                            invActualCosto = UtilsBackend.extractInvActCostByDateAndDiff(listInvActualCosto, invActualCosto.getId());
+                        }
                     }
                 } else {
                     invActualCosto.setCantidad(invActualCosto.getCantidad().subtract(cantidad));
@@ -623,11 +685,11 @@ public class InventarioServiceImpl implements InventarioService {
         logger.info("<-- setInvCosto_UpdateInvInicialDel");
     }
 
-    private void setInvCosto_Venta(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean infinite, Date fecha) throws HandledException {
+    private void setInvCosto_Venta(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean manageStock, Date fecha) throws HandledException {
         logger.info("--> setInvCosto_Venta");
         InventarioActualCosto invActualCosto;
         //Ventas
-        if(!infinite) {
+        if(manageStock) {
             invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
             if(invActualCosto != null) {
                 if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
@@ -745,5 +807,11 @@ public class InventarioServiceImpl implements InventarioService {
         }
 
         return response;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
+    public InventarioActual findInvActualByProducto(Producto producto) {
+        return inventarioActualRepository.findByProducto(producto);
     }
 }

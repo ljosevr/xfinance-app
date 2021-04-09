@@ -424,8 +424,8 @@ public class PventaView extends VerticalLayout {
                     NotificacionesUtil.showSuccess("Factura Generada: " + venta.getNumeroFactura());
                     clearAll();
                 }
-            } catch(HandledException e) {
-                NotificacionesUtil.showError(e.getCode() + " - "+e.getMessage());
+            } catch(Exception e) {
+                NotificacionesUtil.showError(e.getMessage());
             }
         }
     }

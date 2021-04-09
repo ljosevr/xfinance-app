@@ -1,5 +1,6 @@
 package com.gigti.xfinance.backend.services;
 
+import com.gigti.xfinance.backend.data.Movimiento;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.repositories.MovimientoRepository;
 import org.slf4j.Logger;
@@ -30,5 +31,11 @@ public class MovimientoServiceImpl implements MovimientoService{
             logger.error("Error al Eliminar Movimientos: "+e.getMessage(), e);
             return false;
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public Movimiento saveMovimiento(Movimiento movimiento) {
+        return movimientoRepository.save(movimiento);
     }
 }
