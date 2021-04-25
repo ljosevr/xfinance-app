@@ -273,3 +273,4 @@ webpack.config.js
 xfinance-app-ui/target/classes/com/gigti/xfinance/ui/util/MyDefaultCrudFormFactory$1.class
 xfinance-app-backend/target/classes/com/gigti/xfinance/backend/services/InventarioServiceImpl$1.class
 xfinance-app-ui/target/*
+.vscode/settings.json
