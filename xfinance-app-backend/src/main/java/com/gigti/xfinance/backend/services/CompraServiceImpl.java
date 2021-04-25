@@ -53,7 +53,7 @@ public class CompraServiceImpl implements CompraService {
     private CompraItemRepository compraItemRepository;
 
     @Autowired
-    private InventarioService inventarioService;
+    private InventarioCommonService inventarioService;
 
     @Autowired
     private ProductoValorVentaService productoValorVentaService;

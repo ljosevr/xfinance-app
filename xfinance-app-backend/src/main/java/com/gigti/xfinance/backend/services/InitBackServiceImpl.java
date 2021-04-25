@@ -62,7 +62,7 @@ public class InitBackServiceImpl implements InitBackService {
     @Autowired
     private TipoService tipoService;
     @Autowired
-    private InventarioService inventarioService;
+    private InventarioCommonService inventarioService;
     @Autowired
     private ImpuestoService impuestoService;
     @Autowired

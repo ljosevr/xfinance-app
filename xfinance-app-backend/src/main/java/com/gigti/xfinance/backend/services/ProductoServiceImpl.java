@@ -38,7 +38,7 @@ public class ProductoServiceImpl implements ProductoService {
     private ProductoValoresRepository productoValoresRepository;
 
     @Autowired
-    private InventarioService inventarioService;
+    private InventarioInicialService inventarioService;
 
 
     @Transactional(propagation = Propagation.REQUIRED)

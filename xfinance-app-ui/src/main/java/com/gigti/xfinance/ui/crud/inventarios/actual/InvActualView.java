@@ -6,12 +6,15 @@
 
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
+import java.io.ByteArrayInputStream;
+import java.util.List;
+import java.util.Objects;
+
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.InventarioActual;
-import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
-import com.gigti.xfinance.backend.services.InventarioService;
+import com.gigti.xfinance.backend.services.InventarioActualService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.util.ICrudView;
@@ -29,10 +32,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamRegistration;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinSession;
-import org.vaadin.data.spring.OffsetBasedPageRequest;
 
-import java.io.ByteArrayInputStream;
-import java.util.Objects;
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 @Route(value = Constantes.VIEW_R_INVENTARIO_ACTUAL, layout = MainLayout.class)
 @PageTitle(value = Constantes.VIEW_INVENTARIO_ACTUAL +" | "+ Constantes.VIEW_MAIN)
@@ -41,40 +42,36 @@ public class InvActualView extends VerticalLayout  implements ICrudView<Inventar
     private final Empresa empresa;
     private final InvActualGrid grid;
     private TextField filter;
-    private final InventarioService inventarioService;
+    private final InventarioActualService inventarioService;
     private SearchFilterComponent searchLayout;
-    private DataProvider<InventarioActual, Void> dataProvider;
+    //private DataProvider<InventarioActual, Void> dataProvider;
 
-    public InvActualView(InventarioService inventarioService) {
+    public InvActualView(InventarioActualService inventarioService) {
         this.inventarioService = inventarioService;
         empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
 
         detailLayout(this);
-
 
         H1 title = new H1(Constantes.VIEW_INVENTARIO_ACTUAL.toUpperCase());
         title.addClassName("titleView2");
 
         configureSearchLayout();
 
+        configureGrid(grid = new InvActualGrid());
         configureProvider();
 
-        configureGrid(grid = new InvActualGrid());
-
         add(title, searchLayout, grid);
-
-        updateList(grid, dataProvider);
-        closeEditor();
-    }
-
-    public void closeEditor() {
     }
 
     @Override
     public void configureProvider() {
-        dataProvider = DataProvider.fromCallbacks(
-                query -> inventarioService.findInvActual(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
-                query -> inventarioService.countInvActual(filter.getValue(), empresa));
+        grid.setDataProvider(DataProvider.fromCallbacks(
+            query -> {
+                List<InventarioActual> lista = inventarioService.findInvActual(filter.getValue(), empresa, new OffsetBasedPageRequest(query));
+                return lista.stream().parallel();
+            },
+            query -> inventarioService.countInvActual(filter.getValue(), empresa))); 
+
     }
 
     @Override
@@ -89,8 +86,12 @@ public class InvActualView extends VerticalLayout  implements ICrudView<Inventar
                 "", false,
                 "", false,
                 true);
-        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> dataProvider.refreshAll());
-        searchLayout.getBtnSearch().addClickListener(click -> dataProvider.refreshAll());
+        searchLayout.getFilter().addKeyPressListener(Key.ENTER, enter -> {
+            grid.getDataProvider().refreshAll();
+        });
+        searchLayout.getBtnSearch().addClickListener(click -> {
+            grid.getDataProvider().refreshAll();
+        });
         searchLayout.getBtnToPdf().addClickListener(click -> {
             Response response = inventarioService.generateReportInvActual(filter.getValue(),empresa,"pdf");
             if(response.isSuccess()) {
@@ -123,6 +124,12 @@ public class InvActualView extends VerticalLayout  implements ICrudView<Inventar
     @Override
     public void deleteItem(Object obj) {
 
+    }
+
+    @Override
+    public void closeEditor() {
+        // TODO Auto-generated method stub
+        
     }
 
 }

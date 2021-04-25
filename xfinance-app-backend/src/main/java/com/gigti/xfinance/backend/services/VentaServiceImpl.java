@@ -47,7 +47,7 @@ public class VentaServiceImpl implements VentaService {
     private InventarioActualRepository inventarioActualRepository;
 
     @Autowired
-    private InventarioService inventarioService;
+    private InventarioCommonService inventarioService;
 
     @Override
     public List<PventaDTO> findByName(String filter, Empresa empresa, int page, int size) {

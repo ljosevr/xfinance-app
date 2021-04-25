@@ -1,7 +1,0 @@
-<Resource name="jdbc/tis" auth="Container"
-              type="javax.sql.DataSource" driverClassName="org.postgresql.Driver"
-              url="jjdbc:postgresql://dev-prueba-local.caagrb8qixzc.us-east-2.rds.amazonaws.com:5432/ebdb"
-              username="tis" password="tis12020" maxActive="20" maxIdle="10" maxWait="-1"/>
-
-              <!-- url: jdbc:postgresql://localhost:5432/tu_inventario_seguro
-    url: jdbc:postgresql://dev-prueba-local.caagrb8qixzc.us-east-2.rds.amazonaws.com:5432/ebdb -->

@@ -1,5 +1,6 @@
 package com.gigti.xfinance.ui.util;
 
+import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
@@ -29,7 +30,7 @@ public interface ICrudView<T> {
     default void configureGrid(Grid<T> grid) {
         grid.setSizeFull();
         grid.addItemDoubleClickListener(evt -> editItem(evt.getItem()));
-        grid.setPageSize(50);
+        grid.setPageSize(Constantes.PAGE_SIZE_25);
     }
     void configureSearchLayout();
     void configureForm();

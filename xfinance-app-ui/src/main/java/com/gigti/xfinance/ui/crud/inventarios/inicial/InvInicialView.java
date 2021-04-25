@@ -14,7 +14,7 @@ import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.others.Constantes;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ImpuestoService;
-import com.gigti.xfinance.backend.services.InventarioService;
+import com.gigti.xfinance.backend.services.InventarioInicialService;
 import com.gigti.xfinance.backend.services.ProductoService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
@@ -44,13 +44,13 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
     private final Empresa empresa;
     private InvInicialGrid grid;
     private TextField filter;
-    private final InventarioService inventarioService;
+    private final InventarioInicialService inventarioService;
     private final ProductoService productoService;
     private final InvInicialForm form;
     private SearchFilterComponent searchLayout;
     private DataProvider<InventarioInicial, Void> dataProvider;
 
-    public InvInicialView(InventarioService inventarioService, ImpuestoService impuestoService, ProductoService productoService){
+    public InvInicialView(InventarioInicialService inventarioService, ImpuestoService impuestoService, ProductoService productoService){
         this.inventarioService = inventarioService;
         this.productoService = productoService;
         empresa = CurrentUser.get() != null ? Objects.requireNonNull(CurrentUser.get()).getPersona().getEmpresa() : null;
@@ -62,17 +62,14 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
 
         configureSearchLayout();
 
-        configureProvider();
-
         configureGrid(grid = new InvInicialGrid());
+        configureProvider();
 
         form = new InvInicialForm(impuestoService.findAll(empresa));
         configureForm();
 
         add(title, searchLayout, grid);
 
-        updateList(grid, dataProvider);
-        //closeEditor();
     }
 
     public void closeEditor() {
@@ -84,9 +81,10 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
     @Override
     public void configureProvider() {
         dataProvider = DataProvider.fromCallbacks(
-                query -> inventarioService.findAllInvInicial(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
-                query -> productoService.count(filter.getValue(), empresa)
+            query -> inventarioService.findAllInvInicial(filter.getValue(), empresa, new OffsetBasedPageRequest(query)).stream(),
+            query -> productoService.count(filter.getValue(), empresa)
         );
+        grid.setDataProvider(dataProvider);
     }
 
     public void editItem(Object inventario) {
@@ -125,8 +123,6 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
                 StreamResource resource = new StreamResource("reporteInvInicial.pdf", () -> new ByteArrayInputStream((byte[]) response.getObject()));
                 resource.setContentType("application/pdf");
                 StreamRegistration registration = VaadinSession.getCurrent().getResourceRegistry().registerResource(resource);
-                //UI.getCurrent().getPage().setLocation(registration.getResourceUri());
-                //UI.getCurrent().getPage().executeJs("window.open($0,\"_blank\",\"toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=400,height=400\")",registration.getResourceUri().toString());
                 UI.getCurrent().getPage().executeJs("window.open($0,\"_blank\",\"toolbar=yes,scrollbars=yes,resizable=yes\")",registration.getResourceUri().toString());
 
             } else {
@@ -162,7 +158,7 @@ public class InvInicialView extends VerticalLayout  implements ICrudView<Inventa
 
         if(response.isSuccess()) {
             NotificacionesUtil.showSuccess(response.getMessage());
-            updateList(grid, dataProvider);
+            grid.getDataProvider().refreshAll();
             closeEditor();
         } else {
             NotificacionesUtil.showError(response.getMessage());

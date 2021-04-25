@@ -7,8 +7,8 @@
 package com.gigti.xfinance.ui.crud.inventarios.actual;
 
 import com.gigti.xfinance.backend.data.InventarioActual;
-import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.others.AllUtils;
+import com.gigti.xfinance.backend.others.Constantes;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;

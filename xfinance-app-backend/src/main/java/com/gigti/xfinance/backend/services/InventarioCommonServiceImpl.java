@@ -5,51 +5,34 @@ import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.gigti.xfinance.backend.data.Empresa;
-import com.gigti.xfinance.backend.data.Impuesto;
 import com.gigti.xfinance.backend.data.InventarioActual;
 import com.gigti.xfinance.backend.data.InventarioActualCosto;
 import com.gigti.xfinance.backend.data.InventarioInicial;
 import com.gigti.xfinance.backend.data.Movimiento;
 import com.gigti.xfinance.backend.data.Producto;
 import com.gigti.xfinance.backend.data.ProductoValorVenta;
-import com.gigti.xfinance.backend.data.Usuario;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
-import com.gigti.xfinance.backend.others.AllUtils;
 import com.gigti.xfinance.backend.others.HandledException;
-import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.InventarioActualCostoRepository;
 import com.gigti.xfinance.backend.repositories.InventarioActualRepository;
 import com.gigti.xfinance.backend.repositories.InventarioInicialRepository;
 
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.vaadin.data.spring.OffsetBasedPageRequest;
-
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 @Transactional
-public class InventarioServiceImpl implements InventarioService {
+public class InventarioCommonServiceImpl implements InventarioCommonService {
 
-    private static final Logger logger = LoggerFactory.getLogger(InventarioServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(InventarioCommonServiceImpl.class);
 
     @Autowired
     private InventarioInicialRepository inventarioInicialRepository;
@@ -61,177 +44,14 @@ public class InventarioServiceImpl implements InventarioService {
     private InventarioActualRepository inventarioActualRepository;
 
     @Autowired
-    private ProductoService productoService;
-
-    @Autowired
     private ProductoValorVentaService productoValorService;
 
     @Autowired
     private MovimientoService movimientoService;
 
     @Autowired
-    private InventarioService inventarioService;
+    private InventarioCommonService inventarioService;
 
-    @Override
-    public List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
-        String methodName = "findAllInvInicial Con Paginacion";
-        logger.info("--> "+methodName);
-        final List<InventarioInicial> result = new ArrayList<>();
-        List<Producto> listaProductos;
-        listaProductos = productoService.findAll(filterText, empresa, offsetBasedPageRequest);
-
-        listaProductos.forEach(p -> {
-            InventarioInicial invInicial = inventarioInicialRepository.findByProducto(p);
-            if(invInicial == null) {
-                invInicial = new InventarioInicial();
-                invInicial.setProducto(p);
-                invInicial.setImpuesto(new Impuesto());
-                invInicial.setPrecioCosto(BigDecimal.ZERO);
-                invInicial.setPrecioVenta(BigDecimal.ZERO);
-                invInicial.setCantidad(BigDecimal.ZERO);
-                invInicial.setDefinitivo(false);
-                invInicial.setManageStock(true);
-            }
-            result.add(invInicial);
-        });
-        result.sort((InventarioInicial o1, InventarioInicial o2) ->
-                o1.getProducto().getNombreProducto().compareTo(o2.getProducto().getNombreProducto()));
-        logger.info("<-- "+methodName + ": "+result.size());
-        return result;
-    }
-
-    public List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa) {
-        String methodName = "findAllInvInicial Sin Paginacion";
-        logger.info("--> "+methodName);
-        final List<InventarioInicial> result = new ArrayList<>();
-        List<Producto> listaProductos;
-        if(filterText == null || filterText.isEmpty()) {
-            listaProductos = productoService.findAllByEmpresaAndEliminadoIsFalse(empresa);
-        } else  {
-            listaProductos = productoService.findByNombreProducto(empresa, filterText);
-        }
-
-        listaProductos.forEach(p -> {
-            InventarioInicial invInicial = inventarioInicialRepository.findByProducto(p);
-            if(invInicial == null) {
-                invInicial = new InventarioInicial();
-                invInicial.setProducto(p);
-                invInicial.setImpuesto(new Impuesto());
-                invInicial.getImpuesto().setNombre("");
-                invInicial.setPrecioCosto(BigDecimal.ZERO);
-                invInicial.setPrecioVenta(BigDecimal.ZERO);
-                invInicial.setCantidad(BigDecimal.ZERO);
-                invInicial.setDefinitivo(false);
-                invInicial.setFechaS("");
-                invInicial.setManageStockS("");
-                invInicial.setDefinitivoS("NO");
-                invInicial.setPrecioCostoS("");
-                invInicial.setPrecioVentaS("");
-            } else {
-                invInicial.setFechaS(AllUtils.formatDate(invInicial.getFechaActualizacion()));
-                if(invInicial.isManageStock()) {
-                    invInicial.setManageStockS("SI");
-                } else {
-                    invInicial.setManageStockS("NO");
-                }
-                if(invInicial.isDefinitivo()){
-                    invInicial.setDefinitivoS("SI");
-                } else {
-                    invInicial.setDefinitivoS("NO");
-                }
-
-                invInicial.setPrecioCostoS(AllUtils.numberFormat(invInicial.getPrecioCosto()));
-                invInicial.setPrecioVentaS(AllUtils.numberFormat(invInicial.getPrecioVenta()));
-            }
-            result.add(invInicial);
-        });
-        result.sort((InventarioInicial o1, InventarioInicial o2) ->
-                o1.getProducto().getNombreProducto().compareTo(o2.getProducto().getNombreProducto()));
-        logger.info("<-- "+methodName + ": "+result.size());
-        return result;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    public Response processInventarioInicial(InventarioInicial inventarioInicialNuevo, Usuario usuario) {
-        String methodName = "processInventarioInicial";
-        logger.info("--> "+methodName);
-        Response result = new Response();
-        try {
-            if(usuario != null ) {
-
-                if(StringUtils.isBlank(inventarioInicialNuevo.getId())) {
-                    //El inventario Inicial no existe se debe crear
-                    logger.info("-- El inventario Inicial no existe se debe crear");
-                    createInvInicial(inventarioInicialNuevo, usuario, result);
-                } else {
-                    //El inventario Inicial Ya Existe. Se debe Actualizar
-                    logger.info("-- El inventario Inicial Ya Existe. Se debe Actualizar");
-
-                    //Consultar El Inventario Actual.
-                    
-                    InventarioActual invActualOld = findInvActualByProducto(inventarioInicialNuevo.getProducto());
-
-                    if(invActualOld != null){
-                        //Impuesto
-                        Producto prod = inventarioInicialNuevo.getProducto();
-                        prod.setImpuesto(inventarioInicialNuevo.getImpuesto());
-
-                        //Actualizando Producto por Impuesto
-                        Response responseProduct = productoService.saveProduct(prod, usuario);
-                        if(responseProduct.isSuccess()){
-                            //Update Inventario Inicial    
-                            updateInvInicial(inventarioInicialNuevo,invActualOld,usuario,result);
-                        } else {
-                            throw new Exception(responseProduct.getMessage());
-                        }
-                    } else {
-                        result.setSuccess(false);
-                        result.setMessage("Error al Obtener Inventario actual");
-                    }
-                }
-            } else{
-                result.setSuccess(false);
-                result.setMessage("Usuario Null");
-            }
-        }catch(Exception e){
-            logger.error(methodName  + ": "+e.getMessage(), e);
-            result.setSuccess(false);
-            result.setMessage("Error al Procesar");
-        }
-        logger.info("<-- "+methodName);
-        return result;
-    }
-
-    /**
-     * Metodo para crear Inventario Inicial.
-     * @param inventarioInicial
-     * @param usuario
-     * @param result
-     * @throws Exception
-     */
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    private void createInvInicial(InventarioInicial inventarioInicial, Usuario usuario, Response result) throws Exception {
-        logger.info("--> createInvInicial");
-        //Inventario Inicial
-        inventarioInicial.setUsuario(usuario);
-        inventarioInicial.setFechaActualizacion(new Date());
-        inventarioInicial.setManageStock(inventarioInicial.isManageStock());
-        inventarioInicial = inventarioInicialRepository.save(inventarioInicial);
-
-        boolean process = updateTaxAndPrice(inventarioInicial, inventarioInicial.getCantidad(), true, TipoMovimientoEnum.INV_INICIAL);
-
-        if(BooleanUtils.isFalse(process)){
-            result.setSuccess(false);
-            result.setMessage("Error al Procesar Inventario Actual y Precios");
-            result.setObject(null);
-        } else {
-            result.setSuccess(true);
-            result.setMessage("Inventario Guardado Exitosamente");
-            result.setObject(inventarioInicial);
-        }
-        logger.info("<-- createInvInicial");
-    }
 
     /**
      * Actualizar Impuestos del producto y Precios.
@@ -239,10 +59,10 @@ public class InventarioServiceImpl implements InventarioService {
      * @return
      * @throws Exception
      */
+    @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    private boolean updateTaxAndPrice(InventarioInicial inventarioInicial, BigDecimal cantidad, boolean aumentarStock, TipoMovimientoEnum tipoMovimientoEnum) throws Exception {
+    public boolean updateTaxAndPrice(InventarioInicial inventarioInicial, BigDecimal cantidad, boolean aumentarStock, TipoMovimientoEnum tipoMovimientoEnum) throws Exception {
         logger.info("--> updateTaxAndPrice");
-        logger.info("-- INFO: InvInicial - "+inventarioInicial);
         logger.info("-- INFO: Cantidad - "+cantidad);
         logger.info("-- INFO: aumentarSotck - "+aumentarStock);
         logger.info("-- INFO: TipoMovimiento - "+tipoMovimientoEnum);
@@ -255,141 +75,6 @@ public class InventarioServiceImpl implements InventarioService {
 
         logger.info("<-- updateTaxAndPrice");
         return process;
-    }
-
-    /**
-     * Metodp para actualizar inventario Inicial mientras no sea Definitivo.
-     * @param invInicialNuevo
-     * @param usuario
-     * @param result
-     * @throws Exception
-     */
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
-    private void updateInvInicial(InventarioInicial invInicialNuevo, InventarioActual invActual, Usuario usuario, Response result) throws Exception {
-        logger.info("--> updateInvInicial");
-        //Inventario Inicial
-        invInicialNuevo.setUsuario(usuario);
-        logger.info("-- INFO: InvInicialNuevo - "+invInicialNuevo);
-        logger.info("-- INFO: Cantidad - "+invInicialNuevo.getCantidad());
-        logger.info("-- INFO: ManageStock - "+invInicialNuevo.isManageStock());
-        boolean process;
-
-        if(!invInicialNuevo.isManageStock()) {
-            logger.info("-- InvNuevo No maneja Stock");
-            //No se maneja Inventario
-                if(!invActual.isManageStock()) {
-                    logger.info("-- InvActual No maneja Stock");
-                    //Solo se debe actualizar Precios e Impuestos.
-                    process = updateTaxAndPrice(invInicialNuevo, BigDecimal.ZERO, true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
-
-                } else {
-                    logger.info("-- InvActual Si maneja Stock");
-                    process = updateTaxAndPrice(invInicialNuevo, BigDecimal.ZERO, true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
-                }
-
-        } else {
-            logger.info("-- InvNuevo Si maneja Stock");
-            //Inventario NUEVO Maneja STOCK
-
-            if (!invActual.isManageStock()) {
-                logger.info("-- InvActual NO maneja Stock");
-                //Inventario Actual NO MANEJA STOCK - Ahora Es Controlado
-
-                process = updateTaxAndPrice(invInicialNuevo, invInicialNuevo.getCantidad(), true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
-            } else {
-                logger.info("-- InvActual SI maneja Stock");
-                //Inventario Actual MANEJA STOCK - Calcular Diferencia
-
-                int resultado = invActual.getCantidad().compareTo(invInicialNuevo.getCantidad());
-                logger.info("-- Diferencia de Stocks: "+resultado);
-                logger.info("-- (-1) (Primero Menor) - (0) (Iguales) - (1) (Primero Mayor): "+resultado);
-                if(resultado == -1) {
-                    //Sumar
-                    BigDecimal cantidad = invInicialNuevo.getCantidad().subtract(invActual.getCantidad());
-                    logger.info("-- Suma Inventario");
-                    process = updateTaxAndPrice(invInicialNuevo, cantidad, true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
-                } else if(resultado == 1) {
-                    //restar
-                    logger.info("-- Resta Inventario");
-                    BigDecimal cantidad = invActual.getCantidad().subtract(invInicialNuevo.getCantidad());
-                    process = updateTaxAndPrice(invInicialNuevo, cantidad, false, TipoMovimientoEnum.INV_INICIAL_UPDATE_DEL);
-                } else {
-                    //No aumenta Ni resta
-                    logger.info("-- No debe hacer Nada Inventario");
-                    process = updateTaxAndPrice(invInicialNuevo, BigDecimal.ZERO, true, TipoMovimientoEnum.INV_INICIAL_UPDATE_ADD);
-                }
-            }
-        }
-
-        if(BooleanUtils.isFalse(process)){
-            result.setSuccess(false);
-            result.setMessage("Error al Procesar Inventario Actual y Precios");
-            result.setObject(null);
-        } else {
-
-            invInicialNuevo.setFechaActualizacion(new Date());
-            invInicialNuevo = this.saveInventarioInicial(invInicialNuevo);
-
-            result.setSuccess(true);
-            result.setMessage("Inventario Actualizado Exitosamente");
-            result.setObject(invInicialNuevo);
-        }
-        logger.info("<-- updateInvInicial");
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    private InventarioInicial saveInventarioInicial(InventarioInicial inventarioInicial){
-        return inventarioInicialRepository.save(inventarioInicial);
-    }
-
-    @Override
-    public List<InventarioActual> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest) {
-        String methodName = "findInvActual";
-        logger.info("--> "+methodName);
-        List<InventarioActual> listResult;
-        if(filterText == null || filterText.isEmpty()) {
-            listResult = inventarioActualRepository.findAllByEmpresa(empresa, offsetBasedPageRequest);
-        } else  {
-            listResult = inventarioActualRepository.search(empresa, filterText, offsetBasedPageRequest);
-        }
-
-        logger.info("<-- "+methodName + " - "+listResult.size());
-        return listResult;
-    }
-
-    private List<InventarioActual> findInvActualWithoutPagination(String filterText, Empresa empresa) {
-        String methodName = "findInvActual-Sin Filtro";
-        logger.info("--> "+methodName);
-        List<InventarioActual> listResult;
-        if(filterText == null || filterText.isEmpty()) {
-            listResult = inventarioActualRepository.findAllByEmpresa(empresa);
-        } else  {
-            listResult = inventarioActualRepository.search(empresa, filterText);
-        }
-
-        listResult.forEach(inv -> {
-            inv.setFechaS(AllUtils.formatDate(inv.getFechaActualizacion()));
-            if(inv.isManageStock()){
-                inv.setManageStockS("SI");
-            } else {
-                inv.setManageStockS("NO");
-            }
-        });
-
-        logger.info("<-- "+methodName + " - "+listResult.size());
-        return listResult;
-    }
-
-    @Override
-    public int countInvActual(String filterText, Empresa empresa) {
-        int count;
-        if(filterText == null || filterText.isEmpty()) {
-            count = inventarioActualCostoRepository.countAllByEmpresa(empresa);
-        } else  {
-            count = inventarioActualCostoRepository.countAllByEmpresaAndNombreProducto(empresa, filterText);
-        }
-
-        return count;
     }
 
     /**
@@ -492,11 +177,6 @@ public class InventarioServiceImpl implements InventarioService {
         }
     }
 
-    @Override
-    public InventarioInicial findByProducto(Producto producto) {
-        return inventarioInicialRepository.findByProducto(producto);
-    }
-
     //@Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     @Transactional
     protected void setInvActualCosto(Producto producto, BigDecimal cantidad, BigDecimal precioCosto, boolean manageStock, Date fecha, TipoMovimientoEnum tipoMovimiento) throws HandledException {
@@ -537,7 +217,7 @@ public class InventarioServiceImpl implements InventarioService {
     @Transactional
     void setInvActualVenta(Producto producto, boolean aumentarStock, BigDecimal cantidad, boolean manageStock, Date fecha) {
         logger.info("--> setInvActualVenta");
-        InventarioActual invActual = this.findInvActualByProducto(producto);
+        InventarioActual invActual = inventarioActualRepository.findByProducto(producto);
         if(invActual != null){
             invActual.setManageStock(manageStock);
             if(manageStock) {
@@ -643,11 +323,11 @@ public class InventarioServiceImpl implements InventarioService {
         logger.info("<-- setInvCosto_UpdateInvInicialAdd");
     }
 
-    private void setInvCosto_UpdateInvInicialDel(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean infinite, Date fecha) throws HandledException {
+    private void setInvCosto_UpdateInvInicialDel(List<InventarioActualCosto> listInvActualCosto, List<InventarioActualCosto> result, BigDecimal cantidad, boolean manageStock, Date fecha) throws HandledException {
         logger.info("--> setInvCosto_UpdateInvInicialDel");
         InventarioActualCosto invActualCosto;
         //Ventas
-        if(!infinite) {
+        if(manageStock) {
             invActualCosto = UtilsBackend.extractInvActCostByDate(listInvActualCosto);
             if(invActualCosto != null) {
                 if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {
@@ -748,70 +428,5 @@ public class InventarioServiceImpl implements InventarioService {
             logger.error("Error: "+e.getMessage(), e);
             return false;
         }
-    }
-
-    @Override
-    public Response generateReportInvInicial(String filterText, Empresa empresa, String formatType) {
-        Response response = new Response();
-        List<InventarioInicial> listInvInicial = findAllInvInicial(filterText,empresa);
-        try {
-            JasperReport jasperReport = JasperCompileManager.compileReport(new ClassPathResource(
-                    "META-INF/resources/reports/InventarioInicial.jrxml").getInputStream());
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listInvInicial);
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("createdBy","TuInventarioSeguro.com");
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,parameters,dataSource);
-            if(formatType.equalsIgnoreCase("pdf")){
-               byte[] fileGenerate = JasperExportManager.exportReportToPdf(jasperPrint);
-               response.setSuccess(true);
-               response.setObject(fileGenerate);
-               response.setMessage("Reporte Generado Correctamente");
-            }
-//            if(formatType.equalsIgnoreCase("xls")){
-//                JasperExportManager.exportReportTo(jasperPrint);
-//            }
-        } catch (Exception e) {
-            logger.error("Error al Generar Reporte: "+e.getMessage(), e);
-            response.setSuccess(false);
-            response.setMessage("Error al Generar Reporte");
-
-        }
-
-        return response;
-    }
-
-    @Override
-    public Response generateReportInvActual(String filterText, Empresa empresa, String formatType) {
-        Response response = new Response();
-        List<InventarioActual> listInvActual = findInvActualWithoutPagination(filterText,empresa);
-        try {
-            JasperReport jasperReport = JasperCompileManager.compileReport(new ClassPathResource(
-                    "META-INF/resources/reports/InventarioActual.jrxml").getInputStream());
-            JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(listInvActual);
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("createdBy","TuInventarioSeguro.com");
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport,parameters,dataSource);
-            if(formatType.equalsIgnoreCase("pdf")){
-                byte[] fileGenerate = JasperExportManager.exportReportToPdf(jasperPrint);
-                response.setSuccess(true);
-                response.setObject(fileGenerate);
-                response.setMessage("Reporte Generado Correctamente");
-            }
-//            if(formatType.equalsIgnoreCase("xls")){
-//                JasperExportManager.exportReportTo(jasperPrint);
-//            }
-        } catch (Exception e) {
-            logger.error("Error al Generar Reporte: "+e.getMessage(), e);
-            response.setSuccess(false);
-            response.setMessage("Error al Generar Reporte");
-        }
-
-        return response;
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-    public InventarioActual findInvActualByProducto(Producto producto) {
-        return inventarioActualRepository.findByProducto(producto);
     }
 }

@@ -9,26 +9,7 @@ import org.vaadin.data.spring.OffsetBasedPageRequest;
 import java.math.BigDecimal;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
-public interface InventarioService {
-
-    List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
-
-    List<InventarioInicial> findAllInvInicial(String filterText, Empresa empresa);
-
-    Response processInventarioInicial(InventarioInicial inventarioInicial, Usuario usuario);
-
-     /**
-     * Metodo para buscar el Inventario Actual de los productos
-     * @param filterText
-     * @param empresa
-     * @param offsetBasedPageRequest
-     * @return
-     */
-    List<InventarioActual> findInvActual(String filterText, Empresa empresa, OffsetBasedPageRequest offsetBasedPageRequest);
-    
-    int countInvActual(String filterText, Empresa empresa);
+public interface InventarioCommonService {
 
     /**
      * Metodo para actualizar Inventario Actual, Movimientos, y ProductoValores
@@ -48,15 +29,10 @@ public interface InventarioService {
      */
     boolean saveProcessInventarioActualAndPrecios(Producto producto, boolean aumentarStock, BigDecimal cantidad, BigDecimal precioVenta, BigDecimal precioCosto, TipoMovimientoEnum tipoMovimiento, boolean updatePrices, boolean manageStock, BigDecimal impuestoValor, String impuestoNombre) throws HandledException, Exception;
 
-    InventarioInicial findByProducto(Producto producto);
-
     boolean deleteAllInventarios(Empresa emp, List<Producto> productosList);
-
-    Response generateReportInvInicial(String filterText, Empresa empresa, String formatType);
-
-    Response generateReportInvActual(String filterText, Empresa empresa, String formatType);
 
     boolean validarDatosDeInventarios(Producto producto);
 
-    InventarioActual findInvActualByProducto(Producto producto);
+    public boolean updateTaxAndPrice(InventarioInicial inventarioInicial, BigDecimal cantidad, boolean aumentarStock, TipoMovimientoEnum tipoMovimientoEnum) throws Exception;
+
 }

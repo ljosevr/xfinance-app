@@ -1,13 +1,16 @@
 package com.gigti.xfinance.backend.services;
 
-import com.gigti.xfinance.backend.data.*;
-import com.gigti.xfinance.backend.data.dto.PventaDTO;
-import com.gigti.xfinance.backend.others.HandledException;
-import org.vaadin.data.spring.OffsetBasedPageRequest;
-
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
+
+import com.gigti.xfinance.backend.data.Cliente;
+import com.gigti.xfinance.backend.data.Empresa;
+import com.gigti.xfinance.backend.data.Producto;
+import com.gigti.xfinance.backend.data.Usuario;
+import com.gigti.xfinance.backend.data.Venta;
+import com.gigti.xfinance.backend.data.dto.PventaDTO;
+
+import org.vaadin.data.spring.OffsetBasedPageRequest;
 
 public interface VentaService {
 
