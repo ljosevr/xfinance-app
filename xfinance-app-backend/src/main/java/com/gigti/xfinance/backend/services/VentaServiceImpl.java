@@ -112,7 +112,7 @@ public class VentaServiceImpl implements VentaService {
             Producto producto = productoRepository.findById(pv.getIdProducto()).orElse(null);
             List<InventarioActualCosto> listInvActualCosto = inventarioActualCostoRepository
                     .findByProductoOrderByFechaCreacionAsc(producto);
-            logger.info("Inventarios de Venta: " + listInvActualCosto.toString());
+
             InventarioActualCosto invActualCosto;
 
             if (listInvActualCosto.size() > 1) {
@@ -124,7 +124,7 @@ public class VentaServiceImpl implements VentaService {
             }
             BigDecimal cantidad = pv.getCantidadVenta();
             if (invActualCosto != null && invActualCosto.isManageStock()
-                    && invActualCosto.getCantidad().compareTo(cantidad) < 0) {
+                    && invActualCosto.getCantidad().compareTo(cantidad) >= 0) {
                 while (cantidad.compareTo(BigDecimal.ZERO) > 0) {
                     VentaItem item = new VentaItem();
                     if (invActualCosto.getCantidad().compareTo(cantidad) < 0) {

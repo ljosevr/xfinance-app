@@ -12,11 +12,9 @@ spring:
   # Uncomment if using PostgreSQL
   # Database
   datasource:
-#    url: jdbc:postgresql://localhost:5432/tu_inventario_seguro
-    url: jdbc:postgresql://dev-pruebas.caagrb8qixzc.us-east-2.rds.amazonaws.com:5432/ebdb
+    url: jdbc:postgresql://localhost:5432/tu_inventario_seguro
     username: tis
-#    password: 123456
-    password: tis12020
+    password: 123456
     driver-class-name: org.postgresql.Driver
     hikari:
       connectionTimeout: 20000
