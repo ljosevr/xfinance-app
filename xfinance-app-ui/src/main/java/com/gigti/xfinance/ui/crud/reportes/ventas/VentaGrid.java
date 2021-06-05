@@ -20,13 +20,19 @@ public class VentaGrid extends Grid<Venta> {
         addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS, GridVariant.LUMO_COMPACT);
 
         addColumn(Venta::getNumeroFactura)
-                .setHeader("#Numero");
+                .setHeader("#Numero")
+                .setSortable(true);
 
         addColumn(venta -> venta.getCliente() != null ? venta.getCliente().getPersona().getIdentificacion() : "")
                 .setHeader("Cliente");
 
         addColumn(venta -> AllUtils.formatDate(venta.getFechaCreacion()))
-                .setHeader("Fecha");
+                .setHeader("Fecha Creación")
+                .setSortable(true);
+        
+        addColumn(venta -> AllUtils.formatDate(venta.getFechaVentaEfectiva()))
+                .setHeader("Fecha Venta")
+                .setSortable(true);
 
         addColumn(venta -> venta.getItems().size())
                 .setHeader("# Items");

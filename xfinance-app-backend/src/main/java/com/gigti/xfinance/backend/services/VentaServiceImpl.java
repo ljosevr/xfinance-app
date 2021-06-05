@@ -3,6 +3,8 @@ package com.gigti.xfinance.backend.services;
 import com.gigti.xfinance.backend.data.*;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
 import com.gigti.xfinance.backend.data.enums.TipoMovimientoEnum;
+import com.gigti.xfinance.backend.others.DateUtils;
+import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.UtilsBackend;
 import com.gigti.xfinance.backend.repositories.*;
 import org.slf4j.Logger;
@@ -82,6 +84,7 @@ public class VentaServiceImpl implements VentaService {
     }
 
     @Override
+    @Deprecated
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente) throws Exception {
         logger.info("--> Registrar Venta");
@@ -89,21 +92,14 @@ public class VentaServiceImpl implements VentaService {
         if (cliente != null)
             logger.info("--> Cliente: " + cliente.getId() + " - " + cliente.getPersona().getIdentificacion());
 
-        Venta venta = new Venta();
-        venta.setUsuario(usuario);
-        venta.setFechaCreacion(new Date());
-        venta.setCliente(cliente);
-        // TODO Luego cambiar por # Factura de Dian
-        // TODO Agregar luego iniciar factura en Numero XXX definido por los usuarios
-        long cantidadFacturasxEmpresa = ventaRepository.countByUsuarioEmpresa(usuario.getPersona().getEmpresa());
-        cantidadFacturasxEmpresa++;
-        venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
-        venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));
-        venta.setTotalVenta(
-                BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
-        venta.setEmpresa(usuario.getPersona().getEmpresa());
+        Venta venta = saveVenta(usuario, listVenta, cliente, null);
+        processItemsVenta(listVenta, venta);
+        logger.info("<-- Registrar Venta");
+        return venta;
+    }
 
-        ventaRepository.save(venta);
+    @Transactional(propagation = Propagation.MANDATORY, rollbackFor = {Exception.class, RuntimeException.class})
+    private void processItemsVenta(List<PventaDTO> listVenta, Venta venta) throws HandledException, Exception {
         List<VentaItem> listItems = new ArrayList<>();
 
         // Items Factura
@@ -176,7 +172,29 @@ public class VentaServiceImpl implements VentaService {
         } else {
             throw new Exception("Error al registrar venta");
         }
-        logger.info("<-- Registrar Venta");
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY, rollbackFor = {Exception.class, RuntimeException.class})
+    private Venta saveVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente, LocalDate fechaVenta) {
+        Venta venta = new Venta();
+        venta.setUsuario(usuario);
+        venta.setFechaCreacion(new Date());
+        venta.setCliente(cliente);
+        // TODO Luego cambiar por # Factura de Dian
+        // TODO Agregar luego iniciar factura en Numero XXX definido por los usuarios
+        long cantidadFacturasxEmpresa = ventaRepository.countByUsuarioEmpresa(usuario.getPersona().getEmpresa());
+        cantidadFacturasxEmpresa++;
+        venta.setNumeroFacturaInterno(cantidadFacturasxEmpresa);
+        venta.setNumeroFactura(UtilsBackend.generateNumberTicket(cantidadFacturasxEmpresa));
+        venta.setTotalVenta(
+                BigDecimal.valueOf(listVenta.stream().mapToDouble(p -> p.getSubTotal().doubleValue()).sum()));
+        venta.setEmpresa(usuario.getPersona().getEmpresa());
+        if(fechaVenta == null) {
+            venta.setFechaVentaEfectiva(venta.getFechaCreacion());
+        } else {
+            venta.setFechaVentaEfectiva(DateUtils.convertLocalDateToDate(fechaVenta));
+        }
+        ventaRepository.save(venta);
         return venta;
     }
 
@@ -292,10 +310,10 @@ public class VentaServiceImpl implements VentaService {
         logger.info("Fecha Inicio: " + java.sql.Timestamp.valueOf(dateStartTime));
         logger.info("Fecha Fin: " + java.sql.Timestamp.valueOf(dateEndTime));
         if (filterText == null || filterText.isEmpty()) {
-            count = ventaRepository.countAllByEmpresa(empresa, java.sql.Timestamp.valueOf(dateStartTime),
+            count = ventaRepository.countAllByEmpresaAndFechaVenta(empresa, java.sql.Timestamp.valueOf(dateStartTime),
                     java.sql.Timestamp.valueOf(dateEndTime));
         } else {
-            count = ventaRepository.countAllByEmpresaAndNumeroFactura(empresa, filterText,
+            count = ventaRepository.countAllByEmpresaAndNumeroFacturaAndFechaVenta(empresa, filterText,
                     java.sql.Timestamp.valueOf(dateStartTime), java.sql.Timestamp.valueOf(dateEndTime));
         }
         logger.info("<-- " + methodName + " - " + count);
@@ -316,10 +334,10 @@ public class VentaServiceImpl implements VentaService {
         List<Venta> listResult;
         try {
             if (filterText == null || filterText.isEmpty()) {
-                listResult = ventaRepository.findAllByEmpresa(empresa, java.sql.Timestamp.valueOf(dateStartTime),
+                listResult = ventaRepository.findAllByEmpresaAndFechaVenta(empresa, java.sql.Timestamp.valueOf(dateStartTime),
                         java.sql.Timestamp.valueOf(dateEndTime), offsetBasedPageRequest);
             } else {
-                listResult = ventaRepository.search(empresa, filterText, java.sql.Timestamp.valueOf(dateStartTime),
+                listResult = ventaRepository.searchByFechaVenta(empresa, filterText, java.sql.Timestamp.valueOf(dateStartTime),
                         java.sql.Timestamp.valueOf(dateEndTime), offsetBasedPageRequest);
             }
 
@@ -354,6 +372,16 @@ public class VentaServiceImpl implements VentaService {
         }
         logger.info("<-- " + methodName + " - " + listResult.size());
         return listResult;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    public Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente, LocalDate fechaVenta)
+            throws Exception {
+        
+        Venta venta = saveVenta(usuario, listVenta, cliente, fechaVenta);
+        processItemsVenta(listVenta, venta);
+        return venta;
     }
 
 }

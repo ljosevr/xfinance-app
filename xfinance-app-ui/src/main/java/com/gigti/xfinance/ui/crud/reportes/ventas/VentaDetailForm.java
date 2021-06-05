@@ -1,6 +1,7 @@
 package com.gigti.xfinance.ui.crud.reportes.ventas;
 
 import com.gigti.xfinance.backend.data.*;
+import com.gigti.xfinance.backend.others.DateUtils;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -28,6 +29,7 @@ public class VentaDetailForm extends Dialog {
     private final H2 titleForm;
     private final TextField tfFactura;
     private final DatePicker dpFecha;
+    private final DatePicker dpFechaVenta;
     private final BigDecimalField bdFDescuento;
     private final BigDecimalField bdfVentaTotal;
     private final VentaItemGrid itemsGrid;
@@ -51,8 +53,11 @@ public class VentaDetailForm extends Dialog {
         tfFactura.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         tfFactura.setReadOnly(true);
 
-        dpFecha = new DatePicker("Fecha");
+        dpFecha = new DatePicker("Fecha Creación");
         dpFecha.setReadOnly(true);
+
+        dpFechaVenta = new DatePicker("Fecha Venta");
+        dpFechaVenta.setReadOnly(true);
 
         bdFDescuento = new BigDecimalField("Descuento");
         bdFDescuento.setReadOnly(true);
@@ -82,7 +87,7 @@ public class VentaDetailForm extends Dialog {
         HorizontalLayout actionsLayout = new HorizontalLayout();
         actionsLayout.add(btnClose);
 
-        content.add(titleForm, tfFactura, dpFecha, bdFDescuento, bdfVentaTotal, tfClienteIdentificacion, tfClienteNombre, vlGrid, actionsLayout);
+        content.add(titleForm, tfFactura, dpFecha, dpFechaVenta, bdFDescuento, bdfVentaTotal, tfClienteIdentificacion, tfClienteNombre, vlGrid, actionsLayout);
 
         content.setColspan(titleForm, content.getResponsiveSteps().size()+1);
         content.setColspan(vlGrid, content.getResponsiveSteps().size()+1);
@@ -103,10 +108,8 @@ public class VentaDetailForm extends Dialog {
                     item.setPrecioTotalCosto(item.getPrecioCosto().multiply(item.getCantidad())));
             itemsGrid.setItems(listaItems);
             tfFactura.setValue(venta.getNumeroFactura());
-            dpFecha.setValue(venta.getFechaCreacion().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate());
-
+            dpFecha.setValue(DateUtils.convertDateToLocalDate(venta.getFechaCreacion()));
+            dpFechaVenta.setValue(DateUtils.convertDateToLocalDate(venta.getFechaVentaEfectiva()));
             bdFDescuento.setValue(venta.getDescuentoFactura());
             bdfVentaTotal.setValue(venta.getTotalVenta());
 

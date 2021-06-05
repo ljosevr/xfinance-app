@@ -85,7 +85,7 @@ public class VentasView extends VerticalLayout implements ICrudView<Venta> {
     @Override
     public void configureSearchLayout() {
 
-        searchLayout = new SearchFilterAndDatesComponent("", true,
+        searchLayout = new SearchFilterAndDatesComponent("", false,
                 "", " # factura",
                 "", true,
                 "", true,

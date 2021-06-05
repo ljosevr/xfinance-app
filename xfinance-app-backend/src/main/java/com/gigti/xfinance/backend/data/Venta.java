@@ -42,6 +42,11 @@ public class Venta extends AbstractEntity {
     private Date fechaCreacion;
 
     @NotNull
+    @Column(name = "fecha_venta_efectiva")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date fechaVentaEfectiva;
+
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn
     private Usuario usuario;

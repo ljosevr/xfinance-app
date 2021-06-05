@@ -1,12 +1,20 @@
 package com.gigti.xfinance.ui.crud.pventa;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import com.gigti.xfinance.backend.data.Cliente;
 import com.gigti.xfinance.backend.data.Empresa;
 import com.gigti.xfinance.backend.data.Persona;
 import com.gigti.xfinance.backend.data.Venta;
 import com.gigti.xfinance.backend.data.dto.PventaDTO;
+import com.gigti.xfinance.backend.others.AllUtils;
 import com.gigti.xfinance.backend.others.Constantes;
-import com.gigti.xfinance.backend.others.HandledException;
 import com.gigti.xfinance.backend.others.Response;
 import com.gigti.xfinance.backend.services.ClienteService;
 import com.gigti.xfinance.backend.services.TipoService;
@@ -14,17 +22,22 @@ import com.gigti.xfinance.backend.services.VentaService;
 import com.gigti.xfinance.ui.MainLayout;
 import com.gigti.xfinance.ui.authentication.CurrentUser;
 import com.gigti.xfinance.ui.crud.cliente.ClienteForm;
-import com.gigti.xfinance.backend.others.AllUtils;
 import com.gigti.xfinance.ui.util.MyResponsiveStep;
 import com.gigti.xfinance.ui.util.NotificacionesUtil;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -38,9 +51,6 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-
-import java.math.BigDecimal;
-import java.util.*;
 
 @Route(value = Constantes.VIEW_R_VENTA, layout = MainLayout.class)
 @RouteAlias(value = Constantes.VIEW_R_VENTA, layout = MainLayout.class)
@@ -66,6 +76,7 @@ public class PventaView extends VerticalLayout {
     private Cliente cliente;
     private ClienteService clienteService;
     private final ClienteForm clienteForm;
+    private DatePicker fechaVentaEfectiva;
 
     public PventaView(VentaService ventaService, ClienteService clienteService, TipoService tipoService) {
         this.ventaService = ventaService;
@@ -153,8 +164,16 @@ public class PventaView extends VerticalLayout {
         filter.setAutoselect(true);
         filter.addFocusShortcut(Key.F3);
         filter.getElement().setAttribute("title","F3");
-        //filter.setMaxWidth("70%");
+        filter.setClassName("filter");
         filter.addKeyPressListener(Key.ENTER, evt -> search());
+        filter.setMaxWidth("300px");
+
+        fechaVentaEfectiva = new DatePicker();
+        fechaVentaEfectiva.setPlaceholder("Fecha Venta");
+        fechaVentaEfectiva.getElement().setAttribute("theme", "align-center");
+        fechaVentaEfectiva.setValue(LocalDate.now());
+        fechaVentaEfectiva.setRequired(true);
+        fechaVentaEfectiva.setMaxWidth("190px");
 
         Button btnSearch = new Button("", new Icon(VaadinIcon.SEARCH));
         btnSearch.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -172,7 +191,7 @@ public class PventaView extends VerticalLayout {
         btnClient.addClickListener(click -> dialogCliente(null, true));
         btnClient.setMaxWidth("120px");
 
-        topFormLayout.add(filter, btnSearch, btnClient);
+        topFormLayout.add(filter, fechaVentaEfectiva, btnSearch, btnClient);
 
         filter.focus();
 
@@ -307,10 +326,15 @@ public class PventaView extends VerticalLayout {
 
 
     private void validateSave(Collection<PventaDTO> items, boolean sourceClient) {
-        if(cliente == null) {
-            dialogCliente(items, sourceClient);
+        if(fechaVentaEfectiva.isEmpty()){
+            NotificacionesUtil.showError("Fecha de Venta No Puede estar vacio");
+            fechaVentaEfectiva.focus();
         } else {
-            saveSell(mapItemsventa.values(),false);
+            if(cliente == null) {
+                dialogCliente(items, sourceClient);
+            } else {
+                saveSell(mapItemsventa.values(),false);
+            }
         }
     }
 
@@ -417,7 +441,7 @@ public class PventaView extends VerticalLayout {
     private void saveSell(Collection<PventaDTO> items, boolean sourceCliente) {
         if(!sourceCliente) {
             try {
-                Venta venta = ventaService.registrarVenta(CurrentUser.get(), new ArrayList<>(items), cliente);
+                Venta venta = ventaService.registrarVenta(CurrentUser.get(), new ArrayList<>(items), cliente, fechaVentaEfectiva.getValue());
                 if (venta == null) {
                     NotificacionesUtil.showError("Error al generar factura");
                 } else {

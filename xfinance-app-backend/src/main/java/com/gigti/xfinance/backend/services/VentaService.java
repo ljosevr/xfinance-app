@@ -24,6 +24,17 @@ public interface VentaService {
 
     Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente) throws Exception;
 
+    /**
+     * Nuevo metodo que contiene el campo de Fecha de Venta Efectiva
+     * @param usuario
+     * @param listVenta
+     * @param cliente
+     * @param fechaVenta
+     * @return
+     * @throws Exception
+     */
+    Venta registrarVenta(Usuario usuario, List<PventaDTO> listVenta, Cliente cliente, LocalDate fechaVenta) throws Exception;
+
     boolean deleteAllVentas(Empresa emp, List<Producto> productoList);
 
     int count(String filter, Empresa empresa, LocalDate inicio, LocalDate fin);
