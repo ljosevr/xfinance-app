@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
@@ -19,6 +20,7 @@ public class NotificacionesUtil {
     private static Button confirmButton;
     private static Button cancelButton;
     private static Dialog dialogConfirmation;
+    private static Dialog dialogNotification;
 
     public static void openProgressBar(String mensaje, boolean cerrarEsc, boolean cerrarClickOutSide){
         ProgressBar progressBar = new ProgressBar();
@@ -59,6 +61,34 @@ public class NotificacionesUtil {
         dialogConfirmation.open();
     }
 
+    public static void showDialogNotification(String mensaje, boolean cerrarEsc, boolean cerrarClickOutSide, boolean success){
+        VerticalLayout layout = new VerticalLayout();
+        Span content = new Span();
+        content.setText(mensaje);
+        confirmButton = new Button("Cerrar");
+        if(success){
+            content.getStyle().set("color", "green");
+            confirmButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_SMALL);
+        } else {
+            content.getStyle().set("color", "red");
+            confirmButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+        }
+        
+        confirmButton.addClickShortcut(Key.ENTER);
+        confirmButton.addClickListener(listener -> dialogNotification.close());
+        confirmButton.focus();
+        
+        
+        layout.add(content);
+        layout.add(confirmButton);
+
+        dialogNotification = new Dialog();
+        dialogNotification.add(layout);
+        dialogNotification.setCloseOnEsc(cerrarEsc);
+        dialogNotification.setCloseOnOutsideClick(cerrarClickOutSide);
+        dialogNotification.open();
+    }
+
     public static Button getSiButton() {
         return confirmButton;
     }
@@ -82,7 +112,7 @@ public class NotificacionesUtil {
     }
 
     public static void showError(String msg){
-        Notification notification = Notification.show(msg, 5000, Notification.Position.MIDDLE);
+        Notification notification = Notification.show(msg, 15000, Notification.Position.MIDDLE);
         notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
     }
 

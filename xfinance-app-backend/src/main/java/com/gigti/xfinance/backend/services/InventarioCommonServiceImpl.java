@@ -21,6 +21,7 @@ import com.gigti.xfinance.backend.repositories.InventarioActualCostoRepository;
 import com.gigti.xfinance.backend.repositories.InventarioActualRepository;
 import com.gigti.xfinance.backend.repositories.InventarioInicialRepository;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -395,7 +396,11 @@ public class InventarioCommonServiceImpl implements InventarioCommonService {
                     result.add(invActualCosto);
                 }
             } else {
-                throw new HandledException("1", "Error al encontrar Inventario");
+                if(CollectionUtils.isNotEmpty(listInvActualCosto)) {                    
+                    throw new HandledException("1", "Inventario No Existe o esta en Cero(0) - producto: "+listInvActualCosto.get(0).getProducto().getNombreProducto());
+                } else {
+                    throw new HandledException("1", "Error al encontrar Inventario");
+                }
             }
         }
         logger.info("<-- setInvCosto_Venta");

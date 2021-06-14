@@ -443,13 +443,13 @@ public class PventaView extends VerticalLayout {
             try {
                 Venta venta = ventaService.registrarVenta(CurrentUser.get(), new ArrayList<>(items), cliente, fechaVentaEfectiva.getValue());
                 if (venta == null) {
-                    NotificacionesUtil.showError("Error al generar factura");
+                    NotificacionesUtil.showDialogNotification("Error al generar factura",true, false,false);
                 } else {
-                    NotificacionesUtil.showSuccess("Factura Generada: " + venta.getNumeroFactura());
+                    NotificacionesUtil.showDialogNotification("Factura Generada: " + venta.getNumeroFactura(),true, false,true);
                     clearAll();
                 }
             } catch(Exception e) {
-                NotificacionesUtil.showError(e.getMessage());
+                NotificacionesUtil.showDialogNotification(e.getMessage(),true, false,false);
             }
         }
     }
